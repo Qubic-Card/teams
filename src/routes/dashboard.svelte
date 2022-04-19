@@ -1,13 +1,4 @@
-<script context="module">
-  export async function load() {
-    return {
-      status: 301,
-      redirect: '/dashboard',
-    };
-  }
-</script>
-
-<!-- <div class="flex flex-col lg:flex-row justify-between text-white">
+<div class="flex flex-col lg:flex-row justify-between text-white">
   <div
     class="flex-1 flex flex-col items-start justify-between bg-black lg:mr-4 p-8 text-2xl md:text-4xl lg:text-5xl font-bold h-56 mb-4 lg:mb-0 lg:h-80"
   >
@@ -51,4 +42,4 @@
   <div class="bg-white text-black w-[200px] md:w-[300px] lg:w-[700px]">
     No Content
   </div>
-</div> -->
+</div>
