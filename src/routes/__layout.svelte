@@ -1,5 +1,10 @@
 <script>
-  import "../app.css";
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { slide, fly } from 'svelte/transition';
+  import '../app.css';
 </script>
 
-<slot />
+<div class="relative min-h-screen">
+  <slot />
+</div>
