@@ -11,39 +11,43 @@
   const sidebarItem = [
     {
       title: 'dashboard',
+      pathname: '/teams/dashboard',
       urldefault:
         'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-home-essentials-tanah-basah-basic-outline-tanah-basah-2.png',
       url: 'home-white.svg',
       handler: () => {
-        goto('/dashboard');
+        goto('/teams/dashboard');
         // isSidebarOpened && sidebarHandler();
       },
     },
     {
       title: 'company',
+      pathname: '/teams/company',
       urldefault: 'https://img.icons8.com/windows/32/000000/company.png',
       url: 'company-white.svg',
       handler: () => {
-        goto('/company');
+        goto('/teams/company');
         // isSidebarOpened && sidebarHandler();
       },
     },
     {
-      title: 'employee',
+      title: 'member',
+      pathname: '/teams/member',
       urldefault:
         'https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-user-user-flatart-icons-outline-flatarticons-2.png',
       url: 'users-white.svg',
       handler: () => {
-        goto('/employee');
+        goto('/teams/member');
         // isSidebarOpened && sidebarHandler();
       },
     },
     {
       title: 'settings',
+      pathname: '/teams/settings',
       urldefault: 'https://img.icons8.com/ios/50/000000/settings--v1.png',
       url: 'settings-white.svg',
       handler: () => {
-        goto('/settings');
+        goto('/teams/settings');
         // isSidebarOpened && sidebarHandler();
       },
     },
@@ -90,7 +94,9 @@
           class={`flex cursor-pointer items-center justify-between h-16 w-full ${
             isSidebarOpened && 'px-12 w-full'
           } ${
-            $page.routeId === item.title ? 'w-full bg-black text-white' : ''
+            $page.url.pathname === item.pathname
+              ? 'w-full bg-black text-white'
+              : ''
           }`}
           on:click={item.handler}
         >
