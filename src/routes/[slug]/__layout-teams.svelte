@@ -2,61 +2,69 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { slide, fly } from 'svelte/transition';
+  import { onMount } from 'svelte';
   import '../../app.css';
 
   let isSidebarOpened = false;
-
-  const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
+  let team = '';
 
   const sidebarItem = [
     {
       title: 'dashboard',
-      pathname: '/teams/dashboard',
+      routeId: '[slug]/dashboard@teams',
       urldefault:
         'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-home-essentials-tanah-basah-basic-outline-tanah-basah-2.png',
       url: 'home-white.svg',
       handler: () => {
-        goto('/teams/dashboard');
-        // isSidebarOpened && sidebarHandler();
+        goto(`/${team}/dashboard`);
+        isSidebarOpened && sidebarHandler();
       },
     },
     {
       title: 'company',
-      pathname: '/teams/company',
+      routeId: '[slug]/company@teams',
       urldefault: 'https://img.icons8.com/windows/32/000000/company.png',
       url: 'company-white.svg',
       handler: () => {
-        goto('/teams/company');
-        // isSidebarOpened && sidebarHandler();
+        goto(`/${team}/company`);
+        isSidebarOpened && sidebarHandler();
       },
     },
     {
-      title: 'member',
-      pathname: '/teams/member',
+      title: 'users',
+      routeId: '[slug]/users@teams',
       urldefault:
         'https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-user-user-flatart-icons-outline-flatarticons-2.png',
       url: 'users-white.svg',
       handler: () => {
-        goto('/teams/member');
-        // isSidebarOpened && sidebarHandler();
+        goto(`/${team}/users`);
+        isSidebarOpened && sidebarHandler();
       },
     },
     {
       title: 'settings',
-      pathname: '/teams/settings',
+      routeId: '[slug]/settings@teams',
       urldefault: 'https://img.icons8.com/ios/50/000000/settings--v1.png',
       url: 'settings-white.svg',
       handler: () => {
-        goto('/teams/settings');
-        // isSidebarOpened && sidebarHandler();
+        goto(`/${team}/settings`);
+        isSidebarOpened && sidebarHandler();
       },
     },
   ];
+
+  const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
+
+  onMount(() => {
+    if (localStorage.getItem('team')) {
+      team = localStorage.getItem('team');
+    }
+  });
 </script>
 
 <div class="relative min-h-screen">
   <div
-    class="fixed left-0 right-0 h-20 bg-white text-gray-800 flex justify-between items-center border-r border-b border-black pr-2 py-4 z-30"
+    class="fixed left-0 right-0 h-20 bg-neutral-800 text-gray-100 flex justify-between items-center border-r border-b border-black pr-2 py-4 z-30"
   >
     <div class="flex justify-center items-center h-auto">
       {#if isSidebarOpened}
@@ -74,7 +82,7 @@
           on:click={sidebarHandler}
         />
       {/if}
-      <h1 class="text-5xl font-bold ml-4">Tahesta</h1>
+      <h1 class="text-5xl font-bold ml-4">{team}</h1>
     </div>
     <img
       src="https://via.placeholder.com/60"
@@ -84,20 +92,16 @@
   </div>
 
   <div
-    class={`overflow-y-auto bg-white w-20 fixed top-20 bottom-0 left-0 z-10 flex flex-col items-center transition-all duration-300 ease-in-out ${
+    class={`overflow-y-auto bg-neutral-800 w-20 fixed top-20 bottom-0 left-0 z-10 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
       isSidebarOpened ? 'w-full md:w-72' : ''
     }`}
   >
     <nav class="space-y-1 w-full flex flex-col items-center">
       {#each sidebarItem as item}
         <div
-          class={`flex cursor-pointer items-center justify-between h-16 w-full ${
+          class={`flex cursor-pointer items-center justify-between h-16 w-full text-gray-100 ${
             isSidebarOpened && 'px-12 w-full'
-          } ${
-            $page.url.pathname === item.pathname
-              ? 'w-full bg-black text-white'
-              : ''
-          }`}
+          } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''}`}
           on:click={item.handler}
         >
           {#if isSidebarOpened}
@@ -116,7 +120,7 @@
   </div>
 
   <div
-    class="absolute top-20 bottom-0 pt-4 pl-24 pr-4 bg-neutral-200 overflow-y-auto w-full"
+    class="absolute top-20 bottom-0 pt-4 pl-24 pr-4 bg-black overflow-y-auto w-full"
   >
     <slot />
   </div>

@@ -1,0 +1,1 @@
+<div class={`animate-spin rounded-full ${$$props.class} border-t-2 border-b-2`}></div>

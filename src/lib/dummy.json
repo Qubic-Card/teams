@@ -1,0 +1,80 @@
+{
+  "firstname": "Hello",
+  "lastname": "World",
+  "job": "",
+  "company": "",
+  "avatar": "/favicon.svg",
+  "design": {
+    "background": "https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+    "primary": "#121212",
+    "secondary": "#FFFFFF",
+    "accent": "#0000FF"
+  },
+  "socials": [
+    {
+      "link": "https://twitter.com",
+      "icon": "https://img.icons8.com/ios/50/000000/twitter.png"
+    },
+    {
+      "link": "https://youtube.com",
+      "icon": "https://img.icons8.com/ios/50/000000/youtube-play--v1.png"
+    },
+    {
+      "link": "https://facebook.com",
+      "icon": "https://img.icons8.com/ios/50/000000/facebook-new.png"
+    },
+    {
+      "link": "https://linkedin.com",
+      "icon": "https://img.icons8.com/external-tal-revivo-light-tal-revivo/24/000000/external-linkedin-a-business-and-employment-oriented-service-mobile-app-logo-light-tal-revivo.png"
+    },
+    {
+      "link": "https://whatsapp.com",
+      "icon": "https://img.icons8.com/material-outlined/24/000000/whatsapp--v1.png"
+    },
+    {
+      "link": "https://instagram.com",
+      "icon": "https://img.icons8.com/ios/50/000000/instagram-new--v1.png"
+    }
+  ],
+  "body": [
+    {
+      "type": "text",
+      "data": "Hi, I'm Chris and this is a demo page for Qubic business card"
+    },
+    {
+      "type": "social",
+      "data": {
+        "twitter": "https://twitter.com",
+        "youtube": "https://youtube.com",
+        "facebook": "https://facebook.com",
+        "linkedin": "https://linkedin.com",
+        "whatsapp": "https://whatsapp.com",
+        "instagram": "https://instagram.com"
+      }
+    },
+    {
+      "type": "link",
+      "data": {
+        "link": "http://qubic.id",
+        "title": "Come and see my website",
+        "icon": "https://img.icons8.com/fluency-systems-regular/48/000000/centralized-network.png"
+      }
+    },
+    {
+      "type": "link",
+      "data": {
+        "link": "http://qubic.id",
+        "title": "Come and see my website",
+        "icon": "https://img.icons8.com/fluency-systems-regular/48/000000/centralized-network.png"
+      }
+    },
+    {
+      "type": "link",
+      "data": {
+        "link": "http://qubic.id",
+        "title": "Come and see my website",
+        "icon": "https://img.icons8.com/fluency-systems-regular/48/000000/centralized-network.png"
+      }
+    }
+  ]
+}

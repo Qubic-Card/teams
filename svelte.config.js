@@ -1,7 +1,9 @@
-import adapter from "@sveltejs/adapter-auto";
-import preprocess from "svelte-preprocess";
+import preprocess from 'svelte-preprocess';
+import netlify from '@sveltejs/adapter-netlify';
+import path from 'path';
 
 /** @type {import('@sveltejs/kit').Config} */
+
 const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
@@ -12,7 +14,16 @@ const config = {
   ],
 
   kit: {
-    adapter: adapter(),
+    adapter: netlify(),
+    vite: {
+      resolve: {
+        alias: {
+          '@pages': path.resolve('./src/pages'),
+          '@comp': path.resolve('./src/components'),
+          '@lib': path.resolve('./src/lib'),
+        },
+      },
+    },
   },
 };
 
