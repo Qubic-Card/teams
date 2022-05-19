@@ -1,9 +1,10 @@
 <script>
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import { slide, fly } from 'svelte/transition';
   import '../app.css';
 </script>
+
+<svelte:head>
+  <title>Qubic Card | Teams</title>
+</svelte:head>
 
 <div class="relative min-h-screen">
   <slot />

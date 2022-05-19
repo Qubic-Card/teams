@@ -1,17 +1,25 @@
 <script>
-	import { goto } from "$app/navigation";
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { Switch } from '@rgossiaux/svelte-headlessui';
 
   export let member;
-  export let team;
 
-  const toProfileEditor = (slug) => goto(`/${team}/users/${slug}`);
+  $: console.log(member);
+  const toProfileEditor = (slug) =>
+    goto(`/${$page.params.slug}/members/${slug}`);
 </script>
 
-<div class="flex flex-col justify-between w-full h-72 bg-neutral-800 p-4 cursor-pointer" on:click={() => toProfileEditor(member.uid)}>
+<div
+  class="flex flex-col justify-between w-full h-72 bg-neutral-800 p-4 cursor-pointer"
+  on:click={() => toProfileEditor(member.uid)}
+>
   <div>
-    <h1 class="text-4xl">{member.name}</h1>
-    <h2 class="text-3xl">{member.position}</h2>
+    <h1 class="text-4xl">
+      {member.metadata.firstname}
+      {member.metadata.lastname}
+    </h1>
+    <h2 class="text-3xl">{member.metadata.job}</h2>
   </div>
   <Switch
     checked={member.isActive}

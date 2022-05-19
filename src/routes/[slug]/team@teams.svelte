@@ -1,14 +1,10 @@
 <script>
   import Input from '@comp/input.svelte';
-  import Profile from '@pages/profile.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
-  import { socials, links } from '@lib/stores/editorStore';
-  import { go } from '@lib/utils/forwarder';
-  import SelectBackgroundModal from '@comp/modals/selectBackgroundModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import ProfileEditorSkeleton from '@comp/skeleton/profileEditorSkeleton.svelte';
-  import FilePond, { registerPlugin } from 'svelte-filepond';
+  import CompanySkeleton from '@comp/skeleton/companySkeleton.svelte';
 
+  import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
   import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
@@ -16,6 +12,7 @@
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
+  import { socials, links } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -31,6 +28,8 @@
     MenuItem,
     Transition,
   } from '@rgossiaux/svelte-headlessui';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
   // Register the plugins
   registerPlugin(
@@ -44,6 +43,23 @@
 
   let pond;
   let name = 'filepond';
+  let teamId;
+  let isLoading = false;
+
+  let teamData = {
+    company: '',
+    address: '',
+    email: '',
+    phone: '',
+    avatar: '',
+    socials: $socials,
+    links: $links,
+    design: {
+      theme: 'dark',
+      background: '',
+    },
+  };
+  // let team = [];
 
   // handle filepond events
   function handleInit() {
@@ -61,7 +77,7 @@
       .from('avatars')
       .getPublicUrl(`${$user.id}/${file.filename}`);
 
-    profileData.avatar = publicURL;
+    teamData.avatar = publicURL;
     await handleSave();
   };
 
@@ -74,91 +90,14 @@
       : toastFailed('Only 5 link allowed for free members');
   };
 
-  let isLoading = false;
-
-  let profileData = {
-    firstname: '',
-    lastname: '',
-    job: '',
-    company: '',
-    avatar: '',
-    socials: $socials,
-    links: $links,
-    design: {
-      theme: 'dark',
-      background: '',
-    },
-  };
-  let profileId = null;
-  let query = 'background';
-  let url;
-  let unsplashDatas;
-  let showModal = false;
-  let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-
-  $: $socials.map((social) => {
-    if (social.data === '') social.isActive = false;
-    if (social.data !== '') social.isActive = true;
-    return social;
-  });
-
-  $: $links.map((link) => {
-    if (link.title === '' || link.link === '') link.isActive = false;
-    if (link.title !== '' && link.link !== '') link.isActive = true;
-    return link;
-  });
-
-  const modalHandler = () => (showModal = !showModal);
-  const handlePick = async (item) => {
-    profileData.design.background = item.detail.urls.regular;
-    await handleSave();
-  };
-
-  const searchQuery = (val) => (query = val.detail);
-  const getUnsplash = async () => {
-    try {
-      url =
-        `https://api.unsplash.com/search/photos?page=1&query=${query}&client_id=` +
-        accessKey;
-      const res = await fetch(url);
-      const data = await res.json();
-
-      unsplashDatas = data.results;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  $: query, getUnsplash();
-
-  const getProfile = async () => {
-    isLoading = true;
-    let { data, error } = await supabase
-      .from('profile')
-      .select('*')
-      .eq('uid', '39ba7789-537c-4b0f-a8a7-c8a8345838f3');
-
-    if (data) {
-      const profile = data[0]['metadata'];
-      profileData = { ...profile };
-      $socials = profile['socials'];
-      $links = profile['links'];
-      profileId = data[0]['id'];
-    }
-    if (error) console.log(error);
-    setTimeout(() => {
-      isLoading = false;
-    }, 1000);
-    return data;
-  };
-
   const handleSave = async () => {
-    profileData.socials = $socials;
-    profileData.links = $links;
+    teamData.socials = $socials;
+    teamData.links = $links;
     const { error } = await supabase
-      .from('profile')
-      .update({ metadata: profileData }, { returning: 'minimal' })
-      .eq('uid', $user.id);
+      .from('teams')
+      .update({ metadata: teamData }, { returning: 'minimal' })
+      .eq('name', $page.params.slug);
+
     if (error) {
       toastFailed();
       console.log(error);
@@ -194,8 +133,41 @@
     await handleSave();
   };
 
-  $: getProfile();
+  $: console.log($page.params.slug);
 
+  const getTeamsDetail = async () => {
+    const { data, error } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('name', $page.params.slug);
+
+    if (error) console.log(error);
+
+    if (data) {
+      const team = data[0].metadata;
+      // console.log(team);
+      // console.log(data);
+      teamData = { ...team };
+      $socials = team['socials'];
+      $links = team['links'];
+      teamId = team['id'];
+      $socials.map((social) => {
+        if (social.type === 'phone') teamData.phone = social.data;
+        if (social.type === 'email') teamData.email = social.data;
+      });
+    }
+    return data;
+  };
+  $: getTeamsDetail();
+  $: {
+    console.log($socials);
+    // console.log($links);
+    console.log(teamData);
+  }
+  // onMount(async () => {
+  //   await getTeamsDetail();
+  // });
+  // $: console.log(team.company);
   const toNewTab = async (type, data) => {
     switch (type) {
       case 'whatsapp':
@@ -233,18 +205,19 @@
 
 <div class="min-h-screen bg-white flex justify-center">
   {#if isLoading}
-    <ProfileEditorSkeleton />
+    <CompanySkeleton />
   {:else}
-    <div class="md:px-20 px-4 w-full bg-black">
-      <div class="grid grid-cols-2 gap-2 text-black mt-8">
-        <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
+    <div class="w-full bg-black">
+      <div class="text-black mt-8 mx-8">
+        <div class="flex flex-col w-full mb-10">
           <TabGroup>
             <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
               <Tab
                 class={({ selected }) =>
                   selected
                     ? 'bg-white text-black p-2 rounded-md'
-                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}>Bio</Tab
+                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}
+                >Company Profile</Tab
               >
               <Tab
                 class={({ selected }) =>
@@ -263,32 +236,32 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div class="border-b-zinc-300 border mb-4">
-                  <div class="p-3 bg-neutral-800 grid grid-cols-2 space-x-5">
+                  <div class="px-3 pt-3 bg-neutral-800">
                     <Input
                       on:change={handleSave}
-                      placeholder="Hello"
-                      title="First Name"
-                      bind:value={profileData.firstname}
+                      placeholder="Company Name"
+                      title="Name"
+                      bind:value={teamData.company}
                     />
                     <Input
                       on:change={handleSave}
-                      placeholder="World"
-                      title="Last Name"
-                      bind:value={profileData.lastname}
+                      placeholder="Address"
+                      title="Address"
+                      bind:value={teamData.address}
                     />
                   </div>
-                  <div class="p-3 bg-neutral-800">
+                  <div class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5">
                     <Input
                       on:change={handleSave}
-                      placeholder="example company"
-                      title="Company"
-                      bind:value={profileData.company}
+                      placeholder="Email"
+                      title="Email"
+                      bind:value={teamData.email}
                     />
                     <Input
                       on:change={handleSave}
-                      placeholder="Hiring Manager"
-                      title="Job"
-                      bind:value={profileData.job}
+                      placeholder="Phone Number"
+                      title="Phone Number"
+                      bind:value={teamData.phone}
                     />
                   </div>
                   <div class="p-3 bg-neutral-800">
@@ -301,7 +274,7 @@
                       acceptedFileTypes={['image/png', 'image/jpeg']}
                       instantUpload={false}
                       imageCropAspectRatio={1 / 1}
-                      labelIdle="Add Profile Picture"
+                      labelIdle="Add Team Logo"
                       allowMultiple={false}
                       oninit={handleInit}
                       onpreparefile={handleAddFile}
@@ -316,18 +289,6 @@
                           return transforms;
                         },
                       }}
-                    />
-                    <button
-                      on:click={modalHandler}
-                      class="w-full text-black bg-neutral-500 rounded-md p-5 mt-2"
-                      >Select Background</button
-                    >
-                    <SelectBackgroundModal
-                      on:showModal={modalHandler}
-                      on:pickImage={handlePick}
-                      on:searchQuery={searchQuery}
-                      {showModal}
-                      {unsplashDatas}
                     />
                   </div>
                 </div>
@@ -537,16 +498,6 @@
               </TabPanel>
             </TabPanels>
           </TabGroup>
-        </div>
-        <div
-          class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
-        >
-          <Profile
-            class="min-h-screen"
-            isEditorMode={true}
-            data={profileData}
-            id={profileId}
-          />
         </div>
       </div>
     </div>

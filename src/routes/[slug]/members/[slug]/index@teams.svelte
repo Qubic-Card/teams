@@ -16,7 +16,6 @@
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
-  import { onDestroy } from 'svelte';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -32,6 +31,7 @@
     MenuItem,
     Transition,
   } from '@rgossiaux/svelte-headlessui';
+  import { page } from '$app/stores';
 
   // Register the plugins
   registerPlugin(
@@ -62,7 +62,7 @@
       .from('avatars')
       .getPublicUrl(`${$user.id}/${file.filename}`);
 
-    companyData.avatar = publicURL;
+    profileData.avatar = publicURL;
     await handleSave();
   };
 
@@ -77,11 +77,11 @@
 
   let isLoading = false;
 
-  let companyData = {
-    name: '',
-    address: '',
-    email: '',
-    phone: '',
+  let profileData = {
+    firstname: '',
+    lastname: '',
+    job: '',
+    company: '',
     avatar: '',
     socials: $socials,
     links: $links,
@@ -90,25 +90,63 @@
       background: '',
     },
   };
+  let profileId = null;
+  let query = 'background';
+  let url;
+  let unsplashDatas;
+  let showModal = false;
+  let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
-  $: $socials.map((social) => {
-    if (social.data === '') social.isActive = false;
-    if (social.data !== '') social.isActive = true;
-    return social;
-  });
+  const modalHandler = () => (showModal = !showModal);
+  const handlePick = async (item) => {
+    profileData.design.background = item.detail.urls.regular;
+    await handleSave();
+  };
 
-  $: $links.map((link) => {
-    if (link.title === '' || link.link === '') link.isActive = false;
-    if (link.title !== '' && link.link !== '') link.isActive = true;
-    return link;
-  });
+  const searchQuery = (val) => (query = val.detail);
+  const getUnsplash = async () => {
+    try {
+      url =
+        `https://api.unsplash.com/search/photos?page=1&query=${query}&client_id=` +
+        accessKey;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      unsplashDatas = data.results;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  $: query, getUnsplash();
+
+  const getProfile = async () => {
+    isLoading = true;
+    let { data, error } = await supabase
+      .from('profile')
+      .select('*')
+      .eq('uid', $page.params.slug);
+
+    if (data) {
+      const profile = data[0]['metadata'];
+      profileData = { ...profile };
+      $socials = profile['socials'];
+      $links = profile['links'];
+      profileId = data[0]['id'];
+    }
+    if (error) console.log(error);
+    setTimeout(() => {
+      isLoading = false;
+    }, 1000);
+    return data;
+  };
 
   const handleSave = async () => {
-    companyData.socials = $socials;
-    companyData.links = $links;
+    profileData.socials = $socials;
+    profileData.links = $links;
     const { error } = await supabase
       .from('profile')
-      .update({ metadata: companyData }, { returning: 'minimal' })
+      .update({ metadata: profileData }, { returning: 'minimal' })
       .eq('uid', $user.id);
     if (error) {
       toastFailed();
@@ -144,6 +182,8 @@
     toastSuccess('Deleted successfully');
     await handleSave();
   };
+
+  $: getProfile();
 
   const toNewTab = async (type, data) => {
     switch (type) {
@@ -184,17 +224,16 @@
   {#if isLoading}
     <ProfileEditorSkeleton />
   {:else}
-    <div class="w-full bg-black">
-      <div class="text-black mt-8 mx-8">
-        <div class="flex flex-col w-full mb-10">
+    <div class="md:px-20 px-4 w-full bg-black">
+      <div class="grid grid-cols-2 gap-2 text-black mt-8">
+        <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           <TabGroup>
             <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
               <Tab
                 class={({ selected }) =>
                   selected
                     ? 'bg-white text-black p-2 rounded-md'
-                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}
-                >Company Profile</Tab
+                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}>Bio</Tab
               >
               <Tab
                 class={({ selected }) =>
@@ -213,32 +252,32 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div class="border-b-zinc-300 border mb-4">
-                  <div class="px-3 pt-3 bg-neutral-800">
+                  <div class="p-3 bg-neutral-800 grid grid-cols-2 space-x-5">
                     <Input
                       on:change={handleSave}
-                      placeholder="Company Name"
-                      title="Name"
-                      bind:value={companyData.name}
+                      placeholder="Hello"
+                      title="First Name"
+                      bind:value={profileData.firstname}
                     />
                     <Input
                       on:change={handleSave}
-                      placeholder="Address"
-                      title="Address"
-                      bind:value={companyData.address}
+                      placeholder="World"
+                      title="Last Name"
+                      bind:value={profileData.lastname}
                     />
                   </div>
-                  <div class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5">
+                  <div class="p-3 bg-neutral-800">
                     <Input
                       on:change={handleSave}
-                      placeholder="Email"
-                      title="Email"
-                      bind:value={companyData.email}
+                      placeholder="example company"
+                      title="Company"
+                      bind:value={profileData.company}
                     />
                     <Input
                       on:change={handleSave}
-                      placeholder="Phone Number"
-                      title="Phone Number"
-                      bind:value={companyData.phone}
+                      placeholder="Hiring Manager"
+                      title="Job"
+                      bind:value={profileData.job}
                     />
                   </div>
                   <div class="p-3 bg-neutral-800">
@@ -251,7 +290,7 @@
                       acceptedFileTypes={['image/png', 'image/jpeg']}
                       instantUpload={false}
                       imageCropAspectRatio={1 / 1}
-                      labelIdle="Add Team Logo"
+                      labelIdle="Add Profile Picture"
                       allowMultiple={false}
                       oninit={handleInit}
                       onpreparefile={handleAddFile}
@@ -266,6 +305,18 @@
                           return transforms;
                         },
                       }}
+                    />
+                    <button
+                      on:click={modalHandler}
+                      class="w-full text-black bg-neutral-500 rounded-md p-5 mt-2"
+                      >Select Background</button
+                    >
+                    <SelectBackgroundModal
+                      on:showModal={modalHandler}
+                      on:pickImage={handlePick}
+                      on:searchQuery={searchQuery}
+                      {showModal}
+                      {unsplashDatas}
                     />
                   </div>
                 </div>
@@ -475,6 +526,16 @@
               </TabPanel>
             </TabPanels>
           </TabGroup>
+        </div>
+        <div
+          class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
+        >
+          <Profile
+            class="min-h-screen"
+            isEditorMode={true}
+            data={profileData}
+            id={profileId}
+          />
         </div>
       </div>
     </div>
