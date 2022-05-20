@@ -3,12 +3,22 @@
   import { page } from '$app/stores';
   import MemberCard from '@comp/cards/memberCard.svelte';
   import { onMount } from 'svelte';
-  import Cookies from 'js-cookie';
 
-  let teamId = parseInt(Cookies.get('teamId'));
-  let memberss = [];
+  let members = [];
+
+  const getTeamId = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id');
+
+    if (error) console.log(error);
+    if (data) {
+      return data[0].team_id;
+    }
+  };
 
   const getTeamMembers = async () => {
+    let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('team_members')
       .select('profile(*)')
@@ -21,36 +31,14 @@
     }
   };
 
-  const members = [
-    { name: 'John Doe', position: 'CEO', isActive: true, uid: '1412' },
-    {
-      name: 'Jane Doe',
-      position: 'CFO',
-      isActive: false,
-      uid: '2352323',
-    },
-    {
-      name: 'John Smith',
-      position: 'CTO',
-      isActive: true,
-      uid: '675636',
-    },
-    {
-      name: 'Jane Smith',
-      position: 'CMO',
-      isActive: false,
-      uid: '92830958',
-    },
-  ];
   let team = [];
 
   onMount(async () => {
-    memberss = await getTeamMembers();
-    memberss = memberss.map((member) => member.profile);
+    members = await getTeamMembers();
+    members = members.map((member) => member.profile);
   });
   $: {
-    console.log(memberss, teamId);
-    // console.log(memberss.map((member) => member.profile));
+    console.log(members);
   }
 </script>
 
@@ -62,7 +50,7 @@
     {$page.params.slug}
   </div>
   <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">
-    {#each memberss as member}
+    {#each members as member}
       <MemberCard {member} />
     {/each}
   </div>

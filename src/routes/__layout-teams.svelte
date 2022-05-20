@@ -3,9 +3,10 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
-
+  import Cookies from 'js-cookie';
+  $: console.log($page);
   let isSidebarOpened = false;
-  let teamName = $page.params.slug.split('+').join(' ');
+  let teamName = Cookies.get('qubicTeamName');
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   let sidebarItems = [
     {
@@ -77,7 +78,7 @@
           on:click={sidebarHandler}
         />
       {/if}
-      <h1 class="text-5xl font-bold ml-4">{teamName}</h1>
+      <h1 class="text-5xl font-bold ml-4">{$page.params.slug ?? ''}</h1>
     </div>
     <img
       src="https://via.placeholder.com/60"

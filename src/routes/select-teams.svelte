@@ -28,12 +28,13 @@
   const addTeam = (item) => (teams = [...teams, item]);
 
   const chooseTeam = (team, id) => {
+    Cookies.set('qubicTeamName', team.split('+').join(' '));
+    Cookies.set('qubicTeamId', id);
     goto(`/${team}/dashboard`);
-    Cookies.set('teamId', id);
   };
 </script>
 
-<div class="h-screen flex flex-col gap-2 justify-center items-center">
+<div class="h-screen flex flex-col gap-2 justify-center items-center bg-white">
   <h1 class="text-2xl font-bold">Select team</h1>
   {#each teams as item}
     <div

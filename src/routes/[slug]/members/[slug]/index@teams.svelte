@@ -147,7 +147,7 @@
     const { error } = await supabase
       .from('profile')
       .update({ metadata: profileData }, { returning: 'minimal' })
-      .eq('uid', $user.id);
+      .eq('uid', $page.params.slug);
     if (error) {
       toastFailed();
       console.log(error);

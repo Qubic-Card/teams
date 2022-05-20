@@ -28,8 +28,6 @@
     MenuItem,
     Transition,
   } from '@rgossiaux/svelte-headlessui';
-  import { page } from '$app/stores';
-  import { onMount } from 'svelte';
 
   // Register the plugins
   registerPlugin(
@@ -90,13 +88,25 @@
       : toastFailed('Only 5 link allowed for free members');
   };
 
+  const getTeamId = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id');
+
+    if (error) console.log(error);
+    if (data) {
+      return data[0].team_id;
+    }
+  };
+
   const handleSave = async () => {
+    let teamId = await getTeamId();
     teamData.socials = $socials;
     teamData.links = $links;
     const { error } = await supabase
       .from('teams')
       .update({ metadata: teamData }, { returning: 'minimal' })
-      .eq('name', $page.params.slug);
+      .eq('id', teamId);
 
     if (error) {
       toastFailed();
@@ -133,17 +143,17 @@
     await handleSave();
   };
 
-  $: console.log($page.params.slug);
-
   const getTeamsDetail = async () => {
+    let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('teams')
       .select('*')
-      .eq('name', $page.params.slug);
+      .eq('id', teamId);
 
     if (error) console.log(error);
 
     if (data) {
+      console.log(data);
       const team = data[0].metadata;
       // console.log(team);
       // console.log(data);
