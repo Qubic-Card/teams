@@ -15,7 +15,7 @@
   let newRoles = [];
   let roles = [];
   let isOpen = false;
-  let roleName = 'Member';
+  let roleName = 'Member1';
 
   const getTeamId = async () => {
     const { data, error } = await supabase
@@ -61,7 +61,6 @@
     }
   };
 
-  let selectedVars = { X: { lts: [] } };
   $: {
     console.log(roleMapping);
     console.log(newRoles);
@@ -70,26 +69,15 @@
     // console.log(Object.keys(roles).map((key) => roles[key]));
     // console.log(Object.entries(roles).map(([key, value]) => [value]));
   }
-  // $: roleMapping.filter((item) => {
-  //   if (item.checked) {
-  //     newRoles = [...newRoles, item.name];
-  //   }
-  // });
-  // $: roleMapping.map((item) => {
-  //   if (item.checked === true) {
-  //     newRoles = [...newRoles, item.name];
-  //   }
-  // });
-  $: newRoles = [...new Set(newRoles)];
+
   $: getTeamsRoleMapping();
   const openModal = () => (isOpen = true);
   const closeModal = () => (isOpen = false);
-  // const setName = (e) => (roleName = e.detail.roleName);
+
   const addNewRole = (e) => {
     roleName = e.detail.roleName;
     newRoles = { ...roles, [roleName]: roleMapping };
   };
-  let isEditable = false;
 </script>
 
 <div class="min-h-screen flex gap-4">
@@ -108,35 +96,6 @@
         on:setName={addNewRole}
       />
     </div>
-    <h1 class="text-2xl mb-4">Admin</h1>
-    {#each roleMapping as role}
-      <div
-        class="flex w-full justify-between items-center bg-neutral-700 p-4 rounded-lg mb-2"
-      >
-        <div class="block">
-          <div class="mt-2">
-            <label class="inline-flex items-center cursor-pointer container">
-              <input
-                type="checkbox"
-                value={role.name}
-                bind:checked={role.checked}
-                on:change={(e) => {
-                  // role.checked = e.target.checked;
-                  console.log(e);
-                  newRoles = [...newRoles, e.target.value];
-                }}
-                class="cursor-pointer border-2 border-neutral-700 bg-red-500 w-7 h-7 checked:bg-red-600 shadow checked:shadow-xl rounded-lg after:bg-red-500 before:bg-red-200"
-              />
-              <span class="ml-2 checkmark">{role.name}</span>
-            </label>
-          </div>
-        </div>
-        <p class="w-2/3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus, nihil?
-        </p>
-      </div>
-    {/each}
-    <button on:click={() => (isEditable = !isEditable)}>EDIT</button>
     {#each Object.entries(roles) as [key, value]}
       <Disclosure let:open>
         <DisclosureButton
@@ -144,8 +103,13 @@
           >{key}</DisclosureButton
         >
         {#if open}
-          <Checkboxes checkboxes={roleMapping} bind:checked={value} />
-          {#each roleMapping as role}
+          <div transition:slide={{ duration: 500 }}>
+            <DisclosurePanel static>
+              <Checkboxes checkboxes={roleMapping} bind:checked={value} />
+            </DisclosurePanel>
+          </div>
+        {/if}
+        <!-- {#each roleMapping as role}
             <div transition:slide={{ duration: 500 }}>
               <DisclosurePanel static>
                 <div
@@ -153,7 +117,6 @@
                 >
                   <div class="block">
                     <div class="mt-2">
-                      <!-- <Checkboxes checkboxes={role.name} bind:checked={value} /> -->
                       {#if isEditable}
                         <label
                           class="inline-flex items-center cursor-pointer container"
@@ -188,7 +151,7 @@
               </DisclosurePanel>
             </div>
           {/each}
-        {/if}
+        {/if} -->
       </Disclosure>
     {/each}
   </div>
