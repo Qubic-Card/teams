@@ -1,10 +1,10 @@
 <script>
-  import { role, setNewRole } from '@lib/stores/roleStore';
+  import { role, setNewRole, roleName } from '@lib/stores/roleStore';
 
-  export let checkboxes, checked;
+  export let checkboxes, checked, updateTeamsRoleMapping;
   $: setNewRole(checked);
-  $: console.log($role);
-  $: console.log(checked);
+  // $: console.log($role);
+  // $: console.log(checked);
 </script>
 
 {#each checkboxes as checkbox}
@@ -13,14 +13,17 @@
   >
     <div class="block">
       <div class="mt-2">
-        <label>
+        <label class="flex cursor-pointer">
           <input
+            on:change={async () => await updateTeamsRoleMapping()}
             type="checkbox"
-            class="form-check-input"
+            class="w-7 h-7"
             bind:group={checked}
             value={checkbox.name}
           />
-          {checkbox.name}
+          <p class="ml-4">
+            {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
+          </p>
         </label>
       </div>
     </div>

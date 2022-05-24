@@ -1,6 +1,9 @@
 <script>
   import { goto } from '$app/navigation';
-
+  import supabase from '@lib/db';
+  import { user } from '@lib/stores/userStore';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  $: console.log($user);
   let loading = false;
   let email = '';
   let password = '';
@@ -8,22 +11,22 @@
   let isForgotPassword = false;
 
   const handleLogin = async () => {
-    goto('/select-teams');
-    // try {
-    //   loading = true;
-    //   const { error } = await supabase.auth.signIn({
-    //     email: email,
-    //     password: password,
-    //   });
-    //   if (error) throw error;
-    //   toastSuccess('Hello!');
-    //   loading = false;
-    //   isSuccessful = true;
-    //   setTimeout(() => location.reload(), 4000);
-    // } catch (error) {
-    //   toastFailed();
-    //   loading = false;
-    // }
+    // goto('/select-teams');
+    try {
+      loading = true;
+      const { error } = await supabase.auth.signIn({
+        email: email,
+        password: password,
+      });
+      if (error) throw error;
+      toastSuccess('Hello!');
+      loading = false;
+      isSuccessful = true;
+      setTimeout(() => location.reload(), 4000);
+    } catch (error) {
+      toastFailed();
+      loading = false;
+    }
   };
 
   const forgotPassword = () => {
@@ -44,23 +47,24 @@
   };
 </script>
 
-<section class="flex h-screen">
+<section class="flex h-screen bg-black/90">
   <div
-    class="lg:w-1/3 w-full border-2 bg-white border-neutral-300 px-16 py-32 my-auto mx-6 md:mx-14 lg:mx-auto"
+    class="lg:w-1/3 w-full border-2 bg-black/90 text-white border-neutral-300 px-16 py-32 my-auto mx-6 md:mx-14 lg:mx-auto"
   >
+    <h1 class="text-4xl font-bold mb-4">Qubic Team</h1>
     {#if !isSuccessful}
       <a href="/" class="flex items-center w-32 mb-4 font-medium md:mb-0">
         <img src="/qubic.svg" alt="" />
       </a>
       <h1
-        class="mt-6 text-2xl font-semibold text-black tracking-tighter text-left sm:text-3xl title-font"
+        class="mt-6 text-2xl font-semibold tracking-tighter text-left sm:text-3xl title-font"
       >
         {isForgotPassword ? 'We got you!' : 'Hi, Welcome Back!'}
       </h1>
       <div class="mt-6">
         <div>
           <p
-            class="block text-sm font-medium leading-relaxed tracking-tighter text-left text-black"
+            class="block text-sm font-medium leading-relaxed tracking-tighter text-left"
           >
             Email Address
           </p>
@@ -74,7 +78,7 @@
           />
           {#if !isForgotPassword}
             <p
-              class="block text-sm font-medium leading-relaxed mt-3 tracking-tighter text-left text-black"
+              class="block text-sm font-medium leading-relaxed mt-3 tracking-tighter text-left"
             >
               Password
             </p>
@@ -106,20 +110,20 @@
           <h1>loading</h1>
         {/if}
 
-        <p class="mt-3 text-black cursor-pointer" on:click={forgotPassword}>
+        <p class="mt-3 cursor-pointer" on:click={forgotPassword}>
           {isForgotPassword ? 'Back' : 'Forgot password?'}
         </p>
 
-        <p class="mt-3 text-black">
+        <p class="mt-3">
           Don't have a card? Get <a
-            class="underline text-black font-bold"
+            class="underline font-bold"
             href="/pages/order">one</a
           > now!
         </p>
       </div>
     {:else}
       <div>
-        <h1 class="text-3xl font-extrabold text-black uppercase">Success!</h1>
+        <h1 class="text-3xl font-extrabold uppercase">Success!</h1>
         <div class="flex flex-row">
           <p class="pr-3 text-neutral-700">Redirecting you to your page</p>
         </div>

@@ -1,6 +1,6 @@
 <script>
   import roleMapping from '@lib/role';
-  import AddNewRoleModal from '@comp/modals/addNewRoleModal.svelte';
+  import RenameModal from '@comp/modals/renameModal.svelte';
   import supabase from '@lib/db';
   import {
     Disclosure,
@@ -9,14 +9,18 @@
   } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
   import Checkboxes from '@comp/checkbox.svelte';
-  import { role, setNewRole } from '@lib/stores/roleStore';
+  import {
+    role,
+    roleName,
+    setNewRole,
+    setRoleName,
+  } from '@lib/stores/roleStore';
+  import { log } from '@lib/logger/logger';
 
-  // let teamId = parseInt(Cookies.get('teamId'));
   let newRoles = [];
   let roles = [];
   let isOpen = false;
-  let roleName = 'Member1';
-
+  $: roles;
   const getTeamId = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -39,16 +43,22 @@
 
     if (data) {
       roles = data[0].role_mapping;
-      return data[0].role_mapping;
+      // return data[0].role_mapping;
     }
   };
 
-  const updateTeamsRoleMapping = async () => {
+  const updateTeamsRoleMapping = async (isNewRole = false) => {
     let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('teams')
       .update(
-        { role_mapping: Object.assign(roles, { [roleName]: $role }) },
+        {
+          role_mapping: Object.assign(roles, {
+            [isNewRole ? 'member12' : $roleName]: isNewRole
+              ? roleMapping
+              : $role,
+          }),
+        },
         { returning: 'minimal' }
       )
       .eq('id', teamId);
@@ -62,96 +72,62 @@
   };
 
   $: {
-    console.log(roleMapping);
-    console.log(newRoles);
-    console.log(roles);
+    console.log('role map', roleMapping);
+    // console.log(newRoles);
+    console.log('roles', roles);
+    console.log('role', $role);
     // console.log('setting', roleName);
     // console.log(Object.keys(roles).map((key) => roles[key]));
-    // console.log(Object.entries(roles).map(([key, value]) => [value]));
+    console.log(Object.entries(roles).map(([key, value]) => [key, value]));
   }
 
   $: getTeamsRoleMapping();
+  // $: updateTeamsRoleMapping();
   const openModal = () => (isOpen = true);
   const closeModal = () => (isOpen = false);
-
-  const addNewRole = (e) => {
-    roleName = e.detail.roleName;
-    newRoles = { ...roles, [roleName]: roleMapping };
-  };
 </script>
 
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
     <div class="flex justify-between items-center mb-4">
       <h1 class="font-bold text-3xl">Role Settings</h1>
-      <button
+      <!-- <button
         class="p-4 w-56 bg-white text-black rounded-lg"
         on:click={openModal}>+ add new role</button
+      > -->
+      <button
+        class="p-4 w-56 bg-white text-black rounded-lg"
+        on:click={async () => await updateTeamsRoleMapping(true)}
+        >+ Add new role</button
       >
-      <button on:click={updateTeamsRoleMapping}>TEST UPDATE</button>
-      <AddNewRoleModal
-        {isOpen}
-        on:close={closeModal}
-        {roleName}
-        on:setName={addNewRole}
-      />
+      <!-- <AddNewRoleModal {isOpen} on:close={closeModal} {roles} /> --->
     </div>
     {#each Object.entries(roles) as [key, value]}
       <Disclosure let:open>
-        <DisclosureButton
-          class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg"
-          >{key}</DisclosureButton
-        >
+        <RenameModal {isOpen} on:close={closeModal} {roles} {key} />
+        <div class="flex justify-between items-center">
+          <DisclosureButton
+            on:click={() => setRoleName(key)}
+            class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between"
+          >
+            {key.charAt(0).toUpperCase() + key.slice(1)}
+          </DisclosureButton>
+          <button
+            class="bg-white text-black p-1 text-sm h-10"
+            on:click={openModal}>edit</button
+          >
+        </div>
         {#if open}
           <div transition:slide={{ duration: 500 }}>
             <DisclosurePanel static>
-              <Checkboxes checkboxes={roleMapping} bind:checked={value} />
+              <Checkboxes
+                checkboxes={roleMapping}
+                bind:checked={value}
+                {updateTeamsRoleMapping}
+              />
             </DisclosurePanel>
           </div>
         {/if}
-        <!-- {#each roleMapping as role}
-            <div transition:slide={{ duration: 500 }}>
-              <DisclosurePanel static>
-                <div
-                  class="flex w-full justify-between items-center bg-neutral-800 p-4 rounded-lg mb-2"
-                >
-                  <div class="block">
-                    <div class="mt-2">
-                      {#if isEditable}
-                        <label
-                          class="inline-flex items-center cursor-pointer container"
-                        >
-                          <input
-                            type="checkbox"
-                            bind:group={newRoles}
-                            value={role.name}
-                            class="cursor-pointer border-2 border-neutral-700 bg-red-500 w-7 h-7 checked:bg-red-600 shadow checked:shadow-xl rounded-lg after:bg-red-500 before:bg-red-200"
-                          />
-                          <span class="ml-2 checkmark">{role.name}</span>
-                        </label>
-                      {:else}
-                        <label
-                          class="inline-flex items-center cursor-pointer container"
-                        >
-                          <input
-                            type="checkbox"
-                            bind:group={value}
-                            value={role.name}
-                            class="cursor-pointer border-2 border-neutral-700 bg-red-500 w-7 h-7 checked:bg-red-600 shadow checked:shadow-xl rounded-lg after:bg-red-500 before:bg-red-200"
-                          />
-                          <span class="ml-2 checkmark">{role.name}</span>
-                        </label>
-                      {/if}
-                    </div>
-                  </div>
-                  <p class="w-1/2">
-                    {role.desc}
-                  </p>
-                </div>
-              </DisclosurePanel>
-            </div>
-          {/each}
-        {/if} -->
       </Disclosure>
     {/each}
   </div>
