@@ -1,11 +1,28 @@
+<script context="module">
+  import supabase from '@lib/db.js';
+  export async function load(ctx) {
+    if (!supabase.auth.user()) {
+      return {
+        // headers: {
+        //   Location: '/',
+        // },
+        redirect: '/',
+        status: 302,
+      };
+    }
+    return {};
+  }
+</script>
+
 <script>
   import { user } from '@lib/stores/userStore';
-  import supabase from '@lib/db.js';
   import { goto } from '$app/navigation';
-  import Cookies from 'js-cookie';
   import { page } from '$app/stores';
 
   $user = supabase.auth.user();
+  // $: console.log('wrap', $user);
+  $: console.log(supabase.auth.user());
+  // $: console.log('wrap', $page);
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event == 'SIGNED_IN') {
@@ -23,9 +40,7 @@
     }
     if (event == 'SIGNED_OUT') {
       user.set(null);
-      await goto('/', {
-        noscroll: true,
-      });
+      await goto('/', { noscroll: true });
     } else {
       user.set(null);
     }

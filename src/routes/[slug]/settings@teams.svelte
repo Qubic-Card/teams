@@ -1,25 +1,28 @@
 <script>
-  import roleMapping from '@lib/role';
-  import RenameModal from '@comp/modals/renameModal.svelte';
-  import supabase from '@lib/db';
-  import {
-    Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
-  } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
-  import Checkboxes from '@comp/checkbox.svelte';
+  import roleMapping from '@lib/role';
+  import supabase from '@lib/db';
   import {
     role,
     roleName,
     setNewRole,
     setRoleName,
   } from '@lib/stores/roleStore';
+  import {
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    Switch,
+  } from '@rgossiaux/svelte-headlessui';
+  import RenameModal from '@comp/modals/renameModal.svelte';
+  import Checkboxes from '@comp/checkbox.svelte';
   import { log } from '@lib/logger/logger';
 
   let newRoles = [];
   let roles = [];
   let isOpen = false;
+  let isAutoRenew = false;
+  let loading = false;
   $: roles;
   const getTeamId = async () => {
     const { data, error } = await supabase
@@ -33,17 +36,22 @@
   };
 
   const getTeamsRoleMapping = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('teams')
-      .select('role_mapping')
-      .eq('id', teamId);
+    loading = true;
+    try {
+      let teamId = await getTeamId();
+      const { data, error } = await supabase
+        .from('teams')
+        .select('role_mapping')
+        .eq('id', teamId);
 
-    if (error) console.log(error);
+      loading = false;
+      if (error) throw error;
 
-    if (data) {
-      roles = data[0].role_mapping;
-      // return data[0].role_mapping;
+      if (data) {
+        roles = data[0].role_mapping;
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -72,23 +80,65 @@
   };
 
   $: {
-    console.log('role map', roleMapping);
+    console.log(loading);
+    // console.log('role map', roleMapping);
     // console.log(newRoles);
-    console.log('roles', roles);
-    console.log('role', $role);
+    // console.log('roles', roles);
+    // console.log('role', $role);
     // console.log('setting', roleName);
     // console.log(Object.keys(roles).map((key) => roles[key]));
-    console.log(Object.entries(roles).map(([key, value]) => [key, value]));
+    // console.log(Object.entries(roles).map(([key, value]) => [key, value]));
   }
 
   $: getTeamsRoleMapping();
   // $: updateTeamsRoleMapping();
-  const openModal = () => (isOpen = true);
-  const closeModal = () => (isOpen = false);
+  const openModal = () => {
+    console.log('open modal', isOpen);
+    isOpen = !isOpen;
+  };
+  const closeModal = () => {
+    console.log('close modal');
+    isOpen = false;
+  };
 </script>
 
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
+    <div class="flex flex-col my-4">
+      {#if loading}
+        <h1>Loading</h1>
+      {/if}
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="font-bold text-3xl">Billing</h1>
+        <button
+          class="p-4 w-56 bg-white text-black rounded-lg"
+          on:click={async () => await console.log('billing')}
+          >Tambah saldo</button
+        >
+      </div>
+      <p>Subscription valid hingga: 12 Feb 2023</p>
+      <p>Saldo tersisa: 0</p>
+      <div
+        class="flex justify-between items-center p-3 rounded-full mt-4 bg-neutral-800"
+      >
+        <p>Aktifkan auto renew</p>
+        <Switch
+          checked={isAutoRenew}
+          on:change={(e) => (isAutoRenew = e.detail)}
+          class={`flex justify-center items-center self-end rounded-full w-12 h-8 ${
+            isAutoRenew ? 'bg-green-600' : 'bg-neutral-600'
+          }`}
+        >
+          <span
+            class={`inline-block w-5 h-5 bg-white rounded-full transition-transform duration-300 ease-in-out ${
+              isAutoRenew ? 'translate-x-2' : '-translate-x-2'
+            }`}
+            class:toggle-on={isAutoRenew}
+            class:toggle-off={!isAutoRenew}
+          />
+        </Switch>
+      </div>
+    </div>
     <div class="flex justify-between items-center mb-4">
       <h1 class="font-bold text-3xl">Role Settings</h1>
       <!-- <button
@@ -103,20 +153,25 @@
       <!-- <AddNewRoleModal {isOpen} on:close={closeModal} {roles} /> --->
     </div>
     {#each Object.entries(roles) as [key, value]}
+      <RenameModal {isOpen} {roles} {key} />
+
       <Disclosure let:open>
-        <RenameModal {isOpen} on:close={closeModal} {roles} {key} />
-        <div class="flex justify-between items-center">
-          <DisclosureButton
-            on:click={() => setRoleName(key)}
-            class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between"
-          >
-            {key.charAt(0).toUpperCase() + key.slice(1)}
-          </DisclosureButton>
-          <button
-            class="bg-white text-black p-1 text-sm h-10"
-            on:click={openModal}>edit</button
-          >
-        </div>
+        {#if loading}
+          <h1>Loading...</h1>
+        {:else}
+          <div class="flex justify-between items-center">
+            <DisclosureButton
+              on:click={() => setRoleName(key)}
+              class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between"
+            >
+              {key.charAt(0).toUpperCase() + key.slice(1)}
+            </DisclosureButton>
+            <button
+              class="bg-neutral-900 w-12 rounded-md p-1 text-sm h-16"
+              on:click={openModal}>edit</button
+            >
+          </div>
+        {/if}
         {#if open}
           <div transition:slide={{ duration: 500 }}>
             <DisclosurePanel static>
@@ -133,8 +188,7 @@
   </div>
   <div class="flex flex-col w-1/3 rounded-lg gap-4">
     <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
-      <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
-      <p>Berikan permissions yang sesuai di setiao role.</p>
+      <p class="mb-4">Atur subscription dalam billing</p>
     </div>
     <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
       <p class="mb-4">Role settings adalah tempat untuk setting role.</p>

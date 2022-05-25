@@ -8,8 +8,16 @@
   import { user } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import supabase from '@lib/db';
+  import useAuth from '@lib/useAuth.js';
+  import { onMount } from 'svelte';
+  import { role } from '@lib/stores/roleStore';
+  import { setMemberRights } from '@lib/stores/memberRightsStore';
 
-  $: console.log($page);
+  // $: console.log($page);
+  // const useAuth = async () => {
+  //   if (user) await goto('/');
+  // };
+  // $: useAuth($user);
   $: console.log('team layout', $user);
 
   let isSidebarOpened = false;
@@ -31,30 +39,90 @@
   //   return data;
   // };
   // $: getProfile();
+  let allData = [];
+  let memberRole = [];
+  let roleMapping = [];
+  let memberRight = [];
+
+  const getTeamId = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id');
+
+    if (error) console.log(error);
+    if (data) {
+      return data[0].team_id;
+    }
+  };
+
+  const getTeamMembers = async () => {
+    let teamId = await getTeamId();
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id(*), role')
+      .eq('team_id', teamId);
+
+    if (error) console.log(error);
+
+    if (data) {
+      console.log(data);
+      return data;
+    }
+  };
+
+  onMount(async () => {
+    allData = await getTeamMembers();
+    memberRole = allData.map((member) => member.role);
+    roleMapping = allData.map((member) => member.team_id.role_mapping);
+    memberRight = Object.entries(roleMapping[0] ?? []).map(([key, value]) =>
+      [key].map((item) => {
+        if (item === memberRole[0]) {
+          return value;
+        }
+      })
+    );
+    memberRight = memberRight.filter((item) => item[0] !== undefined);
+    memberRight = memberRight.map((item) => item[0]);
+  });
+
+  $: setMemberRights(memberRight);
+
   $: console.log(userImg);
   let sidebarItems = [
     {
       title: 'dashboard',
       routeId: '[slug]/dashboard@teams',
-      urldefault: '/home-white.svg',
+      urldefault:
+        'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
       handler: () => {
         goto(`/${teamName}/dashboard`);
         isSidebarOpened && sidebarHandler();
       },
     },
     {
-      title: 'team',
-      routeId: '[slug]/team@teams',
-      urldefault: '/company-white.svg',
+      title: 'connections',
+      routeId: '[slug]/connections@teams',
+      urldefault:
+        'https://img.icons8.com/external-icongeek26-outline-icongeek26/64/ffffff/external-connection-data-analytics-icongeek26-outline-icongeek26.png',
       handler: () => {
-        goto(`/${teamName}/team`);
+        goto(`/${teamName}/connections`);
+        isSidebarOpened && sidebarHandler();
+      },
+    },
+    {
+      title: 'analytics',
+      routeId: '[slug]/analytics@teams',
+      urldefault: 'https://img.icons8.com/windows/96/ffffff/area-chart.png',
+      handler: () => {
+        goto(`/${teamName}/analytics`);
         isSidebarOpened && sidebarHandler();
       },
     },
     {
       title: 'members',
       routeId: '[slug]/members@teams',
-      urldefault: '/users-white.svg',
+      urldefault:
+        'https://img.icons8.com/ios/100/ffffff/user-group-man-man.png',
       handler: () => {
         goto(`/${teamName}/members`);
         isSidebarOpened && sidebarHandler();
@@ -63,7 +131,8 @@
     {
       title: 'settings',
       routeId: '[slug]/settings@teams',
-      urldefault: '/settings-white.svg',
+      urldefault:
+        'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
       handler: () => {
         goto(`/${teamName}/settings`);
         isSidebarOpened && sidebarHandler();
@@ -79,7 +148,9 @@
 <AuthWrapper>
   <div class="relative min-h-screen">
     <div
-      class="fixed left-0 right-0 h-20 flex justify-between items-center pr-2 py-4 z-30 border-r-2 border-b-2 border-neutral-700 text-gray-100"
+      class={`fixed left-0 right-0 h-20 flex justify-between items-center pr-2 py-4 z-30 border-r-2 border-b-2 border-neutral-700 text-gray-100 ${
+        isSidebarOpened ? 'bg-black' : 'bg-zinc-900/50'
+      }`}
     >
       <div class="flex justify-center items-center h-auto">
         {#if isSidebarOpened}
@@ -125,7 +196,11 @@
           <div
             class={`flex cursor-pointer items-center justify-between h-16 w-full text-gray-100 ${
               isSidebarOpened && 'px-12 w-full'
-            } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''}`}
+            } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''} ${
+              isSidebarOpened && $page.routeId === item.routeId
+                ? 'bg-neutral-900'
+                : ''
+            }`}
             on:click={item.handler}
           >
             {#if isSidebarOpened}

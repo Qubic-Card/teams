@@ -3,7 +3,11 @@
   import { page } from '$app/stores';
   import MemberCard from '@comp/cards/memberCard.svelte';
   import { onMount } from 'svelte';
+  import { user } from '@lib/stores/userStore';
+  import { memberRights } from '@lib/stores/memberRightsStore';
+  $: console.log($memberRights);
 
+  let allData = [];
   let members = [];
 
   const getTeamId = async () => {
@@ -21,7 +25,7 @@
     let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('team_members')
-      .select('profile(*)')
+      .select('role, profile(*), team_id(*)')
       .eq('team_id', teamId);
 
     if (error) console.log(error);
@@ -31,13 +35,12 @@
     }
   };
 
-  let team = [];
-
   onMount(async () => {
-    members = await getTeamMembers();
-    members = members.map((member) => member.profile);
+    allData = await getTeamMembers();
+    members = allData.map((member) => member.profile);
   });
   $: {
+    // console.log(allData, members, memberRole, roleMapping, memberRight[0]);
     console.log(members);
   }
 </script>
@@ -49,9 +52,26 @@
   >
     {$page.params.slug}
   </div>
+  {#each $memberRights as item, i}
+    {#if item[i] === 'allow_read_members'}
+      <p>allowed read members</p>
+    {:else}
+      <p>denies read members</p>
+    {/if}
+  {/each}
   <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">
-    {#each members as member}
-      <MemberCard {member} />
+    {#each $memberRights as item, i}
+      {#each members as member}
+        {#if member.uid === $user.id}
+          <MemberCard {member} />
+        {:else if item[i] === 'allow_read_members'}
+          <MemberCard {member} />
+        {:else}
+          <div class="bg-neutral-800 w-full h-full">
+            You are not allowed to read members
+          </div>
+        {/if}
+      {/each}
     {/each}
   </div>
 </div>

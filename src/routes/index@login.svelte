@@ -3,6 +3,8 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import Spinner from '@comp/loading/spinner.svelte';
+
   $: console.log($user);
   let loading = false;
   let email = '';
@@ -107,7 +109,7 @@
             >
           {/if}
         {:else}
-          <h1>loading</h1>
+          <Spinner class="h-8 w-8 my-4" />
         {/if}
 
         <p class="mt-3 cursor-pointer" on:click={forgotPassword}>
@@ -117,7 +119,7 @@
         <p class="mt-3">
           Don't have a card? Get <a
             class="underline font-bold"
-            href="/pages/order">one</a
+            href="https://qubic.id/pages/order">one</a
           > now!
         </p>
       </div>
@@ -125,7 +127,7 @@
       <div>
         <h1 class="text-3xl font-extrabold uppercase">Success!</h1>
         <div class="flex flex-row">
-          <p class="pr-3 text-neutral-700">Redirecting you to your page</p>
+          <p class="pr-3 mt-2">Redirecting you to your page</p>
         </div>
       </div>
     {/if}
