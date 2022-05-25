@@ -1,10 +1,32 @@
 <script>
+  import supabase from '@lib/db';
+
   import { role, setNewRole, roleName } from '@lib/stores/roleStore';
 
-  export let checkboxes, checked, updateTeamsRoleMapping;
+  export let checkboxes, checked, roles, id;
+
   $: setNewRole(checked);
-  // $: console.log($role);
-  // $: console.log(checked);
+  const updateTeamsRoleMapping = async () => {
+    const { data, error } = await supabase
+      .from('team_roles')
+      .update(
+        {
+          role_maps: $role,
+        },
+        { returning: 'minimal' }
+      )
+      .eq('id', id);
+
+    if (error) console.log(error);
+
+    if (data) {
+      console.log(data);
+      return data;
+    }
+  };
+
+  $: console.log('ROLE STORE', $role);
+  $: console.log('CHECKED', checked);
 </script>
 
 {#each checkboxes as checkbox}

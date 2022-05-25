@@ -1,7 +1,7 @@
 export const theme = {
   dark: {
     pageBackground: 'bg-neutral-900',
-    text: 'text-neutral-600',
+    text: 'text-white',
     border: 'border-neutral-700',
     secondary: 'bg-neutral-800',
   },

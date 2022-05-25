@@ -1,14 +1,10 @@
 <script>
   import Input from '@comp/input.svelte';
-  import Profile from '@pages/profile.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
-  import { socials, links } from '@lib/stores/editorStore';
-  import { go } from '@lib/utils/forwarder';
-  import SelectBackgroundModal from '@comp/modals/selectBackgroundModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import ProfileEditorSkeleton from '@comp/skeleton/profileEditorSkeleton.svelte';
-  import FilePond, { registerPlugin } from 'svelte-filepond';
+  import CompanySkeleton from '@comp/skeleton/companySkeleton.svelte';
 
+  import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
   import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
@@ -16,6 +12,7 @@
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
+  import { socials, links } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -31,8 +28,8 @@
     MenuItem,
     Transition,
   } from '@rgossiaux/svelte-headlessui';
-  import { page } from '$app/stores';
-
+  import { memberRights } from '@lib/stores/memberRightsStore';
+  $: console.log($memberRights);
   // Register the plugins
   registerPlugin(
     FilePondPluginImageExifOrientation,
@@ -45,6 +42,23 @@
 
   let pond;
   let name = 'filepond';
+  let teamId;
+  let isLoading = false;
+
+  let teamData = {
+    company: '',
+    address: '',
+    email: '',
+    phone: '',
+    avatar: '',
+    socials: $socials,
+    links: $links,
+    design: {
+      theme: 'dark',
+      background: '',
+    },
+  };
+  // let team = [];
 
   // handle filepond events
   function handleInit() {
@@ -62,7 +76,7 @@
       .from('avatars')
       .getPublicUrl(`${$user.id}/${file.filename}`);
 
-    profileData.avatar = publicURL;
+    teamData.avatar = publicURL;
     await handleSave();
   };
 
@@ -75,79 +89,26 @@
       : toastFailed('Only 5 link allowed for free members');
   };
 
-  let isLoading = false;
-
-  let profileData = {
-    firstname: '',
-    lastname: '',
-    job: '',
-    company: '',
-    avatar: '',
-    socials: $socials,
-    links: $links,
-    design: {
-      theme: 'dark',
-      background: '',
-    },
-  };
-  let profileId = null;
-  let query = 'background';
-  let url;
-  let unsplashDatas;
-  let showModal = false;
-  let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-
-  const modalHandler = () => (showModal = !showModal);
-  const handlePick = async (item) => {
-    profileData.design.background = item.detail.urls.regular;
-    await handleSave();
-  };
-
-  const searchQuery = (val) => (query = val.detail);
-  const getUnsplash = async () => {
-    try {
-      url =
-        `https://api.unsplash.com/search/photos?page=1&query=${query}&client_id=` +
-        accessKey;
-      const res = await fetch(url);
-      const data = await res.json();
-
-      unsplashDatas = data.results;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  $: query, getUnsplash();
-
-  const getProfile = async () => {
-    isLoading = true;
-    let { data, error } = await supabase
+  const getTeamId = async () => {
+    const { data, error } = await supabase
       .from('team_members')
-      .select('team_profile, uid')
-      .eq('uid', $page.params.slug);
+      .select('team_id');
 
-    if (data) {
-      const profile = data[0]['team_profile'];
-      profileData = { ...profile };
-      $socials = profile['socials'];
-      $links = profile['links'];
-      profileId = data[0]['id'];
-    }
     if (error) console.log(error);
-    setTimeout(() => {
-      isLoading = false;
-    }, 1000);
-    return data;
+    if (data) {
+      return data[0].team_id;
+    }
   };
 
   const handleSave = async () => {
-    profileData.socials = $socials;
-    profileData.links = $links;
+    let teamId = await getTeamId();
+    teamData.socials = $socials;
+    teamData.links = $links;
     const { error } = await supabase
-      .from('team_members')
-      .update({ team_profile: profileData }, { returning: 'minimal' })
-      .eq('uid', $page.params.slug);
+      .from('teams')
+      .update({ metadata: teamData }, { returning: 'minimal' })
+      .eq('id', teamId);
+
     if (error) {
       toastFailed();
       console.log(error);
@@ -183,7 +144,34 @@
     await handleSave();
   };
 
-  $: getProfile();
+  const getTeamsDetail = async () => {
+    let teamId = await getTeamId();
+    const { data, error } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('id', teamId);
+
+    if (error) console.log(error);
+
+    if (data) {
+      const team = data[0].metadata;
+      teamData = { ...team };
+      $socials = team['socials'];
+      $links = team['links'];
+      teamId = team['id'];
+      $socials.map((social) => {
+        if (social.type === 'phone') teamData.phone = social.data;
+        if (social.type === 'email') teamData.email = social.data;
+      });
+    }
+    return data;
+  };
+  $: getTeamsDetail();
+  $: {
+    // console.log($socials);
+    // console.log($links);
+    // console.log(teamData);
+  }
 
   const toNewTab = async (type, data) => {
     switch (type) {
@@ -220,20 +208,21 @@
   };
 </script>
 
-<div class="min-h-screen bg-white flex justify-center">
+<div class="flex justify-center">
   {#if isLoading}
-    <ProfileEditorSkeleton />
+    <CompanySkeleton />
   {:else}
-    <div class="md:px-20 px-4 w-full bg-black">
-      <div class="grid grid-cols-2 gap-2 text-black mt-8">
-        <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
+    <div class="w-full">
+      <div class="text-black">
+        <div class="flex flex-col w-full">
           <TabGroup>
             <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
               <Tab
                 class={({ selected }) =>
                   selected
                     ? 'bg-white text-black p-2 rounded-md'
-                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}>Bio</Tab
+                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}
+                >Company Profile</Tab
               >
               <Tab
                 class={({ selected }) =>
@@ -252,32 +241,32 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div class="border-b-zinc-300 border mb-4">
-                  <div class="p-3 bg-neutral-800 grid grid-cols-2 space-x-5">
+                  <div class="px-3 pt-3 bg-neutral-800">
                     <Input
                       on:change={handleSave}
-                      placeholder="Hello"
-                      title="First Name"
-                      bind:value={profileData.firstname}
+                      placeholder="Company Name"
+                      title="Name"
+                      bind:value={teamData.company}
                     />
                     <Input
                       on:change={handleSave}
-                      placeholder="World"
-                      title="Last Name"
-                      bind:value={profileData.lastname}
+                      placeholder="Address"
+                      title="Address"
+                      bind:value={teamData.address}
                     />
                   </div>
-                  <div class="p-3 bg-neutral-800">
+                  <div class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5">
                     <Input
                       on:change={handleSave}
-                      placeholder="example company"
-                      title="Company"
-                      bind:value={profileData.company}
+                      placeholder="Email"
+                      title="Email"
+                      bind:value={teamData.email}
                     />
                     <Input
                       on:change={handleSave}
-                      placeholder="Hiring Manager"
-                      title="Job"
-                      bind:value={profileData.job}
+                      placeholder="Phone Number"
+                      title="Phone Number"
+                      bind:value={teamData.phone}
                     />
                   </div>
                   <div class="p-3 bg-neutral-800">
@@ -290,7 +279,7 @@
                       acceptedFileTypes={['image/png', 'image/jpeg']}
                       instantUpload={false}
                       imageCropAspectRatio={1 / 1}
-                      labelIdle="Add Profile Picture"
+                      labelIdle="Add Team Logo"
                       allowMultiple={false}
                       oninit={handleInit}
                       onpreparefile={handleAddFile}
@@ -305,18 +294,6 @@
                           return transforms;
                         },
                       }}
-                    />
-                    <button
-                      on:click={modalHandler}
-                      class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"
-                      >Select Background</button
-                    >
-                    <SelectBackgroundModal
-                      on:showModal={modalHandler}
-                      on:pickImage={handlePick}
-                      on:searchQuery={searchQuery}
-                      {showModal}
-                      {unsplashDatas}
                     />
                   </div>
                 </div>
@@ -526,16 +503,6 @@
               </TabPanel>
             </TabPanels>
           </TabGroup>
-        </div>
-        <div
-          class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
-        >
-          <Profile
-            class="min-h-screen"
-            isEditorMode={true}
-            data={profileData}
-            id={profileId}
-          />
         </div>
       </div>
     </div>

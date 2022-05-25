@@ -16,10 +16,10 @@
 >
   <div>
     <h1 class="text-4xl">
-      {member.metadata.firstname}
-      {member.metadata.lastname}
+      {member.team_profile.firstname}
+      {member.team_profile.lastname}
     </h1>
-    <h2 class="text-3xl">{member.metadata.job}</h2>
+    <h2 class="text-3xl">{member.team_profile.job}</h2>
   </div>
   <Switch
     checked={member.isActive}

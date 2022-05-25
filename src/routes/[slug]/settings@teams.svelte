@@ -17,12 +17,15 @@
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
   import { log } from '@lib/logger/logger';
+  import TeamEditor from '@pages/teamEditor.svelte';
+  import { memberRights } from '@lib/stores/memberRightsStore';
 
   let newRoles = [];
   let roles = [];
   let isOpen = false;
   let isAutoRenew = false;
   let loading = false;
+  let isHasPermission = false;
   $: roles;
   const getTeamId = async () => {
     const { data, error } = await supabase
@@ -39,71 +42,60 @@
     loading = true;
     try {
       let teamId = await getTeamId();
+      console.log(teamId);
       const { data, error } = await supabase
-        .from('teams')
-        .select('role_mapping')
-        .eq('id', teamId);
+        .from('team_roles')
+        .select('*')
+        .eq('team_id', teamId);
 
       loading = false;
       if (error) throw error;
 
       if (data) {
-        roles = data[0].role_mapping;
+        console.log('data', data);
+        roles = data;
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const updateTeamsRoleMapping = async (isNewRole = false) => {
+  const addRoleHandler = async () => {
     let teamId = await getTeamId();
     const { data, error } = await supabase
-      .from('teams')
-      .update(
-        {
-          role_mapping: Object.assign(roles, {
-            [isNewRole ? 'member12' : $roleName]: isNewRole
-              ? roleMapping
-              : $role,
-          }),
-        },
-        { returning: 'minimal' }
-      )
+      .from('team_roles')
+      .insert({
+        role_maps: roleMapping.map((role) => role.name),
+        role_name: 'test',
+        team_id: teamId,
+      })
       .eq('id', teamId);
-
-    if (error) console.log(error);
-
-    if (data) {
-      console.log(data);
-      return data;
-    }
   };
 
   $: {
-    console.log(loading);
+    // console.log(loading);
     // console.log('role map', roleMapping);
     // console.log(newRoles);
-    // console.log('roles', roles);
+    console.log('roles', roles);
     // console.log('role', $role);
     // console.log('setting', roleName);
-    // console.log(Object.keys(roles).map((key) => roles[key]));
-    // console.log(Object.entries(roles).map(([key, value]) => [key, value]));
+    console.log($memberRights);
   }
 
-  $: getTeamsRoleMapping();
-  // $: updateTeamsRoleMapping();
-  const openModal = () => {
-    console.log('open modal', isOpen);
-    isOpen = !isOpen;
-  };
-  const closeModal = () => {
-    console.log('close modal');
-    isOpen = false;
-  };
+  $: {
+    getTeamsRoleMapping();
+
+    $memberRights?.filter((item) => {
+      if (item === 'allow_read_team') isHasPermission = true;
+    });
+  }
 </script>
 
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
+    {#if isHasPermission}
+      <TeamEditor />
+    {/if}
     <div class="flex flex-col my-4">
       {#if loading}
         <h1>Loading</h1>
@@ -147,29 +139,24 @@
       > -->
       <button
         class="p-4 w-56 bg-white text-black rounded-lg"
-        on:click={async () => await updateTeamsRoleMapping(true)}
-        >+ Add new role</button
+        on:click={async () => await addRoleHandler()}>+ Add new role</button
       >
       <!-- <AddNewRoleModal {isOpen} on:close={closeModal} {roles} /> --->
     </div>
-    {#each Object.entries(roles) as [key, value]}
-      <RenameModal {isOpen} {roles} {key} />
-
+    {#each roles as role}
       <Disclosure let:open>
         {#if loading}
           <h1>Loading...</h1>
         {:else}
           <div class="flex justify-between items-center">
             <DisclosureButton
-              on:click={() => setRoleName(key)}
+              on:click={() => setRoleName(role.role_name)}
               class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between"
             >
-              {key.charAt(0).toUpperCase() + key.slice(1)}
+              <!-- {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)} -->
+              {role.role_name}
             </DisclosureButton>
-            <button
-              class="bg-neutral-900 w-12 rounded-md p-1 text-sm h-16"
-              on:click={openModal}>edit</button
-            >
+            <RenameModal roleName={role.role_name} id={role.id} />
           </div>
         {/if}
         {#if open}
@@ -177,8 +164,9 @@
             <DisclosurePanel static>
               <Checkboxes
                 checkboxes={roleMapping}
-                bind:checked={value}
-                {updateTeamsRoleMapping}
+                bind:checked={role.role_maps}
+                {roles}
+                id={role.id}
               />
             </DisclosurePanel>
           </div>

@@ -6,6 +6,7 @@
   import { slide } from 'svelte/transition';
   import Cookies from 'js-cookie';
   import { user } from '@lib/stores/userStore';
+  import { memberRights } from '@lib/stores/memberRightsStore';
 
   let teams = [];
 
@@ -25,7 +26,14 @@
   onMount(async () => {
     teams = await getTeamsList();
   });
-  $: console.log(teams);
+
+  $: {
+    console.log($memberRights.map((rights, i) => i));
+    console.log(
+      $memberRights.findIndex((rights) => rights === 'allow_write_team')
+    );
+    console.log($memberRights.map((rights) => rights).map((rights) => rights));
+  }
   const addTeam = (item) => (teams = [...teams, item]);
 
   const chooseTeam = (team, id) => {
@@ -54,5 +62,11 @@
       <p>{item.team_id.name}</p>
     </div>
   {/each}
-  <p class="cursor-pointer p-2" on:click={() => addTeam('Teams')}>+ add team</p>
+  {#each $memberRights as item, i}
+    {#if item[i] === 'allow_write_members'}
+      <p class="cursor-pointer p-2" on:click={() => addTeam('Teams')}>
+        + add team
+      </p>
+    {/if}
+  {/each}
 </div>

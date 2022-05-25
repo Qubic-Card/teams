@@ -5,10 +5,11 @@
   import { onMount } from 'svelte';
   import { user } from '@lib/stores/userStore';
   import { memberRights } from '@lib/stores/memberRightsStore';
-  $: console.log($memberRights);
 
   let allData = [];
   let members = [];
+  let ownProfile = [];
+  let isHasPermission = false;
 
   const getTeamId = async () => {
     const { data, error } = await supabase
@@ -25,7 +26,7 @@
     let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('team_members')
-      .select('role, profile(*), team_id(*)')
+      .select('team_profile, uid')
       .eq('team_id', teamId);
 
     if (error) console.log(error);
@@ -36,9 +37,26 @@
   };
 
   onMount(async () => {
-    allData = await getTeamMembers();
-    members = allData.map((member) => member.profile);
+    // allData = await getTeamMembers();
+    // console.log(allData);
+    // members = allData.map((member) => member.profile);
+    members = await getTeamMembers();
   });
+
+  $: {
+    $memberRights?.filter((item) => {
+      if (item === 'allow_read_members') {
+        isHasPermission = true;
+      }
+    });
+
+    members.map((member) => {
+      if (member.uid === $user.id) {
+        ownProfile = member;
+      }
+    });
+    console.log(isHasPermission);
+  }
   $: {
     // console.log(allData, members, memberRole, roleMapping, memberRight[0]);
     console.log(members);
@@ -52,26 +70,13 @@
   >
     {$page.params.slug}
   </div>
-  {#each $memberRights as item, i}
-    {#if item[i] === 'allow_read_members'}
-      <p>allowed read members</p>
-    {:else}
-      <p>denies read members</p>
-    {/if}
-  {/each}
   <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">
-    {#each $memberRights as item, i}
-      {#each members as member}
-        {#if member.uid === $user.id}
-          <MemberCard {member} />
-        {:else if item[i] === 'allow_read_members'}
-          <MemberCard {member} />
-        {:else}
-          <div class="bg-neutral-800 w-full h-full">
-            You are not allowed to read members
-          </div>
-        {/if}
-      {/each}
+    {#each members as member}
+      {#if isHasPermission === false}
+        <MemberCard member={ownProfile} />
+      {:else if isHasPermission === true}
+        <MemberCard {member} />
+      {/if}
     {/each}
   </div>
 </div>

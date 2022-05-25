@@ -1,205 +1,99 @@
 <script>
   import supabase from '@lib/db';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import Spinner from '@comp/loading/spinner.svelte';
 
-  import {
-    Dialog,
-    DialogOverlay,
-    DialogTitle,
-    DialogDescription,
-  } from '@rgossiaux/svelte-headlessui';
-  export let isOpen, roles, key;
-  $: console.log('isOpen', isOpen);
+  export let roleName, id;
 
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
+  let showModal = false;
+  let loading = false;
 
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
+  const toggleModal = () => (showModal = !showModal);
 
-  const updateTeamsRoleMapping = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('teams')
-      .update({ role_mapping: roles }, { returning: 'minimal' })
-      .eq('id', teamId);
+  const updateRoleName = async () => {
+    try {
+      loading = true;
+      const { error } = await supabase
+        .from('team_roles')
+        .update(
+          {
+            role_name: roleName,
+          },
+          { returning: 'minimal' }
+        )
+        .eq('id', id);
 
-    if (error) console.log(error);
+      if (error) {
+        throw new Error(error.message);
+      } else {
+        loading = false;
+        toastSuccess('Role name updated');
+      }
 
-    if (data) {
-      return data;
-    }
-  };
-</script>
-
-<!-- Pass `isOpen` to the `open` prop and use the `on:close` handler to set it back to false when the user clicks outside of the dialog or presses the escape key. -->
-<Dialog
-  open={isOpen}
-  on:close={() => (isOpen = false)}
-  class="overflow-x-hidden overflow-y-auto fixed top-72 left-32 md:left-60 lg:left-96 inset-0 z-20 outline-none focus:outline-none flex flex-col bg-neutral-900 text-white p-4 h-[280px] w-1/2 rounded-lg"
->
-  <DialogOverlay />
-
-  <DialogTitle class="w-full font-bold text-3xl mb-4">Rename</DialogTitle>
-  <input
-    type="text"
-    bind:value={key}
-    class="text-black py-4 px-2"
-    placeholder="Role name"
-  />
-  <button
-    class="bg-cyan-900 hover:bg-cyan-800 p-4 mt-2 text-white"
-    on:click={async () => await updateTeamsRoleMapping()}>Rename</button
-  >
-  <button
-    class="bg-red-900 hover:bg-red-900/80 p-4 mt-2 text-white"
-    on:click={() => (isOpen = false)}>Cancel</button
-  >
-</Dialog>
-
-<!-- <script>
-  import supabase from '@lib/db';
-  import roleMapping from '@lib/role';
-  import { role, roleName } from '@lib/stores/roleStore';
-  import {
-    Dialog,
-    DialogOverlay,
-    DialogTitle,
-  } from '@rgossiaux/svelte-headlessui';
-  import { createEventDispatcher } from 'svelte';
-
-  export let isOpen, roles, key;
-  let name;
-  // $: console.log($roleName);
-  // $: console.log(roles);
-  let dispatch = createEventDispatcher();
-  const closeDialog = () => dispatch('close', { isOpen: false });
-
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
-
-  const updateTeamsRoleMapping = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('teams')
-      .update({ role_mapping: roles }, { returning: 'minimal' })
-      .eq('id', teamId);
-
-    if (error) console.log(error);
-
-    if (data) {
-      return data;
+      toggleModal();
+    } catch (error) {
+      loading = false;
+      toastFailed("Couldn't update role name");
     }
   };
 </script>
 
-<Dialog
-  open={isOpen}
-  on:close={closeDialog}
-  class="overflow-x-hidden overflow-y-auto fixed top-72 left-32 md:left-60 lg:left-96 inset-0 z-20 outline-none focus:outline-none flex flex-col bg-neutral-900 text-white p-4 h-[280px] w-1/2 rounded-lg"
+<button
+  type="button"
+  on:click={toggleModal}
+  class="p-5 bg-neutral-800 rounded-lg"
 >
-  <DialogOverlay />
-
-  <DialogTitle class="w-full font-bold text-3xl mb-4">Rename</DialogTitle>
-  <input
-    type="text"
-    bind:value={key}
-    class="text-black py-4 px-2"
-    placeholder="Role name"
+  <img
+    class="h-6 w-6"
+    src="https://img.icons8.com/material-outlined/24/ffffff/edit--v1.png"
+    alt="edit"
   />
-  <button
-    class="bg-cyan-900 hover:bg-cyan-800 p-4 mt-2 text-white"
-    on:click={async () => await updateTeamsRoleMapping()}>Rename</button
+  <!-- Rename -->
+</button>
+{#if showModal}
+  <div
+    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
   >
-  <button
-    class="bg-red-900 hover:bg-red-900/80 p-4 mt-2 text-white"
-    on:click={closeDialog}>Cancel</button
-  >
-</Dialog> -->
-
-<!-- ------------------------ 
-add new role modal 
------------------------->
-
-<!-- <script>
-  import supabase from '@lib/db';
-  import roleMapping from '@lib/role';
-
-  import { roleName } from '@lib/stores/roleStore';
-  import {
-    Dialog,
-    DialogOverlay,
-    DialogTitle,
-    DialogDescription,
-  } from '@rgossiaux/svelte-headlessui';
-  import { createEventDispatcher } from 'svelte';
-
-  export let isOpen, roles;
-  let name;
-  $: console.log($roleName);
-  let dispatch = createEventDispatcher();
-  const closeDialog = () => dispatch('close', { isOpen: false });
-
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
-
-  const updateTeamsRoleMapping = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('teams')
-      .update(
-        { role_mapping: Object.assign(roles, { [name]: roleMapping }) },
-        { returning: 'minimal' }
-      )
-      .eq('id', teamId);
-
-    if (error) console.log(error);
-
-    if (data) {
-      console.log(data);
-      return data;
-    }
-  };
-</script>
-
-<Dialog
-  open={isOpen}
-  on:close={closeDialog}
-  class="overflow-x-hidden overflow-y-auto fixed top-72 left-32 md:left-60 lg:left-96 inset-0 z-20 outline-none focus:outline-none flex flex-col bg-neutral-900 text-white p-4 h-1/2 w-1/2 rounded-lg"
->
-  <DialogOverlay />
-
-  <DialogTitle class="w-full font-bold text-2xl">Add new role</DialogTitle>
-  <input
-    type="text"
-    bind:value={name}
-    class="text-black p-2"
-    placeholder="Role name"
-  />
-  <button
-    class="bg-white p-4 w-20 text-black mt-2"
-    on:click={updateTeamsRoleMapping}>Add</button
-  >
-  <button on:click={closeDialog}>Deactivate</button>
-  <button on:click={closeDialog}>Cancel</button>
-</Dialog> -->
+    <div class="relative w-1/2 my-6 mx-auto md:max-w-3xl max-w-md">
+      <!--content-->
+      <div
+        class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-900 outline-none focus:outline-none"
+      >
+        <!--header-->
+        <div class="p-5 border-b border-solid rounded-t">
+          <div class="flex w-full justify-between items-center">
+            <h3 class="text-xl font-semibold">Rename role name</h3>
+            <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
+              x
+            </p>
+          </div>
+        </div>
+        <!--body-->
+        <div
+          class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
+        >
+          {#if loading}
+            <h1>Loading</h1>
+          {/if}
+          <input
+            type="text"
+            bind:value={roleName}
+            placeholder="Role name"
+            class="p-3 w-full text-black"
+          />
+          <button
+            on:click={async () => await updateRoleName()}
+            class="flex justify-center items-center p-3 w-full bg-neutral-700 hover:bg-neutral-800 hover:border hover:border-neutral-500"
+          >
+            {#if loading}
+              <Spinner class="w-7 h-7" />
+            {:else}
+              Apply changes
+            {/if}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
+{/if}

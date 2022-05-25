@@ -11,7 +11,7 @@
   import useAuth from '@lib/useAuth.js';
   import { onMount } from 'svelte';
   import { role } from '@lib/stores/roleStore';
-  import { setMemberRights } from '@lib/stores/memberRightsStore';
+  import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
 
   // $: console.log($page);
   // const useAuth = async () => {
@@ -59,35 +59,33 @@
     let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('team_members')
-      .select('team_id(*), role')
-      .eq('team_id', teamId);
+      .select('role(*)')
+      .eq('uid', $user.id);
 
     if (error) console.log(error);
 
+    const { role_maps, role_name } = data[0].role;
     if (data) {
-      console.log(data);
-      return data;
+      return { role_maps, role_name };
     }
   };
 
   onMount(async () => {
-    allData = await getTeamMembers();
-    memberRole = allData.map((member) => member.role);
-    roleMapping = allData.map((member) => member.team_id.role_mapping);
-    memberRight = Object.entries(roleMapping[0] ?? []).map(([key, value]) =>
-      [key].map((item) => {
-        if (item === memberRole[0]) {
-          return value;
-        }
-      })
-    );
-    memberRight = memberRight.filter((item) => item[0] !== undefined);
-    memberRight = memberRight.map((item) => item[0]);
+    const { role_maps, role_name } = await getTeamMembers();
+    roleMapping = role_maps;
+    // [
+    //   "allow_read_members",
+    //   "allow_read_team",
+    //   "allow_read_analytics",
+    //   "allow_write_members",
+    //   "allow_write_team",
+    //   "allow_write_profile"
+    // ]
   });
 
-  $: setMemberRights(memberRight);
+  $: setMemberRights(roleMapping);
 
-  $: console.log(userImg);
+  $: console.log(userImg, $memberRights);
   let sidebarItems = [
     {
       title: 'dashboard',
