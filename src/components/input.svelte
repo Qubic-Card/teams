@@ -71,6 +71,7 @@
       bind:value
       maxlength={$$props.maxlength}
       class="w-full text-gray-100 bg-neutral-500 rounded-md my-2 h-10 px-2"
+      disabled={$$props.disabled}
     />
   </div>
   {#if isLinkInput && isLinkInvalid}

@@ -166,8 +166,17 @@
     }
     return data;
   };
-  $: getTeamsDetail();
+  let isHasPermission = false
+  
   $: {
+    getTeamsDetail();
+
+    $memberRights?.filter((item) => {
+      if (item === 'allow_write_team') {
+        isHasPermission = true;
+      }
+    });
+
     // console.log($socials);
     // console.log($links);
     // console.log(teamData);
@@ -247,12 +256,14 @@
                       placeholder="Company Name"
                       title="Name"
                       bind:value={teamData.company}
+                      disabled={isHasPermission ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Address"
                       title="Address"
                       bind:value={teamData.address}
+                      disabled={isHasPermission ? false : true}
                     />
                   </div>
                   <div class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5">
@@ -261,15 +272,17 @@
                       placeholder="Email"
                       title="Email"
                       bind:value={teamData.email}
+                      disabled={isHasPermission ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Phone Number"
                       title="Phone Number"
                       bind:value={teamData.phone}
+                      disabled={isHasPermission ? false : true}
                     />
                   </div>
-                  <div class="p-3 bg-neutral-800">
+                  <div class={`p-3 bg-neutral-800 ${isHasPermission ? '' : 'hidden'}`}>
                     <FilePond
                       bind:this={pond}
                       {name}
@@ -303,7 +316,7 @@
                 <div class="border mb-4 p-4 bg-neutral-800">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
-                    <AddSocialsModal />
+                    <AddSocialsModal class={`${isHasPermission ? '' : 'hidden'}`}/>
                   </div>
                   {#each $socials as item, i}
                     <div class="p-3 flex items-end">
@@ -351,9 +364,10 @@
                           : false}
                         isPhoneInput={item.type === 'phone' ? true : false}
                         isEmptyChecking={true}
+                        disabled={isHasPermission ? false : true}
                       />
 
-                      <div class="flex items-center mb-3">
+                      <div class={`flex items-center mb-3 ${isHasPermission ? 'flex' : 'hidden'}`}>
                         <Menu
                           as="div"
                           class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
@@ -447,7 +461,7 @@
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
-                      class="h-10 w-10 cursor-pointer"
+                      class={`h-10 w-10 cursor-pointer ${isHasPermission ? '' : 'hidden'}`}
                       on:click={addLink}
                       src="/add-icon.svg"
                       alt="add"
@@ -473,7 +487,7 @@
                         />
                       </div>
                       <div
-                        class="mx-3 grid grid-cols-3 gap-3 place-items-center"
+                        class={`mx-3 grid-cols-3 gap-3 place-items-center ${isHasPermission ? 'grid' : 'hidden'}`}
                       >
                         <SwitchButton bind:checked={item.isActive} />
                         {#if i != 0}

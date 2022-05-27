@@ -17,6 +17,7 @@
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
   import supabase from '@lib/db';
+	import { memberRights } from "@lib/stores/memberRightsStore";
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
@@ -182,8 +183,25 @@
     toastSuccess('Deleted successfully');
     await handleSave();
   };
+  let isHasWriteProfilePermission = false
+  let isHasWriteMembersPermission = false
 
-  $: getProfile();
+  $: {
+    getProfile();
+
+    $memberRights?.filter((item) => {
+      if ($page.params.slug === $user.id) {
+        if (item === 'allow_write_profile') {
+          isHasWriteProfilePermission = true;
+        }
+      }
+      if (item === 'allow_write_members') {
+      isHasWriteMembersPermission = true;
+      }
+    });
+
+    console.log(isHasWriteProfilePermission, isHasWriteMembersPermission)
+  }
 
   const toNewTab = async (type, data) => {
     switch (type) {
@@ -218,6 +236,7 @@
         break;
     }
   };
+  $: console.log($memberRights)
 </script>
 
 <div class="min-h-screen bg-white flex justify-center">
@@ -258,12 +277,15 @@
                       placeholder="Hello"
                       title="First Name"
                       bind:value={profileData.firstname}
+                      disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
+                      
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="World"
                       title="Last Name"
                       bind:value={profileData.lastname}
+                      disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
                     />
                   </div>
                   <div class="p-3 bg-neutral-800">
@@ -272,15 +294,17 @@
                       placeholder="example company"
                       title="Company"
                       bind:value={profileData.company}
+                      disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Hiring Manager"
                       title="Job"
                       bind:value={profileData.job}
+                      disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
                     />
                   </div>
-                  <div class="p-3 bg-neutral-800">
+                  <div class={`p-3 bg-neutral-800 ${isHasWriteProfilePermission || isHasWriteMembersPermission ? '' : 'hidden'}`}>
                     <FilePond
                       bind:this={pond}
                       {name}
@@ -326,7 +350,7 @@
                 <div class="border mb-4 p-4 bg-neutral-800">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
-                    <AddSocialsModal />
+                    <AddSocialsModal class={`${isHasWriteProfilePermission ? 'flex' : 'hidden'}`}/>
                   </div>
                   {#each $socials as item, i}
                     <div class="p-3 flex items-end">
@@ -374,9 +398,10 @@
                           : false}
                         isPhoneInput={item.type === 'phone' ? true : false}
                         isEmptyChecking={true}
+                        disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
                       />
 
-                      <div class="flex items-center mb-3">
+                      <div class={`items-center mb-3 ${isHasWriteProfilePermission || isHasWriteMembersPermission ? 'flex' : 'hidden'}`}>
                         <Menu
                           as="div"
                           class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
@@ -470,7 +495,7 @@
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
-                      class="h-10 w-10 cursor-pointer"
+                      class={`h-10 w-10 cursor-pointer ${isHasWriteProfilePermission || isHasWriteMembersPermission ? '' : 'hidden'}`}
                       on:click={addLink}
                       src="/add-icon.svg"
                       alt="add"
@@ -485,6 +510,7 @@
                           title="Title"
                           placeholder="Title"
                           bind:value={item.title}
+                          disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
                         />
                         <Input
                           title="Link"
@@ -493,10 +519,11 @@
                           isLinkInput={true}
                           placeholder="Link"
                           isEmptyChecking={true}
+                          disabled={isHasWriteProfilePermission ? false : isHasWriteMembersPermission ? false : true}
                         />
                       </div>
                       <div
-                        class="mx-3 grid grid-cols-3 gap-3 place-items-center"
+                        class={`mx-3 grid-cols-3 gap-3 place-items-center ${isHasWriteProfilePermission || isHasWriteMembersPermission ? 'grid' : 'hidden'}`}
                       >
                         <SwitchButton bind:checked={item.isActive} />
                         {#if i != 0}

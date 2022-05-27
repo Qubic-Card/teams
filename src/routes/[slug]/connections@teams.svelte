@@ -1,11 +1,7 @@
 <script>
-  // export let currentPageRows;
-  // export let totalPages;
-  // export let page;
-  // export let active;
-  // export let setPage;
-  // export let loading;
-
+	import supabase from '@lib/db';
+  import { onMount } from 'svelte';
+  
   let innerWidth;
   let asc = true;
   let sortedField = 'name';
@@ -83,6 +79,34 @@
   // };
   let currentPageRows = [2, 2, 2, 2, 2];
   let loading = false;
+  let teamConnections = []
+  const getTeamId = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id');
+
+    if (error) console.log(error);
+    if (data) {
+      return data[0].team_id;
+    }
+  };
+
+  const getTeamConnectionsList = async () => {
+    let teamId = await getTeamId();
+    const {data, error} = await supabase
+      .from('team_connection_acc')
+      .select('*')
+      .eq('team_id', teamId);
+
+    if (error) console.log(error);
+    if (data) {
+      return data;
+    }
+  }
+  onMount(async () => {
+    teamConnections = await getTeamConnectionsList();
+    console.log(teamConnections)
+  });
   // $: searchQuery, searchHandler();
   // $: currentPageRows, useSortHandler(sortedField);
 </script>

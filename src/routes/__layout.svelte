@@ -9,53 +9,30 @@
 
   $: console.log('layout', $user);
   // onMount(() => useAuth($user));
-  let allData = [];
-  let memberRole = [];
+
   let roleMapping = [];
-  let memberRight = [];
-
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
 
   const getTeamMembers = async () => {
-    let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('team_members')
-      .select('team_id(*), role')
-      .eq('team_id', teamId);
+      .select('role(*)')
+      .eq('uid', $user.id);
 
     if (error) console.log(error);
 
+    const { role_maps, role_name } = data[0].role;
     if (data) {
-      console.log(data);
-      return data;
+      return { role_maps, role_name };
     }
   };
 
   onMount(async () => {
-    allData = await getTeamMembers();
-    memberRole = allData.map((member) => member.role);
-    roleMapping = allData.map((member) => member.team_id.role_mapping);
-    memberRight = Object.entries(roleMapping[0] ?? []).map(([key, value]) =>
-      [key].map((item) => {
-        if (item === memberRole[0]) {
-          return value;
-        }
-      })
-    );
-    memberRight = memberRight.filter((item) => item[0] !== undefined);
-    memberRight = memberRight.map((item) => item[0]);
+    const { role_maps, role_name } = await getTeamMembers();
+    roleMapping = role_maps;
+    // [
   });
 
-  $: setMemberRights(memberRight);
+  $: setMemberRights(roleMapping);
 </script>
 
 <svelte:head>

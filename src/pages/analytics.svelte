@@ -1,4 +1,5 @@
 <script>
+	import { memberRights } from "@lib/stores/memberRightsStore";
   import supabase from '@lib/db.js';
   import Chart from 'svelte-frappe-charts';
   import AnalyticTable from '@comp/analyticTable.svelte';
@@ -35,14 +36,21 @@
   let connectionCount = 0;
   let totalPages = [];
   let currentPageRows = [];
+  let activity = []
+  let logs = []
   let itemsPerPage = 20;
   let active = 0;
+  
+  let teamConnections = [];
+  let teamLogs = [];
+  let teamActivity = [];
 
   let loading = false;
+  let isHasPermission = false
 
   $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
 
-  const paginate = (items) => {
+  const paginate = (items = []) => {
     const pages = Math.ceil(items.length / itemsPerPage);
 
     const paginatedItems = Array.from({ length: pages }, (_, index) => {
@@ -105,34 +113,43 @@
     return result;
   };
 
-  // let connectionChart = null;
-  // let connectionLabel = null;
-  // let logTable = null;
-  // let logChart = null;
+  const getTeamId = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id');
+
+    if (error) console.log(error);
+    if (data) {
+      return data[0].team_id;
+    }
+  };
 
   const getConnectionsList = async () => {
+    let teamId = await getTeamId();
     let {
       data: connection_profile,
       error: error_profile,
       count,
     } = await supabase
-      .from('connection_acc')
+      .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
       .select('dateConnected', { count: 'estimated' })
-      .eq('uid', '39ba7789-537c-4b0f-a8a7-c8a8345838f3')
+      .eq(isHasPermission ? 'team_id' : 'uid', isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3')
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
 
     if (connection_profile) connectionCount = count;
     if (error_profile) console.log(error_profile);
 
-    const dateConnected = connection_profile.map((item) =>
+    const dateConnected = connection_profile ?? [].map((item) =>
       new Date(item.dateConnected).toDateString().slice(4)
     );
-
+    console.log("date", dateConnected);
+    console.log("profile", connection_profile);
     return { connection_profile, dateConnected };
   };
 
   const getWeeklyLogsActivity = async () => {
+    let teamId = await getTeamId();
     loading = true;
     try {
       let {
@@ -140,11 +157,12 @@
         error,
         count,
       } = await supabase
-        .from('logs')
+        .from(isHasPermission ? 'team_logs' : 'logs')
         .select('*', { count: 'estimated' })
-        .eq('uid', '39ba7789-537c-4b0f-a8a7-c8a8345838f3')
+        .eq(isHasPermission ? 'team' : 'uid', isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3')
         .gte('timestamp', new Date(last7Days[0]).toISOString())
-        .order('timestamp', { ascending: false });
+        .order('timestamp', { ascending: false })
+        .limit(5);
 
       if (logs) {
         let newArr = [];
@@ -153,15 +171,15 @@
         });
         uniqueCount = newArr.length;
         activityCount = count;
-        const activity = logs.map((log) =>
+        activity = logs.map((log) =>
           new Date(log.timestamp).toDateString().slice(4)
         );
 
         setTimeout(() => {
           loading = false;
         }, 1000);
-
-        return { logs, activity };
+        console.log("logs",logs);
+        return logs
       }
     } catch (error) {
       loading = false;
@@ -169,8 +187,8 @@
     }
   };
 
-  const activity = async () => {
-    const { logs, activity } = await getWeeklyLogsActivity();
+  const activityHandler = async () => {
+    logs = await getWeeklyLogsActivity();
 
     activityData.labels =
       $selected === '7 Days'
@@ -186,16 +204,6 @@
         : last90Days,
       activity
     );
-    // const totalWeeklyActivity = count(
-    //   $selected === '7 Days'
-    //     ? last7Days
-    //     : $selected === '30 Days'
-    //     ? last30Days
-    //     : last90Days,
-    //   activity
-    // ).reduce((a, b) => a + b, 0);
-    // chartEls[1].count = totalWeeklyActivity;
-
     paginate(logs);
   };
 
@@ -220,11 +228,32 @@
     );
   };
 
+
+  $: $memberRights?.filter((item) => {
+    if (item === 'allow_read_analytics') {
+      isHasPermission = true;
+    }
+  });
+
   $: {
     $selected, connection();
+    // if(isHasPermission) {
+    //   $selected, teamConnection();
+    //   console.log('teamConnection');
+    // } else {
+    //   $selected, connection();
+    //   console.log('connection');
+    // }
   }
   $: {
-    $selected, activity();
+    $selected, activityHandler();
+    // if (isHasPermission) {
+    //   $selected, teamActivityHandler();
+    //   console.log('teamActivityHandler');
+    // } else {
+    //   $selected, activityHandler();
+    //   console.log('activityHandler');
+    // }
   }
 </script>
 

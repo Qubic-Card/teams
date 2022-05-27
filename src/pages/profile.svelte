@@ -12,6 +12,13 @@
   import { VCard } from '@covve/easy-vcard';
   import { go } from '@lib/utils/forwarder';
   import formatter from '@lib/vcard/formatter';
+  import {
+    Tab,
+    TabGroup,
+    TabList,
+    TabPanel,
+    TabPanels,
+  } from "@rgossiaux/svelte-headlessui";
 
   export let data;
   export let isEditorMode = false;
@@ -206,70 +213,101 @@
       {data.company == '' ? Dummy.company : data.company}
     </h1>
   </div>
-  <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
-    <!-- UTILITIES -->
-    <BorderButton
-      class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
-      on:click={modalHandler}
-    >
-      Connect with Me
-    </BorderButton>
-    <ConnectModal
-      on:showModal={modalHandler}
-      {showModal}
-      {profileUid}
-      {cardId}
-      {data}
-    />
-    <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-      {#each isEditorMode ? $socials : data.socials as item}
-        {#if item.isActive}
+  <TabGroup class="flex flex-col items-center w-full text-white mt-4">
+    <TabList class="flex w-2/3 bg-black border-2 border-neutral-500 rounded-lg p-3">
+      <Tab class="w-1/2">My Contact</Tab>
+      <Tab class="w-1/2">QUBIC</Tab>
+    </TabList>
+    <TabPanels>
+      <TabPanel>
+        <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
+          <!-- UTILITIES -->
           <BorderButton
-            on:click={() => {
-              go(
-                item.type,
-                item.data,
-                $page.url.searchParams.get('type'),
-                cardId,
-                profileUid
-              );
-            }}
-            class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
-            ><img
-              src={socialIcons[item.type]}
-              width="32"
-              height="32"
-              alt=""
-            /></BorderButton
+            class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
+            on:click={modalHandler}
           >
-        {/if}
-      {/each}
-    </div>
-    <BorderButton
-      class="w-full h-12 mb-10 {currentTheme.border} {currentTheme.secondary} rounded-md"
-      on:click={addToContactHandler}
-    >
-      Add to Contacts
-    </BorderButton>
+            Connect with Me
+          </BorderButton>
+          <ConnectModal
+            on:showModal={modalHandler}
+            {showModal}
+            {profileUid}
+            {cardId}
+            {data}
+          />
+          <div class="flex justify-between flex-wrap items-start gap-1 my-1">
+            {#each isEditorMode ? $socials : data.socials as item}
+              {#if item.isActive}
+                <BorderButton
+                  on:click={() => {
+                    go(
+                      item.type,
+                      item.data,
+                      $page.url.searchParams.get('type'),
+                      cardId,
+                      profileUid
+                    );
+                  }}
+                  class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+                  ><img
+                    src={socialIcons[item.type]}
+                    width="32"
+                    height="32"
+                    alt=""
+                  /></BorderButton
+                >
+              {/if}
+            {/each}
+          </div>
+          <BorderButton
+            class="w-full h-12 mb-10 {currentTheme.border} {currentTheme.secondary} rounded-md"
+            on:click={addToContactHandler}
+          >
+            Add to Contacts
+          </BorderButton>
 
-    <!-- LINKS -->
-    <div class="gap-2 flex flex-col justify-center items-center pb-5">
-      {#each isEditorMode ? $links : data.links as item}
-        {#if item.isActive}
-          <BorderButton
-            class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-            ><div class="p-2">
-              <LinkPreview
-                title={item.title}
-                url={item.link}
-                className={currentTheme.secondary}
-                {profileUid}
-                {cardId}
-              />
-            </div></BorderButton
-          >
-        {/if}
-      {/each}
-    </div>
-  </div>
+          <!-- LINKS -->
+          <div class="gap-2 flex flex-col justify-center items-center pb-5">
+            {#each isEditorMode ? $links : data.links as item}
+              {#if item.isActive}
+                <BorderButton
+                  class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+                  ><div class="p-2">
+                    <LinkPreview
+                      title={item.title}
+                      url={item.link}
+                      className={currentTheme.secondary}
+                      {profileUid}
+                      {cardId}
+                    />
+                  </div></BorderButton
+                >
+              {/if}
+            {/each}
+          </div>
+        </div>
+      </TabPanel>
+      <TabPanel>
+        <div class="gap-2 flex flex-col justify-center items-center pb-5 px-16 mt-4">
+          {#each isEditorMode ? $links : data.links as item}
+            {#if item.isActive}
+              <BorderButton
+                class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+                ><div class="p-2">
+                  <LinkPreview
+                    title={item.title}
+                    url={item.link}
+                    className={currentTheme.secondary}
+                    {profileUid}
+                    {cardId}
+                  />
+                </div></BorderButton
+              >
+            {/if}
+          {/each}
+        </div>
+      </TabPanel>
+    </TabPanels>
+  </TabGroup>
+ 
 </div>

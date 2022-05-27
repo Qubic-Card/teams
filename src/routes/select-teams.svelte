@@ -14,7 +14,7 @@
     const { data, error } = await supabase
       .from('team_members')
       .select('team_id(*)')
-      .eq('uid', '39ba7789-537c-4b0f-a8a7-c8a8345838f3');
+      .eq('uid', $user.id);
 
     if (error) console.log(error);
 
@@ -26,13 +26,11 @@
   onMount(async () => {
     teams = await getTeamsList();
   });
-
+  let isHasPermission = false;
   $: {
-    console.log($memberRights.map((rights, i) => i));
-    console.log(
-      $memberRights.findIndex((rights) => rights === 'allow_write_team')
-    );
-    console.log($memberRights.map((rights) => rights).map((rights) => rights));
+    $memberRights?.filter((item) => {
+      if (item === 'allow_write_team') isHasPermission = true;
+    });
   }
   const addTeam = (item) => (teams = [...teams, item]);
 
@@ -62,11 +60,9 @@
       <p>{item.team_id.name}</p>
     </div>
   {/each}
-  {#each $memberRights as item, i}
-    {#if item[i] === 'allow_write_members'}
-      <p class="cursor-pointer p-2" on:click={() => addTeam('Teams')}>
-        + add team
-      </p>
-    {/if}
-  {/each}
+  {#if isHasPermission}
+    <p class="cursor-pointer p-2" on:click={() => addTeam('Teams')}>
+      + add team
+    </p>
+  {/if}
 </div>

@@ -6,7 +6,6 @@
   import { user } from '@lib/stores/userStore';
   import { memberRights } from '@lib/stores/memberRightsStore';
 
-  let allData = [];
   let members = [];
   let ownProfile = [];
   let isHasPermission = false;
@@ -37,9 +36,6 @@
   };
 
   onMount(async () => {
-    // allData = await getTeamMembers();
-    // console.log(allData);
-    // members = allData.map((member) => member.profile);
     members = await getTeamMembers();
   });
 
@@ -55,11 +51,6 @@
         ownProfile = member;
       }
     });
-    console.log(isHasPermission);
-  }
-  $: {
-    // console.log(allData, members, memberRole, roleMapping, memberRight[0]);
-    console.log(members);
   }
 </script>
 
@@ -72,7 +63,7 @@
   </div>
   <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">
     {#each members as member}
-      {#if isHasPermission === false}
+      {#if isHasPermission === false && member.uid === ownProfile.uid}
         <MemberCard member={ownProfile} />
       {:else if isHasPermission === true}
         <MemberCard {member} />

@@ -15,17 +15,46 @@
 </script>
 
 <script>
-  import { user } from '@lib/stores/userStore';
+  import { user, userData } from '@lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+  const getTeamMembers = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('role(*)')
+      .eq('uid', $user.id);
+
+    if (error) console.log(error);
+
+    const { role_maps, role_name } = data[0].role;
+    if (data) {
+      return { role_maps, role_name };
+    }
+  };
+
+  // onMount(async () => {
+  //   const { role_maps, role_name } = await getTeamMembers();
+  //   roleMapping = role_maps;
+  //   // [
+  //   //   "allow_read_members",
+  //   //   "allow_read_team",
+  //   //   "allow_read_analytics",
+  //   //   "allow_write_members",
+  //   //   "allow_write_team",
+  //   //   "allow_write_profile"
+  //   // ]
+  // });
   $user = supabase.auth.user();
   // $: console.log('wrap', $user);
   $: console.log(supabase.auth.user());
+  $: console.log("user data",$userData);
   // $: console.log('wrap', $page);
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event == 'SIGNED_IN') {
+      const { role_maps, role_name } = await getTeamMembers();
+      userData.set(role_maps);
       user.set(session.user);
       await goto('/select-teams', { noscroll: true });
     }

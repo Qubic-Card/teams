@@ -18,7 +18,7 @@
   };
 </script>
 
-<button type="button" on:click={toggleModal}>
+<button type="button" on:click={toggleModal} class={$$props.class}>
   <img class="h-10 w-10" src="/add-icon.svg" alt="add" />
 </button>
 {#if showModal}

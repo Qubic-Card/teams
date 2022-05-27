@@ -14,6 +14,7 @@
     DisclosurePanel,
     Switch,
   } from '@rgossiaux/svelte-headlessui';
+  import AddRoleModal from "@comp/modals/addRoleModal.svelte";
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
   import { log } from '@lib/logger/logger';
@@ -137,10 +138,7 @@
         class="p-4 w-56 bg-white text-black rounded-lg"
         on:click={openModal}>+ add new role</button
       > -->
-      <button
-        class="p-4 w-56 bg-white text-black rounded-lg"
-        on:click={async () => await addRoleHandler()}>+ Add new role</button
-      >
+      <AddRoleModal />
       <!-- <AddNewRoleModal {isOpen} on:close={closeModal} {roles} /> --->
     </div>
     {#each roles as role}
