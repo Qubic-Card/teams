@@ -41,15 +41,11 @@
 
   $: {
     $memberRights?.filter((item) => {
-      if (item === 'allow_read_members') {
-        isHasPermission = true;
-      }
+      if (item === 'allow_read_members') isHasPermission = true;
     });
 
     members.map((member) => {
-      if (member.uid === $user.id) {
-        ownProfile = member;
-      }
+      if (member.uid === $user.id) ownProfile = member;
     });
   }
 </script>
@@ -62,12 +58,18 @@
     {$page.params.slug}
   </div>
   <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">
-    {#each members as member}
-      {#if isHasPermission === false && member.uid === ownProfile.uid}
-        <MemberCard member={ownProfile} />
-      {:else if isHasPermission === true}
-        <MemberCard {member} />
-      {/if}
-    {/each}
+    {#await getTeamMembers()}
+      <h1>Loading...</h1>
+    {:then members}
+      {#each members as member}
+        {#if isHasPermission === false && member.uid === ownProfile.uid}
+          <MemberCard member={ownProfile} />
+        {:else if isHasPermission === true}
+          <MemberCard {member} />
+        {/if}
+      {/each}
+    {:catch}
+      <h1>Some error occurred. Please reload the page and try again.</h1>
+    {/await}
   </div>
 </div>

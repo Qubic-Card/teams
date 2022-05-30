@@ -39,7 +39,7 @@
           <input
             on:change={async () => await updateTeamsRoleMapping()}
             type="checkbox"
-            class="w-7 h-7"
+            class="w-7 h-7 cursor-pointer"
             bind:group={checked}
             value={checkbox.name}
           />

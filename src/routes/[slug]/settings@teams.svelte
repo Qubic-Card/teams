@@ -14,20 +14,20 @@
     DisclosurePanel,
     Switch,
   } from '@rgossiaux/svelte-headlessui';
-  import AddRoleModal from "@comp/modals/addRoleModal.svelte";
+  import AddRoleModal from '@comp/modals/addRoleModal.svelte';
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
   import { log } from '@lib/logger/logger';
   import TeamEditor from '@pages/teamEditor.svelte';
   import { memberRights } from '@lib/stores/memberRightsStore';
+  import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
 
   let newRoles = [];
   let roles = [];
   let isOpen = false;
   let isAutoRenew = false;
-  let loading = false;
   let isHasPermission = false;
-  $: roles;
+  // $: roles;
   const getTeamId = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -40,7 +40,6 @@
   };
 
   const getTeamsRoleMapping = async () => {
-    loading = true;
     try {
       let teamId = await getTeamId();
       console.log(teamId);
@@ -49,42 +48,26 @@
         .select('*')
         .eq('team_id', teamId);
 
-      loading = false;
       if (error) throw error;
 
-      if (data) {
-        console.log('data', data);
-        roles = data;
-      }
+      if (data) roles = data;
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const addRoleHandler = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('team_roles')
-      .insert({
-        role_maps: roleMapping.map((role) => role.name),
-        role_name: 'test',
-        team_id: teamId,
-      })
-      .eq('id', teamId);
   };
 
   $: {
     // console.log(loading);
     // console.log('role map', roleMapping);
     // console.log(newRoles);
-    console.log('roles', roles);
+    // console.log('roles', roles);
     // console.log('role', $role);
     // console.log('setting', roleName);
     console.log($memberRights);
   }
 
   $: {
-    getTeamsRoleMapping();
+    // getTeamsRoleMapping();
 
     $memberRights?.filter((item) => {
       if (item === 'allow_read_team') isHasPermission = true;
@@ -98,9 +81,6 @@
       <TeamEditor />
     {/if}
     <div class="flex flex-col my-4">
-      {#if loading}
-        <h1>Loading</h1>
-      {/if}
       <div class="flex justify-between items-center mb-4">
         <h1 class="font-bold text-3xl">Billing</h1>
         <button
@@ -134,18 +114,13 @@
     </div>
     <div class="flex justify-between items-center mb-4">
       <h1 class="font-bold text-3xl">Role Settings</h1>
-      <!-- <button
-        class="p-4 w-56 bg-white text-black rounded-lg"
-        on:click={openModal}>+ add new role</button
-      > -->
       <AddRoleModal />
-      <!-- <AddNewRoleModal {isOpen} on:close={closeModal} {roles} /> --->
     </div>
-    {#each roles as role}
-      <Disclosure let:open>
-        {#if loading}
-          <h1>Loading...</h1>
-        {:else}
+    {#await getTeamsRoleMapping()}
+      <RoleSettingsSkeleton />
+    {:then}
+      {#each roles as role}
+        <Disclosure let:open>
           <div class="flex justify-between items-center">
             <DisclosureButton
               on:click={() => setRoleName(role.role_name)}
@@ -156,21 +131,23 @@
             </DisclosureButton>
             <RenameModal roleName={role.role_name} id={role.id} />
           </div>
-        {/if}
-        {#if open}
-          <div transition:slide={{ duration: 500 }}>
-            <DisclosurePanel static>
-              <Checkboxes
-                checkboxes={roleMapping}
-                bind:checked={role.role_maps}
-                {roles}
-                id={role.id}
-              />
-            </DisclosurePanel>
-          </div>
-        {/if}
-      </Disclosure>
-    {/each}
+          {#if open}
+            <div transition:slide={{ duration: 500 }}>
+              <DisclosurePanel static>
+                <Checkboxes
+                  checkboxes={roleMapping}
+                  bind:checked={role.role_maps}
+                  {roles}
+                  id={role.id}
+                />
+              </DisclosurePanel>
+            </div>
+          {/if}
+        </Disclosure>
+      {/each}
+    {:catch error}
+      <h1>Some error occurred. Please reload the page and try again.</h1>
+    {/await}
   </div>
   <div class="flex flex-col w-1/3 rounded-lg gap-4">
     <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">

@@ -3,7 +3,8 @@
   import { toastFailed } from '@lib/utils/toast';
   import { onMount } from 'svelte';
   import supabase from '@lib/db';
-  
+  import { user } from '@lib/stores/userStore';
+
   let isHasPermission = false;
 
   const dummy = [
@@ -31,15 +32,12 @@
   let selectedTopic = null;
   let state = 'idle';
   $: $memberRights?.filter((item) => {
-    if (item === 'allow_read_analytics') {
-      isHasPermission = true;
-    }
+    if (item === 'allow_read_analytics') isHasPermission = true;
   });
 
-  $: console.log('s', isHasPermission);
   const selectTopic = (topic) => (selectedTopic = topic);
   const setState = (newState) => (state = newState);
-  let contactsCount = 0
+  let contactsCount = 0;
   const getTeamId = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -51,25 +49,31 @@
     }
   };
 
-  const getTeamConnectionsList = async () => {
+  const getContacts = async () => {
     let teamId = await getTeamId();
-    const {data, error} = await supabase
-      .from('team_connection_acc')
+    const { data, error } = await supabase
+      .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
       .select('*')
-      .eq('team_id', teamId);
+      .eq(
+        isHasPermission ? 'team_id' : 'uid',
+        isHasPermission ? teamId ?? '' : $user.id ?? ''
+      );
 
     if (error) console.log(error);
     if (data) {
       return data.length;
     }
-  }
+  };
   onMount(async () => {
-    contactsCount = await getTeamConnectionsList();
-    console.log(contactsCount)
+    contactsCount = await getContacts();
+    console.log(contactsCount);
   });
 </script>
 
 <div class="flex flex-col w-full h-full">
+  {#await getContacts()}
+    <h1>Loading...</h1>
+  {:then name}
     <div class="flex justify-between gap-4">
       {#each dummy as item}
         <div
@@ -83,7 +87,7 @@
         </div>
       {/each}
     </div>
-    {#if !isHasPermission}
+    {#if isHasPermission}
       <div
         class="flex flex-col w-full h-full bg-neutral-800 my-4 rounded-lg p-8 justify-between"
       >
@@ -114,18 +118,25 @@
             Power Analyze
           </button>
         {:else}
-          <div class="flex justify-between h-24 border-b border-neutral-700 pb-8">
+          <div
+            class="flex justify-between h-24 border-b border-neutral-700 pb-8"
+          >
             <button
               class="border-2 border-neutral-700 hover:bg-neutral-700 text-xl rounded-lg w-96 h-full p-4"
               >{selectedTopic}
             </button>
-            <button class="self-end bg-white p-4 w-80 h-full text-black text-xl">
+            <button
+              class="self-end bg-white p-4 w-80 h-full text-black text-xl"
+            >
               Power Analyze
             </button>
           </div>
         {/if}
       </div>
-    <!-- {:else}
-      <p>you dont have access to this page, you cant see the analytics</p> -->
-  {/if}
+      <!-- {:else}
+    <p>you dont have access to this page, you cant see the analytics</p> -->
+    {/if}
+  {:catch}
+    <h1>Some error occurred. Please reload the page and try again.</h1>
+  {/await}
 </div>

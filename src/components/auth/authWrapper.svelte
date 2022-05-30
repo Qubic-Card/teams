@@ -48,15 +48,15 @@
   $user = supabase.auth.user();
   // $: console.log('wrap', $user);
   $: console.log(supabase.auth.user());
-  $: console.log("user data",$userData);
+  $: console.log('user data', $userData);
   // $: console.log('wrap', $page);
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event == 'SIGNED_IN') {
+      await goto('/select-teams', { noscroll: true });
       const { role_maps, role_name } = await getTeamMembers();
       userData.set(role_maps);
       user.set(session.user);
-      await goto('/select-teams', { noscroll: true });
     }
     if (event == 'TOKEN_REFRESHED') {
       user.set(session.user);

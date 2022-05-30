@@ -22,7 +22,11 @@
       </h1>
       <h2 class="text-3xl">{member.team_profile.job}</h2>
     </div>
-    <img src={member.team_profile.avatar} alt="Photo profile" class="w-16 h-16 rounded-full" />
+    <img
+      src={member.team_profile.avatar}
+      alt="Photo profile"
+      class="w-16 h-16 rounded-full"
+    />
   </div>
   <Switch
     checked={member.isActive}

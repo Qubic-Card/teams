@@ -2,7 +2,7 @@
   import Input from '@comp/input.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import CompanySkeleton from '@comp/skeleton/companySkeleton.svelte';
+  import TeamEditorSkeleton from '@comp/skeleton/teamEditorSkeleton.svelte';
 
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
@@ -44,9 +44,10 @@
   let name = 'filepond';
   let teamId;
   let isLoading = false;
-
+  let teamNickname = null;
   let teamData = {
     company: '',
+    description: '',
     address: '',
     email: '',
     phone: '',
@@ -106,7 +107,10 @@
     teamData.links = $links;
     const { error } = await supabase
       .from('teams')
-      .update({ metadata: teamData }, { returning: 'minimal' })
+      .update(
+        { metadata: teamData, nickname: teamNickname },
+        { returning: 'minimal' }
+      )
       .eq('id', teamId);
 
     if (error) {
@@ -156,6 +160,7 @@
     if (data) {
       const team = data[0].metadata;
       teamData = { ...team };
+      teamNickname = data[0].nickname;
       $socials = team['socials'];
       $links = team['links'];
       teamId = team['id'];
@@ -166,20 +171,18 @@
     }
     return data;
   };
-  let isHasPermission = false
-  
+  let isHasPermission = false;
+
   $: {
-    getTeamsDetail();
+    // getTeamsDetail();
 
     $memberRights?.filter((item) => {
-      if (item === 'allow_write_team') {
-        isHasPermission = true;
-      }
+      if (item === 'allow_write_team') isHasPermission = true;
     });
 
     // console.log($socials);
     // console.log($links);
-    // console.log(teamData);
+    console.log(teamData);
   }
 
   const toNewTab = async (type, data) => {
@@ -218,9 +221,9 @@
 </script>
 
 <div class="flex justify-center">
-  {#if isLoading}
-    <CompanySkeleton />
-  {:else}
+  {#await getTeamsDetail()}
+    <TeamEditorSkeleton />
+  {:then}
     <div class="w-full">
       <div class="text-black">
         <div class="flex flex-col w-full">
@@ -250,7 +253,9 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div class="border-b-zinc-300 border mb-4">
-                  <div class="px-3 pt-3 bg-neutral-800">
+                  <div
+                    class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5 mt-2"
+                  >
                     <Input
                       on:change={handleSave}
                       placeholder="Company Name"
@@ -260,9 +265,25 @@
                     />
                     <Input
                       on:change={handleSave}
+                      placeholder="Nickname"
+                      title="Nickname"
+                      bind:value={teamNickname}
+                      disabled={isHasPermission ? false : true}
+                    />
+                  </div>
+                  <div class="px-3 bg-neutral-800">
+                    <Input
+                      on:change={handleSave}
                       placeholder="Address"
                       title="Address"
                       bind:value={teamData.address}
+                      disabled={isHasPermission ? false : true}
+                    />
+                    <Input
+                      on:change={handleSave}
+                      placeholder="Description"
+                      title="Description"
+                      bind:value={teamData.description}
                       disabled={isHasPermission ? false : true}
                     />
                   </div>
@@ -282,7 +303,11 @@
                       disabled={isHasPermission ? false : true}
                     />
                   </div>
-                  <div class={`p-3 bg-neutral-800 ${isHasPermission ? '' : 'hidden'}`}>
+                  <div
+                    class={`p-3 bg-neutral-800 ${
+                      isHasPermission ? '' : 'hidden'
+                    }`}
+                  >
                     <FilePond
                       bind:this={pond}
                       {name}
@@ -316,7 +341,9 @@
                 <div class="border mb-4 p-4 bg-neutral-800">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
-                    <AddSocialsModal class={`${isHasPermission ? '' : 'hidden'}`}/>
+                    <AddSocialsModal
+                      class={`${isHasPermission ? '' : 'hidden'}`}
+                    />
                   </div>
                   {#each $socials as item, i}
                     <div class="p-3 flex items-end">
@@ -367,7 +394,11 @@
                         disabled={isHasPermission ? false : true}
                       />
 
-                      <div class={`flex items-center mb-3 ${isHasPermission ? 'flex' : 'hidden'}`}>
+                      <div
+                        class={`flex items-center mb-3 ${
+                          isHasPermission ? 'flex' : 'hidden'
+                        }`}
+                      >
                         <Menu
                           as="div"
                           class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
@@ -461,7 +492,9 @@
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
-                      class={`h-10 w-10 cursor-pointer ${isHasPermission ? '' : 'hidden'}`}
+                      class={`h-10 w-10 cursor-pointer ${
+                        isHasPermission ? '' : 'hidden'
+                      }`}
                       on:click={addLink}
                       src="/add-icon.svg"
                       alt="add"
@@ -487,7 +520,9 @@
                         />
                       </div>
                       <div
-                        class={`mx-3 grid-cols-3 gap-3 place-items-center ${isHasPermission ? 'grid' : 'hidden'}`}
+                        class={`mx-3 grid-cols-3 gap-3 place-items-center ${
+                          isHasPermission ? 'grid' : 'hidden'
+                        }`}
                       >
                         <SwitchButton bind:checked={item.isActive} />
                         {#if i != 0}
@@ -520,7 +555,9 @@
         </div>
       </div>
     </div>
-  {/if}
+  {:catch}
+    <h1>Some error occurred. Please reload the page and try again.</h1>
+  {/await}
 </div>
 
 <style global>

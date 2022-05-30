@@ -1,10 +1,11 @@
 <script>
-	import { memberRights } from "@lib/stores/memberRightsStore";
+  import { memberRights } from '@lib/stores/memberRightsStore';
   import supabase from '@lib/db.js';
   import Chart from 'svelte-frappe-charts';
   import AnalyticTable from '@comp/analyticTable.svelte';
   import { user } from '@lib/stores/userStore.js';
   import { selected } from '@lib/stores/dropdownStore.js';
+  import AnalyticsSkeleton from '@comp/skeleton/AnalyticsSkeleton.svelte';
 
   let connectionData = {
     labels: [],
@@ -36,17 +37,17 @@
   let connectionCount = 0;
   let totalPages = [];
   let currentPageRows = [];
-  let activity = []
-  let logs = []
+  let activity = [];
+  let logs = [];
   let itemsPerPage = 20;
   let active = 0;
-  
+
   let teamConnections = [];
   let teamLogs = [];
   let teamActivity = [];
 
   let loading = false;
-  let isHasPermission = false
+  let isHasPermission = false;
 
   $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
 
@@ -133,18 +134,21 @@
     } = await supabase
       .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
       .select('dateConnected', { count: 'estimated' })
-      .eq(isHasPermission ? 'team_id' : 'uid', isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3')
+      .eq(
+        isHasPermission ? 'team_id' : 'uid',
+        isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3'
+      )
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
 
     if (connection_profile) connectionCount = count;
     if (error_profile) console.log(error_profile);
 
-    const dateConnected = connection_profile ?? [].map((item) =>
-      new Date(item.dateConnected).toDateString().slice(4)
-    );
-    console.log("date", dateConnected);
-    console.log("profile", connection_profile);
+    const dateConnected =
+      connection_profile ??
+      [].map((item) => new Date(item.dateConnected).toDateString().slice(4));
+    console.log('date', dateConnected);
+    console.log('profile', connection_profile);
     return { connection_profile, dateConnected };
   };
 
@@ -159,7 +163,10 @@
       } = await supabase
         .from(isHasPermission ? 'team_logs' : 'logs')
         .select('*', { count: 'estimated' })
-        .eq(isHasPermission ? 'team' : 'uid', isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3')
+        .eq(
+          isHasPermission ? 'team' : 'uid',
+          isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3'
+        )
         .gte('timestamp', new Date(last7Days[0]).toISOString())
         .order('timestamp', { ascending: false })
         .limit(5);
@@ -178,8 +185,8 @@
         setTimeout(() => {
           loading = false;
         }, 1000);
-        console.log("logs",logs);
-        return logs
+        console.log('logs', logs);
+        return logs;
       }
     } catch (error) {
       loading = false;
@@ -228,11 +235,8 @@
     );
   };
 
-
   $: $memberRights?.filter((item) => {
-    if (item === 'allow_read_analytics') {
-      isHasPermission = true;
-    }
+    if (item === 'allow_read_analytics') isHasPermission = true;
   });
 
   $: {
@@ -259,72 +263,78 @@
 
 <div class="h-auto flex justify-center mt-8">
   <div class="w-full">
-    <div class="flex flex-col lg:flex-row justify-between">
-      {#each chartEls as item}
-        <div class="flex flex-col w-full lg:w-[49.5%] pt-4 lg:pt-0">
-          <div class="flex w-full justify-between">
-            <h1 class="text-2xl font-semibold">{item.label}</h1>
-            <!-- <DropdownButton /> -->
+    {#await (connection(), activityHandler())}
+      <AnalyticsSkeleton />
+    {:then}
+      <div class="flex flex-col lg:flex-row justify-between">
+        {#each chartEls as item}
+          <div class="flex flex-col w-full lg:w-[49.5%] pt-4 lg:pt-0">
+            <div class="flex w-full justify-between">
+              <h1 class="text-2xl font-semibold">{item.label}</h1>
+              <!-- <DropdownButton /> -->
+            </div>
+            <div
+              class="h-80 border-neutral-500 bg-neutral-800 border rounded-xl mt-4"
+            >
+              <Chart
+                data={item.label === 'Weekly New Connections'
+                  ? connectionData
+                  : activityData}
+                type="line"
+                colors={['green']}
+                axisOptions={{
+                  xIsSeries: true,
+                  xAxisMode: 'tick',
+                  yAxisMode: 'tick',
+                }}
+                lineOptions={{
+                  hideDots: 1,
+                  heatline: 0,
+                  areaFill: 1,
+                  regionFill: 1,
+                }}
+              />
+            </div>
           </div>
-          <div
-            class="h-80 border-neutral-500 bg-neutral-800 border rounded-xl mt-4"
-          >
-            <Chart
-              data={item.label === 'Weekly New Connections'
-                ? connectionData
-                : activityData}
-              type="line"
-              colors={['green']}
-              axisOptions={{
-                xIsSeries: true,
-                xAxisMode: 'tick',
-                yAxisMode: 'tick',
-              }}
-              lineOptions={{
-                hideDots: 1,
-                heatline: 0,
-                areaFill: 1,
-                regionFill: 1,
-              }}
-            />
-          </div>
+        {/each}
+      </div>
+      <div
+        class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[150px] my-4 space-x-0 md:space-x-2"
+      >
+        <div
+          class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
+        >
+          <p class="">New connections this week</p>
+          <p class="font-bold text-4xl">{connectionCount}</p>
         </div>
-      {/each}
-    </div>
-    <div
-      class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[150px] my-4 space-x-0 md:space-x-2"
-    >
-      <div
-        class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
-      >
-        <p class="">New connections this week</p>
-        <p class="font-bold text-4xl">{connectionCount}</p>
+        <div
+          class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
+        >
+          <p class="">Your activity this week</p>
+          <p class="font-bold text-4xl">{activityCount}</p>
+        </div>
+        <div
+          class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
+        >
+          <p class="">Unique People this week</p>
+          <p class="font-bold text-4xl">{uniqueCount}</p>
+        </div>
       </div>
-      <div
-        class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
-      >
-        <p class="">Your activity this week</p>
-        <p class="font-bold text-4xl">{activityCount}</p>
+      <div class="hidden lg:flex lg:flex-col">
+        <AnalyticTable
+          {currentPageRows}
+          {setPage}
+          {page}
+          {totalPages}
+          {active}
+          {loading}
+        />
       </div>
-      <div
-        class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
-      >
-        <p class="">Unique People this week</p>
-        <p class="font-bold text-4xl">{uniqueCount}</p>
+      <div class="flex lg:hidden w-full justify-center mt-8">
+        View more on desktop
       </div>
-    </div>
-    <div class="hidden lg:flex lg:flex-col">
-      <AnalyticTable
-        {currentPageRows}
-        {setPage}
-        {page}
-        {totalPages}
-        {active}
-        {loading}
-      />
-    </div>
-    <div class="flex lg:hidden w-full justify-center mt-8">
-      View more on desktop
-    </div>
+    {:catch}
+      <h1>Some error occurred. Please reload the page and try again.</h1>
+    {/await}
   </div>
 </div>

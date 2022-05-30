@@ -4,7 +4,7 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
 
-  let roleName = ''
+  let roleName = '';
   let showModal = false;
   let loading = false;
 
@@ -35,7 +35,7 @@
         .eq('id', teamId);
       if (error) {
         loading = false;
-        throw new Error(error)
+        throw new Error(error);
       } else {
         loading = false;
         toastSuccess('Role added successfully');
@@ -48,9 +48,7 @@
   };
 </script>
 
-<button
-  class="p-4 w-56 bg-white text-black rounded-lg"
-  on:click={toggleModal}>
+<button class="p-4 w-56 bg-white text-black rounded-lg" on:click={toggleModal}>
   + Add new role
 </button>
 {#if showModal}
@@ -85,8 +83,9 @@
             class="p-3 w-full text-black"
           />
           <button
-            class="flex justify-center p-4 w-full bg-neutral-600 text-black rounded-lg"
-            on:click={async () => await addRoleHandler()}>
+            class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg"
+            on:click={async () => await addRoleHandler()}
+          >
             {#if loading}
               <Spinner class="w-7 h-7" />
             {:else}

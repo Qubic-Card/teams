@@ -18,18 +18,25 @@
     TabList,
     TabPanel,
     TabPanels,
-  } from "@rgossiaux/svelte-headlessui";
+  } from '@rgossiaux/svelte-headlessui';
+  import supabase from '@lib/db';
 
   export let data;
   export let isEditorMode = false;
   export let profileUid;
   export let cardId;
+  export let teamId;
 
   let imageBase64 = null;
   let showModal = false;
+  let companyName = null;
+  let companyNickname = null;
+  let companyDesc = null;
+  let companyAddress = null;
+  let companyLogo = null;
   let currentTheme = theme[data.design?.theme?.toString() ?? 'dark'];
 
-  const download = (vCardString, fileName) => {
+  const downloadContactHandler = (vCardString, fileName) => {
     const fileURL = URL.createObjectURL(
       new Blob([vCardString], { type: 'text/vcard;charset=utf-8' })
     );
@@ -172,10 +179,31 @@
 
     log('Your contact was added to a phone', 'INFO', null, cardId, profileUid);
 
-    download(iOS() ? iosFormattedText : androidFormattedText, `qubicContact`);
+    downloadContactHandler(
+      iOS() ? iosFormattedText : androidFormattedText,
+      `qubicContact`
+    );
   };
 
+  const getTeams = async () => {
+    const { data, error } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('id', teamId);
+
+    if (error) console.log(error);
+    if (data) {
+      companyName = data[0].metadata.company;
+      companyNickname = data[0].nickname;
+      companyAddress = data[0].metadata.address;
+      companyDesc = data[0].metadata.description;
+      companyLogo = data[0].metadata.logo;
+      return data;
+    }
+  };
+  $: getTeams();
   const modalHandler = () => (showModal = !showModal);
+  const downloadHandler = () => console.log('Brosur has been downloaded');
 </script>
 
 <div class={`${currentTheme.pageBackground} ${$$props.class}`}>
@@ -214,11 +242,52 @@
     </h1>
   </div>
   <TabGroup class="flex flex-col items-center w-full text-white mt-4">
-    <TabList class="flex w-2/3 bg-black border-2 border-neutral-500 rounded-lg p-3">
-      <Tab class="w-1/2">My Contact</Tab>
-      <Tab class="w-1/2">QUBIC</Tab>
+    <TabList
+      class="flex w-2/3 bg-black border-2 border-neutral-500 rounded-lg p-2"
+    >
+      <Tab
+        class={({ selected }) =>
+          selected
+            ? 'bg-white text-black p-2 rounded-l-lg w-1/2'
+            : 'bg-neutral-800 text-white p-2 rounded-l-lg w-1/2'}
+        >{companyNickname ?? '-'}</Tab
+      >
+      <Tab
+        class={({ selected }) =>
+          selected
+            ? 'bg-white text-black p-2 rounded-r-lg w-1/2'
+            : 'bg-neutral-800 text-white p-2 rounded-r-lg w-1/2'}
+        >My Contact</Tab
+      >
     </TabList>
-    <TabPanels>
+    <TabPanels class="w-full">
+      <TabPanel>
+        <div class="gap-2 flex flex-col px-16 justify-center items-center mt-4">
+          <div
+            class="flex gap-2 flex-col w-full border-2 border-neutral-500 rounded-lg p-4"
+          >
+            <div class="flex">
+              <img
+                src={companyLogo ?? 'https://placeimg.com/80/80/any'}
+                alt=""
+                class="rounded-lg w-16 h-16 mr-2"
+              />
+              <h1>{companyName ?? '-'}</h1>
+            </div>
+            <p>{companyAddress ?? '-'}</p>
+            <p class="text-neutral-400">
+              {companyDesc ?? '-'}
+            </p>
+          </div>
+          <div
+            on:click={downloadHandler}
+            class="w-full border-2 border-neutral-500 rounded-lg p-4 cursor-pointer"
+          >
+            <h1>Know more about us</h1>
+            <p class="text-neutral-400">Download brosur starbucks</p>
+          </div>
+        </div>
+      </TabPanel>
       <TabPanel>
         <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
           <!-- UTILITIES -->
@@ -287,27 +356,6 @@
           </div>
         </div>
       </TabPanel>
-      <TabPanel>
-        <div class="gap-2 flex flex-col justify-center items-center pb-5 px-16 mt-4">
-          {#each isEditorMode ? $links : data.links as item}
-            {#if item.isActive}
-              <BorderButton
-                class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-                ><div class="p-2">
-                  <LinkPreview
-                    title={item.title}
-                    url={item.link}
-                    className={currentTheme.secondary}
-                    {profileUid}
-                    {cardId}
-                  />
-                </div></BorderButton
-              >
-            {/if}
-          {/each}
-        </div>
-      </TabPanel>
     </TabPanels>
   </TabGroup>
- 
 </div>

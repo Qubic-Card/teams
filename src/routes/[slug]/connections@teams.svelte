@@ -1,7 +1,7 @@
 <script>
-	import supabase from '@lib/db';
+  import supabase from '@lib/db';
   import { onMount } from 'svelte';
-  
+
   let innerWidth;
   let asc = true;
   let sortedField = 'name';
@@ -79,7 +79,7 @@
   // };
   let currentPageRows = [2, 2, 2, 2, 2];
   let loading = false;
-  let teamConnections = []
+  let teamConnections = [];
   const getTeamId = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -93,7 +93,7 @@
 
   const getTeamConnectionsList = async () => {
     let teamId = await getTeamId();
-    const {data, error} = await supabase
+    const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*')
       .eq('team_id', teamId);
@@ -102,10 +102,10 @@
     if (data) {
       return data;
     }
-  }
+  };
   onMount(async () => {
     teamConnections = await getTeamConnectionsList();
-    console.log(teamConnections)
+    console.log(teamConnections);
   });
   // $: searchQuery, searchHandler();
   // $: currentPageRows, useSortHandler(sortedField);
@@ -113,110 +113,113 @@
 
 <svelte:window bind:innerWidth />
 <div class="flex flex-col">
-  <div class="flex justify-end mt-6 gap-2">
-    <input
-      type="text"
-      class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-black bg-neutral-800"
-      placeholder="Search name"
-      bind:value={searchQuery}
-    />
-    <button class="p-2 bg-neutral-700 rounded-lg w-28">Search</button>
-  </div>
-  <div
-    class="snap-container snap-x mx-auto snap-mandatory flex flex-row w-full overflow-x-auto mb-8"
-  >
-    <table class="snap-center text-black w-full mt-6">
-      <thead class="text-left text-neutral-400">
-        <tr>
-          {#if innerWidth > 640}
-            {#each TABLE_HEADERS as item}
-              <th class=" pl-4 p-4 w-1/4 bg-neutral-900">
-                <div class="flex justify-between">
-                  <p>{item.name}</p>
-                  <img
-                    src="/sortIcon.svg"
-                    alt=""
-                    class="w-6 h-6 cursor-pointer hidden"
-                    on:click={() => {
-                      asc = !asc;
-                      sortedField = item.id;
-                      // useSortHandler(item.id);
-                    }}
-                  />
-                </div>
-              </th>
-            {/each}
-          {:else}
-            {#each TABLE_HEADERS_MOBILE as item}
-              <th class=" pl-4 p-2 w-1/2">
-                <div class="flex justify-between">
-                  <p>{item.name}</p>
-                  <img
-                    src="/sortIcon.svg"
-                    alt=""
-                    class="w-6 h-6 cursor-pointer hidden"
-                    on:click={() => {
-                      asc = !asc;
-                      sortedField = item.id;
-                      // useSortHandler(item.id);
-                    }}
-                  />
-                </div>
-              </th>
-            {/each}
-          {/if}
-        </tr>
-      </thead>
-      <tbody>
-        {#if currentPageRows.length > 0}
-          {#each currentPageRows as connection, i}
-            <tr
-              class={`h-12 text-left py-6 px-4 mb-2 ${
-                i % 2 == 0 ? 'bg-neutral-400' : 'bg-neutral-700'
-              }`}
-            >
-              <td
-                class="text-black font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1"
+  {#await getTeamConnectionsList()}
+    <h1>Loading...</h1>
+  {:then name}
+    <div class="flex justify-end mt-6 gap-2">
+      <input
+        type="text"
+        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-black bg-neutral-800"
+        placeholder="Search name"
+        bind:value={searchQuery}
+      />
+      <button class="p-2 bg-neutral-700 rounded-lg w-28">Search</button>
+    </div>
+    <div
+      class="snap-container snap-x mx-auto snap-mandatory flex flex-row w-full overflow-x-auto mb-8"
+    >
+      <table class="snap-center text-black w-full mt-6">
+        <thead class="text-left text-neutral-400">
+          <tr>
+            {#if innerWidth > 640}
+              {#each TABLE_HEADERS as item}
+                <th class=" pl-4 p-4 w-1/4 bg-neutral-900">
+                  <div class="flex justify-between">
+                    <p>{item.name}</p>
+                    <img
+                      src="/sortIcon.svg"
+                      alt=""
+                      class="w-6 h-6 cursor-pointer hidden"
+                      on:click={() => {
+                        asc = !asc;
+                        sortedField = item.id;
+                        // useSortHandler(item.id);
+                      }}
+                    />
+                  </div>
+                </th>
+              {/each}
+            {:else}
+              {#each TABLE_HEADERS_MOBILE as item}
+                <th class=" pl-4 p-2 w-1/2">
+                  <div class="flex justify-between">
+                    <p>{item.name}</p>
+                    <img
+                      src="/sortIcon.svg"
+                      alt=""
+                      class="w-6 h-6 cursor-pointer hidden"
+                      on:click={() => {
+                        asc = !asc;
+                        sortedField = item.id;
+                        // useSortHandler(item.id);
+                      }}
+                    />
+                  </div>
+                </th>
+              {/each}
+            {/if}
+          </tr>
+        </thead>
+        <tbody>
+          {#if currentPageRows.length > 0}
+            {#each currentPageRows as connection, i}
+              <tr
+                class={`h-12 text-left py-6 px-4 mb-2 ${
+                  i % 2 == 0 ? 'bg-neutral-400' : 'bg-neutral-700'
+                }`}
               >
-                edfdsf
-              </td>
-
-              {#if innerWidth > 640}
-                <td class="flex-1 text-black truncate pl-4"
-                  >{'sfdasfas' ?? '-'}</td
+                <td
+                  class="text-black font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1"
                 >
-                <td class="flex-1 text-black truncate pl-4">
-                  {'fasf' ?? '-'}
+                  edfdsf
                 </td>
-              {/if}
 
-              <td class="flex-1 text-black truncate pl-4">
-                {new Date().toDateString().slice(4) ?? '-'}
-              </td>
+                {#if innerWidth > 640}
+                  <td class="flex-1 text-black truncate pl-4"
+                    >{'sfdasfas' ?? '-'}</td
+                  >
+                  <td class="flex-1 text-black truncate pl-4">
+                    {'fasf' ?? '-'}
+                  </td>
+                {/if}
 
-              <td class="flex-1 text-black truncate pl-4 pr-4">
-                Pangestu Galih</td
-              >
-            </tr>
-          {/each}
-        {:else if loading}
-          <!-- <TableSkeleton colLength={4} /> -->
-          <div>Loading...</div>
-        {:else if currentPageRows.length === 0}
-          <h1 class="text-lg">
-            <span class="text-black">{currentPageRows.length}</span> contact
-          </h1>
-        {/if}
-      </tbody>
-    </table>
-  </div>
-  <!-- <div
+                <td class="flex-1 text-black truncate pl-4">
+                  {new Date().toDateString().slice(4) ?? '-'}
+                </td>
+
+                <td class="flex-1 text-black truncate pl-4 pr-4">
+                  Pangestu Galih</td
+                >
+              </tr>
+            {/each}
+          {:else if loading}
+            <!-- <TableSkeleton colLength={4} /> -->
+            <div>Loading...</div>
+          {:else if currentPageRows.length === 0}
+            <h1 class="text-lg">
+              <span class="text-black">{currentPageRows.length}</span> contact
+            </h1>
+          {/if}
+        </tbody>
+      </table>
+    </div>
+    <!-- <div
   class="w-full flex justify-center items-center mt-4 p-4 font-bold bg-neutral-300 text-black"
 >
   <h1>Upgrade Your Subscription</h1>
 </div> -->
 
-  <!-- <Pagination
+    <!-- <Pagination
   {subscriptionType}
   {currentPageRows}
   {totalPages}
@@ -224,4 +227,7 @@
   {setPage}
   {page}
 /> -->
+  {:catch}
+    <h1>Some error occurred. Please reload the page and try again.</h1>
+  {/await}
 </div>
