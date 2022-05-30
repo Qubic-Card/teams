@@ -618,8 +618,8 @@
         </div>
       </div>
     </div>
-  {:catch name}
-    <h1>err</h1>
+  {:catch}
+    <h1>Some error occurred. Please reload the page and try again.</h1>
   {/await}
 </div>
 

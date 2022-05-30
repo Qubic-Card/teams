@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
+  import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
 
   let isHasPermission = false;
 
@@ -72,7 +73,7 @@
 
 <div class="flex flex-col w-full h-full">
   {#await getContacts()}
-    <h1>Loading...</h1>
+    <AnalyticsPageSkeleton {isHasPermission} />
   {:then name}
     <div class="flex justify-between gap-4">
       {#each dummy as item}

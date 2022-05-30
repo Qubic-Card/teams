@@ -1,5 +1,7 @@
 <script>
+  import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
   import supabase from '@lib/db';
+  import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import { onMount } from 'svelte';
 
   let innerWidth;
@@ -13,7 +15,7 @@
     { name: 'Company', id: 'company' },
     {
       name: 'Connected At',
-      id: 'date',
+      id: 'dateConnected',
     },
     {
       name: 'By',
@@ -25,7 +27,7 @@
     { name: 'Name', id: 'name' },
     {
       name: 'Connected At',
-      id: 'date',
+      id: 'dateConnected',
     },
   ];
 
@@ -37,7 +39,7 @@
   //     sortedField = col;
   //     asc = true;
   //   }
-
+  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
   //   const newArr = currentPageRows.sort((a, b) => {
   //     const nameA = a['metadata']['firstname'].toLowerCase();
   //     const nameB = b['metadata']['firstname'].toLowerCase();
@@ -95,7 +97,7 @@
     let teamId = await getTeamId();
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*')
+      .select('*, by(*)')
       .eq('team_id', teamId);
 
     if (error) console.log(error);
@@ -103,10 +105,29 @@
       return data;
     }
   };
+
+  const sortHandler = async () => {
+    let teamId = await getTeamId();
+    const { data, error } = await supabase
+      .from('team_connection_acc')
+      .select('*')
+      .eq('team_id', teamId)
+      // .filter('role_name', 'in', 'admin');
+      // .match({ role_name: searchQuery });
+      .order('dateConnected', { ascending: true });
+    if (error) console.log(error);
+    if (data) {
+      console.log(data);
+      return data;
+    }
+  };
+
   onMount(async () => {
     teamConnections = await getTeamConnectionsList();
     console.log(teamConnections);
+    // await sortHandler();
   });
+  // $: asc, sortHandler();
   // $: searchQuery, searchHandler();
   // $: currentPageRows, useSortHandler(sortedField);
 </script>
@@ -114,8 +135,8 @@
 <svelte:window bind:innerWidth />
 <div class="flex flex-col">
   {#await getTeamConnectionsList()}
-    <h1>Loading...</h1>
-  {:then name}
+    <ConnectionsSkeletion />
+  {:then}
     <div class="flex justify-end mt-6 gap-2">
       <input
         type="text"
@@ -134,16 +155,18 @@
             {#if innerWidth > 640}
               {#each TABLE_HEADERS as item}
                 <th class=" pl-4 p-4 w-1/4 bg-neutral-900">
-                  <div class="flex justify-between">
+                  <div class="flex items-center">
                     <p>{item.name}</p>
                     <img
-                      src="/sortIcon.svg"
+                      src="https://img.icons8.com/android/96/ffffff/sort.png"
                       alt=""
-                      class="w-6 h-6 cursor-pointer hidden"
-                      on:click={() => {
-                        asc = !asc;
-                        sortedField = item.id;
+                      class="w-4 h-4 ml-2 cursor-pointer"
+                      on:click={async () => {
+                        // asc = !asc;
+                        // sortedField = item.id;
                         // useSortHandler(item.id);
+                        console.log('clicked' + item.id);
+                        await sortHandler();
                       }}
                     />
                   </div>
@@ -159,9 +182,10 @@
                       alt=""
                       class="w-6 h-6 cursor-pointer hidden"
                       on:click={() => {
-                        asc = !asc;
-                        sortedField = item.id;
+                        // asc = !asc;
+                        // sortedField = item.id;
                         // useSortHandler(item.id);
+                        console.log('clicked' + item.id);
                       }}
                     />
                   </div>
@@ -172,7 +196,7 @@
         </thead>
         <tbody>
           {#if currentPageRows.length > 0}
-            {#each currentPageRows as connection, i}
+            {#each teamConnections as connection, i}
               <tr
                 class={`h-12 text-left py-6 px-4 mb-2 ${
                   i % 2 == 0 ? 'bg-neutral-400' : 'bg-neutral-700'
@@ -181,33 +205,33 @@
                 <td
                   class="text-black font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1"
                 >
-                  edfdsf
+                  {connection.profileData.firstname ?? '-'}
+                  {connection.profileData.lastname ?? '-'}
                 </td>
 
                 {#if innerWidth > 640}
                   <td class="flex-1 text-black truncate pl-4"
-                    >{'sfdasfas' ?? '-'}</td
+                    >{connection.profileData.job ?? '-'}</td
                   >
                   <td class="flex-1 text-black truncate pl-4">
-                    {'fasf' ?? '-'}
+                    {connection.profileData.company ?? '-'}
                   </td>
                 {/if}
 
                 <td class="flex-1 text-black truncate pl-4">
-                  {new Date().toDateString().slice(4) ?? '-'}
+                  {new Date(connection.dateConnected).toDateString().slice(4) ??
+                    '-'}
                 </td>
 
                 <td class="flex-1 text-black truncate pl-4 pr-4">
-                  Pangestu Galih</td
-                >
+                  {connection.by.team_profile.firstname ?? '-'}
+                  {connection.by.team_profile.lastname ?? '-'}
+                </td>
               </tr>
             {/each}
-          {:else if loading}
-            <!-- <TableSkeleton colLength={4} /> -->
-            <div>Loading...</div>
           {:else if currentPageRows.length === 0}
             <h1 class="text-lg">
-              <span class="text-black">{currentPageRows.length}</span> contact
+              <span class="text-black">0</span> contact
             </h1>
           {/if}
         </tbody>

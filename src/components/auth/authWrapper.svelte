@@ -53,7 +53,7 @@
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event == 'SIGNED_IN') {
-      await goto('/select-teams', { noscroll: true });
+      // await goto('/select-teams', { noscroll: true });
       const { role_maps, role_name } = await getTeamMembers();
       userData.set(role_maps);
       user.set(session.user);

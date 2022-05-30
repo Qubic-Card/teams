@@ -5,7 +5,7 @@
   import AnalyticTable from '@comp/analyticTable.svelte';
   import { user } from '@lib/stores/userStore.js';
   import { selected } from '@lib/stores/dropdownStore.js';
-  import AnalyticsSkeleton from '@comp/skeleton/AnalyticsSkeleton.svelte';
+  import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
 
   let connectionData = {
     labels: [],

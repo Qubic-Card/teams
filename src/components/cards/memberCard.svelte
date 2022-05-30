@@ -24,20 +24,20 @@
     </div>
     <img
       src={member.team_profile.avatar}
-      alt="Photo profile"
+      alt="Profile"
       class="w-16 h-16 rounded-full"
     />
   </div>
   <Switch
     checked={member.isActive}
     on:change={(e) => (member.isActive = e.detail)}
-    class={`flex justify-center items-center self-end rounded-full w-24 h-12 ${
+    class={`flex justify-center items-center self-end rounded-full w-16 h-10 ${
       member.isActive ? 'bg-green-600' : 'bg-neutral-600'
     }`}
   >
     <span
-      class={`inline-block w-10 h-10 bg-white rounded-full transition-transform duration-300 ease-in-out ${
-        member.isActive ? 'translate-x-6' : '-translate-x-6'
+      class={`inline-block w-8 h-8 bg-white rounded-full transition-transform duration-300 ease-in-out ${
+        member.isActive ? 'translate-x-3' : '-translate-x-3'
       }`}
       class:toggle-on={member.isActive}
       class:toggle-off={!member.isActive}
