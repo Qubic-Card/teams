@@ -1,18 +1,22 @@
 <script>
-  import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
   import supabase from '@lib/db';
+  import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
+  import Spinner from '@comp/loading/spinner.svelte';
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
+  import ConnectionTableBody from '@comp/connectionTableBody.svelte';
+  import { memberRights } from '@lib/stores/memberRightsStore';
+  import { user } from '@lib/stores/userStore';
   import { onMount } from 'svelte';
+  import { getProfileId, getTeamId } from '@lib/query/getId';
 
   let innerWidth;
   let asc = true;
-  let sortedField = 'name';
   let searchQuery = '';
 
   const TABLE_HEADERS = [
-    { name: 'Name', id: 'name' },
-    { name: 'Job', id: 'job' },
-    { name: 'Company', id: 'company' },
+    { name: 'Name', id: 'profileData->>firstname' },
+    { name: 'Job', id: 'profileData->>job' },
+    { name: 'Company', id: 'profileData->>company' },
     {
       name: 'Connected At',
       id: 'dateConnected',
@@ -24,112 +28,84 @@
   ];
 
   const TABLE_HEADERS_MOBILE = [
-    { name: 'Name', id: 'name' },
+    { name: 'Name', id: 'profileData->>firstname' },
     {
       name: 'Connected At',
       id: 'dateConnected',
     },
   ];
 
-  // const useSortHandler = (col) => {
-  //   asc = !asc;
-  //   if (sortedField === col) {
-  //     asc = !asc;
-  //   } else {
-  //     sortedField = col;
-  //     asc = true;
-  //   }
-  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
-  //   const newArr = currentPageRows.sort((a, b) => {
-  //     const nameA = a['metadata']['firstname'].toLowerCase();
-  //     const nameB = b['metadata']['firstname'].toLowerCase();
-  //     const jobA = a['metadata']['job'].toLowerCase();
-  //     const jobB = b['metadata']['job'].toLowerCase();
-  //     const companyA = a['metadata']['company'].toLowerCase();
-  //     const companyB = b['metadata']['company'].toLowerCase();
-  //     const dateA = a['dateConnected'].toLowerCase();
-  //     const dateB = b['dateConnected'].toLowerCase();
-
-  //     if (col === 'name')
-  //       return asc ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-
-  //     if (col === 'job')
-  //       return asc ? jobA.localeCompare(jobB) : jobB.localeCompare(jobA);
-
-  //     if (col === 'company')
-  //       return asc
-  //         ? companyA.localeCompare(companyB)
-  //         : companyB.localeCompare(companyA);
-
-  //     if (col === 'date')
-  //       return asc ? dateA.localeCompare(dateB) : dateB.localeCompare(dateA);
-  //   });
-
-  //   currentPageRows = newArr;
-  // };
-
-  // const searchHandler = () => {
-  //   const search = searchQuery.toLowerCase();
-  //   const newArr = currentPageRows.filter((row) => {
-  //     const name =
-  //       row['connectedProfile']['metadata']['firstname'].toLowerCase();
-
-  //     return name.includes(search);
-  //   });
-
-  //   search && newArr ? (currentPageRows = newArr) : currentPageRows;
-  // };
-  let currentPageRows = [2, 2, 2, 2, 2];
+  // let currentPageRows = [2, 2, 2, 2, 2];
   let loading = false;
   let teamConnections = [];
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
 
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
+  let isHasPermission = false;
+  $: {
+    $memberRights?.filter((item) => {
+      if (item === 'allow_read_connections') isHasPermission = true;
+    });
+
+    console.log(isHasPermission);
+  }
 
   const getTeamConnectionsList = async () => {
-    let teamId = await getTeamId();
+    let id = isHasPermission
+      ? await getTeamId($user.id)
+      : await getProfileId($user.id);
+    console.log(id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq('team_id', teamId);
+      .eq(isHasPermission ? 'team_id' : 'by', id)
+      .order('dateConnected', { ascending: true });
 
     if (error) console.log(error);
     if (data) {
+      teamConnections = data;
+    }
+  };
+
+  const sortHandler = async (col = 'profileData->>firstname') => {
+    let id = isHasPermission
+      ? await getTeamId($user.id)
+      : await getProfileId($user.id);
+    const { data, error } = await supabase
+      .from('team_connection_acc')
+      .select('*, by(*)')
+      .eq('team_id', id)
+      .order(col, { ascending: asc });
+
+    if (error) console.log(error);
+    if (data) {
+      teamConnections = data;
       return data;
     }
   };
 
-  const sortHandler = async () => {
-    let teamId = await getTeamId();
+  const searchProfileHandler = async () => {
+    loading = true;
+    let id = isHasPermission
+      ? await getTeamId($user.id)
+      : await getProfileId($user.id);
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*')
-      .eq('team_id', teamId)
-      // .filter('role_name', 'in', 'admin');
-      // .match({ role_name: searchQuery });
-      .order('dateConnected', { ascending: true });
+      .select('*, by(*)')
+      .eq(isHasPermission ? 'team_id' : 'by', id)
+      // .textSearch('profileData->>firstname', `%${searchQuery}%`, {
+      //   type: 'websearch',
+      //   config: 'english',
+      // });
+      .ilike('profileData->>firstname', `%${searchQuery}%`);
+
+    loading = false;
     if (error) console.log(error);
     if (data) {
       console.log(data);
+      teamConnections = data;
       return data;
     }
   };
-
-  onMount(async () => {
-    teamConnections = await getTeamConnectionsList();
-    console.log(teamConnections);
-    // await sortHandler();
-  });
-  // $: asc, sortHandler();
-  // $: searchQuery, searchHandler();
-  // $: currentPageRows, useSortHandler(sortedField);
+  // $: searchProfileHandler();
 </script>
 
 <svelte:window bind:innerWidth />
@@ -137,14 +113,20 @@
   {#await getTeamConnectionsList()}
     <ConnectionsSkeletion />
   {:then}
-    <div class="flex justify-end mt-6 gap-2">
+    <div class="flex justify-end items-center mt-6 gap-2">
+      {#if loading}
+        <Spinner class="w-10 h-10 mr-2" />
+      {/if}
       <input
         type="text"
-        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-black bg-neutral-800"
+        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
         placeholder="Search name"
         bind:value={searchQuery}
       />
-      <button class="p-2 bg-neutral-700 rounded-lg w-28">Search</button>
+      <button
+        class="p-2 bg-neutral-700 rounded-lg w-28"
+        on:click={async () => await searchProfileHandler()}>Search</button
+      >
     </div>
     <div
       class="snap-container snap-x mx-auto snap-mandatory flex flex-row w-full overflow-x-auto mb-8"
@@ -162,11 +144,8 @@
                       alt=""
                       class="w-4 h-4 ml-2 cursor-pointer"
                       on:click={async () => {
-                        // asc = !asc;
-                        // sortedField = item.id;
-                        // useSortHandler(item.id);
-                        console.log('clicked' + item.id);
-                        await sortHandler();
+                        asc = !asc;
+                        await sortHandler(item.id);
                       }}
                     />
                   </div>
@@ -194,49 +173,17 @@
             {/if}
           </tr>
         </thead>
-        <tbody>
-          {#if currentPageRows.length > 0}
-            {#each teamConnections as connection, i}
-              <tr
-                class={`h-12 text-left py-6 px-4 mb-2 ${
-                  i % 2 == 0 ? 'bg-neutral-400' : 'bg-neutral-700'
-                }`}
-              >
-                <td
-                  class="text-black font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1"
-                >
-                  {connection.profileData.firstname ?? '-'}
-                  {connection.profileData.lastname ?? '-'}
-                </td>
-
-                {#if innerWidth > 640}
-                  <td class="flex-1 text-black truncate pl-4"
-                    >{connection.profileData.job ?? '-'}</td
-                  >
-                  <td class="flex-1 text-black truncate pl-4">
-                    {connection.profileData.company ?? '-'}
-                  </td>
-                {/if}
-
-                <td class="flex-1 text-black truncate pl-4">
-                  {new Date(connection.dateConnected).toDateString().slice(4) ??
-                    '-'}
-                </td>
-
-                <td class="flex-1 text-black truncate pl-4 pr-4">
-                  {connection.by.team_profile.firstname ?? '-'}
-                  {connection.by.team_profile.lastname ?? '-'}
-                </td>
-              </tr>
-            {/each}
-          {:else if currentPageRows.length === 0}
-            <h1 class="text-lg">
-              <span class="text-black">0</span> contact
-            </h1>
-          {/if}
-        </tbody>
+        {#each teamConnections as connection, i}
+          <ConnectionTableBody
+            {innerWidth}
+            {teamConnections}
+            {connection}
+            {i}
+          />
+        {/each}
       </table>
     </div>
+
     <!-- <div
   class="w-full flex justify-center items-center mt-4 p-4 font-bold bg-neutral-300 text-black"
 >

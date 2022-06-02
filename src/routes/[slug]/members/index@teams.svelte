@@ -1,30 +1,22 @@
 <script>
-  import supabase from '@lib/db';
-  import { page } from '$app/stores';
-  import MemberCard from '@comp/cards/memberCard.svelte';
   import { onMount } from 'svelte';
+  import { page } from '$app/stores';
+  import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
+  import MemberCard from '@comp/cards/memberCard.svelte';
+  import Spinner from '@comp/loading/spinner.svelte';
+  import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { memberRights } from '@lib/stores/memberRightsStore';
-  import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
+  import { getTeamId } from '@lib/query/getId';
 
   let members = [];
   let ownProfile = [];
   let isHasPermission = false;
   let searchQuery = '';
-
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
+  let loading = false;
 
   const getTeamMembers = async () => {
-    let teamId = await getTeamId();
+    let teamId = await getTeamId($user.id);
     const { data, error } = await supabase
       .from('team_members')
       .select('team_profile, uid')
@@ -38,50 +30,31 @@
   };
 
   const searchMemberHandler = async () => {
-    let teamId = await getTeamId();
-    const search = searchQuery.toLowerCase();
+    loading = true;
+    let teamId = await getTeamId($user.id);
     const { data, error } = await supabase
       .from('team_members')
-      .select('team_profile')
-      .eq('team_id', teamId)
-      .match({ team_profile: 'galih' });
-    // .textSearch('team_profile', 'galih', {
-    //   // type: 'plain',
-    //   config: 'english',
-    // });
-    if (error) console.log(error);
-    if (data) {
-      console.log(data);
-      return data;
-    }
-  };
-
-  const testFilterHandler = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('team_roles')
       .select('*')
       .eq('team_id', teamId)
-      // .filter('role_name', 'in', 'admin');
-      // .match({ role_name: searchQuery });
-      .order('role_name', { ascending: false });
+      .ilike('team_profile->>firstname', `%${searchQuery}%`);
+
+    loading = false;
     if (error) console.log(error);
     if (data) {
       console.log(data);
+      members = data;
       return data;
     }
   };
 
-  onMount(async () => {
-    members = await getTeamMembers();
-    await searchMemberHandler();
-    await testFilterHandler();
-  });
+  onMount(async () => (members = await getTeamMembers()));
 
   $: {
     $memberRights?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
+
+    members;
 
     members.map((member) => {
       if (member.uid === $user.id) ownProfile = member;
@@ -99,16 +72,19 @@
     >
       {$page.params.slug}
     </div>
-    <div class="flex justify-end mt-6 gap-2">
+    <div class="flex justify-end items-center mt-6 gap-2">
+      {#if loading}
+        <Spinner class="w-10 h-10 mr-2" />
+      {/if}
       <input
         type="text"
-        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-black bg-neutral-800"
+        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
         placeholder="Search name"
         bind:value={searchQuery}
       />
       <button
         class="p-2 bg-neutral-700 rounded-lg w-28"
-        on:click={async () => await testFilterHandler()}>Search</button
+        on:click={async () => await searchMemberHandler()}>Search</button
       >
     </div>
     <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">

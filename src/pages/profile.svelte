@@ -243,7 +243,7 @@
   </div>
   <TabGroup class="flex flex-col items-center w-full text-white mt-4">
     <TabList
-      class="flex w-2/3 bg-black border-2 border-neutral-500 rounded-lg p-2"
+      class="flex w-2/3 bg-black border-2 border-neutral-700 rounded-lg p-2"
     >
       <Tab
         class={({ selected }) =>
@@ -264,7 +264,7 @@
       <TabPanel>
         <div class="gap-2 flex flex-col px-16 justify-center items-center mt-4">
           <div
-            class="flex gap-2 flex-col w-full border-2 border-neutral-500 rounded-lg p-4"
+            class="flex gap-2 flex-col w-full border-2 border-neutral-700 rounded-lg p-4"
           >
             <div class="flex">
               <img
@@ -281,7 +281,7 @@
           </div>
           <div
             on:click={downloadHandler}
-            class="w-full border-2 border-neutral-500 rounded-lg p-4 cursor-pointer"
+            class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
           >
             <h1>Know more about us</h1>
             <p class="text-neutral-400">Download brosur starbucks</p>

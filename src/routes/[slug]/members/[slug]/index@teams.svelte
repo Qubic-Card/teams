@@ -33,6 +33,7 @@
     Transition,
   } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
+  import toNewTab from '@lib/utils/newTab';
 
   // Register the plugins
   registerPlugin(
@@ -198,42 +199,28 @@
     console.log(isHasWriteProfilePermission, isHasWriteMembersPermission);
   }
 
-  const toNewTab = async (type, data) => {
-    switch (type) {
-      case 'whatsapp':
-        await window.open('https://wa.me/' + data, '_blank').focus();
-        break;
-      case 'facebook':
-        await window.open('https://facebook.com/' + data, '_blank').focus();
-        break;
-      case 'twitter':
-        await window.open('https://twitter.com/' + data, '_blank').focus();
-        break;
-      case 'tiktok':
-        await window.open('https://tiktok.com/' + data, '_blank').focus();
-        break;
-      case 'linkedin':
-        await window.open('https://linkedin.com/' + data, '_blank').focus();
-        break;
-      case 'youtube':
-        await window.open('https://youtube.com/' + data, '_blank').focus();
-        break;
-      case 'instagram':
-        await window.open('https://instagram.com/' + data, '_blank').focus();
-        break;
-      case 'email':
-        await window.open('mailto:' + data, '_blank').focus();
-        break;
-      case 'phone':
-        await window.open('tel:' + data, '_blank').focus();
-        break;
-      default:
-        break;
-    }
-  };
   $: console.log($memberRights);
 </script>
 
+{#if $page.params.slug === $user.id}
+  {#if isHasWriteProfilePermission === false}
+    <div
+      class={`flex justify-center bg-neutral-200 text-black p-2 rounded-lg ${
+        isHasWriteProfilePermission ? 'hidden' : ''
+      }`}
+    >
+      You dont have permission to edit your profile
+    </div>
+  {/if}
+{:else if isHasWriteMembersPermission === false}
+  <div
+    class={`flex justify-center bg-neutral-200 text-black p-2 rounded-lg ${
+      isHasWriteMembersPermission ? 'hidden' : ''
+    }`}
+  >
+    You dont have permission to edit this member's profile
+  </div>
+{/if}
 <div class="min-h-screen flex justify-center">
   {#await getProfile()}
     <ProfileEditorSkeleton />
@@ -242,32 +229,34 @@
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           <TabGroup>
-            <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
+            <TabList
+              class="w-full grid grid-cols-3 border-2 border-neutral-700 rounded-md p-2"
+            >
               <Tab
                 class={({ selected }) =>
                   selected
                     ? 'bg-white text-black p-2 rounded-md'
-                    : 'bg-neutral-800 text-white p-2 rounded-l-md'}>Bio</Tab
+                    : 'bg-neutral-900 text-white p-2 rounded-l-md'}>Bio</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
                     ? 'bg-white text-black p-2 rounded-md'
-                    : 'bg-neutral-800 text-white p-2'}>Socials</Tab
+                    : 'bg-neutral-900 text-white p-2'}>Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
                     ? 'bg-white text-black p-2 rounded-md'
-                    : 'bg-neutral-800 text-white p-2 rounded-r-md'}>Links</Tab
+                    : 'bg-neutral-900 text-white p-2 rounded-r-md'}>Links</Tab
               >
             </TabList>
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="border-b-zinc-300 border mb-4">
+                <div class="border-neutral-700 border-2 mb-4">
                   <div
-                    class="px-3 pt-3 bg-neutral-800 grid grid-cols-2 space-x-5"
+                    class="px-3 pt-3 bg-neutral-900 grid grid-cols-2 space-x-5"
                   >
                     <Input
                       on:change={handleSave}
@@ -292,7 +281,7 @@
                         : true}
                     />
                   </div>
-                  <div class="px-3 bg-neutral-800">
+                  <div class="px-3 bg-neutral-900">
                     <Input
                       on:change={handleSave}
                       placeholder="example company"
@@ -317,7 +306,7 @@
                     />
                   </div>
                   <div
-                    class={`p-3 bg-neutral-800 ${
+                    class={`p-3 bg-neutral-900 ${
                       isHasWriteProfilePermission || isHasWriteMembersPermission
                         ? ''
                         : 'hidden'
@@ -365,7 +354,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="border mb-4 p-4 bg-neutral-800">
+                <div class="border mb-4 p-4 bg-neutral-900">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
@@ -465,7 +454,7 @@
                             leaveTo="transform scale-95 opacity-0"
                           >
                             <MenuItems
-                              class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
+                              class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-700 p-2 w-40"
                             >
                               <MenuItem
                                 class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
@@ -524,7 +513,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- Link Editor -->
-                <div class="border p-4 mb-0 lg:mb-20 bg-neutral-800">
+                <div class="border p-4 mb-0 lg:mb-20 bg-neutral-900">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img

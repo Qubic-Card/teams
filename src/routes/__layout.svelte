@@ -6,31 +6,14 @@
   import useAuth from '@lib/useAuth.js';
   import supabase from '@lib/db';
   import { setMemberRights } from '@lib/stores/memberRightsStore';
+  import getRoleMaps from '@lib/query/getRoleMaps';
 
   $: console.log('layout', $user);
   // onMount(() => useAuth($user));
 
   let roleMapping = [];
 
-  const getTeamMembers = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('role(*)')
-      .eq('uid', $user.id);
-
-    if (error) console.log(error);
-
-    const { role_maps, role_name } = data[0].role;
-    if (data) {
-      return { role_maps, role_name };
-    }
-  };
-
-  onMount(async () => {
-    const { role_maps, role_name } = await getTeamMembers();
-    roleMapping = role_maps;
-    // [
-  });
+  onMount(async () => (roleMapping = await getRoleMaps($user.id)));
 
   $: setMemberRights(roleMapping);
 </script>

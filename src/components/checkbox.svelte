@@ -1,32 +1,9 @@
 <script>
-  import supabase from '@lib/db';
+  import { setNewRole } from '@lib/stores/roleStore';
 
-  import { role, setNewRole, roleName } from '@lib/stores/roleStore';
-
-  export let checkboxes, checked, roles, id;
+  export let checkboxes, checked;
 
   $: setNewRole(checked);
-  const updateTeamsRoleMapping = async () => {
-    const { data, error } = await supabase
-      .from('team_roles')
-      .update(
-        {
-          role_maps: $role,
-        },
-        { returning: 'minimal' }
-      )
-      .eq('id', id);
-
-    if (error) console.log(error);
-
-    if (data) {
-      console.log(data);
-      return data;
-    }
-  };
-
-  $: console.log('ROLE STORE', $role);
-  $: console.log('CHECKED', checked);
 </script>
 
 {#each checkboxes as checkbox}
@@ -37,7 +14,6 @@
       <div class="mt-2">
         <label class="flex cursor-pointer">
           <input
-            on:change={async () => await updateTeamsRoleMapping()}
             type="checkbox"
             class="w-7 h-7 cursor-pointer"
             bind:group={checked}

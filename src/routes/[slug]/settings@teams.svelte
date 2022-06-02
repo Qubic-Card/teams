@@ -17,10 +17,10 @@
   import AddRoleModal from '@comp/modals/addRoleModal.svelte';
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
-  import { log } from '@lib/logger/logger';
-  import TeamEditor from '@pages/teamEditor.svelte';
   import { memberRights } from '@lib/stores/memberRightsStore';
   import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
+  import { getTeamId } from '@lib/query/getId';
+  import { user } from '@lib/stores/userStore';
 
   let newRoles = [];
   let roles = [];
@@ -28,20 +28,10 @@
   let isAutoRenew = false;
   let isHasPermission = false;
   // $: roles;
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
 
   const getTeamsRoleMapping = async () => {
     try {
-      let teamId = await getTeamId();
+      let teamId = await getTeamId($user.id);
       console.log(teamId);
       const { data, error } = await supabase
         .from('team_roles')
@@ -53,6 +43,25 @@
       if (data) roles = data;
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const updateTeamsRoleMapping = async (id) => {
+    const { data, error } = await supabase
+      .from('team_roles')
+      .update(
+        {
+          role_maps: $role,
+        },
+        { returning: 'minimal' }
+      )
+      .eq('id', id);
+
+    if (error) console.log(error);
+
+    if (data) {
+      console.log(data);
+      return data;
     }
   };
 
@@ -77,9 +86,6 @@
 
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
-    {#if isHasPermission}
-      <TeamEditor />
-    {/if}
     <div class="flex flex-col my-4">
       <div class="flex justify-between items-center mb-4">
         <h1 class="font-bold text-3xl">Billing</h1>
@@ -140,6 +146,11 @@
                   {roles}
                   id={role.id}
                 />
+                <button
+                  class="w-full p-3 bg-white text-black rounded-lg"
+                  on:click={async () => await updateTeamsRoleMapping(role.id)}
+                  >Save changes</button
+                >
               </DisclosurePanel>
             </div>
           {/if}

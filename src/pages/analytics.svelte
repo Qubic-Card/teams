@@ -6,6 +6,7 @@
   import { user } from '@lib/stores/userStore.js';
   import { selected } from '@lib/stores/dropdownStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
+  import { getTeamId } from '@lib/query/getId';
 
   let connectionData = {
     labels: [],
@@ -114,19 +115,8 @@
     return result;
   };
 
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
-
   const getConnectionsList = async () => {
-    let teamId = await getTeamId();
+    let teamId = await getTeamId($user.id);
     let {
       data: connection_profile,
       error: error_profile,
@@ -136,7 +126,7 @@
       .select('dateConnected', { count: 'estimated' })
       .eq(
         isHasPermission ? 'team_id' : 'uid',
-        isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3'
+        isHasPermission ? teamId : $user.id
       )
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
@@ -153,7 +143,7 @@
   };
 
   const getWeeklyLogsActivity = async () => {
-    let teamId = await getTeamId();
+    let teamId = await getTeamId($user.id);
     loading = true;
     try {
       let {
@@ -165,7 +155,7 @@
         .select('*', { count: 'estimated' })
         .eq(
           isHasPermission ? 'team' : 'uid',
-          isHasPermission ? teamId : '39ba7789-537c-4b0f-a8a7-c8a8345838f3'
+          isHasPermission ? teamId : $user.id
         )
         .gte('timestamp', new Date(last7Days[0]).toISOString())
         .order('timestamp', { ascending: false })

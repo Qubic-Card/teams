@@ -5,6 +5,7 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
+  import { getTeamId } from '@lib/query/getId';
 
   let isHasPermission = false;
 
@@ -39,19 +40,9 @@
   const selectTopic = (topic) => (selectedTopic = topic);
   const setState = (newState) => (state = newState);
   let contactsCount = 0;
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
 
   const getContacts = async () => {
-    let teamId = await getTeamId();
+    let teamId = await getTeamId($user.id);
     const { data, error } = await supabase
       .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
       .select('*')

@@ -12,6 +12,7 @@
   import { onMount } from 'svelte';
   import { role } from '@lib/stores/roleStore';
   import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
+  import getRoleMaps from '@lib/query/getRoleMaps';
 
   // $: console.log($page);
   // const useAuth = async () => {
@@ -43,36 +44,10 @@
   let memberRole = [];
   let roleMapping = [];
   let memberRight = [];
-
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
-
-  const getTeamMembers = async () => {
-    let teamId = await getTeamId();
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('role(*)')
-      .eq('uid', $user.id);
-
-    if (error) console.log(error);
-
-    const { role_maps, role_name } = data[0].role;
-    if (data) {
-      return { role_maps, role_name };
-    }
-  };
+  let roleName = '';
 
   onMount(async () => {
-    const { role_maps, role_name } = await getTeamMembers();
-    roleMapping = role_maps;
+    roleMapping = await getRoleMaps($user.id);
     // [
     //   "allow_read_members",
     //   "allow_read_team",
@@ -84,7 +59,6 @@
   });
 
   $: setMemberRights(roleMapping);
-
   $: console.log(userImg, $memberRights);
   let sidebarItems = [
     {
@@ -104,6 +78,16 @@
         'https://img.icons8.com/external-icongeek26-outline-icongeek26/64/ffffff/external-connection-data-analytics-icongeek26-outline-icongeek26.png',
       handler: () => {
         goto(`/${teamName}/connections`);
+        isSidebarOpened && sidebarHandler();
+      },
+    },
+    {
+      title: 'team',
+      routeId: '[slug]/team@teams',
+      urldefault:
+        'https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/64/ffffff/external-team-business-and-management-kiranshastry-lineal-kiranshastry-2.png',
+      handler: () => {
+        goto(`/${teamName}/team`);
         isSidebarOpened && sidebarHandler();
       },
     },
