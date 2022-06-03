@@ -12,8 +12,8 @@
     MenuButton,
     MenuItems,
     MenuItem,
-    Transition,
   } from '@rgossiaux/svelte-headlessui';
+  import { slide } from 'svelte/transition';
 
   let innerWidth;
   let asc = true;
@@ -45,12 +45,19 @@
   // let currentPageRows = [2, 2, 2, 2, 2];
   let loading = false;
   let teamConnections = [];
+  let searchMenus = [
+    { name: 'Name', col: 'profileData->>firstname' },
+    { name: 'Job', col: 'profileData->>job' },
+    { name: 'Company', col: 'profileData->>company' },
+  ];
+  let selectedSearchMenu = null;
 
   let isHasPermission = false;
   $: {
     $memberRights?.filter((item) => {
       if (item === 'allow_read_connections') isHasPermission = true;
     });
+    console.log(isHasPermission);
   }
 
   const getTeamConnectionsList = async () => {
@@ -114,12 +121,6 @@
   };
   $: searchQuery, searchProfileHandler();
 
-  let searchMenus = [
-    { name: 'Name', col: 'profileData->>firstname' },
-    { name: 'Job', col: 'profileData->>job' },
-    { name: 'Company', col: 'profileData->>company' },
-  ];
-  let selectedSearchMenu = null;
   const selectMenu = (menu) => (selectedSearchMenu = menu);
 </script>
 
@@ -138,37 +139,43 @@
         placeholder="Search name"
         bind:value={searchQuery}
       />
-      <Menu as="div" class="mx-2">
+      <Menu as="div" class="mx-2" let:open>
         <MenuButton
-          class="bg-neutral-700 inline-block relative w-24 h-12 rounded-md"
-          >{selectedSearchMenu ? selectedSearchMenu.name : 'Name'}</MenuButton
+          class="bg-white text-black flex justify-around items-center relative min-w-28 h-12 px-2 rounded-md"
         >
-        <Transition
-          enter="transition duration-100 ease-out"
-          enterFrom="transform scale-95 opacity-0"
-          enterTo="transform scale-100 opacity-100"
-          leave="transition duration-75 ease-out"
-          leaveFrom="transform scale-100 opacity-100"
-          leaveTo="transform scale-95 opacity-0"
-        >
-          <MenuItems
-            class="top-24 right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+          {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="black"
+            stroke-width="2"
           >
-            {#each searchMenus as item}
-              <MenuItem
-                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                on:click={() => selectMenu(item)}
-              >
-                {item.name}
-              </MenuItem>
-            {/each}
-          </MenuItems>
-        </Transition>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </MenuButton>
+        {#if open}
+          <div transition:slide|local={{ duration: 500 }}>
+            <MenuItems
+              class="top-24 right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+            >
+              {#each searchMenus as item}
+                <MenuItem
+                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                  on:click={() => selectMenu(item)}
+                >
+                  {item.name}
+                </MenuItem>
+              {/each}
+            </MenuItems>
+          </div>
+        {/if}
       </Menu>
-      <!-- <button
-        class="p-2 bg-neutral-700 rounded-lg w-28"
-        on:click={async () => await searchProfileHandler()}>Search</button
-      > -->
     </div>
     <div
       class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"

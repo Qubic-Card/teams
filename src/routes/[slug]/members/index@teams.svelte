@@ -6,14 +6,14 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { memberRights } from '@lib/stores/memberRightsStore';
-  import { getTeamId } from '@lib/query/getId';
+  import { getProfileId, getTeamId } from '@lib/query/getId';
   import {
     Menu,
     MenuButton,
     MenuItems,
     MenuItem,
-    Transition,
   } from '@rgossiaux/svelte-headlessui';
+  import { slide } from 'svelte/transition';
 
   let members = [];
   let ownProfile = [];
@@ -22,11 +22,19 @@
   let searchNotFoundMsg = '';
   let loading = false;
 
+  let searchMenus = [
+    { name: 'Name', col: 'team_profile->>firstname' },
+    { name: 'Job', col: 'team_profile->>job' },
+    { name: 'Company', col: 'team_profile->>company' },
+  ];
+  let selectedSearchMenu = null;
+  let statusMember = null;
+
   const getTeamMembers = async () => {
     let teamId = await getTeamId($user.id);
     const { data, error } = await supabase
       .from('team_members')
-      .select('team_profile, uid')
+      .select('team_profile, uid, id')
       .eq('team_id', teamId);
 
     if (error) console.log(error);
@@ -36,6 +44,21 @@
       members = data;
     }
   };
+
+  // const getMembersStatusCard = async () => {
+  //   let id = await getProfileId($user.id);
+  //   const { data, error } = await supabase
+  //     .from('team_cardcon')
+  //     .select('status')
+  //     .eq('team_member_id', id);
+
+  //   if (error) console.log(error);
+
+  //   if (data) {
+  //     console.log(data);
+  //     statusMember = data;
+  //   }
+  // };
 
   const searchMemberHandler = async () => {
     loading = true;
@@ -63,6 +86,8 @@
   };
 
   $: {
+    // getMembersStatusCard();
+    console.log(members);
     $memberRights?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
@@ -74,14 +99,7 @@
 
   $: searchQuery, searchMemberHandler();
 
-  let searchMenus = [
-    { name: 'Name', col: 'team_profile->>firstname' },
-    { name: 'Job', col: 'team_profile->>job' },
-    { name: 'Company', col: 'team_profile->>company' },
-  ];
-  let selectedSearchMenu = null;
   const selectMenu = (menu) => (selectedSearchMenu = menu);
-  $: console.log(selectedSearchMenu);
 </script>
 
 <div class="flex flex-col">
@@ -104,40 +122,62 @@
         placeholder="Search name"
         bind:value={searchQuery}
       />
-      <Menu as="div" class="mx-2">
+      <Menu as="div" class="mx-2" let:open>
         <MenuButton
-          class="bg-neutral-700 inline-block relative w-24 h-12 rounded-md"
-          >{selectedSearchMenu ? selectedSearchMenu.name : 'Name'}</MenuButton
+          class="bg-white text-black flex justify-around items-center relative min-w-28 h-12 px-2 rounded-md"
         >
-        <Transition
-          enter="transition duration-100 ease-out"
-          enterFrom="transform scale-95 opacity-0"
-          enterTo="transform scale-100 opacity-100"
-          leave="transition duration-75 ease-out"
-          leaveFrom="transform scale-100 opacity-100"
-          leaveTo="transform scale-95 opacity-0"
-        >
-          <MenuItems
-            class="top-24 right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+          {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="black"
+            stroke-width="2"
           >
-            {#each searchMenus as item}
-              <MenuItem
-                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                on:click={() => selectMenu(item)}
-              >
-                {item.name}
-              </MenuItem>
-            {/each}
-          </MenuItems>
-        </Transition>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </MenuButton>
+        {#if open}
+          <div transition:slide|local={{ duration: 500 }}>
+            <MenuItems
+              class="top-[480px] right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+            >
+              {#each searchMenus as item}
+                <MenuItem
+                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                  on:click={() => selectMenu(item)}
+                >
+                  {item.name}
+                </MenuItem>
+              {/each}
+            </MenuItems>
+          </div>
+        {/if}
       </Menu>
     </div>
     <div class="grid grid-cols-3 grid-flow-row my-8">
-      {#each members as member}
+      {#each members as member, i}
         {#if isHasPermission === false && member.uid === ownProfile.uid}
-          <MemberCard member={ownProfile} />
+          <MemberCard
+            member={ownProfile}
+            {isHasPermission}
+            id={member.id}
+            index={i}
+            {statusMember}
+          />
         {:else if isHasPermission === true}
-          <MemberCard {member} />
+          <MemberCard
+            {member}
+            {isHasPermission}
+            id={member.id}
+            index={i}
+            {statusMember}
+          />
         {/if}
       {/each}
     </div>

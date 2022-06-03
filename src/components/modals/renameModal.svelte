@@ -38,14 +38,10 @@
   };
 </script>
 
-<button
-  type="button"
-  on:click={toggleModal}
-  class="p-5 bg-neutral-800 rounded-lg"
->
+<button type="button" on:click={toggleModal} class="p-5 bg-white rounded-lg">
   <img
-    class="h-6 w-6"
-    src="https://img.icons8.com/material-outlined/24/ffffff/edit--v1.png"
+    class="h-5 w-5"
+    src="https://img.icons8.com/external-becris-lineal-becris/64/undefined/external-edit-mintab-for-ios-becris-lineal-becris.png"
     alt="edit"
   />
   <!-- Rename -->

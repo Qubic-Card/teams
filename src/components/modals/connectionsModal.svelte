@@ -55,10 +55,8 @@
                   class="flex flex-col w-72 mt-4 lg:mt-0 text-center lg:text-left"
                 >
                   <p class="font-bold">
-                    {connection.profileData.firstname ??
-                      connection.profileData.firstName}
-                    {connection.profileData.lastname ??
-                      connection.profileData.lastName}
+                    {connection.profileData.firstname ?? ''}
+                    {connection.profileData.lastname ?? ''}
                   </p>
                   <p
                     class={`${
@@ -97,21 +95,25 @@
             >
               <button
                 on:click={() => addToContactHandler(connection.profileData)}
-                class="w-full bg-neutral-600 hover:font-bold text-white mx-auto p-4 mb-4"
+                class="w-full bg-black rounded-md hover:font-bold text-white mx-auto p-4 mb-4"
               >
                 Add to Contacts
               </button>
               <div
-                class="w-full flex p-4 mb-4 flex-wrap justify-center items-center gap-3 bg-neutral-600"
+                class={`w-full p-4 mb-4 flex-wrap justify-center items-center gap-3 bg-neutral-800 rounded-md ${
+                  connection.profileData.socials.length > 0
+                    ? 'grid grid-cols-3 grid-flow-row px-44'
+                    : 'flex'
+                }`}
               >
-                {#if connection.profileData.socials}
+                {#if connection.profileData.socials.length > 0}
                   {#each connection.profileData.socials as item}
                     {#if item.isActive}
                       <BorderButton
                         on:click={async () => await go(item.type, item.data)}
                         ><img
                           src={socialIcons[item.type]}
-                          class="w-10 md:w-16 h-10 md:h-16 border-neutral-700"
+                          class="w-10 md:w-16 h-10 md:h-16 mx-auto p-2"
                           alt=""
                         /></BorderButton
                       >

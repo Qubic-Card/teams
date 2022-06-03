@@ -66,8 +66,8 @@
       console.log(error);
     }
 
+    isClicked = true;
     toastSuccess('Role updated');
-    isClicked = false;
     // if (data) {
     //   return data;
     // }
@@ -126,7 +126,7 @@
           <div class="flex justify-between items-center">
             <DisclosureButton
               on:click={() => setRoleName(role.role_name)}
-              class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between"
+              class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between mr-2"
             >
               {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
               <!-- {role.role_name} -->
@@ -134,7 +134,7 @@
             <RenameModal roleName={role.role_name} id={role.id} />
             {#if open}
               <button
-                class="w-24 h-12 p-1 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
+                class="w-24 p-4 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
                 on:click={async () => await updateTeamsRoleMapping(role.id)}
                 disabled={isClicked}
               >

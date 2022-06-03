@@ -1,1 +1,3 @@
-<button on:click class={`border text-sm ${$$props.class}`}><slot /></button>
+<button on:click class={`border text-sm border-neutral-700 ${$$props.class}`}
+  ><slot /></button
+>
