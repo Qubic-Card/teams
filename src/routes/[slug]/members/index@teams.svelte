@@ -1,5 +1,4 @@
-<script>
-  import { onMount } from 'svelte';
+<script lang="ts">
   import { page } from '$app/stores';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
@@ -8,11 +7,19 @@
   import { user } from '@lib/stores/userStore';
   import { memberRights } from '@lib/stores/memberRightsStore';
   import { getTeamId } from '@lib/query/getId';
+  import {
+    Menu,
+    MenuButton,
+    MenuItems,
+    MenuItem,
+    Transition,
+  } from '@rgossiaux/svelte-headlessui';
 
   let members = [];
   let ownProfile = [];
   let isHasPermission = false;
   let searchQuery = '';
+  let searchNotFoundMsg = '';
   let loading = false;
 
   const getTeamMembers = async () => {
@@ -25,7 +32,8 @@
     if (error) console.log(error);
 
     if (data) {
-      return data;
+      console.log(data);
+      members = data;
     }
   };
 
@@ -41,25 +49,34 @@
     loading = false;
     if (error) console.log(error);
     if (data) {
-      console.log(data);
       members = data;
+      if (data.length === 0) {
+        searchNotFoundMsg = '0 results found. Please try again.';
+      }
       return data;
     }
   };
-
-  onMount(async () => (members = await getTeamMembers()));
 
   $: {
     $memberRights?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
 
-    members;
-
     members.map((member) => {
       if (member.uid === $user.id) ownProfile = member;
     });
   }
+
+  $: searchQuery, searchMemberHandler();
+
+  let searchMenus = [
+    { name: 'Name', col: 'team_profile->>firstname' },
+    { name: 'Job', col: 'team_profile->>job' },
+    { name: 'Company', col: 'team_profile->>company' },
+  ];
+  let selectedSearchMenu = null;
+  const selectMenu = (menu) => (selectedSearchMenu = menu);
+  $: console.log(selectedSearchMenu);
 </script>
 
 <div class="flex flex-col">
@@ -82,12 +99,35 @@
         placeholder="Search name"
         bind:value={searchQuery}
       />
-      <button
-        class="p-2 bg-neutral-700 rounded-lg w-28"
-        on:click={async () => await searchMemberHandler()}>Search</button
-      >
+      <Menu as="div" class="mx-2">
+        <MenuButton
+          class="bg-neutral-700 inline-block relative w-24 h-12 rounded-md"
+          >{selectedSearchMenu ? selectedSearchMenu.name : 'Name'}</MenuButton
+        >
+        <Transition
+          enter="transition duration-100 ease-out"
+          enterFrom="transform scale-95 opacity-0"
+          enterTo="transform scale-100 opacity-100"
+          leave="transition duration-75 ease-out"
+          leaveFrom="transform scale-100 opacity-100"
+          leaveTo="transform scale-95 opacity-0"
+        >
+          <MenuItems
+            class="top-24 right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+          >
+            {#each searchMenus as item}
+              <MenuItem
+                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                on:click={() => selectMenu(item)}
+              >
+                {item.name}
+              </MenuItem>
+            {/each}
+          </MenuItems>
+        </Transition>
+      </Menu>
     </div>
-    <div class="grid grid-cols-3 grid-flow-row gap-6 my-8">
+    <div class="grid grid-cols-3 grid-flow-row my-8">
       {#each members as member}
         {#if isHasPermission === false && member.uid === ownProfile.uid}
           <MemberCard member={ownProfile} />
@@ -96,7 +136,14 @@
         {/if}
       {/each}
     </div>
+    {#if searchNotFoundMsg !== ''}
+      <div class="text-2xl font-bold text-white text-center w-full mt-8">
+        {searchNotFoundMsg}
+      </div>
+    {/if}
   {:catch}
-    <h1>Some error occurred. Please reload the page and try again.</h1>
+    <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+      Some error occurred. Please reload the page and try again.
+    </h1>
   {/await}
 </div>

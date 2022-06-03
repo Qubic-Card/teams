@@ -6,12 +6,19 @@
   import ConnectionTableBody from '@comp/connectionTableBody.svelte';
   import { memberRights } from '@lib/stores/memberRightsStore';
   import { user } from '@lib/stores/userStore';
-  import { onMount } from 'svelte';
   import { getProfileId, getTeamId } from '@lib/query/getId';
+  import {
+    Menu,
+    MenuButton,
+    MenuItems,
+    MenuItem,
+    Transition,
+  } from '@rgossiaux/svelte-headlessui';
 
   let innerWidth;
   let asc = true;
   let searchQuery = '';
+  let searchNotFoundMsg = '';
 
   const TABLE_HEADERS = [
     { name: 'Name', id: 'profileData->>firstname' },
@@ -44,8 +51,6 @@
     $memberRights?.filter((item) => {
       if (item === 'allow_read_connections') isHasPermission = true;
     });
-
-    console.log(isHasPermission);
   }
 
   const getTeamConnectionsList = async () => {
@@ -91,21 +96,31 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq(isHasPermission ? 'team_id' : 'by', id)
-      // .textSearch('profileData->>firstname', `%${searchQuery}%`, {
-      //   type: 'websearch',
-      //   config: 'english',
-      // });
-      .ilike('profileData->>firstname', `%${searchQuery}%`);
+      .ilike(
+        selectedSearchMenu ? selectedSearchMenu.col : 'profileData->>firstname',
+        `%${searchQuery}%`
+      );
 
     loading = false;
     if (error) console.log(error);
     if (data) {
       console.log(data);
       teamConnections = data;
+      if (data.length === 0) {
+        searchNotFoundMsg = '0 results found. Please try again.';
+      }
       return data;
     }
   };
-  // $: searchProfileHandler();
+  $: searchQuery, searchProfileHandler();
+
+  let searchMenus = [
+    { name: 'Name', col: 'profileData->>firstname' },
+    { name: 'Job', col: 'profileData->>job' },
+    { name: 'Company', col: 'profileData->>company' },
+  ];
+  let selectedSearchMenu = null;
+  const selectMenu = (menu) => (selectedSearchMenu = menu);
 </script>
 
 <svelte:window bind:innerWidth />
@@ -123,13 +138,40 @@
         placeholder="Search name"
         bind:value={searchQuery}
       />
-      <button
+      <Menu as="div" class="mx-2">
+        <MenuButton
+          class="bg-neutral-700 inline-block relative w-24 h-12 rounded-md"
+          >{selectedSearchMenu ? selectedSearchMenu.name : 'Name'}</MenuButton
+        >
+        <Transition
+          enter="transition duration-100 ease-out"
+          enterFrom="transform scale-95 opacity-0"
+          enterTo="transform scale-100 opacity-100"
+          leave="transition duration-75 ease-out"
+          leaveFrom="transform scale-100 opacity-100"
+          leaveTo="transform scale-95 opacity-0"
+        >
+          <MenuItems
+            class="top-24 right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+          >
+            {#each searchMenus as item}
+              <MenuItem
+                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                on:click={() => selectMenu(item)}
+              >
+                {item.name}
+              </MenuItem>
+            {/each}
+          </MenuItems>
+        </Transition>
+      </Menu>
+      <!-- <button
         class="p-2 bg-neutral-700 rounded-lg w-28"
         on:click={async () => await searchProfileHandler()}>Search</button
-      >
+      > -->
     </div>
     <div
-      class="snap-container snap-x mx-auto snap-mandatory flex flex-row w-full overflow-x-auto mb-8"
+      class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
     >
       <table class="snap-center text-black w-full mt-6">
         <thead class="text-left text-neutral-400">
@@ -173,15 +215,28 @@
             {/if}
           </tr>
         </thead>
-        {#each teamConnections as connection, i}
-          <ConnectionTableBody
-            {innerWidth}
-            {teamConnections}
-            {connection}
-            {i}
-          />
-        {/each}
+        {#if teamConnections.length > 0}
+          <tbody>
+            {#each teamConnections as connection, i}
+              <ConnectionTableBody
+                {innerWidth}
+                {teamConnections}
+                {connection}
+                {i}
+              />
+            {/each}
+          </tbody>
+        {/if}
       </table>
+      {#if searchNotFoundMsg !== ''}
+        <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+          {searchNotFoundMsg}
+        </h1>
+      {:else if teamConnections.length === 0}
+        <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+          0 connection.
+        </h1>
+      {/if}
     </div>
 
     <!-- <div
@@ -199,6 +254,8 @@
   {page}
 /> -->
   {:catch}
-    <h1>Some error occurred. Please reload the page and try again.</h1>
+    <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+      Some error occurred. Please reload the page and try again.
+    </h1>
   {/await}
 </div>

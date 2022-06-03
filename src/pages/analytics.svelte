@@ -7,6 +7,7 @@
   import { selected } from '@lib/stores/dropdownStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getTeamId } from '@lib/query/getId';
+  import getDates from '@lib/utils/getDates';
 
   let connectionData = {
     labels: [],
@@ -68,22 +69,6 @@
       page = p;
       active = p;
     }
-  };
-
-  Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
-  };
-
-  const getDates = (startDate, stopDate) => {
-    var dateArray = new Array();
-    var currentDate = startDate;
-    while (currentDate <= stopDate) {
-      dateArray.push(new Date(currentDate).toDateString().slice(4));
-      currentDate = currentDate.addDays(1);
-    }
-    return dateArray;
   };
 
   const today = new Date().setDate(new Date().getDate());
@@ -324,7 +309,9 @@
         View more on desktop
       </div>
     {:catch}
-      <h1>Some error occurred. Please reload the page and try again.</h1>
+      <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+        Some error occurred. Please reload the page and try again.
+      </h1>
     {/await}
   </div>
 </div>

@@ -48,7 +48,10 @@
   };
 </script>
 
-<button class="p-4 w-56 bg-white text-black rounded-lg" on:click={toggleModal}>
+<button
+  class="p-4 w-56 bg-blue-600 text-white rounded-lg"
+  on:click={toggleModal}
+>
   + Add new role
 </button>
 {#if showModal}

@@ -608,7 +608,9 @@
       </div>
     </div>
   {:catch}
-    <h1>Some error occurred. Please reload the page and try again.</h1>
+    <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+      Some error occurred. Please reload the page and try again.
+    </h1>
   {/await}
 </div>
 

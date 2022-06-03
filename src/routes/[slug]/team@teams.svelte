@@ -512,10 +512,12 @@
         </div>
       </div>
     {:catch}
-      <h1>Some error occurred. Please reload the page and try again.</h1>
+      <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+        Some error occurred. Please reload the page and try again.
+      </h1>
     {/await}
   {:else}
-    <h1>
+    <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
       You are not allowed to access this page. Please contact your administrator
     </h1>
   {/if}

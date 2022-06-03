@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { slide } from 'svelte/transition';
   import roleMapping from '@lib/role';
   import supabase from '@lib/db';
@@ -21,13 +21,12 @@
   import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
   import { getTeamId } from '@lib/query/getId';
   import { user } from '@lib/stores/userStore';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
-  let newRoles = [];
   let roles = [];
-  let isOpen = false;
   let isAutoRenew = false;
-  let isHasPermission = false;
-  // $: roles;
+  let isClicked = true;
+  let loading = false;
 
   const getTeamsRoleMapping = async () => {
     try {
@@ -40,13 +39,17 @@
 
       if (error) throw error;
 
-      if (data) roles = data;
+      if (data) {
+        roles = data;
+        console.log(roles);
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
   const updateTeamsRoleMapping = async (id) => {
+    loading = true;
     const { data, error } = await supabase
       .from('team_roles')
       .update(
@@ -57,31 +60,24 @@
       )
       .eq('id', id);
 
-    if (error) console.log(error);
-
-    if (data) {
-      console.log(data);
-      return data;
+    loading = false;
+    if (error) {
+      toastFailed('Failed to update role');
+      console.log(error);
     }
+
+    toastSuccess('Role updated');
+    isClicked = false;
+    // if (data) {
+    //   return data;
+    // }
   };
 
   $: {
-    // console.log(loading);
-    // console.log('role map', roleMapping);
-    // console.log(newRoles);
-    // console.log('roles', roles);
-    // console.log('role', $role);
-    // console.log('setting', roleName);
     console.log($memberRights);
   }
 
-  $: {
-    // getTeamsRoleMapping();
-
-    $memberRights?.filter((item) => {
-      if (item === 'allow_read_team') isHasPermission = true;
-    });
-  }
+  const clicked = (e) => (isClicked = e.detail);
 </script>
 
 <div class="min-h-screen flex gap-4">
@@ -90,7 +86,7 @@
       <div class="flex justify-between items-center mb-4">
         <h1 class="font-bold text-3xl">Billing</h1>
         <button
-          class="p-4 w-56 bg-white text-black rounded-lg"
+          class="p-4 w-56 bg-blue-600 text-white rounded-lg"
           on:click={async () => await console.log('billing')}
           >Tambah saldo</button
         >
@@ -132,32 +128,41 @@
               on:click={() => setRoleName(role.role_name)}
               class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between"
             >
-              <!-- {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)} -->
-              {role.role_name}
+              {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
+              <!-- {role.role_name} -->
             </DisclosureButton>
             <RenameModal roleName={role.role_name} id={role.id} />
+            {#if open}
+              <button
+                class="w-24 h-12 p-1 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
+                on:click={async () => await updateTeamsRoleMapping(role.id)}
+                disabled={isClicked}
+              >
+                {#if loading}
+                  Saving...
+                {:else}
+                  Save
+                {/if}
+              </button>
+            {/if}
           </div>
           {#if open}
-            <div transition:slide={{ duration: 500 }}>
+            <div transition:slide|local={{ duration: 500 }} class="mb-4">
               <DisclosurePanel static>
                 <Checkboxes
                   checkboxes={roleMapping}
                   bind:checked={role.role_maps}
-                  {roles}
-                  id={role.id}
+                  on:clicked={clicked}
                 />
-                <button
-                  class="w-full p-3 bg-white text-black rounded-lg"
-                  on:click={async () => await updateTeamsRoleMapping(role.id)}
-                  >Save changes</button
-                >
               </DisclosurePanel>
             </div>
           {/if}
         </Disclosure>
       {/each}
     {:catch error}
-      <h1>Some error occurred. Please reload the page and try again.</h1>
+      <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+        Some error occurred. Please reload the page and try again.
+      </h1>
     {/await}
   </div>
   <div class="flex flex-col w-1/3 rounded-lg gap-4">

@@ -7,11 +7,8 @@
   import { socials, links } from '@lib/stores/editorStore';
   import { theme } from '@lib/profileTheme';
   import Dummy from '@lib/dummy.json';
-  import { log } from '@lib/logger/logger';
   import { page } from '$app/stores';
-  import { VCard } from '@covve/easy-vcard';
   import { go } from '@lib/utils/forwarder';
-  import formatter from '@lib/vcard/formatter';
   import {
     Tab,
     TabGroup,
@@ -20,6 +17,7 @@
     TabPanels,
   } from '@rgossiaux/svelte-headlessui';
   import supabase from '@lib/db';
+  import addToContactHandler from '@lib/utils/addToContact';
 
   export let data;
   export let isEditorMode = false;
@@ -27,7 +25,6 @@
   export let cardId;
   export let teamId;
 
-  let imageBase64 = null;
   let showModal = false;
   let companyName = null;
   let companyNickname = null;
@@ -35,155 +32,6 @@
   let companyAddress = null;
   let companyLogo = null;
   let currentTheme = theme[data.design?.theme?.toString() ?? 'dark'];
-
-  const downloadContactHandler = (vCardString, fileName) => {
-    const fileURL = URL.createObjectURL(
-      new Blob([vCardString], { type: 'text/vcard;charset=utf-8' })
-    );
-    let fileLink = document.createElement('a');
-    fileLink.href = fileURL;
-    fileLink.download = `${fileName}.vcf`;
-    document.body.appendChild(fileLink);
-    fileLink.click();
-  };
-
-  const getBase64FromUrl = async (url) => {
-    const data = await fetch(url);
-    const blob = await data.blob();
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = () => {
-        const base64data = reader.result;
-        resolve(base64data);
-      };
-    });
-  };
-
-  const iOS = () => {
-    return (
-      [
-        'iPad Simulator',
-        'iPhone Simulator',
-        'iPod Simulator',
-        'iPad',
-        'iPhone',
-        'iPod',
-      ].includes(navigator.platform) ||
-      // iPad on iOS 13 detection
-      (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
-    );
-  };
-
-  // getBase64FromUrl(data.avatar).then((base64) => (imageBase64 = base64));
-
-  let phoneNumber = null;
-  $: phoneNumber;
-  data.socials.map((social) => {
-    if (social.type === 'phone') {
-      phoneNumber = social.data;
-      if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
-      if (phoneNumber.startsWith('0')) {
-        phoneNumber = phoneNumber.slice(1);
-        phoneNumber = '62' + phoneNumber;
-      }
-    }
-  });
-
-  const addToContactHandler = () => {
-    let vcard = new VCard();
-    vcard
-      .setFullName(`${data.firstname} ${data.lastname}`)
-      .addFirstName(`${data.firstname}`)
-      .addLastName(`${data.lastname}`)
-      .addTitle(`${data.job}`)
-      .addOrganization(`${data.company}`, [])
-      .addPhoto(data.avatar);
-
-    data.socials.map((social) => {
-      if (social.isActive === true) {
-        if (social.type === 'facebook') {
-          vcard.addUrl(`https://facebook.com/${social.data}`, {
-            label: 'Facebook',
-          });
-        }
-        if (social.type === 'twitter') {
-          vcard.addUrl(`https://twitter.com/${social.data}`, {
-            label: 'Twitter',
-          });
-        }
-        if (social.type === 'instagram') {
-          vcard.addUrl(`https://instagram.com/${social.data}`, {
-            label: 'Instagram',
-          });
-        }
-        if (social.type === 'linkedin') {
-          vcard.addUrl(`https://linkedin.com/in/${social.data}`, {
-            label: 'LinkedIn',
-          });
-        }
-        if (social.type === 'tiktok') {
-          vcard.addUrl(`https://tiktok.com/${social.data}`, {
-            label: 'TikTok',
-          });
-        }
-
-        if (social.type === 'youtube') {
-          vcard.addUrl(`https://youtube.com/${social.data}`, {
-            label: 'YouTube',
-          });
-        }
-
-        if (social.type === 'whatsapp') {
-          vcard.addUrl(`https://wa.me/${social.data.split('+')}`, {
-            label: 'Whatsapp',
-          });
-          if (social.data !== phoneNumber) {
-            vcard.addPhone(`+${social.data}`);
-          }
-        }
-
-        if (social.type === 'line') {
-          vcard.addUrl(`https://line.me/R/ti/p/~${social.data}`, {
-            label: 'Line',
-          });
-        }
-
-        if (social.type === 'email') {
-          vcard.addEmail(`${social.data}`);
-        }
-
-        if (social.type === 'phone') {
-          vcard.addPhone(`${social.data}`);
-        }
-      }
-    });
-    data.links.map((link) => {
-      if (link.isActive === true) {
-        vcard.addUrl(`${link.link}`, {
-          label: 'Website',
-        });
-      }
-    });
-
-    const formattedText = vcard.toVcard(true);
-
-    const iosFormattedText = formatter(
-      vcard.toString(),
-      true,
-      data.socials,
-      data.links
-    );
-
-    const androidFormattedText = formatter(formattedText, false);
-
-    log('Your contact was added to a phone', 'INFO', null, cardId, profileUid);
-
-    downloadContactHandler(
-      iOS() ? iosFormattedText : androidFormattedText,
-      `qubicContact`
-    );
-  };
 
   const getTeams = async () => {
     const { data, error } = await supabase
@@ -330,7 +178,7 @@
           </div>
           <BorderButton
             class="w-full h-12 mb-10 {currentTheme.border} {currentTheme.secondary} rounded-md"
-            on:click={addToContactHandler}
+            on:click={() => addToContactHandler(data)}
           >
             Add to Contacts
           </BorderButton>
