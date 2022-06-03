@@ -44,7 +44,12 @@
       .from('team_members')
       .select('*')
       .eq('team_id', teamId)
-      .ilike('team_profile->>firstname', `%${searchQuery}%`);
+      .ilike(
+        selectedSearchMenu
+          ? selectedSearchMenu.col
+          : 'team_profile->>firstname',
+        `%${searchQuery}%`
+      );
 
     loading = false;
     if (error) console.log(error);
