@@ -8,12 +8,12 @@
   export let active;
   export let totalPages;
   export let loading;
-  console.log(currentPageRows);
+  console.log('current page rows', currentPageRows);
 </script>
 
 <div class="bg-neutral-800 rounded-lg p-2 border border-neutral-500">
   <table class="text-black w-full mt-2">
-    <thead class="text-neutral-400">
+    <thead class="text-neutral-200">
       <tr>
         <th class="text-left pl-4 p-2">Date</th>
         <th class="text-left pl-4 p-2">Description</th>
@@ -25,7 +25,9 @@
         <TableSkeleton colLength={3} />
       {:else}
         {#each currentPageRows as row}
-          <tr class="even:bg-white odd:bg-zinc-100 hover:border">
+          <tr
+            class="even:bg-neutral-700 odd:bg-neutral-900 text-white hover:border"
+          >
             <td class="pl-4 p-2 w-48">
               {new Date(row.timestamp).toDateString().slice(4)}
             </td>

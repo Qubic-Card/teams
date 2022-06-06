@@ -8,7 +8,7 @@
 </script>
 
 <div
-  class={`justify-center mt-4 mb-20 ${
+  class={`justify-center my-4 ${
     currentPageRows.length === 0
       ? 'hidden'
       : subscriptionType === 'basic'

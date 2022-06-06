@@ -205,7 +205,7 @@
 {#if $page.params.slug === $user.id}
   {#if isHasWriteProfilePermission === false}
     <div
-      class={`flex justify-center bg-neutral-200 text-black p-2 rounded-lg ${
+      class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${
         isHasWriteProfilePermission ? 'hidden' : ''
       }`}
     >
@@ -214,7 +214,7 @@
   {/if}
 {:else if isHasWriteMembersPermission === false}
   <div
-    class={`flex justify-center bg-neutral-200 text-black p-2 rounded-lg ${
+    class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${
       isHasWriteMembersPermission ? 'hidden' : ''
     }`}
   >
@@ -224,7 +224,7 @@
 <div class="min-h-screen flex justify-center">
   {#await getProfile()}
     <ProfileEditorSkeleton />
-  {:then name}
+  {:then}
     <div class="md:px-20 px-4 w-full bg-black">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">

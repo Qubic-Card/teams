@@ -17,11 +17,12 @@
   import AddRoleModal from '@comp/modals/addRoleModal.svelte';
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
-  import { memberRights } from '@lib/stores/memberRightsStore';
+  import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
   import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
   import { getTeamId } from '@lib/query/getId';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import getRoleMaps from '@lib/query/getRoleMaps';
 
   let roles = [];
   let isAutoRenew = false;
@@ -73,9 +74,9 @@
     // }
   };
 
-  $: {
-    console.log($memberRights);
-  }
+  let roleMaps = [];
+
+  $: setMemberRights(roleMaps);
 
   const clicked = (e) => (isClicked = e.detail);
 </script>
@@ -135,7 +136,10 @@
             {#if open}
               <button
                 class="w-24 p-4 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
-                on:click={async () => await updateTeamsRoleMapping(role.id)}
+                on:click={async () => {
+                  await updateTeamsRoleMapping(role.id);
+                  roleMaps = await getRoleMaps($user.id);
+                }}
                 disabled={isClicked}
               >
                 {#if loading}

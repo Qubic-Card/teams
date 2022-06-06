@@ -1,7 +1,10 @@
 <script>
   import supabase from '@lib/db';
 
-  const handleLogout = async () => await supabase.auth.signOut();
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    location.reload();
+  };
 </script>
 
 <div

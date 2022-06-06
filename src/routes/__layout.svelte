@@ -14,7 +14,6 @@
   let roleMapping = [];
 
   onMount(async () => (roleMapping = await getRoleMaps($user.id)));
-
   $: setMemberRights(roleMapping);
 </script>
 

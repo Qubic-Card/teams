@@ -101,18 +101,38 @@
   };
 
   const getConnectionsList = async () => {
+    let {
+      data: connection_profile,
+      error: error_profile,
+      count,
+    } = await supabase
+      .from('connection_acc')
+      .select('dateConnected', { count: 'estimated' })
+      .eq('uid', $user.id)
+      .gte('dateConnected', new Date(last7Days[0]).toUTCString())
+      .order('dateConnected', { ascending: false });
+
+    if (connection_profile) connectionCount = count;
+    if (error_profile) console.log(error_profile);
+
+    const dateConnected =
+      connection_profile ??
+      [].map((item) => new Date(item.dateConnected).toDateString().slice(4));
+    console.log('date', dateConnected);
+    console.log('profile', connection_profile);
+    return { connection_profile, dateConnected };
+  };
+
+  const getTeamConnectionsList = async () => {
     let teamId = await getTeamId($user.id);
     let {
       data: connection_profile,
       error: error_profile,
       count,
     } = await supabase
-      .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
+      .from('team_connection_acc')
       .select('dateConnected', { count: 'estimated' })
-      .eq(
-        isHasPermission ? 'team_id' : 'uid',
-        isHasPermission ? teamId : $user.id
-      )
+      .eq('team_id', teamId)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
 
@@ -128,6 +148,44 @@
   };
 
   const getWeeklyLogsActivity = async () => {
+    loading = true;
+    try {
+      let {
+        data: logs,
+        error,
+        count,
+      } = await supabase
+        .from('logs')
+        .select('*', { count: 'estimated' })
+        .eq('uid', $user.id)
+        .gte('timestamp', new Date(last7Days[0]).toISOString())
+        .order('timestamp', { ascending: false })
+        .limit(5);
+
+      if (logs) {
+        let newArr = [];
+        logs.map((log) => {
+          if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
+        });
+        uniqueCount = newArr.length;
+        activityCount = count;
+        activity = logs.map((log) =>
+          new Date(log.timestamp).toDateString().slice(4)
+        );
+
+        setTimeout(() => {
+          loading = false;
+        }, 1000);
+        console.log('logs', logs);
+        return logs;
+      }
+    } catch (error) {
+      loading = false;
+      console.log(error);
+    }
+  };
+
+  const getTeamWeeklyLogsActivity = async () => {
     let teamId = await getTeamId($user.id);
     loading = true;
     try {
@@ -136,12 +194,9 @@
         error,
         count,
       } = await supabase
-        .from(isHasPermission ? 'team_logs' : 'logs')
+        .from('team_logs')
         .select('*', { count: 'estimated' })
-        .eq(
-          isHasPermission ? 'team' : 'uid',
-          isHasPermission ? teamId : $user.id
-        )
+        .eq('team', teamId)
         .gte('timestamp', new Date(last7Days[0]).toISOString())
         .order('timestamp', { ascending: false })
         .limit(5);
@@ -170,7 +225,28 @@
   };
 
   const activityHandler = async () => {
-    logs = await getWeeklyLogsActivity();
+    logs = await getTeamWeeklyLogsActivity();
+    // : await getWeeklyLogsActivity();
+
+    activityData.labels =
+      $selected === '7 Days'
+        ? last7Days
+        : $selected === '30 Days'
+        ? last30Days
+        : last90Days;
+    activityData.datasets[0].values = count(
+      $selected === '7 Days'
+        ? last7Days
+        : $selected === '30 Days'
+        ? last30Days
+        : last90Days,
+      activity
+    );
+    paginate(logs);
+  };
+
+  const teamActivityHandler = async () => {
+    logs = await getTeamWeeklyLogsActivity();
 
     activityData.labels =
       $selected === '7 Days'
@@ -190,7 +266,31 @@
   };
 
   const connection = async () => {
-    const { connection_profile, dateConnected } = await getConnectionsList();
+    const { connection_profile, dateConnected } = isHasPermission
+      ? await getTeamConnectionsList()
+      : await getConnectionsList();
+
+    connections = connection_profile;
+
+    connectionData.labels =
+      $selected === '7 Days'
+        ? last7Days
+        : $selected === '30 Days'
+        ? last30Days
+        : last90Days;
+    connectionData.datasets[0].values = count(
+      $selected === '7 Days'
+        ? last7Days
+        : $selected === '30 Days'
+        ? last30Days
+        : last90Days,
+      dateConnected
+    );
+  };
+
+  const teamConnection = async () => {
+    const { connection_profile, dateConnected } =
+      await getTeamConnectionsList();
 
     connections = connection_profile;
 
@@ -216,7 +316,8 @@
 
   $: {
     $selected, connection();
-    // if(isHasPermission) {
+    if (isHasPermission) console.log('TRUE');
+    // if (isHasPermission) {
     //   $selected, teamConnection();
     //   console.log('teamConnection');
     // } else {

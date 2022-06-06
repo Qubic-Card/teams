@@ -31,6 +31,8 @@
     $memberRights?.filter((item) => {
       if (item === 'allow_write_team') isHasPermission = true;
     });
+    console.log($memberRights);
+    console.log(isHasPermission);
   }
   const addTeam = (item) => (teams = [...teams, item]);
 

@@ -45,21 +45,6 @@
     }
   };
 
-  // const getMembersStatusCard = async () => {
-  //   let id = await getProfileId($user.id);
-  //   const { data, error } = await supabase
-  //     .from('team_cardcon')
-  //     .select('status')
-  //     .eq('team_member_id', id);
-
-  //   if (error) console.log(error);
-
-  //   if (data) {
-  //     console.log(data);
-  //     statusMember = data;
-  //   }
-  // };
-
   const searchMemberHandler = async () => {
     loading = true;
     let teamId = await getTeamId($user.id);
@@ -86,8 +71,7 @@
   };
 
   $: {
-    // getMembersStatusCard();
-    console.log(members);
+    // console.log(members);
     $memberRights?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
@@ -97,7 +81,7 @@
     });
   }
 
-  $: searchQuery, searchMemberHandler();
+  $: searchQuery, selectedSearchMenu, searchMemberHandler();
 
   const selectMenu = (menu) => (selectedSearchMenu = menu);
 </script>
@@ -118,7 +102,7 @@
       {/if}
       <input
         type="text"
-        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
+        class="w-full md:w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
         placeholder="Search name"
         bind:value={searchQuery}
       />
@@ -160,7 +144,7 @@
         {/if}
       </Menu>
     </div>
-    <div class="grid grid-cols-3 grid-flow-row my-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 grid-flow-row my-8">
       {#each members as member, i}
         {#if isHasPermission === false && member.uid === ownProfile.uid}
           <MemberCard
@@ -168,7 +152,7 @@
             {isHasPermission}
             id={member.id}
             index={i}
-            {statusMember}
+            {members}
           />
         {:else if isHasPermission === true}
           <MemberCard
@@ -176,7 +160,7 @@
             {isHasPermission}
             id={member.id}
             index={i}
-            {statusMember}
+            {members}
           />
         {/if}
       {/each}

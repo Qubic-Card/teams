@@ -2,36 +2,54 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { Switch } from '@rgossiaux/svelte-headlessui';
 
   export let member;
   export let isHasPermission;
   export let id;
   export let index;
-  export let statusMember;
+  export let members;
 
-  let status = true;
-  let statusMembers = null;
+  let statusMember = false;
+  let cardId = null;
 
   const getMembersStatusCard = async () => {
-    // let id = await getProfileId($user.id);
     const { data, error } = await supabase
       .from('team_cardcon')
-      .select('status')
+      .select('status, id')
       .eq('team_member_id', id);
 
     if (error) console.log(error);
 
     if (data) {
-      console.log(data[0].status);
-      statusMembers = data[0].status;
-      // statusMember = data;
+      statusMember = data[0].status;
+      cardId = data[0].id;
+    }
+  };
+
+  const setStatus = async (id, stat, index) => {
+    const { data, error } = await supabase
+      .from('team_cardcon')
+      .update({ status: stat }, { returning: 'minimal' })
+      .eq('id', id);
+
+    members[index].status = !members[index].status;
+
+    if (error) {
+      toastFailed();
+      return;
+    }
+
+    console.log(stat);
+    if (stat) {
+      toastSuccess('Card has been activated');
+    } else {
+      toastSuccess('Card has been deactivated');
     }
   };
 
   $: getMembersStatusCard();
-  $: console.log(id);
-  $: console.log(statusMembers);
   const toProfileEditor = (slug) =>
     goto(`/${$page.params.slug}/members/${slug}`);
 </script>
@@ -57,22 +75,23 @@
     </div>
   </div>
   <Switch
-    checked={statusMembers
-      ? statusMembers
-      : statusMembers === undefined
-      ? true
-      : true}
-    on:change={(e) => (status = e.detail)}
-    class={`justify-center items-center self-end relative -top-16 right-4 rounded-full w-20 z-40 h-12 ${
-      status ? 'bg-green-600' : 'bg-neutral-600'
+    checked={statusMember}
+    on:change={async (e) => {
+      await setStatus(cardId, e.detail, index);
+      statusMember = e.detail;
+    }}
+    class={`justify-center items-center self-end relative -top-16 right-4 rounded-full w-16 md:w-20 h-10 md:h-12 z-40 ${
+      statusMember ? 'bg-green-600' : 'bg-neutral-600'
     } ${isHasPermission ? 'flex' : 'hidden'}`}
   >
     <span
-      class={`inline-block w-9 h-9 bg-white rounded-full transition-transform duration-300 ease-in-out ${
-        status ? 'translate-x-4' : '-translate-x-4'
+      class={`inline-block w-8 md:w-9 h-8 md:h-9 bg-white rounded-full transition-transform duration-300 ease-in-out ${
+        statusMember
+          ? 'translate-x-3 md:translate-x-4'
+          : '-translate-x-3 md:-translate-x-4'
       }`}
-      class:toggle-on={status}
-      class:toggle-off={!status}
+      class:toggle-on={statusMember}
+      class:toggle-off={!statusMember}
     />
   </Switch>
 </div>

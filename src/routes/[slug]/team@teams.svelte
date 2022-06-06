@@ -31,7 +31,7 @@
   import { memberRights } from '@lib/stores/memberRightsStore';
   import { getTeamId } from '@lib/query/getId';
   import toNewTab from '@lib/utils/newTab';
-  $: console.log($memberRights);
+
   // Register the plugins
   registerPlugin(
     FilePondPluginImageExifOrientation,
@@ -436,7 +436,10 @@
                               </MenuItems>
                             </Transition>
                           </Menu>
-                          <SwitchButton bind:checked={item.isActive} />
+                          <SwitchButton
+                            bind:checked={item.isActive}
+                            on:change={handleSave}
+                          />
                         </div>
                       </div>
                     {/each}
@@ -480,7 +483,10 @@
                             isHasPermissionToWriteTeam ? 'grid' : 'hidden'
                           }`}
                         >
-                          <SwitchButton bind:checked={item.isActive} />
+                          <SwitchButton
+                            bind:checked={item.isActive}
+                            on:change={handleSave}
+                          />
                           {#if i != 0}
                             <img
                               on:click={() => handleDeleteLink(item)}

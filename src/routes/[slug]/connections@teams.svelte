@@ -40,6 +40,10 @@
       name: 'Connected At',
       id: 'dateConnected',
     },
+    {
+      name: 'By',
+      id: 'by',
+    },
   ];
 
   // let currentPageRows = [2, 2, 2, 2, 2];
@@ -53,12 +57,6 @@
   let selectedSearchMenu = null;
 
   let isHasPermission = false;
-  $: {
-    $memberRights?.filter((item) => {
-      if (item === 'allow_read_connections') isHasPermission = true;
-    });
-    console.log(isHasPermission);
-  }
 
   const getTeamConnectionsList = async () => {
     let id = isHasPermission
@@ -86,11 +84,11 @@
       .select('*, by(*)')
       .eq('team_id', id)
       .order(col, { ascending: asc });
-
+    console.log(id);
     if (error) console.log(error);
     if (data) {
       teamConnections = data;
-      return data;
+      // return data;
     }
   };
 
@@ -119,7 +117,15 @@
       return data;
     }
   };
-  $: searchQuery, searchProfileHandler();
+
+  $: {
+    $memberRights?.filter((item) => {
+      if (item === 'allow_read_connections') isHasPermission = true;
+    });
+  }
+
+  $: searchQuery, selectedSearchMenu, searchProfileHandler();
+  $: getTeamConnectionsList();
 
   const selectMenu = (menu) => (selectedSearchMenu = menu);
 </script>
@@ -135,13 +141,13 @@
       {/if}
       <input
         type="text"
-        class="w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
+        class="w-full md:w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
         placeholder="Search name"
         bind:value={searchQuery}
       />
       <Menu as="div" class="mx-2" let:open>
         <MenuButton
-          class="bg-white text-black flex justify-around items-center relative min-w-28 h-12 px-2 rounded-md"
+          class="bg-white text-black flex justify-around items-center relative min-w-24 md:min-w-28 h-12 px-2 rounded-md"
         >
           {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
           <svg

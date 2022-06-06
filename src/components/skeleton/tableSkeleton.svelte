@@ -9,6 +9,6 @@
 
 <tr class="animate-pulse my-1">
   {#each totalCol as item}
-    <td class="bg-neutral-400 h-12 roun" />
+    <td class="bg-neutral-700 h-12 roun" />
   {/each}
 </tr>

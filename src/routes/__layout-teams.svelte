@@ -7,11 +7,11 @@
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { user } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
-  import supabase from '@lib/db';
   import useAuth from '@lib/useAuth.js';
   import { onMount } from 'svelte';
   import { role } from '@lib/stores/roleStore';
   import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
+  import supabase from '@lib/db';
   import getRoleMaps from '@lib/query/getRoleMaps';
 
   // $: console.log($page);
@@ -28,38 +28,13 @@
   let teamName = Cookies.get('qubicTeamName');
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
-  // const getProfile = async () => {
-  //   let { data, error } = await supabase
-  //     .from('profile')
-  //     .select('*')
-  //     .eq('uid', $user.id);
 
-  //   if (data) userImg = data[0].metadata.avatar;
-  //   if (error) console.log(error);
-
-  //   return data;
-  // };
-  // $: getProfile();
-  let allData = [];
-  let memberRole = [];
   let roleMapping = [];
-  let memberRight = [];
-  let roleName = '';
 
-  onMount(async () => {
-    roleMapping = await getRoleMaps($user.id);
-    // [
-    //   "allow_read_members",
-    //   "allow_read_team",
-    //   "allow_read_analytics",
-    //   "allow_write_members",
-    //   "allow_write_team",
-    //   "allow_write_profile"
-    // ]
-  });
+  onMount(async () => (roleMapping = await getRoleMaps($user.id)));
 
   $: setMemberRights(roleMapping);
-  $: console.log(userImg, $memberRights);
+
   let sidebarItems = [
     {
       title: 'dashboard',
