@@ -12,9 +12,12 @@
   },
   "devDependencies": {
     "@rgossiaux/svelte-headlessui": "^1.0.0-beta.12",
+    "@supabase/supabase-js": "^1.30.7",
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
     "autoprefixer": "^10.4.4",
+    "@types/vcards-js": "^2.10.2",
+    "@zerodevx/svelte-toast": "^0.7.1",
     "postcss": "^8.4.12",
     "postcss-load-config": "^3.1.4",
     "svelte": "^3.44.0",
@@ -24,5 +27,19 @@
     "tslib": "^2.3.1",
     "typescript": "~4.6.2"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@covve/easy-vcard": "^1.1.0",
+    "filepond": "^4.30.3",
+    "filepond-plugin-file-validate-size": "^2.2.5",
+    "filepond-plugin-file-validate-type": "^1.2.6",
+    "filepond-plugin-image-crop": "^2.0.6",
+    "filepond-plugin-image-exif-orientation": "^1.0.11",
+    "filepond-plugin-image-preview": "^4.6.10",
+    "filepond-plugin-image-resize": "^2.0.10",
+    "filepond-plugin-image-transform": "^3.8.7",
+    "js-cookie": "^3.0.1",
+    "svelte-filepond": "^0.2.0",
+    "svelte-frappe-charts": "^1.9.1"
+  }
 }

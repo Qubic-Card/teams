@@ -1,7 +1,10 @@
 const config = {
-  content: ["./src/**/*.{html,js,svelte,ts}"],
+  content: ['./src/**/*.{html,js,svelte,ts}'],
 
   theme: {
+    fontFamily: {
+      sans: 'Inter',
+    },
     extend: {},
   },
 

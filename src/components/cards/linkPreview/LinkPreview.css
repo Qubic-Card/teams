@@ -1,0 +1,38 @@
+
+
+/* common */
+.Container {
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	transition: 0.3s all ease;
+	height: fit-content;
+}
+
+.Container:hover {
+	cursor: pointer;
+}
+
+
+.LowerContainer {
+	padding: 10px;
+}
+
+.Title {
+	margin-top: 0;
+	margin-bottom: 10px;
+}
+
+.Image {
+	width: 100%;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	height: 20vh;
+}
+
+.SiteDetails {
+	margin-top: 10px;
+}
