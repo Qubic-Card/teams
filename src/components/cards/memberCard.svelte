@@ -56,19 +56,21 @@
 
 <div class="flex flex-col justify-between mx-4">
   <div
-    class="w-full h-72 bg-neutral-800 p-4 cursor-pointer"
+    class="w-full h-56 md:h-72 bg-neutral-800 p-4 cursor-pointer"
     on:click={() => toProfileEditor(member.uid)}
   >
     <div class="flex justify-between">
       <div>
-        <h1 class="text-4xl">
+        <h1 class="text-2xl md:text-3xl lg:text-4xl">
           {member.team_profile.firstname}
           {member.team_profile.lastname}
         </h1>
-        <h2 class="text-3xl">{member.team_profile.job}</h2>
+        <h2 class="text-xl md:text-2xl lg:text-3xl">
+          {member.team_profile.job}
+        </h2>
       </div>
       <img
-        src={member.team_profile.avatar}
+        src="https://placeimg.com/640/480/any"
         alt="Profile"
         class="w-16 h-16 rounded-full"
       />

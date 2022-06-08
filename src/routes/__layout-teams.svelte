@@ -5,25 +5,15 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { user } from '@lib/stores/userStore';
+  import { setUserData, user } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
-  import useAuth from '@lib/useAuth.js';
   import { onMount } from 'svelte';
-  import { role } from '@lib/stores/roleStore';
-  import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
-  import supabase from '@lib/db';
   import getRoleMaps from '@lib/query/getRoleMaps';
 
-  // $: console.log($page);
-  // const useAuth = async () => {
-  //   if (user) await goto('/');
-  // };
-  // $: useAuth($user);
   $: console.log('team layout', $user);
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
-  let userImg = '';
 
   let teamName = Cookies.get('qubicTeamName');
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
@@ -33,7 +23,7 @@
 
   onMount(async () => (roleMapping = await getRoleMaps($user.id)));
 
-  $: setMemberRights(roleMapping);
+  $: setUserData(roleMapping);
 
   let sidebarItems = [
     {
@@ -134,9 +124,9 @@
       {/if}
       <img
         on:click={menuHandler}
-        src={userImg ?? ''}
+        src="https://placeimg.com/640/480/any"
         alt="avatar"
-        class="rounded-full cursor-pointer"
+        class="rounded-full w-12 h-12 cursor-pointer"
       />
       {#if isMenuOpened}
         <MenuButton />

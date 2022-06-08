@@ -1,20 +1,16 @@
 <script>
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { user } from '@lib/stores/userStore';
+  import { setUserData, user } from '@lib/stores/userStore';
   import '../app.css';
   import { onMount } from 'svelte';
-  import useAuth from '@lib/useAuth.js';
-  import supabase from '@lib/db';
-  import { setMemberRights } from '@lib/stores/memberRightsStore';
   import getRoleMaps from '@lib/query/getRoleMaps';
 
   $: console.log('layout', $user);
-  // onMount(() => useAuth($user));
 
   let roleMapping = [];
 
   onMount(async () => (roleMapping = await getRoleMaps($user.id)));
-  $: setMemberRights(roleMapping);
+  $: setUserData(roleMapping);
 </script>
 
 <svelte:head>

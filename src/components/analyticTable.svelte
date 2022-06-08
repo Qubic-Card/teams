@@ -1,17 +1,10 @@
 <script>
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
-  import Pagination from '@comp/pagination.svelte';
 
-  export let currentPageRows;
-  export let setPage;
-  export let page;
-  export let active;
-  export let totalPages;
-  export let loading;
-  console.log('current page rows', currentPageRows);
+  export let loading, logs;
 </script>
 
-<div class="bg-neutral-800 rounded-lg p-2 border border-neutral-500">
+<div class="bg-neutral-800 rounded-lg p-2 border border-neutral-500 pb-6">
   <table class="text-black w-full mt-2">
     <thead class="text-neutral-200">
       <tr>
@@ -24,7 +17,7 @@
       {#if loading}
         <TableSkeleton colLength={3} />
       {:else}
-        {#each currentPageRows as row}
+        {#each logs as row}
           <tr
             class="even:bg-neutral-700 odd:bg-neutral-900 text-white hover:border"
           >
@@ -40,10 +33,9 @@
       {/if}
     </tbody>
   </table>
-  {#if currentPageRows.length === 0 && !loading}
+  {#if logs.length === 0 && !loading}
     <div class="text-center">
       <h1 class="text-xl my-4">No activity found</h1>
     </div>
   {/if}
-  <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
 </div>

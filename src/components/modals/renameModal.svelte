@@ -2,6 +2,7 @@
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
+  import Input from '@comp/input.svelte';
 
   export let roleName, id;
 
@@ -38,9 +39,9 @@
   };
 </script>
 
-<button type="button" on:click={toggleModal} class="p-5 bg-white rounded-lg">
+<button type="button" on:click={toggleModal} class="p-3 bg-white rounded-lg">
   <img
-    class="h-5 w-5"
+    class="h-4 w-4"
     src="https://img.icons8.com/external-becris-lineal-becris/64/undefined/external-edit-mintab-for-ios-becris-lineal-becris.png"
     alt="edit"
   />
@@ -68,14 +69,12 @@
         <div
           class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
         >
-          {#if loading}
-            <h1>Loading</h1>
-          {/if}
-          <input
-            type="text"
+          <Input
+            placeholder="Role Name"
+            title="Role Name"
             bind:value={roleName}
-            placeholder="Role name"
-            class="p-3 w-full text-black"
+            class="w-full"
+            isEmptyChecking={true}
           />
           <button
             on:click={async () => await updateRoleName()}

@@ -14,7 +14,7 @@
 
   import { socials, links } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
+  import { user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -28,7 +28,6 @@
     MenuItem,
     Transition,
   } from '@rgossiaux/svelte-headlessui';
-  import { memberRights } from '@lib/stores/memberRightsStore';
   import { getTeamId } from '@lib/query/getId';
   import toNewTab from '@lib/utils/newTab';
 
@@ -166,7 +165,7 @@
   let isHasPermissionToReadTeam = false;
 
   $: {
-    $memberRights?.filter((item) => {
+    $userData?.filter((item) => {
       if (item === 'allow_write_team') isHasPermissionToWriteTeam = true;
       if (item === 'allow_read_team') isHasPermissionToReadTeam = true;
     });

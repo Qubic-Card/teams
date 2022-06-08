@@ -1,6 +1,5 @@
 <script>
-	import { user } from "@lib/stores/userStore";
-  import { memberRights } from '@lib/stores/memberRightsStore';
+  import { user, userData } from '@lib/stores/userStore';
   import Analytics from '@pages/analytics.svelte';
   import QuickActionsModal from '@comp/modals/quickActionsModal.svelte';
   import { goto } from '$app/navigation';
@@ -11,7 +10,7 @@
   let isHasPermissionToEditProfilePage = false;
   let showModal = false;
 
-  $: $memberRights?.filter((item) => {
+  $: $userData?.filter((item) => {
     if (item === 'allow_write_members') {
       isHasPermissionToMemberPage = true;
     }
@@ -25,19 +24,31 @@
 
   const quickActions = [
     {
-      handler: () => isHasPermissionToMemberPage === false ? showModal = true : goto(`/${$page.params.slug}/members`),
+      handler: () =>
+        isHasPermissionToMemberPage === false
+          ? (showModal = true)
+          : goto(`/${$page.params.slug}/members`),
       name: 'Add new member',
     },
     {
-      handler: () => isHasPermissionToAnalyticsPage === false ? showModal = true :goto(`/${$page.params.slug}/analytics`),
+      handler: () =>
+        isHasPermissionToAnalyticsPage === false
+          ? (showModal = true)
+          : goto(`/${$page.params.slug}/analytics`),
       name: 'Analyze BI',
     },
     {
-      handler: () => isHasPermissionToAnalyticsPage === false ? showModal = true : goto(`/${$page.params.slug}/analytics`),
+      handler: () =>
+        isHasPermissionToAnalyticsPage === false
+          ? (showModal = true)
+          : goto(`/${$page.params.slug}/analytics`),
       name: 'Manage billing',
     },
     {
-      handler: () => isHasPermissionToEditProfilePage === false ? showModal = true : goto(`/${$page.params.slug}/members/${$user.id}`),
+      handler: () =>
+        isHasPermissionToEditProfilePage === false
+          ? (showModal = true)
+          : goto(`/${$page.params.slug}/members/${$user.id}`),
       name: 'Edit profile',
     },
   ];

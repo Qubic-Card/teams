@@ -56,7 +56,7 @@
 
 <div class={`flex flex-col ${$$props.class}`}>
   <h1
-    transition:fade|local={{ duration: 300 }}
+    transition:fade|local={{ duration: 200 }}
     class={`text-gray-100 after:content-['*'] after:ml-0.5 ${
       value === '' && isEmptyChecking ? 'after:text-red-500' : 'after:hidden'
     }`}
@@ -65,7 +65,7 @@
   </h1>
   <div class={'relative'}>
     <input
-      transition:fade|local={{ duration: 300 }}
+      transition:fade|local={{ duration: 200 }}
       on:change
       placeholder={`${$$props.placeholder}`}
       bind:value

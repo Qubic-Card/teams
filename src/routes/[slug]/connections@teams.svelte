@@ -4,8 +4,7 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import ConnectionTableBody from '@comp/connectionTableBody.svelte';
-  import { memberRights } from '@lib/stores/memberRightsStore';
-  import { user } from '@lib/stores/userStore';
+  import { user, userData } from '@lib/stores/userStore';
   import { getProfileId, getTeamId } from '@lib/query/getId';
   import {
     Menu,
@@ -118,11 +117,9 @@
     }
   };
 
-  $: {
-    $memberRights?.filter((item) => {
-      if (item === 'allow_read_connections') isHasPermission = true;
-    });
-  }
+  $: $userData?.filter((item) => {
+    if (item === 'allow_read_connections') isHasPermission = true;
+  });
 
   $: searchQuery, selectedSearchMenu, searchProfileHandler();
   $: getTeamConnectionsList();

@@ -4,8 +4,7 @@
   import MemberCard from '@comp/cards/memberCard.svelte';
   import Spinner from '@comp/loading/spinner.svelte';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
-  import { memberRights } from '@lib/stores/memberRightsStore';
+  import { user, userData } from '@lib/stores/userStore';
   import { getProfileId, getTeamId } from '@lib/query/getId';
   import {
     Menu,
@@ -28,7 +27,6 @@
     { name: 'Company', col: 'team_profile->>company' },
   ];
   let selectedSearchMenu = null;
-  let statusMember = null;
 
   const getTeamMembers = async () => {
     let teamId = await getTeamId($user.id);
@@ -71,8 +69,8 @@
   };
 
   $: {
-    // console.log(members);
-    $memberRights?.filter((item) => {
+    console.log(members);
+    $userData?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
 
@@ -144,7 +142,9 @@
         {/if}
       </Menu>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 grid-flow-row my-8">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-flow-row my-8"
+    >
       {#each members as member, i}
         {#if isHasPermission === false && member.uid === ownProfile.uid}
           <MemberCard

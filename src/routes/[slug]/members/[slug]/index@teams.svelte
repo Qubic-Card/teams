@@ -17,8 +17,7 @@
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
   import supabase from '@lib/db';
-  import { memberRights } from '@lib/stores/memberRightsStore';
-  import { user } from '@lib/stores/userStore';
+  import { user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -185,7 +184,7 @@
   let isHasWriteMembersPermission = false;
 
   $: {
-    $memberRights?.filter((item) => {
+    $userData?.filter((item) => {
       if ($page.params.slug === $user.id) {
         if (item === 'allow_write_profile') {
           isHasWriteProfilePermission = true;
@@ -199,7 +198,7 @@
     console.log(isHasWriteProfilePermission, isHasWriteMembersPermission);
   }
 
-  $: console.log($memberRights);
+  $: console.log($userData);
 </script>
 
 {#if $page.params.slug === $user.id}

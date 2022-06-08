@@ -1,9 +1,8 @@
 <script>
-  import { memberRights } from '@lib/stores/memberRightsStore';
   import { toastFailed } from '@lib/utils/toast';
   import { onMount } from 'svelte';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
+  import { user, userData } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
   import { getTeamId } from '@lib/query/getId';
 
@@ -33,13 +32,14 @@
   ];
   let selectedTopic = null;
   let state = 'idle';
-  $: $memberRights?.filter((item) => {
+  let contactsCount = 0;
+
+  $: $userData?.filter((item) => {
     if (item === 'allow_read_analytics') isHasPermission = true;
   });
 
   const selectTopic = (topic) => (selectedTopic = topic);
   const setState = (newState) => (state = newState);
-  let contactsCount = 0;
 
   const getContacts = async () => {
     let teamId = await getTeamId($user.id);

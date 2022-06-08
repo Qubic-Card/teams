@@ -1,10 +1,8 @@
 <script>
-  import { memberRights } from '@lib/stores/memberRightsStore';
   import supabase from '@lib/db.js';
   import Chart from 'svelte-frappe-charts';
   import AnalyticTable from '@comp/analyticTable.svelte';
-  import { user } from '@lib/stores/userStore.js';
-  import { selected } from '@lib/stores/dropdownStore.js';
+  import { user, userData } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getTeamId } from '@lib/query/getId';
   import getDates from '@lib/utils/getDates';
@@ -32,56 +30,19 @@
     { label: 'Weekly Activities', count: 0 },
   ];
 
-  let connections = [];
-  let page = 0;
+  // let connections = [];
   let uniqueCount = 0;
   let activityCount = 0;
   let connectionCount = 0;
-  let totalPages = [];
-  let currentPageRows = [];
   let activity = [];
   let logs = [];
-  let itemsPerPage = 20;
-  let active = 0;
-
-  let teamConnections = [];
-  let teamLogs = [];
-  let teamActivity = [];
 
   let loading = false;
   let isHasPermission = false;
 
-  $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
-
-  const paginate = (items = []) => {
-    const pages = Math.ceil(items.length / itemsPerPage);
-
-    const paginatedItems = Array.from({ length: pages }, (_, index) => {
-      const start = index * itemsPerPage;
-      return items.slice(start, start + itemsPerPage);
-    });
-
-    totalPages = [...paginatedItems];
-  };
-
-  const setPage = (p) => {
-    if (p >= 0 && p < totalPages.length) {
-      page = p;
-      active = p;
-    }
-  };
-
   const today = new Date().setDate(new Date().getDate());
   const last7Days = getDates(
     new Date(new Date().setDate(new Date().getDate() - 6)),
-    today
-  );
-  const last30Days = getDates(
-    new Date(new Date().setDate(new Date().getDate() - 30)),
-    today
-  );
-  const last90Days = getDates(
-    new Date(new Date().setDate(new Date().getDate() - 90)),
     today
   );
 
@@ -118,8 +79,8 @@
     const dateConnected =
       connection_profile ??
       [].map((item) => new Date(item.dateConnected).toDateString().slice(4));
-    console.log('date', dateConnected);
-    console.log('profile', connection_profile);
+    // console.log('date', dateConnected);
+    // console.log('profile', connection_profile);
     return { connection_profile, dateConnected };
   };
 
@@ -142,8 +103,8 @@
     const dateConnected =
       connection_profile ??
       [].map((item) => new Date(item.dateConnected).toDateString().slice(4));
-    console.log('date', dateConnected);
-    console.log('profile', connection_profile);
+    // console.log('date', dateConnected);
+    // console.log('profile', connection_profile);
     return { connection_profile, dateConnected };
   };
 
@@ -215,7 +176,7 @@
         setTimeout(() => {
           loading = false;
         }, 1000);
-        console.log('logs', logs);
+        // console.log('logs', logs);
         return logs;
       }
     } catch (error) {
@@ -225,115 +186,33 @@
   };
 
   const activityHandler = async () => {
-    logs = await getTeamWeeklyLogsActivity();
-    // : await getWeeklyLogsActivity();
+    logs = await getWeeklyLogsActivity();
 
-    activityData.labels =
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days;
-    activityData.datasets[0].values = count(
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days,
-      activity
-    );
-    paginate(logs);
-  };
-
-  const teamActivityHandler = async () => {
-    logs = await getTeamWeeklyLogsActivity();
-
-    activityData.labels =
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days;
-    activityData.datasets[0].values = count(
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days,
-      activity
-    );
-    paginate(logs);
+    activityData.labels = last7Days;
+    activityData.datasets[0].values = count(last7Days, activity);
   };
 
   const connection = async () => {
     const { connection_profile, dateConnected } = isHasPermission
-      ? await getTeamConnectionsList()
+      ? await getConnectionsList()
       : await getConnectionsList();
 
-    connections = connection_profile;
+    // connections = connection_profile;
 
-    connectionData.labels =
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days;
-    connectionData.datasets[0].values = count(
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days,
-      dateConnected
-    );
+    connectionData.labels = last7Days;
+    connectionData.datasets[0].values = count(last7Days, dateConnected);
   };
 
-  const teamConnection = async () => {
-    const { connection_profile, dateConnected } =
-      await getTeamConnectionsList();
-
-    connections = connection_profile;
-
-    connectionData.labels =
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days;
-    connectionData.datasets[0].values = count(
-      $selected === '7 Days'
-        ? last7Days
-        : $selected === '30 Days'
-        ? last30Days
-        : last90Days,
-      dateConnected
-    );
-  };
-
-  $: $memberRights?.filter((item) => {
+  $: $userData?.filter((item) => {
     if (item === 'allow_read_analytics') isHasPermission = true;
   });
 
   $: {
-    $selected, connection();
+    connection();
     if (isHasPermission) console.log('TRUE');
-    // if (isHasPermission) {
-    //   $selected, teamConnection();
-    //   console.log('teamConnection');
-    // } else {
-    //   $selected, connection();
-    //   console.log('connection');
-    // }
   }
   $: {
-    $selected, activityHandler();
-    // if (isHasPermission) {
-    //   $selected, teamActivityHandler();
-    //   console.log('teamActivityHandler');
-    // } else {
-    //   $selected, activityHandler();
-    //   console.log('activityHandler');
-    // }
+    activityHandler();
   }
 </script>
 
@@ -347,7 +226,6 @@
           <div class="flex flex-col w-full lg:w-[49.5%] pt-4 lg:pt-0">
             <div class="flex w-full justify-between">
               <h1 class="text-2xl font-semibold">{item.label}</h1>
-              <!-- <DropdownButton /> -->
             </div>
             <div
               class="h-80 border-neutral-500 bg-neutral-800 border rounded-xl mt-4"
@@ -397,14 +275,7 @@
         </div>
       </div>
       <div class="hidden lg:flex lg:flex-col">
-        <AnalyticTable
-          {currentPageRows}
-          {setPage}
-          {page}
-          {totalPages}
-          {active}
-          {loading}
-        />
+        <AnalyticTable {logs} {loading} />
       </div>
       <div class="flex lg:hidden w-full justify-center mt-8">
         View more on desktop
