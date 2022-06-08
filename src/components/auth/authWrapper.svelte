@@ -1,23 +1,8 @@
-<script context="module">
-  import supabase from '@lib/db.js';
-  export async function load(ctx) {
-    if (!supabase.auth.user()) {
-      return {
-        // headers: {
-        //   Location: '/',
-        // },
-        redirect: '/',
-        status: 302,
-      };
-    }
-    return {};
-  }
-</script>
-
 <script>
   import { user, userData } from '@lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import supabase from '@lib/db';
 
   let roleMaps = [];
 
@@ -37,14 +22,24 @@
   $user = supabase.auth.user();
   // $: console.log('wrap', $user);
   $: console.log(supabase.auth.user());
-  $: console.log('user data', $userData);
+  $: console.log('user data', $page.url.pathname);
+  $: redirect()
+  $: redirectToLogin()
   // $: console.log('wrap', $page);
+  const redirect = () => {
+    if($user && $page.url.pathname === '/')
+    goto('/select-teams');
+  }
+
+  const redirectToLogin = () => {
+    if(!$user && $page.url.pathname !== '/')
+    goto('/');
+  }
+
   supabase.auth.onAuthStateChange(async (event, session) => {
     console.log('auth state change', event, session);
     if (event == 'SIGNED_IN') {
-      await goto('/select-teams', { noscroll: true });
-      // roleMaps = await getRoleMaps();
-      userData.set(roleMaps);
+      // userData.set(roleMaps);
       user.set(session.user);
     }
     if (event == 'TOKEN_REFRESHED') {

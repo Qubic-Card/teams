@@ -2,10 +2,10 @@
   import { goto } from '$app/navigation';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
+  import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
 
-  $: console.log($user);
   let loading = false;
   let email = '';
   let password = '';
@@ -13,7 +13,6 @@
   let isForgotPassword = false;
 
   const handleLogin = async () => {
-    // goto('/select-teams');
     try {
       loading = true;
       const { error } = await supabase.auth.signIn({
@@ -24,7 +23,7 @@
       toastSuccess('Hello!');
       loading = false;
       isSuccessful = true;
-      setTimeout(() => location.reload(), 4000);
+      setTimeout(() => goto('/select-teams'), 2000);
     } catch (error) {
       toastFailed();
       loading = false;
@@ -49,9 +48,10 @@
   };
 </script>
 
-<section class="flex h-screen bg-black/90">
+<AuthWrapper>
+<section class="flex h-screen bg-black">
   <div
-    class="lg:w-1/3 w-full border-2 bg-black/90 text-white border-neutral-300 px-16 py-32 my-auto mx-6 md:mx-14 lg:mx-auto"
+    class="lg:w-1/3 w-full border-2 bg-black text-white border-neutral-700 px-16 py-32 my-auto mx-6 md:mx-14 lg:mx-auto"
   >
     <h1 class="text-4xl font-bold mb-4">Qubic Team</h1>
     {#if !isSuccessful}
@@ -133,3 +133,4 @@
     {/if}
   </div>
 </section>
+</AuthWrapper>
