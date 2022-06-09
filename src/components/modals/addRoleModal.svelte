@@ -16,7 +16,7 @@
   const addRoleHandler = async () => {
     loading = true;
     try {
-      let teamId = await getTeamId($user.id);
+      let teamId = await getTeamId($user?.id);
       const { data, error } = await supabase
         .from('team_roles')
         .insert({
@@ -32,6 +32,9 @@
         loading = false;
         toastSuccess('Role added successfully');
         toggleModal();
+        setTimeout(() => {
+          location.reload();
+        }, 500);
       }
     } catch (error) {
       loading = false;

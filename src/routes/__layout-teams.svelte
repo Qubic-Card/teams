@@ -5,7 +5,7 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { setUserData, user } from '@lib/stores/userStore';
+  import { setUserData, user, userData } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import getRoleMaps from '@lib/query/getRoleMaps';
@@ -117,11 +117,6 @@
         {/if}
         <h1 class="text-5xl font-bold ml-4">{$page.params.slug ?? ''}</h1>
       </div>
-      {#if $user}
-        <p>logged in</p>
-      {:else}
-        <p>not logged in</p>
-      {/if}
       <img
         on:click={menuHandler}
         src="https://placeimg.com/640/480/any"
@@ -160,7 +155,6 @@
         {/each}
       </nav>
     </div>
-
     <div
       class="absolute top-20 bottom-0 pt-4 pl-24 pr-4 bg-black text-white overflow-y-auto w-full"
     >

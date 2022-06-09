@@ -59,8 +59,8 @@
 
   const getTeamConnectionsList = async () => {
     let id = isHasPermission
-      ? await getTeamId($user.id)
-      : await getProfileId($user.id);
+      ? await getTeamId($user?.id)
+      : await getProfileId($user?.id);
     console.log(id);
     const { data, error } = await supabase
       .from('team_connection_acc')
@@ -76,8 +76,8 @@
 
   const sortHandler = async (col = 'profileData->>firstname') => {
     let id = isHasPermission
-      ? await getTeamId($user.id)
-      : await getProfileId($user.id);
+      ? await getTeamId($user?.id)
+      : await getProfileId($user?.id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
@@ -94,8 +94,8 @@
   const searchProfileHandler = async () => {
     loading = true;
     let id = isHasPermission
-      ? await getTeamId($user.id)
-      : await getProfileId($user.id);
+      ? await getTeamId($user?.id)
+      : await getProfileId($user?.id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')

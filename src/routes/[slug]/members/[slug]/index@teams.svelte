@@ -55,13 +55,13 @@
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
       .from('avatars')
-      .upload(`${$user.id}/${file.filename}`, output[1].file, {
+      .upload(`${$user?.id}/${file.filename}`, output[1].file, {
         contentType: 'image/jpeg',
       });
 
     const { publicURL, error } = supabase.storage
       .from('avatars')
-      .getPublicUrl(`${$user.id}/${file.filename}`);
+      .getPublicUrl(`${$user?.id}/${file.filename}`);
 
     profileData.avatar = publicURL;
     await handleSave();
@@ -185,7 +185,7 @@
 
   $: {
     $userData?.filter((item) => {
-      if ($page.params.slug === $user.id) {
+      if ($page.params.slug === $user?.id) {
         if (item === 'allow_write_profile') {
           isHasWriteProfilePermission = true;
         }
@@ -201,7 +201,7 @@
   $: console.log($userData);
 </script>
 
-{#if $page.params.slug === $user.id}
+{#if $page.params.slug === $user?.id}
   {#if isHasWriteProfilePermission === false}
     <div
       class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${

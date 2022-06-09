@@ -13,7 +13,7 @@
 
   $: console.log('Auth Wrapper', $userData);
 
-  onMount(async () => (roleMaps = await getRoleMaps($user.id)));
+  // onMount(async () => (roleMaps = await getRoleMaps($user.id)));
 
   const redirect = () => {
     if ($user && $page.url.pathname === '/') goto('/select-teams');
@@ -29,8 +29,9 @@
   supabase.auth.onAuthStateChange(async (event, session) => {
     // console.log('auth state change', event, session);
     if (event == 'SIGNED_IN') {
-      // roleMaps = await getRoleMaps($user.id);
-      setUserData(roleMaps);
+      // console.log('signed in');
+      // roleMaps = await getRoleMaps($user?.id);
+      // setUserData(roleMaps);
       user.set(session.user);
     }
     if (event == 'TOKEN_REFRESHED') {

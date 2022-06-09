@@ -29,7 +29,7 @@
   let selectedSearchMenu = null;
 
   const getTeamMembers = async () => {
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_members')
       .select('team_profile, uid, id')
@@ -45,7 +45,7 @@
 
   const searchMemberHandler = async () => {
     loading = true;
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
@@ -75,7 +75,7 @@
     });
 
     members.map((member) => {
-      if (member.uid === $user.id) ownProfile = member;
+      if (member.uid === $user?.id) ownProfile = member;
     });
   }
 

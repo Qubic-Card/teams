@@ -30,7 +30,7 @@
     const { data, error } = await supabase
       .from('profile')
       .select('*')
-      .eq('uid', $user.id);
+      .eq('uid', $user?.id);
 
     if (error) console.log(error);
 

@@ -29,6 +29,9 @@
       } else {
         loading = false;
         toastSuccess('Role name updated');
+        setTimeout(() => {
+          location.reload();
+        }, 500);
       }
 
       toggleModal();

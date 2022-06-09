@@ -69,7 +69,7 @@
     } = await supabase
       .from('connection_acc')
       .select('dateConnected', { count: 'estimated' })
-      .eq('uid', $user.id)
+      .eq('uid', $user?.id)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
 
@@ -85,7 +85,7 @@
   };
 
   const getTeamConnectionsList = async () => {
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     let {
       data: connection_profile,
       error: error_profile,
@@ -118,7 +118,7 @@
       } = await supabase
         .from('logs')
         .select('*', { count: 'estimated' })
-        .eq('uid', $user.id)
+        .eq('uid', $user?.id)
         .gte('timestamp', new Date(last7Days[0]).toISOString())
         .order('timestamp', { ascending: false })
         .limit(5);
@@ -137,7 +137,7 @@
         setTimeout(() => {
           loading = false;
         }, 1000);
-        console.log('logs', logs);
+        // console.log('logs', logs);
         return logs;
       }
     } catch (error) {
@@ -147,7 +147,7 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     loading = true;
     try {
       let {
@@ -209,7 +209,6 @@
 
   $: {
     connection();
-    if (isHasPermission) console.log('TRUE');
   }
   $: {
     activityHandler();

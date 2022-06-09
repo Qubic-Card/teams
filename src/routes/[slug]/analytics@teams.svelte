@@ -42,13 +42,13 @@
   const setState = (newState) => (state = newState);
 
   const getContacts = async () => {
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
       .select('*')
       .eq(
         isHasPermission ? 'team_id' : 'uid',
-        isHasPermission ? teamId ?? '' : $user.id ?? ''
+        isHasPermission ? teamId ?? '' : $user?.id ?? ''
       );
 
     if (error) console.log(error);

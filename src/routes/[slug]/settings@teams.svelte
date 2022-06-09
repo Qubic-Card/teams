@@ -2,7 +2,7 @@
   import { fade, slide } from 'svelte/transition';
   import roleMapping from '@lib/role';
   import supabase from '@lib/db';
-  import { role, setRoleName } from '@lib/stores/roleStore';
+  import { role, roleName, setRoleName } from '@lib/stores/roleStore';
   import {
     Disclosure,
     DisclosureButton,
@@ -19,13 +19,14 @@
   import getRoleMaps from '@lib/query/getRoleMaps';
 
   let roles = [];
+  let roleMaps = [];
   let isAutoRenew = false;
   let isClicked = true;
   let loading = false;
 
   const getTeamsRoleMapping = async () => {
     try {
-      let teamId = await getTeamId($user.id);
+      let teamId = await getTeamId($user?.id);
       const { data, error } = await supabase
         .from('team_roles')
         .select('*')
@@ -68,10 +69,9 @@
     // }
   };
 
-  let roleMaps = [];
+  const clicked = (e) => (isClicked = e.detail);
 
   $: setUserData(roleMaps);
-  const clicked = (e) => (isClicked = e.detail);
 </script>
 
 <div class="min-h-screen flex gap-4">
@@ -130,7 +130,7 @@
                 class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
                 on:click={async () => {
                   await updateTeamsRoleMapping(role.id);
-                  roleMaps = await getRoleMaps($user.id);
+                  roleMaps = await getRoleMaps($user?.id);
                 }}
                 disabled={isClicked}
               >
@@ -167,7 +167,7 @@
     </div>
     <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
       <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
-      <p>Berikan permissions yang sesuai di setiao role.</p>
+      <p>Berikan permissions yang sesuai di setiap role.</p>
     </div>
   </div>
 </div>

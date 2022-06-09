@@ -70,13 +70,13 @@
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
       .from('avatars')
-      .upload(`${$user.id}/${file.filename}`, output[1].file, {
+      .upload(`${$user?.id}/${file.filename}`, output[1].file, {
         contentType: 'image/jpeg',
       });
 
     const { publicURL, error } = supabase.storage
       .from('avatars')
-      .getPublicUrl(`${$user.id}/${file.filename}`);
+      .getPublicUrl(`${$user?.id}/${file.filename}`);
 
     teamData.avatar = publicURL;
     await handleSave();
@@ -92,7 +92,7 @@
   };
 
   const handleSave = async () => {
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     teamData.socials = $socials;
     teamData.links = $links;
     const { error } = await supabase
@@ -139,7 +139,7 @@
   };
 
   const getTeamsDetail = async () => {
-    let teamId = await getTeamId($user.id);
+    let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('teams')
       .select('*')

@@ -15,7 +15,7 @@
     const { data, error } = await supabase
       .from('team_members')
       .select('team_id(*)')
-      .eq('uid', $user.id);
+      .eq('uid', $user?.id);
 
     if (error) console.log(error);
 
