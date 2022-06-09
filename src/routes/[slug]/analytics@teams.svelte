@@ -4,6 +4,7 @@
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
+  import { page } from '$app/stores';
   import { getTeamId } from '@lib/query/getId';
 
   let isHasPermission = false;
@@ -48,7 +49,7 @@
       .select('*')
       .eq(
         isHasPermission ? 'team_id' : 'uid',
-        isHasPermission ? teamId ?? '' : $user?.id ?? ''
+        isHasPermission ? teamId : $user?.id
       );
 
     if (error) console.log(error);

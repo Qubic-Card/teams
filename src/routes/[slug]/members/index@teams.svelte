@@ -5,7 +5,6 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
-  import { getProfileId, getTeamId } from '@lib/query/getId';
   import {
     Menu,
     MenuButton,
@@ -13,6 +12,7 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
+  import { getTeamId } from '@lib/query/getId';
 
   let members = [];
   let ownProfile = [];
@@ -44,8 +44,8 @@
   };
 
   const searchMemberHandler = async () => {
-    loading = true;
     let teamId = await getTeamId($user?.id);
+    loading = true;
     const { data, error } = await supabase
       .from('team_members')
       .select('*')

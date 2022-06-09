@@ -5,23 +5,27 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { setUserData, user, userData } from '@lib/stores/userStore';
+  import { setUserData, user } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import getRoleMaps from '@lib/query/getRoleMaps';
-
-  $: console.log('team layout', $user);
+  import { getTeamId } from '@lib/query/getId';
+  import supabase from '@lib/db';
+  import getTeamData from '@lib/query/getTeamData';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
 
-  let teamName = Cookies.get('qubicTeamName');
+  let roleMapping = [];
+  let team = [];
+
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
 
-  let roleMapping = [];
-
-  onMount(async () => (roleMapping = await getRoleMaps($user.id)));
+  onMount(async () => {
+    roleMapping = await getRoleMaps($user?.id);
+    team = await getTeamData($user?.id);
+  });
 
   $: setUserData(roleMapping);
 
@@ -32,7 +36,7 @@
       urldefault:
         'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
       handler: () => {
-        goto(`/${teamName}/dashboard`);
+        goto(`/${$page.params.slug}/dashboard`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -42,7 +46,7 @@
       urldefault:
         'https://img.icons8.com/external-icongeek26-outline-icongeek26/64/ffffff/external-connection-data-analytics-icongeek26-outline-icongeek26.png',
       handler: () => {
-        goto(`/${teamName}/connections`);
+        goto(`/${$page.params.slug}/connections`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -52,7 +56,7 @@
       urldefault:
         'https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/64/ffffff/external-team-business-and-management-kiranshastry-lineal-kiranshastry-2.png',
       handler: () => {
-        goto(`/${teamName}/team`);
+        goto(`/${$page.params.slug}/team`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -61,7 +65,7 @@
       routeId: '[slug]/analytics@teams',
       urldefault: 'https://img.icons8.com/windows/96/ffffff/area-chart.png',
       handler: () => {
-        goto(`/${teamName}/analytics`);
+        goto(`/${$page.params.slug}/analytics`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -71,7 +75,7 @@
       urldefault:
         'https://img.icons8.com/ios/100/ffffff/user-group-man-man.png',
       handler: () => {
-        goto(`/${teamName}/members`);
+        goto(`/${$page.params.slug}/members`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -81,7 +85,7 @@
       urldefault:
         'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
       handler: () => {
-        goto(`/${teamName}/settings`);
+        goto(`/${$page.params.slug}/settings`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -115,14 +119,34 @@
             on:click={sidebarHandler}
           />
         {/if}
-        <h1 class="text-5xl font-bold ml-4">{$page.params.slug ?? ''}</h1>
+        {#if team.name}
+          <p class="text-5xl font-bold ml-4">{team.name}</p>
+        {:else}
+          <div class="animate-pulse p-4">
+            <p
+              class="text-5xl w-full h-12 text-neutral-700 bg-neutral-700 rounded-lg"
+            >
+              {team.name}
+            </p>
+          </div>
+        {/if}
       </div>
-      <img
-        on:click={menuHandler}
-        src="https://placeimg.com/640/480/any"
-        alt="avatar"
-        class="rounded-full w-12 h-12 cursor-pointer"
-      />
+      {#if team.logo}
+        <img
+          on:click={menuHandler}
+          src={team.logo}
+          alt="avatar"
+          class="rounded-full w-12 h-12 cursor-pointer"
+        />
+      {:else}
+        <div class="animate-pulse p-4">
+          <p
+            class="text-5xl w-12 h-12 text-neutral-700 bg-neutral-700 rounded-full"
+          >
+            1
+          </p>
+        </div>
+      {/if}
       {#if isMenuOpened}
         <MenuButton />
       {/if}
@@ -135,23 +159,34 @@
     >
       <nav class="space-y-2 w-full flex flex-col items-center">
         {#each sidebarItems as item}
-          <div
-            class={`flex cursor-pointer items-center justify-between h-16 w-full text-gray-100 ${
-              isSidebarOpened && 'px-12 w-full'
-            } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''} ${
-              isSidebarOpened && $page.routeId === item.routeId
-                ? 'bg-neutral-900'
-                : ''
-            }`}
-            on:click={item.handler}
-          >
-            {#if isSidebarOpened}
-              <p>
-                {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
+          {#if team.name}
+            <!-- skeleton -->
+            <div
+              class={`flex cursor-pointer items-center justify-between h-16 w-full text-gray-100 ${
+                isSidebarOpened && 'px-12 w-full'
+              } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''} ${
+                isSidebarOpened && $page.routeId === item.routeId
+                  ? 'bg-neutral-900'
+                  : ''
+              }`}
+              on:click={item.handler}
+            >
+              {#if isSidebarOpened}
+                <p>
+                  {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
+                </p>
+              {/if}
+              <img src={item.urldefault} alt={item.title} class="w-9 ml-5" />
+            </div>
+          {:else}
+            <div class="animate-pulse gap-5">
+              <p
+                class="text-5xl w-full h-16 text-neutral-700 bg-neutral-700 rounded-lg"
+              >
+                qb
               </p>
-            {/if}
-            <img src={item.urldefault} alt={item.title} class="w-9 ml-5" />
-          </div>
+            </div>
+          {/if}
         {/each}
       </nav>
     </div>

@@ -6,6 +6,7 @@
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getTeamId } from '@lib/query/getId';
   import getDates from '@lib/utils/getDates';
+  import { page } from '$app/stores';
 
   let connectionData = {
     labels: [],

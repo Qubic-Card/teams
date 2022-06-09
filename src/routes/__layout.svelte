@@ -5,8 +5,6 @@
   import { setUserData, user } from '@lib/stores/userStore';
   import '../app.css';
 
-  $: console.log('layout', $user);
-
   let roleMapping = [];
 
   onMount(async () => (roleMapping = await getRoleMaps($user?.id)));

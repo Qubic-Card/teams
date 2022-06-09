@@ -13,6 +13,7 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
+  import { page } from '$app/stores';
 
   let innerWidth;
   let asc = true;
@@ -57,15 +58,49 @@
 
   let isHasPermission = false;
 
+  $: $userData?.filter((item) => {
+    if (item === 'allow_read_connections') isHasPermission = true;
+  });
+
+  // const getTeamConnectionsList = async () => {
+  //   let id = isHasPermission
+  //     ? await getTeamId($user?.id)
+  //     : await getProfileId($user?.id);
+  //   console.log(id);
+  //   const { data, error } = await supabase
+  //     .from('team_connection_acc')
+  //     .select('*, by(*)')
+  //     .eq(isHasPermission ? 'team_id' : 'by', id)
+  //     .order('dateConnected', { ascending: true });
+
+  //   if (error) console.log(error);
+  //   if (data) {
+  //     teamConnections = data;
+  //   }
+  // };
+
   const getTeamConnectionsList = async () => {
-    let id = isHasPermission
-      ? await getTeamId($user?.id)
-      : await getProfileId($user?.id);
+    let id = await getTeamId($user?.id);
     console.log(id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq(isHasPermission ? 'team_id' : 'by', id)
+      .eq('team_id', id)
+      .order('dateConnected', { ascending: true });
+
+    if (error) console.log(error);
+    if (data) {
+      teamConnections = data;
+    }
+  };
+
+  const getUserConnectionsList = async () => {
+    let id = await getProfileId($user?.id);
+    console.log(id);
+    const { data, error } = await supabase
+      .from('team_connection_acc')
+      .select('*, by(*)')
+      .eq('by', id)
       .order('dateConnected', { ascending: true });
 
     if (error) console.log(error);
@@ -75,9 +110,10 @@
   };
 
   const sortHandler = async (col = 'profileData->>firstname') => {
-    let id = isHasPermission
-      ? await getTeamId($user?.id)
-      : await getProfileId($user?.id);
+    // let id = isHasPermission
+    //   ? await getTeamId($user?.id)
+    //   : await getProfileId($user?.id);
+    let id = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
@@ -93,13 +129,15 @@
 
   const searchProfileHandler = async () => {
     loading = true;
-    let id = isHasPermission
-      ? await getTeamId($user?.id)
-      : await getProfileId($user?.id);
+    // let id = isHasPermission
+    //   ? await getTeamId($user?.id)
+    //   : await getProfileId($user?.id);
+    let id = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq(isHasPermission ? 'team_id' : 'by', id)
+      // .eq(isHasPermission ? 'team_id' : 'by', id)
+      .eq('team_id', id)
       .ilike(
         selectedSearchMenu ? selectedSearchMenu.col : 'profileData->>firstname',
         `%${searchQuery}%`
@@ -117,13 +155,10 @@
     }
   };
 
-  $: $userData?.filter((item) => {
-    if (item === 'allow_read_connections') isHasPermission = true;
-  });
-
   $: searchQuery, selectedSearchMenu, searchProfileHandler();
-  $: getTeamConnectionsList();
-
+  // $: getTeamConnectionsList();
+  $: console.log(getTeamConnectionsList());
+  $: console.log(isHasPermission);
   const selectMenu = (menu) => (selectedSearchMenu = menu);
 </script>
 

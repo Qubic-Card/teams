@@ -13,10 +13,11 @@
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
   import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
-  import { getTeamId } from '@lib/query/getId';
   import { setUserData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import getRoleMaps from '@lib/query/getRoleMaps';
+  import { page } from '$app/stores';
+  import { getTeamId } from '@lib/query/getId';
 
   let roles = [];
   let roleMaps = [];
@@ -25,8 +26,8 @@
   let loading = false;
 
   const getTeamsRoleMapping = async () => {
+    let teamId = await getTeamId($user?.id);
     try {
-      let teamId = await getTeamId($user?.id);
       const { data, error } = await supabase
         .from('team_roles')
         .select('*')
@@ -37,7 +38,6 @@
 
       if (data) {
         roles = data;
-        console.log(roles);
       }
     } catch (error) {
       console.log(error);

@@ -30,6 +30,7 @@
   } from '@rgossiaux/svelte-headlessui';
   import { getTeamId } from '@lib/query/getId';
   import toNewTab from '@lib/utils/newTab';
+  import { page } from '$app/stores';
 
   // Register the plugins
   registerPlugin(
@@ -43,8 +44,6 @@
 
   let pond;
   let name = 'filepond';
-  let teamId;
-  let isLoading = false;
   let teamNickname = null;
   let teamData = {
     company: '',
@@ -60,7 +59,8 @@
       background: '',
     },
   };
-  // let team = [];
+  let isHasPermissionToWriteTeam = false;
+  let isHasPermissionToReadTeam = false;
 
   // handle filepond events
   function handleInit() {
@@ -153,7 +153,7 @@
       teamNickname = data[0].nickname;
       $socials = team['socials'];
       $links = team['links'];
-      teamId = team['id'];
+      // teamId = team['id'];
       $socials.map((social) => {
         if (social.type === 'phone') teamData.phone = social.data;
         if (social.type === 'email') teamData.email = social.data;
@@ -161,8 +161,6 @@
     }
     return data;
   };
-  let isHasPermissionToWriteTeam = false;
-  let isHasPermissionToReadTeam = false;
 
   $: {
     $userData?.filter((item) => {
@@ -170,7 +168,8 @@
       if (item === 'allow_read_team') isHasPermissionToReadTeam = true;
     });
 
-    console.log(teamData);
+    console.log($userData);
+    console.log(isHasPermissionToReadTeam, isHasPermissionToWriteTeam);
   }
 </script>
 
