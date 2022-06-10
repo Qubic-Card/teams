@@ -34,6 +34,7 @@
   import { page } from '$app/stores';
   import toNewTab from '@lib/utils/newTab';
   import { getTeamId } from '@lib/query/getId';
+  import Cookies from 'js-cookie';
 
   // Register the plugins
   registerPlugin(
@@ -47,6 +48,7 @@
 
   let pond;
   let name = 'filepond';
+  let teamIdCookies = Cookies.get('qubicTeamId');
 
   // handle filepond events
   function handleInit() {
@@ -141,13 +143,13 @@
   };
 
   const handleSave = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     profileData.socials = $socials;
     profileData.links = $links;
     const { error } = await supabase
       .from('team_members')
       .update({ team_profile: profileData }, { returning: 'minimal' })
-      .eq('uid', teamId);
+      .eq('uid', teamIdCookies);
     if (error) {
       toastFailed();
       console.log(error);

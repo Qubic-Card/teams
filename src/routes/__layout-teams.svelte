@@ -8,7 +8,7 @@
   import { setUserData, user } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
-  import getRoleMaps from '@lib/query/getRoleMaps';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { getTeamId } from '@lib/query/getId';
   import supabase from '@lib/db';
   import getTeamData from '@lib/query/getTeamData';
@@ -18,17 +18,17 @@
 
   let roleMapping = [];
   let team = [];
+  let teamId = Cookies.get('qubicTeamId');
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
 
   onMount(async () => {
-    roleMapping = await getRoleMaps($user?.id);
-    team = await getTeamData($user?.id);
+    roleMapping = await getRoleMapsByProfile($user?.id, teamId);
+    team = await getTeamData(teamId);
   });
-
+  $: console.log(roleMapping);
   $: setUserData(roleMapping);
-
   let sidebarItems = [
     {
       title: 'dashboard',
@@ -36,7 +36,7 @@
       urldefault:
         'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
       handler: () => {
-        goto(`/${$page.params.slug}/dashboard`);
+        goto(`/${team.id}/dashboard`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -46,7 +46,7 @@
       urldefault:
         'https://img.icons8.com/external-icongeek26-outline-icongeek26/64/ffffff/external-connection-data-analytics-icongeek26-outline-icongeek26.png',
       handler: () => {
-        goto(`/${$page.params.slug}/connections`);
+        goto(`/${team.id}/connections`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -56,7 +56,7 @@
       urldefault:
         'https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/64/ffffff/external-team-business-and-management-kiranshastry-lineal-kiranshastry-2.png',
       handler: () => {
-        goto(`/${$page.params.slug}/team`);
+        goto(`/${team.id}/team`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -65,7 +65,7 @@
       routeId: '[slug]/analytics@teams',
       urldefault: 'https://img.icons8.com/windows/96/ffffff/area-chart.png',
       handler: () => {
-        goto(`/${$page.params.slug}/analytics`);
+        goto(`/${team.id}/analytics`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -75,7 +75,7 @@
       urldefault:
         'https://img.icons8.com/ios/100/ffffff/user-group-man-man.png',
       handler: () => {
-        goto(`/${$page.params.slug}/members`);
+        goto(`/${team.id}/members`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -85,7 +85,7 @@
       urldefault:
         'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
       handler: () => {
-        goto(`/${$page.params.slug}/settings`);
+        goto(`/${team.id}/settings`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -104,20 +104,28 @@
       }`}
     >
       <div class="flex justify-center items-center h-auto">
-        {#if isSidebarOpened}
-          <img
-            src="/close-white.svg"
-            alt="close"
-            class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
-            on:click={sidebarHandler}
-          />
+        {#if team.name}
+          {#if isSidebarOpened}
+            <img
+              src="/close-white.svg"
+              alt="close"
+              class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
+              on:click={sidebarHandler}
+            />
+          {:else}
+            <img
+              src="/menu-white.svg"
+              alt="humberger-menu"
+              class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
+              on:click={sidebarHandler}
+            />
+          {/if}
         {:else}
-          <img
-            src="/menu-white.svg"
-            alt="humberger-menu"
-            class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
-            on:click={sidebarHandler}
-          />
+          <div
+            class="w-20 h-20 border-r-2 border-neutral-700 flex justify-center items-center animate-pulse"
+          >
+            <div class="bg-neutral-700 w-12 h-12 rounded-lg" />
+          </div>
         {/if}
         {#if team.name}
           <p class="text-5xl font-bold ml-4">{team.name}</p>
@@ -138,6 +146,13 @@
           alt="avatar"
           class="rounded-full w-12 h-12 cursor-pointer"
         />
+      {:else if team.logo === ''}
+        <div
+          on:click={menuHandler}
+          class="bg-neutral-700 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
+        >
+          {team.name.charAt(0).toUpperCase()}
+        </div>
       {:else}
         <div class="animate-pulse p-4">
           <p

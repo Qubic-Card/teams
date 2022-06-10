@@ -13,6 +13,12 @@
   } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
   import { getTeamId } from '@lib/query/getId';
+  import Cookies from 'js-cookie';
+  import AddMember from '@comp/modals/addMember.svelte';
+  import { onMount } from 'svelte';
+  import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
+
+  let teamId = Cookies.get('qubicTeamId');
 
   let members = [];
   let ownProfile = [];
@@ -27,9 +33,12 @@
     { name: 'Company', col: 'team_profile->>company' },
   ];
   let selectedSearchMenu = null;
+  let roles = [];
+
+  const selectMenu = (menu) => (selectedSearchMenu = menu);
 
   const getTeamMembers = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_members')
       .select('team_profile, uid, id')
@@ -38,13 +47,12 @@
     if (error) console.log(error);
 
     if (data) {
-      console.log(data);
       members = data;
     }
   };
 
   const searchMemberHandler = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     loading = true;
     const { data, error } = await supabase
       .from('team_members')
@@ -78,13 +86,12 @@
       if (member.uid === $user?.id) ownProfile = member;
     });
   }
-
   $: searchQuery, selectedSearchMenu, searchMemberHandler();
 
-  const selectMenu = (menu) => (selectedSearchMenu = menu);
+  onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col pb-20">
   {#await getTeamMembers()}
     <MemberSkeleton />
   {:then}
@@ -94,53 +101,56 @@
     >
       {$page.params.slug}
     </div>
-    <div class="flex justify-end items-center mt-6 gap-2">
-      {#if loading}
-        <Spinner class="w-10 h-10 mr-2" />
-      {/if}
-      <input
-        type="text"
-        class="w-full md:w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
-        placeholder="Search name"
-        bind:value={searchQuery}
-      />
-      <Menu as="div" class="mx-2" let:open>
-        <MenuButton
-          class="bg-white text-black flex justify-around items-center relative min-w-28 h-12 px-2 rounded-md"
-        >
-          {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="black"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </MenuButton>
-        {#if open}
-          <div transition:slide|local={{ duration: 500 }}>
-            <MenuItems
-              class="top-[480px] right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
-            >
-              {#each searchMenus as item}
-                <MenuItem
-                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                  on:click={() => selectMenu(item)}
-                >
-                  {item.name}
-                </MenuItem>
-              {/each}
-            </MenuItems>
-          </div>
+    <div class="flex justify-between items-center pt-6">
+      <AddMember {roles} />
+      <div class="flex items-center gap-2">
+        {#if loading}
+          <Spinner class="w-10 h-10 mr-2" />
         {/if}
-      </Menu>
+        <input
+          type="text"
+          class="w-full md:w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
+          placeholder="Search name"
+          bind:value={searchQuery}
+        />
+        <Menu as="div" class="mx-2" let:open>
+          <MenuButton
+            class="text-white border-2 border-neutral-700 flex justify-around items-center relative min-w-28 h-12 px-2 gap-2 rounded-md"
+          >
+            {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#737373"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </MenuButton>
+          {#if open}
+            <div transition:slide|local={{ duration: 500 }}>
+              <MenuItems
+                class="top-[480px] right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
+              >
+                {#each searchMenus as item}
+                  <MenuItem
+                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                    on:click={() => selectMenu(item)}
+                  >
+                    {item.name}
+                  </MenuItem>
+                {/each}
+              </MenuItems>
+            </div>
+          {/if}
+        </Menu>
+      </div>
     </div>
     <div
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-flow-row my-8"
@@ -153,15 +163,21 @@
             id={member.id}
             index={i}
             {members}
+            memberUid={member.uid}
+            {roles}
           />
         {:else if isHasPermission === true}
+          <!-- {#each members as member, i} -->
           <MemberCard
             {member}
             {isHasPermission}
             id={member.id}
             index={i}
             {members}
+            memberUid={member.uid}
+            {roles}
           />
+          <!-- {/each} -->
         {/if}
       {/each}
     </div>

@@ -6,7 +6,9 @@
   import { getTeamId } from '@lib/query/getId';
   import { user } from '@lib/stores/userStore';
   import Input from '@comp/input.svelte';
+  import Cookies from 'js-cookie';
 
+  let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
   let showModal = false;
   let loading = false;
@@ -16,7 +18,7 @@
   const addRoleHandler = async () => {
     loading = true;
     try {
-      let teamId = await getTeamId($user?.id);
+      // let teamId = await getTeamId($user?.id);
       const { data, error } = await supabase
         .from('team_roles')
         .insert({

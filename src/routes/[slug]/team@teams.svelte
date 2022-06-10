@@ -31,6 +31,7 @@
   import { getTeamId } from '@lib/query/getId';
   import toNewTab from '@lib/utils/newTab';
   import { page } from '$app/stores';
+  import Cookies from 'js-cookie';
 
   // Register the plugins
   registerPlugin(
@@ -42,6 +43,7 @@
     FilePondPluginFileValidateType
   );
 
+  let teamId = Cookies.get('qubicTeamId');
   let pond;
   let name = 'filepond';
   let teamNickname = null;
@@ -92,7 +94,7 @@
   };
 
   const handleSave = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     teamData.socials = $socials;
     teamData.links = $links;
     const { error } = await supabase
@@ -139,7 +141,7 @@
   };
 
   const getTeamsDetail = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('teams')
       .select('*')
@@ -148,6 +150,7 @@
     if (error) console.log(error);
 
     if (data) {
+      console.log(data);
       const team = data[0].metadata;
       teamData = { ...team };
       teamNickname = data[0].nickname;
@@ -299,148 +302,158 @@
                         class={`${isHasPermissionToWriteTeam ? '' : 'hidden'}`}
                       />
                     </div>
-                    {#each $socials as item, i}
-                      <div class="p-3 flex items-end">
-                        <Input
-                          class="flex-grow"
-                          title={item.type === 'tiktok'
-                            ? 'TikTok'
-                            : item.type === 'youtube'
-                            ? 'YouTube'
-                            : item.type.charAt(0).toUpperCase() +
-                              item.type.slice(1)}
-                          placeholder={item.type === 'instagram'
-                            ? 'Username (without @)'
-                            : item.type === 'tiktok'
-                            ? 'Tiktok (with @)'
-                            : item.type === 'whatsapp'
-                            ? 'Whatsapp (with country code. ex: 62...'
-                            : item.type === 'twitter'
-                            ? 'Username (without @)'
-                            : item.type === ' facebook'
-                            ? 'Username'
-                            : item.type === 'youtube'
-                            ? 'channel/UC4kUcG-bHD1ARIPINkS_n8A'
-                            : item.type === 'linkedin'
-                            ? 'in/username or company/qubic-id'
-                            : item.type === 'email'
-                            ? 'support@qubic.id'
-                            : item.type === 'phone'
-                            ? '+62 / 081'
-                            : item.type === 'facebook'
-                            ? 'Username'
-                            : item.type === 'line'
-                            ? 'Line ID'
-                            : item.type}
-                          bind:value={$socials[i].data}
-                          on:change={handleSave}
-                          isSocialInput={true}
-                          isTiktokInput={item.type === 'tiktok' ? true : false}
-                          isEmailInput={item.type === 'email' ? true : false}
-                          isWhatsappInput={item.type === 'whatsapp'
-                            ? true
-                            : false}
-                          isInstagramInput={item.type === 'instagram'
-                            ? true
-                            : false}
-                          isPhoneInput={item.type === 'phone' ? true : false}
-                          isEmptyChecking={true}
-                          disabled={isHasPermissionToWriteTeam ? false : true}
-                        />
+                    {#if $socials.length > 0}
+                      {#each $socials as item, i}
+                        <div class="p-3 flex items-end">
+                          <Input
+                            class="flex-grow"
+                            title={item.type === 'tiktok'
+                              ? 'TikTok'
+                              : item.type === 'youtube'
+                              ? 'YouTube'
+                              : item.type.charAt(0).toUpperCase() +
+                                item.type.slice(1)}
+                            placeholder={item.type === 'instagram'
+                              ? 'Username (without @)'
+                              : item.type === 'tiktok'
+                              ? 'Tiktok (with @)'
+                              : item.type === 'whatsapp'
+                              ? 'Whatsapp (with country code. ex: 62...'
+                              : item.type === 'twitter'
+                              ? 'Username (without @)'
+                              : item.type === ' facebook'
+                              ? 'Username'
+                              : item.type === 'youtube'
+                              ? 'channel/UC4kUcG-bHD1ARIPINkS_n8A'
+                              : item.type === 'linkedin'
+                              ? 'in/username or company/qubic-id'
+                              : item.type === 'email'
+                              ? 'support@qubic.id'
+                              : item.type === 'phone'
+                              ? '+62 / 081'
+                              : item.type === 'facebook'
+                              ? 'Username'
+                              : item.type === 'line'
+                              ? 'Line ID'
+                              : item.type}
+                            bind:value={$socials[i].data}
+                            on:change={handleSave}
+                            isSocialInput={true}
+                            isTiktokInput={item.type === 'tiktok'
+                              ? true
+                              : false}
+                            isEmailInput={item.type === 'email' ? true : false}
+                            isWhatsappInput={item.type === 'whatsapp'
+                              ? true
+                              : false}
+                            isInstagramInput={item.type === 'instagram'
+                              ? true
+                              : false}
+                            isPhoneInput={item.type === 'phone' ? true : false}
+                            isEmptyChecking={true}
+                            disabled={isHasPermissionToWriteTeam ? false : true}
+                          />
 
-                        <div
-                          class={`flex items-center mb-3 ${
-                            isHasPermissionToWriteTeam ? 'flex' : 'hidden'
-                          }`}
-                        >
-                          <Menu
-                            as="div"
-                            class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
+                          <div
+                            class={`flex items-center mb-3 ${
+                              isHasPermissionToWriteTeam ? 'flex' : 'hidden'
+                            }`}
                           >
-                            <MenuButton
-                              class="w-8 h-auto flex justify-center items-center pt-1"
-                              ><svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                                />
-                              </svg></MenuButton
+                            <Menu
+                              as="div"
+                              class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
                             >
-                            <Transition
-                              enter="transition duration-100 ease-out"
-                              enterFrom="transform scale-95 opacity-0"
-                              enterTo="transform scale-100 opacity-100"
-                              leave="transition duration-75 ease-out"
-                              leaveFrom="transform scale-100 opacity-100"
-                              leaveTo="transform scale-95 opacity-0"
-                            >
-                              <MenuItems
-                                class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
+                              <MenuButton
+                                class="w-8 h-auto flex justify-center items-center pt-1"
+                                ><svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  class="h-6 w-6"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                                  />
+                                </svg></MenuButton
                               >
-                                <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                  on:click={() =>
-                                    // go(item.type, item.data, 'Preview')
-                                    toNewTab(item.type, item.data)}
+                              <Transition
+                                enter="transition duration-100 ease-out"
+                                enterFrom="transform scale-95 opacity-0"
+                                enterTo="transform scale-100 opacity-100"
+                                leave="transition duration-75 ease-out"
+                                leaveFrom="transform scale-100 opacity-100"
+                                leaveTo="transform scale-95 opacity-0"
+                              >
+                                <MenuItems
+                                  class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
                                 >
-                                  <img
-                                    class="cursor-pointer mr-2"
-                                    draggable="false"
-                                    width="20"
-                                    height="20"
-                                    src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
-                                    alt=""
-                                  />
-                                  <p>Test</p>
-                                </MenuItem>
-                                <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                  on:click={() => handleDeleteSocial(item)}
-                                >
-                                  <img
-                                    class="cursor-pointer mr-2"
-                                    draggable="false"
-                                    width="20"
-                                    height="20"
-                                    src="https://img.icons8.com/material-outlined/96/000000/trash--v1.png"
-                                    alt=""
-                                  />
-                                  <p>Delete</p>
-                                </MenuItem>
-                                {#if i != 0}
                                   <MenuItem
-                                    class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                    on:click={() => handleUpSocial(item, i)}
+                                    class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                    on:click={() =>
+                                      // go(item.type, item.data, 'Preview')
+                                      toNewTab(item.type, item.data)}
                                   >
                                     <img
-                                      draggable="false"
                                       class="cursor-pointer mr-2"
+                                      draggable="false"
                                       width="20"
                                       height="20"
-                                      src="/icons/arrow_up.png"
+                                      src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
                                       alt=""
                                     />
-                                    <p>Move up</p>
+                                    <p>Test</p>
                                   </MenuItem>
-                                {/if}
-                              </MenuItems>
-                            </Transition>
-                          </Menu>
-                          <SwitchButton
-                            bind:checked={item.isActive}
-                            on:change={handleSave}
-                          />
+                                  <MenuItem
+                                    class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                    on:click={() => handleDeleteSocial(item)}
+                                  >
+                                    <img
+                                      class="cursor-pointer mr-2"
+                                      draggable="false"
+                                      width="20"
+                                      height="20"
+                                      src="https://img.icons8.com/material-outlined/96/000000/trash--v1.png"
+                                      alt=""
+                                    />
+                                    <p>Delete</p>
+                                  </MenuItem>
+                                  {#if i != 0}
+                                    <MenuItem
+                                      class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                      on:click={() => handleUpSocial(item, i)}
+                                    >
+                                      <img
+                                        draggable="false"
+                                        class="cursor-pointer mr-2"
+                                        width="20"
+                                        height="20"
+                                        src="/icons/arrow_up.png"
+                                        alt=""
+                                      />
+                                      <p>Move up</p>
+                                    </MenuItem>
+                                  {/if}
+                                </MenuItems>
+                              </Transition>
+                            </Menu>
+                            <SwitchButton
+                              bind:checked={item.isActive}
+                              on:change={handleSave}
+                            />
+                          </div>
                         </div>
+                      {/each}
+                    {:else}
+                      <div class="flex flex-col items-center justify-center">
+                        <p class="text-lg text-neutral-500">
+                          No social media yet
+                        </p>
                       </div>
-                    {/each}
+                    {/if}
                   </div>
                 </TabPanel>
                 <TabPanel>
@@ -458,56 +471,64 @@
                       />
                     </div>
 
-                    {#each $links as item, i}
-                      <div class="p-3 flex">
-                        <div class="flex flex-col flex-grow">
-                          <Input
-                            on:change={handleSave}
-                            title="Title"
-                            placeholder="Title"
-                            bind:value={item.title}
-                          />
-                          <Input
-                            title="Link"
-                            on:change={handleSave}
-                            bind:value={item.link}
-                            isLinkInput={true}
-                            placeholder="Link"
-                            isEmptyChecking={true}
-                          />
-                        </div>
-                        <div
-                          class={`mx-3 grid-cols-3 gap-3 place-items-center ${
-                            isHasPermissionToWriteTeam ? 'grid' : 'hidden'
-                          }`}
-                        >
-                          <SwitchButton
-                            bind:checked={item.isActive}
-                            on:change={handleSave}
-                          />
-                          {#if i != 0}
-                            <img
-                              on:click={() => handleDeleteLink(item)}
-                              draggable="false"
-                              class="cursor-pointer"
-                              width="24"
-                              height="24"
-                              src="/icons/trash.svg"
-                              alt=""
+                    {#if $links.length > 0}
+                      {#each $links as item, i}
+                        <div class="p-3 flex">
+                          <div class="flex flex-col flex-grow">
+                            <Input
+                              on:change={handleSave}
+                              title="Title"
+                              placeholder="Title"
+                              bind:value={item.title}
                             />
-                            <img
-                              on:click={() => handleUpLink(item, i)}
-                              draggable="false"
-                              class="cursor-pointer"
-                              width="24"
-                              height="24"
-                              src="/icons/arrow_up.png"
-                              alt=""
+                            <Input
+                              title="Link"
+                              on:change={handleSave}
+                              bind:value={item.link}
+                              isLinkInput={true}
+                              placeholder="Link"
+                              isEmptyChecking={true}
                             />
-                          {/if}
+                          </div>
+                          <div
+                            class={`mx-3 grid-cols-3 gap-3 place-items-center ${
+                              isHasPermissionToWriteTeam ? 'grid' : 'hidden'
+                            }`}
+                          >
+                            <SwitchButton
+                              bind:checked={item.isActive}
+                              on:change={handleSave}
+                            />
+                            {#if i != 0}
+                              <img
+                                on:click={() => handleDeleteLink(item)}
+                                draggable="false"
+                                class="cursor-pointer"
+                                width="24"
+                                height="24"
+                                src="/icons/trash.svg"
+                                alt=""
+                              />
+                              <img
+                                on:click={() => handleUpLink(item, i)}
+                                draggable="false"
+                                class="cursor-pointer"
+                                width="24"
+                                height="24"
+                                src="/icons/arrow_up.png"
+                                alt=""
+                              />
+                            {/if}
+                          </div>
                         </div>
+                      {/each}
+                    {:else}
+                      <div class="flex flex-col items-center justify-center">
+                        <p class="text-lg text-neutral-500">
+                          No social media yet
+                        </p>
                       </div>
-                    {/each}
+                    {/if}
                   </div>
                 </TabPanel>
               </TabPanels>

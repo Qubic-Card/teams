@@ -1,13 +1,17 @@
 <script>
+  import Cookies from 'js-cookie';
   import { onMount } from 'svelte';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import getRoleMaps from '@lib/query/getRoleMaps';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { setUserData, user } from '@lib/stores/userStore';
   import '../app.css';
 
   let roleMapping = [];
+  let teamId = Cookies.get('qubicTeamId');
 
-  onMount(async () => (roleMapping = await getRoleMaps($user?.id)));
+  onMount(
+    async () => (roleMapping = await getRoleMapsByProfile($user?.id, teamId))
+  );
   $: setUserData(roleMapping);
 </script>
 

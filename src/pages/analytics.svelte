@@ -7,7 +7,9 @@
   import { getTeamId } from '@lib/query/getId';
   import getDates from '@lib/utils/getDates';
   import { page } from '$app/stores';
+  import Cookies from 'js-cookie';
 
+  let teamId = Cookies.get('qubicTeamId');
   let connectionData = {
     labels: [],
     datasets: [
@@ -86,7 +88,7 @@
   };
 
   const getTeamConnectionsList = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     let {
       data: connection_profile,
       error: error_profile,
@@ -148,7 +150,7 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     loading = true;
     try {
       let {

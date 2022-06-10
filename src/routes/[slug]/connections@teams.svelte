@@ -5,7 +5,7 @@
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import ConnectionTableBody from '@comp/connectionTableBody.svelte';
   import { user, userData } from '@lib/stores/userStore';
-  import { getProfileId, getTeamId } from '@lib/query/getId';
+  import { getMemberId, getTeamId } from '@lib/query/getId';
   import {
     Menu,
     MenuButton,
@@ -14,7 +14,9 @@
   } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
   import { page } from '$app/stores';
+  import Cookies from 'js-cookie';
 
+  let teamId = Cookies.get('qubicTeamId');
   let innerWidth;
   let asc = true;
   let searchQuery = '';
@@ -61,30 +63,15 @@
   $: $userData?.filter((item) => {
     if (item === 'allow_read_connections') isHasPermission = true;
   });
-
-  // const getTeamConnectionsList = async () => {
-  //   let id = isHasPermission
-  //     ? await getTeamId($user?.id)
-  //     : await getProfileId($user?.id);
-  //   console.log(id);
-  //   const { data, error } = await supabase
-  //     .from('team_connection_acc')
-  //     .select('*, by(*)')
-  //     .eq(isHasPermission ? 'team_id' : 'by', id)
-  //     .order('dateConnected', { ascending: true });
-
-  //   if (error) console.log(error);
-  //   if (data) {
-  //     teamConnections = data;
-  //   }
-  // };
-
+  $: console.log(teamId);
   const getTeamConnectionsList = async () => {
-    let id = await getTeamId($user?.id);
+    // let id = isHasPermission ? teamId : await getMemberId($user?.id);
+    let id = teamId;
     console.log(id);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
+      // .eq(isHasPermission ? 'team_id' : 'by', id)
       .eq('team_id', id)
       .order('dateConnected', { ascending: true });
 
@@ -94,26 +81,41 @@
     }
   };
 
-  const getUserConnectionsList = async () => {
-    let id = await getProfileId($user?.id);
-    console.log(id);
-    const { data, error } = await supabase
-      .from('team_connection_acc')
-      .select('*, by(*)')
-      .eq('by', id)
-      .order('dateConnected', { ascending: true });
+  // const getTeamConnectionsList = async () => {
+  //   let id = await getTeamId($user?.id);
+  //   console.log(id);
+  //   const { data, error } = await supabase
+  //     .from('team_connection_acc')
+  //     .select('*, by(*)')
+  //     .eq('team_id', id)
+  //     .order('dateConnected', { ascending: true });
 
-    if (error) console.log(error);
-    if (data) {
-      teamConnections = data;
-    }
-  };
+  //   if (error) console.log(error);
+  //   if (data) {
+  //     teamConnections = data;
+  //   }
+  // };
+
+  // const getUserConnectionsList = async () => {
+  //   let id = await getProfileId($user?.id);
+  //   console.log(id);
+  //   const { data, error } = await supabase
+  //     .from('team_connection_acc')
+  //     .select('*, by(*)')
+  //     .eq('by', id)
+  //     .order('dateConnected', { ascending: true });
+
+  //   if (error) console.log(error);
+  //   if (data) {
+  //     teamConnections = data;
+  //   }
+  // };
 
   const sortHandler = async (col = 'profileData->>firstname') => {
     // let id = isHasPermission
     //   ? await getTeamId($user?.id)
-    //   : await getProfileId($user?.id);
-    let id = await getTeamId($user?.id);
+    //   : await getMemberId($user?.id);
+    let id = teamId;
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
@@ -131,8 +133,8 @@
     loading = true;
     // let id = isHasPermission
     //   ? await getTeamId($user?.id)
-    //   : await getProfileId($user?.id);
-    let id = await getTeamId($user?.id);
+    //   : await getMemberId($user?.id);
+    let id = teamId;
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
@@ -157,8 +159,8 @@
 
   $: searchQuery, selectedSearchMenu, searchProfileHandler();
   // $: getTeamConnectionsList();
-  $: console.log(getTeamConnectionsList());
-  $: console.log(isHasPermission);
+  // $: console.log(getTeamConnectionsList());
+  // $: console.log(isHasPermission);
   const selectMenu = (menu) => (selectedSearchMenu = menu);
 </script>
 
@@ -179,15 +181,15 @@
       />
       <Menu as="div" class="mx-2" let:open>
         <MenuButton
-          class="bg-white text-black flex justify-around items-center relative min-w-24 md:min-w-28 h-12 px-2 rounded-md"
+          class="text-white border-2 border-neutral-700 flex justify-around items-center relative min-w-24 md:min-w-28 h-12 px-2 gap-2 rounded-md"
         >
           {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
+            class="h-6 w-5"
             fill="none"
             viewBox="0 0 24 24"
-            stroke="black"
+            stroke="#737373"
             stroke-width="2"
           >
             <path

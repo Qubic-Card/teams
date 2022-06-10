@@ -1,10 +1,11 @@
 <script>
+  import Cookies from 'js-cookie';
   import { setUserData, user, userData } from '@lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
   import { browser } from '$app/env';
-  import getRoleMaps from '@lib/query/getRoleMaps';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { onMount } from 'svelte';
 
   let roleMaps = [];
@@ -12,8 +13,11 @@
   $user = supabase.auth.user();
 
   $: console.log('Auth Wrapper', $userData);
+  let teamId = Cookies.get('qubicTeamId');
 
-  // onMount(async () => (roleMaps = await getRoleMaps($user.id)));
+  onMount(
+    async () => (roleMaps = await getRoleMapsByProfile($user.id, teamId))
+  );
 
   const redirect = () => {
     if ($user && $page.url.pathname === '/') goto('/select-teams');
@@ -31,7 +35,7 @@
     if (event == 'SIGNED_IN') {
       // console.log('signed in');
       // roleMaps = await getRoleMaps($user?.id);
-      // setUserData(roleMaps);
+      setUserData(roleMaps);
       user.set(session.user);
     }
     if (event == 'TOKEN_REFRESHED') {

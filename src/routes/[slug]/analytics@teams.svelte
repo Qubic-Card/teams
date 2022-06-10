@@ -6,7 +6,9 @@
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
   import { page } from '$app/stores';
   import { getTeamId } from '@lib/query/getId';
+  import Cookies from 'js-cookie';
 
+  let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
 
   const dummy = [
@@ -43,7 +45,7 @@
   const setState = (newState) => (state = newState);
 
   const getContacts = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
       .select('*')
@@ -58,7 +60,7 @@
     }
   };
   onMount(async () => {
-    contactsCount = await getContacts();
+    // contactsCount = await getContacts();
     console.log(contactsCount);
   });
 </script>

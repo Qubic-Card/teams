@@ -15,18 +15,20 @@
   import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
   import { setUserData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import getRoleMaps from '@lib/query/getRoleMaps';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { page } from '$app/stores';
   import { getTeamId } from '@lib/query/getId';
+  import Cookies from 'js-cookie';
 
   let roles = [];
   let roleMaps = [];
   let isAutoRenew = false;
   let isClicked = true;
   let loading = false;
+  let teamId = Cookies.get('qubicTeamId');
 
   const getTeamsRoleMapping = async () => {
-    let teamId = await getTeamId($user?.id);
+    // let teamId = await getTeamId($user?.id);
     try {
       const { data, error } = await supabase
         .from('team_roles')
@@ -71,7 +73,8 @@
 
   const clicked = (e) => (isClicked = e.detail);
 
-  $: setUserData(roleMaps);
+  // $: setUserData(roleMaps);
+  $: console.log(roles);
 </script>
 
 <div class="min-h-screen flex gap-4">
@@ -115,46 +118,54 @@
     {#await getTeamsRoleMapping()}
       <RoleSettingsSkeleton />
     {:then}
-      {#each roles as role}
-        <Disclosure let:open>
-          <div class="flex justify-between items-center">
-            <DisclosureButton
-              class="text-xl w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between mr-2"
-            >
-              {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
-            </DisclosureButton>
-            <RenameModal roleName={role.role_name} id={role.id} />
-            {#if open}
-              <button
-                transition:fade|local={{ duration: 200 }}
-                class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
-                on:click={async () => {
-                  await updateTeamsRoleMapping(role.id);
-                  roleMaps = await getRoleMaps($user?.id);
-                }}
-                disabled={isClicked}
+      {#if roles.length > 0}
+        {#each roles as role}
+          <Disclosure let:open>
+            <div class="flex justify-between items-center">
+              <DisclosureButton
+                class="text-xl w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between mr-2"
               >
-                {#if loading}
-                  Saving...
-                {:else}
-                  Save
-                {/if}
-              </button>
-            {/if}
-          </div>
-          {#if open}
-            <div transition:slide|local={{ duration: 500 }} class="mb-4">
-              <DisclosurePanel static>
-                <Checkboxes
-                  checkboxes={roleMapping}
-                  bind:checked={role.role_maps}
-                  on:clicked={clicked}
-                />
-              </DisclosurePanel>
+                {role.role_name.charAt(0).toUpperCase() +
+                  role.role_name.slice(1)}
+              </DisclosureButton>
+              <RenameModal roleName={role.role_name} id={role.id} />
+              {#if open}
+                <button
+                  transition:fade|local={{ duration: 200 }}
+                  class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
+                  on:click={async () => {
+                    await updateTeamsRoleMapping(role.id);
+                    roleMaps = await getRoleMapsByProfile($user?.id);
+                    setUserData(roleMaps);
+                  }}
+                  disabled={isClicked}
+                >
+                  {#if loading}
+                    Saving...
+                  {:else}
+                    Save
+                  {/if}
+                </button>
+              {/if}
             </div>
-          {/if}
-        </Disclosure>
-      {/each}
+            {#if open}
+              <div transition:slide|local={{ duration: 500 }} class="mb-4">
+                <DisclosurePanel static>
+                  <Checkboxes
+                    checkboxes={roleMapping}
+                    bind:checked={role.role_maps}
+                    on:clicked={clicked}
+                  />
+                </DisclosurePanel>
+              </div>
+            {/if}
+          </Disclosure>
+        {/each}
+      {:else}
+        <div class="flex justify-center items-center">
+          <p class="text-xl text-center">No roles found</p>
+        </div>
+      {/if}
     {:catch error}
       <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
         Some error occurred. Please reload the page and try again.
