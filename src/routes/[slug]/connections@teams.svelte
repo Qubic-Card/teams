@@ -96,7 +96,7 @@
       console.log(data);
       isHasPermission ? (teamConnections = data) : (userConnections = data);
       if (data.length === 0) {
-        searchNotFoundMsg = '0 results found. Please try again.';
+        searchNotFoundMsg = 'No connection found.';
       } else {
         searchNotFoundMsg = '';
       }
@@ -206,7 +206,7 @@
           </h1>
         {:else if teamConnections.length === 0}
           <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            0 connection.
+            No connection found.
           </h1>
         {/if}
       </div>
@@ -309,7 +309,7 @@
           </h1>
         {:else if userConnections.length === 0}
           <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            0 connection.
+            No connection found.
           </h1>
         {/if}
       </div>

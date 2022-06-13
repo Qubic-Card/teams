@@ -16,8 +16,6 @@
   import { setUserData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
-  import { page } from '$app/stores';
-  import { getTeamId } from '@lib/query/getId';
   import Cookies from 'js-cookie';
 
   let roles = [];
@@ -72,18 +70,15 @@
   };
 
   const clicked = (e) => (isClicked = e.detail);
-
-  // $: setUserData(roleMaps);
-  $: console.log(roles);
 </script>
 
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
     <div class="flex flex-col my-4">
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-4">
         <h1 class="font-bold text-3xl">Billing</h1>
         <button
-          class="p-4 w-56 bg-blue-600 text-white rounded-lg"
+          class="p-4 md:w-48 lg:w-56 bg-blue-600 text-white rounded-lg"
           on:click={async () => await console.log('billing')}
           >Tambah saldo</button
         >
@@ -135,7 +130,7 @@
                   class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
                   on:click={async () => {
                     await updateTeamsRoleMapping(role.id);
-                    roleMaps = await getRoleMapsByProfile($user?.id);
+                    roleMaps = await getRoleMapsByProfile($user?.id, teamId);
                     setUserData(roleMaps);
                   }}
                   disabled={isClicked}

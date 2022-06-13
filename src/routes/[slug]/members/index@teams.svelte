@@ -25,6 +25,7 @@
   let members = [];
   let ownProfile = [];
   let isHasPermission = false;
+  let isHasPermissionToWriteMember = false;
   let searchQuery = '';
   let searchNotFoundMsg = '';
   let loading = false;
@@ -77,6 +78,7 @@
     console.log(members);
     $userData?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
+      if (item === 'allow_write_members') isHasPermissionToWriteMember = true;
     });
 
     members.map((member) => {
@@ -93,21 +95,27 @@
     <MemberSkeleton />
   {:then}
     <div
-      class="flex justify-center items-center bg-neutral-800 w-full h-96 text-4xl font-bold brightness-50"
+      class="flex justify-center items-center bg-no-repeat bg-cover bg-neutral-800 w-full h-96 text-4xl font-bold brightness-50"
       style="background-image: url(https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1632&q=80)"
     >
       {$page.params.slug}
     </div>
     <div class="flex justify-between items-center pt-6">
-      <AddMember {roles} />
-      <div class={`items-center gap-2 ${isHasPermission ? 'flex' : 'hidden'}`}>
+      {#if isHasPermissionToWriteMember}
+        <AddMember {roles} />
+      {/if}
+      <div
+        class={`items-center w-full justify-end gap-2 ${
+          isHasPermission ? 'flex' : 'hidden'
+        }`}
+      >
         {#if loading}
           <Spinner class="w-10 h-10 mr-2" />
         {/if}
         <input
           type="text"
           class="w-full md:w-[400px] h-12 p-2 border-2 border-neutral-500 text-white bg-neutral-800"
-          placeholder="Search name"
+          placeholder="Search"
           bind:value={searchQuery}
         />
         <Menu as="div" class="mx-2" let:open>

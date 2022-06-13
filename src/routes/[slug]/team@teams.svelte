@@ -169,6 +169,7 @@
     $userData?.filter((item) => {
       if (item === 'allow_write_team') isHasPermissionToWriteTeam = true;
       if (item === 'allow_read_team') isHasPermissionToReadTeam = true;
+      // if (item !== 'allow_read_team') isHasPermissionToReadTeam = false;
     });
 
     console.log($userData);
@@ -541,13 +542,13 @@
         Some error occurred. Please reload the page and try again.
       </h1>
     {/await}
-  {:else if isHasPermissionToReadTeam === false}
+  {:else}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
       You are not allowed to access this page. Please contact your
       administrator.
     </h1>
-  {:else}
-    <TeamEditorSkeleton />
+    <!-- {:else}
+    <TeamEditorSkeleton /> -->
   {/if}
 </div>
 

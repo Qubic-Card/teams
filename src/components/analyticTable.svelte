@@ -2,7 +2,6 @@
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
 
   export let loading, logs;
-  $: console.log(logs);
 </script>
 
 <div class="bg-neutral-800 rounded-lg p-2 border border-neutral-500 pb-6">

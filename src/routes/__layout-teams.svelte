@@ -27,7 +27,7 @@
     roleMapping = await getRoleMapsByProfile($user?.id, teamId);
     team = await getTeamData(teamId);
   });
-  // $: console.log(roleMapping);
+  // $: console.log(team);
   $: setUserData(roleMapping);
   let sidebarItems = [
     {
@@ -128,7 +128,9 @@
           </div>
         {/if}
         {#if team.name}
-          <p class="text-5xl font-bold ml-4">{team.name}</p>
+          <p class="text-3xl md:text-4xl lg:text-5xl font-bold ml-4">
+            {team.name}
+          </p>
         {:else}
           <div class="animate-pulse p-4">
             <p

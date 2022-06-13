@@ -12,12 +12,13 @@
 
   $user = supabase.auth.user();
 
-  $: console.log('Auth Wrapper', $userData);
+  // $: console.log('Auth Wrapper', $userData);
+  $: console.log('Auth Wrapper', $user);
   let teamId = Cookies.get('qubicTeamId');
 
-  onMount(
-    async () => (roleMaps = await getRoleMapsByProfile($user.id, teamId))
-  );
+  // onMount(
+  //   async () => (roleMaps = await getRoleMapsByProfile($user.id, teamId))
+  // );
 
   const redirect = () => {
     if ($user && $page.url.pathname === '/') goto('/select-teams');
@@ -35,7 +36,7 @@
     if (event == 'SIGNED_IN') {
       // console.log('signed in');
       // roleMaps = await getRoleMaps($user?.id);
-      setUserData(roleMaps);
+      // setUserData(roleMaps);
       user.set(session.user);
     }
     if (event == 'TOKEN_REFRESHED') {
