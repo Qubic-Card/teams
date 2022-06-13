@@ -5,7 +5,7 @@
   <div
     class="flex justify-center items-center mt-2 p-2 gap-4 border border-neutral-600 w-96"
   >
-    <div class="bg-neutral-700 h-10 w-12 rounded-full" />
+    <div class="bg-neutral-700 h-10 w-12 rounded-md" />
     <div class="w-full bg-neutral-700 h-12" />
   </div>
   <div class="flex p-4 bg-neutral-700 h-12 rounded-lg w-40" />

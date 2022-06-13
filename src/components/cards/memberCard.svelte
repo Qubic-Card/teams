@@ -2,6 +2,8 @@
   import Cookies from 'js-cookie';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
   import supabase from '@lib/db';
   import {
     getAllRoleByTeam,
@@ -17,8 +19,7 @@
     MenuItems,
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
-  import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
 
   export let member, isHasPermission, id, index, members, memberUid, roles;
 
@@ -89,12 +90,12 @@
   $: getMembersStatusCard();
 </script>
 
-<div class="flex flex-col justify-between mx-4 z-10">
+<div class="flex flex-col justify-between z-10">
   <div
     class="flex flex-col justify-between w-full h-56 md:h-72 bg-neutral-800 p-4 z-10 rounded-md"
   >
     <div
-      class="flex justify-between cursor-pointer h-full"
+      class="flex justify-between cursor-pointer h-full gap-4"
       on:click={() => toProfileEditor(member.uid)}
     >
       <div>
@@ -188,6 +189,7 @@
         />
       </Switch>
     </div> -->
+
     <Switch
       checked={statusMember}
       on:change={async (e) => {
@@ -199,7 +201,7 @@
       } ${isHasPermission ? 'flex' : 'hidden'}`}
     >
       <span
-        class={`inline-block w-8 h-8 bg-white rounded-full transition-transform duration-300 ease-in-out ${
+        class={`inline-block w-7 h-7 bg-white rounded-full transition-transform duration-300 ease-in-out ${
           statusMember ? 'translate-x-3' : '-translate-x-3 '
         }`}
         class:toggle-on={statusMember}
@@ -207,35 +209,23 @@
       />
     </Switch>
 
-    <Menu let:open>
-      <MenuButton
-        class="text-white border-2 border-neutral-700 flex justify-around items-center w-auto h-10 px-2 py-4 gap-2 rounded-md absolute"
-      >
-        {selectedRole !== ''
+    <Menu
+      class="absolute translate-y-[140px] md:translate-y-[200px] mt-3"
+      let:open
+    >
+      <DropdownButton
+        class="w-auto"
+        label={selectedRole !== ''
           ? selectedRole
           : memberRole?.role_name
           ? memberRole.role_name.charAt(0).toUpperCase() +
             memberRole.role_name.slice(1)
           : 'Loading...'}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="white"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </MenuButton>
+      />
       {#if open}
-        <div>
+        <div transition:slide|local>
           <MenuItems
-            class="bottom-12 left-2 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 min-w-40"
+            class="top-2 z-40 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
           >
             {#each roles as item}
               <MenuItem

@@ -4,12 +4,10 @@
   import AnalyticTable from '@comp/analyticTable.svelte';
   import { user, userData } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
-  import { getTeamId } from '@lib/query/getId';
+  import { getMemberId } from '@lib/query/getId';
   import getDates from '@lib/utils/getDates';
-  import { page } from '$app/stores';
   import Cookies from 'js-cookie';
 
-  let teamId = Cookies.get('qubicTeamId');
   let connectionData = {
     labels: [],
     datasets: [
@@ -28,17 +26,44 @@
     ],
   };
 
+  let teamConnectionData = {
+    labels: [],
+    datasets: [
+      {
+        values: [],
+      },
+    ],
+  };
+
+  let teamActivityData = {
+    labels: [],
+    datasets: [
+      {
+        values: [],
+      },
+    ],
+  };
+
   const chartEls = [
     { label: 'Weekly New Connections', count: 0 },
     { label: 'Weekly Activities', count: 0 },
   ];
 
-  // let connections = [];
+  let teamId = Cookies.get('qubicTeamId');
+
   let uniqueCount = 0;
   let activityCount = 0;
   let connectionCount = 0;
   let activity = [];
-  let logs = [];
+  let dateConnected = [];
+  let userLogs = [];
+
+  let teamUniqueCount = 0;
+  let teamActivityCount = 0;
+  let teamConnectionCount = 0;
+  let teamActivity = [];
+  let teamDateConnected = [];
+  let teamLogs = [];
 
   let loading = false;
   let isHasPermission = false;
@@ -65,30 +90,29 @@
   };
 
   const getConnectionsList = async () => {
+    let id = await getMemberId($user?.id, teamId);
+
     let {
       data: connection_profile,
       error: error_profile,
       count,
     } = await supabase
-      .from('connection_acc')
+      .from('team_connection_acc')
       .select('dateConnected', { count: 'estimated' })
-      .eq('uid', $user?.id)
+      .eq('by', id)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
 
-    if (connection_profile) connectionCount = count;
     if (error_profile) console.log(error_profile);
-
-    const dateConnected =
-      connection_profile ??
-      [].map((item) => new Date(item.dateConnected).toDateString().slice(4));
-    // console.log('date', dateConnected);
-    // console.log('profile', connection_profile);
-    return { connection_profile, dateConnected };
+    if (connection_profile) {
+      connectionCount = count;
+      dateConnected = connection_profile.map((item) =>
+        new Date(item.dateConnected).toDateString().slice(4)
+      );
+    }
   };
 
   const getTeamConnectionsList = async () => {
-    // let teamId = await getTeamId($user?.id);
     let {
       data: connection_profile,
       error: error_profile,
@@ -100,18 +124,17 @@
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
 
-    if (connection_profile) connectionCount = count;
+    if (connection_profile) {
+      teamConnectionCount = count;
+      teamDateConnected = connection_profile.map((item) =>
+        new Date(item.dateConnected).toDateString().slice(4)
+      );
+    }
     if (error_profile) console.log(error_profile);
-
-    const dateConnected =
-      connection_profile ??
-      [].map((item) => new Date(item.dateConnected).toDateString().slice(4));
-    // console.log('date', dateConnected);
-    // console.log('profile', connection_profile);
-    return { connection_profile, dateConnected };
   };
 
   const getWeeklyLogsActivity = async () => {
+    let id = await getMemberId($user?.id, teamId);
     loading = true;
     try {
       let {
@@ -119,11 +142,13 @@
         error,
         count,
       } = await supabase
-        .from('logs')
+        .from('team_logs')
         .select('*', { count: 'estimated' })
-        .eq('uid', $user?.id)
-        .gte('timestamp', new Date(last7Days[0]).toISOString())
-        .order('timestamp', { ascending: false })
+        .eq('team_member', id)
+        .gte('created_at', new Date(last7Days[0]).toISOString())
+        .order('created_at', {
+          ascending: false,
+        })
         .limit(5);
 
       if (logs) {
@@ -134,14 +159,14 @@
         uniqueCount = newArr.length;
         activityCount = count;
         activity = logs.map((log) =>
-          new Date(log.timestamp).toDateString().slice(4)
+          new Date(log.created_at).toDateString().slice(4)
         );
 
         setTimeout(() => {
           loading = false;
         }, 1000);
-        // console.log('logs', logs);
-        return logs;
+
+        userLogs = logs;
       }
     } catch (error) {
       loading = false;
@@ -150,7 +175,6 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    // let teamId = await getTeamId($user?.id);
     loading = true;
     try {
       let {
@@ -161,8 +185,8 @@
         .from('team_logs')
         .select('*', { count: 'estimated' })
         .eq('team', teamId)
-        .gte('timestamp', new Date(last7Days[0]).toISOString())
-        .order('timestamp', { ascending: false })
+        .gte('created_at', new Date(last7Days[0]).toISOString())
+        .order('created_at', { ascending: false })
         .limit(5);
 
       if (logs) {
@@ -170,17 +194,17 @@
         logs.map((log) => {
           if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
         });
-        uniqueCount = newArr.length;
-        activityCount = count;
-        activity = logs.map((log) =>
-          new Date(log.timestamp).toDateString().slice(4)
+        teamUniqueCount = newArr.length;
+        teamActivityCount = count;
+        teamActivity = logs.map((log) =>
+          new Date(log.created_at).toDateString().slice(4)
         );
 
         setTimeout(() => {
           loading = false;
         }, 1000);
         // console.log('logs', logs);
-        return logs;
+        teamLogs = logs;
       }
     } catch (error) {
       loading = false;
@@ -189,21 +213,31 @@
   };
 
   const activityHandler = async () => {
-    logs = await getWeeklyLogsActivity();
+    await getWeeklyLogsActivity();
 
     activityData.labels = last7Days;
     activityData.datasets[0].values = count(last7Days, activity);
   };
 
-  const connection = async () => {
-    const { connection_profile, dateConnected } = isHasPermission
-      ? await getConnectionsList()
-      : await getConnectionsList();
+  const TeamActivityHandler = async () => {
+    await getTeamWeeklyLogsActivity();
 
-    // connections = connection_profile;
+    teamActivityData.labels = last7Days;
+    teamActivityData.datasets[0].values = count(last7Days, teamActivity);
+  };
+
+  const connection = async () => {
+    await getConnectionsList();
 
     connectionData.labels = last7Days;
     connectionData.datasets[0].values = count(last7Days, dateConnected);
+  };
+
+  const teamConnection = async () => {
+    await getTeamConnectionsList();
+
+    teamConnectionData.labels = last7Days;
+    teamConnectionData.datasets[0].values = count(last7Days, teamDateConnected);
   };
 
   $: $userData?.filter((item) => {
@@ -211,16 +245,19 @@
   });
 
   $: {
-    connection();
-  }
-  $: {
-    activityHandler();
+    if (isHasPermission) {
+      teamConnection();
+      TeamActivityHandler();
+    } else {
+      connection();
+      activityHandler();
+    }
   }
 </script>
 
 <div class="h-auto flex justify-center mt-8">
   <div class="w-full">
-    {#await (connection(), activityHandler())}
+    {#await (connection(), activityHandler(), teamConnection(), TeamActivityHandler())}
       <AnalyticsSkeleton />
     {:then}
       <div class="flex flex-col lg:flex-row justify-between">
@@ -232,24 +269,45 @@
             <div
               class="h-80 border-neutral-500 bg-neutral-800 border rounded-xl mt-4"
             >
-              <Chart
-                data={item.label === 'Weekly New Connections'
-                  ? connectionData
-                  : activityData}
-                type="line"
-                colors={['green']}
-                axisOptions={{
-                  xIsSeries: true,
-                  xAxisMode: 'tick',
-                  yAxisMode: 'tick',
-                }}
-                lineOptions={{
-                  hideDots: 1,
-                  heatline: 0,
-                  areaFill: 1,
-                  regionFill: 1,
-                }}
-              />
+              {#if isHasPermission}
+                <Chart
+                  data={item.label === 'Weekly New Connections'
+                    ? teamConnectionData
+                    : teamActivityData}
+                  type="line"
+                  colors={['green']}
+                  axisOptions={{
+                    xIsSeries: true,
+                    xAxisMode: 'tick',
+                    yAxisMode: 'tick',
+                  }}
+                  lineOptions={{
+                    hideDots: 1,
+                    heatline: 0,
+                    areaFill: 1,
+                    regionFill: 1,
+                  }}
+                />
+              {:else}
+                <Chart
+                  data={item.label === 'Weekly New Connections'
+                    ? connectionData
+                    : activityData}
+                  type="line"
+                  colors={['green']}
+                  axisOptions={{
+                    xIsSeries: true,
+                    xAxisMode: 'tick',
+                    yAxisMode: 'tick',
+                  }}
+                  lineOptions={{
+                    hideDots: 1,
+                    heatline: 0,
+                    areaFill: 1,
+                    regionFill: 1,
+                  }}
+                />
+              {/if}
             </div>
           </div>
         {/each}
@@ -261,23 +319,29 @@
           class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
         >
           <p class="">New connections this week</p>
-          <p class="font-bold text-4xl">{connectionCount}</p>
+          <p class="font-bold text-4xl">
+            {isHasPermission ? teamConnectionCount : connectionCount}
+          </p>
         </div>
         <div
           class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
         >
           <p class="">Your activity this week</p>
-          <p class="font-bold text-4xl">{activityCount}</p>
+          <p class="font-bold text-4xl">
+            {isHasPermission ? teamActivityCount : activityCount}
+          </p>
         </div>
         <div
           class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
         >
           <p class="">Unique People this week</p>
-          <p class="font-bold text-4xl">{uniqueCount}</p>
+          <p class="font-bold text-4xl">
+            {isHasPermission ? teamUniqueCount : uniqueCount}
+          </p>
         </div>
       </div>
       <div class="hidden lg:flex lg:flex-col">
-        <AnalyticTable {logs} {loading} />
+        <AnalyticTable logs={isHasPermission ? teamLogs : userLogs} {loading} />
       </div>
       <div class="flex lg:hidden w-full justify-center mt-8">
         View more on desktop

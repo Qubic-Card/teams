@@ -13,11 +13,14 @@
     MenuItems,
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
+  import { slide } from 'svelte/transition';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
 
   export let roles;
 
   let teamId = Cookies.get('qubicTeamId');
-  let name = '';
+  let fname = '';
+  let lname = '';
   let email = '';
   let showModal = false;
   let loading = false;
@@ -50,8 +53,8 @@
             isActive: true,
           },
         ],
-        lastname: '',
-        firstname: name,
+        lastname: lname,
+        firstname: fname,
       },
     });
 
@@ -94,44 +97,41 @@
         <div
           class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
         >
-          <Input
-            placeholder="Name"
-            title="Name"
-            bind:value={name}
-            class="w-full"
-            isEmptyChecking={true}
-          />
+          <div class="flex w-full gap-2">
+            <Input
+              placeholder="Firstname"
+              title="Firstname"
+              bind:value={fname}
+              class="w-full"
+              isEmptyChecking={true}
+            />
+            <Input
+              placeholder="Lastname"
+              title="Lastname"
+              bind:value={lname}
+              class="w-full"
+              isEmptyChecking={true}
+            />
+          </div>
           <Input
             placeholder="Email"
             title="Email"
             bind:value={email}
             class="w-full"
             isEmptyChecking={true}
+            isEmailInput={true}
           />
-          <Menu class="flex w-full justify-start" let:open>
-            <MenuButton
-              class="bg-blue-600 text-white flex justify-around items-center w-auto h-10 px-2 gap-2 rounded-md relative "
-            >
-              {selectedRole !== '' ? selectedRole : 'Please select a role'}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="white"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </MenuButton>
+          <Menu class="flex w-full justify-start mb-2" let:open>
+            <DropdownButton
+              class="w-1/2"
+              label={selectedRole !== ''
+                ? selectedRole
+                : 'Please select a role'}
+            />
             {#if open}
-              <div>
+              <div transition:slide|local>
                 <MenuItems
-                  class="top-[320px] left-5 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
+                  class="top-[320px] left-5 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-1/2"
                 >
                   {#each roles as item}
                     <MenuItem
@@ -148,8 +148,13 @@
             {/if}
           </Menu>
           <button
-            disabled={name === '' || email === '' ? true : false}
-            class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500 disabled:cursor-not-allowed"
+            disabled={fname === '' ||
+            lname === '' ||
+            email === '' ||
+            selectedRole === ''
+              ? true
+              : false}
+            class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500"
           >
             {#if loading}
               <Spinner class="w-7 h-7" />

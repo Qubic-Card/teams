@@ -4,6 +4,7 @@
   import MemberCard from '@comp/cards/memberCard.svelte';
   import Spinner from '@comp/loading/spinner.svelte';
   import supabase from '@lib/db';
+  import { memberSearchMenu } from '@lib/constants.js';
   import { user, userData } from '@lib/stores/userStore';
   import {
     Menu,
@@ -17,6 +18,7 @@
   import AddMember from '@comp/modals/addMember.svelte';
   import { onMount } from 'svelte';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
 
@@ -27,11 +29,6 @@
   let searchNotFoundMsg = '';
   let loading = false;
 
-  let searchMenus = [
-    { name: 'Name', col: 'team_profile->>firstname' },
-    { name: 'Job', col: 'team_profile->>job' },
-    { name: 'Company', col: 'team_profile->>company' },
-  ];
   let selectedSearchMenu = null;
   let roles = [];
 
@@ -103,7 +100,7 @@
     </div>
     <div class="flex justify-between items-center pt-6">
       <AddMember {roles} />
-      <div class="flex items-center gap-2">
+      <div class={`items-center gap-2 ${isHasPermission ? 'flex' : 'hidden'}`}>
         {#if loading}
           <Spinner class="w-10 h-10 mr-2" />
         {/if}
@@ -114,31 +111,16 @@
           bind:value={searchQuery}
         />
         <Menu as="div" class="mx-2" let:open>
-          <MenuButton
-            class="text-white border-2 border-neutral-700 flex justify-around items-center relative min-w-28 h-12 px-2 gap-2 rounded-md"
-          >
-            {selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="#737373"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </MenuButton>
+          <DropdownButton
+            class="w-28"
+            label={selectedSearchMenu ? selectedSearchMenu.name : 'Name'}
+          />
           {#if open}
             <div transition:slide|local={{ duration: 500 }}>
               <MenuItems
                 class="top-[480px] right-7 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40"
               >
-                {#each searchMenus as item}
+                {#each memberSearchMenu as item}
                   <MenuItem
                     class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
                     on:click={() => selectMenu(item)}
@@ -153,7 +135,7 @@
       </div>
     </div>
     <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-flow-row my-8"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-flow-row my-8 gap-4"
     >
       {#each members as member, i}
         {#if isHasPermission === false && member.uid === ownProfile.uid}

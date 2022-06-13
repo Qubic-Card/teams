@@ -11,18 +11,25 @@
     MenuItems,
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
 
   let nickname = '';
   let commercialName = '';
   let discCode = '';
   let disc = 'Rp 0';
+  let showModal = false;
+  let loading = false;
+  let selectedMemberType = '';
+  let selectedTimeType = '';
 
   let data = ['name', 'name1', 'name2'];
 
-  let showModal = false;
-  let loading = false;
+  let timeType = ['1', '2', '3'];
+  let memberType = ['5', '10', '15'];
 
   const toggleModal = () => (showModal = !showModal);
+  const selectMemberType = (type) => (selectedMemberType = type);
+  const selectTimeType = (type) => (selectedTimeType = type);
   const addTeam = async () => {
     let profileId = await getProfileId($user?.id);
 
@@ -150,69 +157,49 @@
           </div>
           <div class="flex w-full gap-2">
             <Menu as="div" class="w-full mx-2" let:open>
-              <MenuButton
-                class="text-white border-2 border-neutral-700 flex items-center relative w-full h-12 px-2 gap-2 rounded-md"
-              >
-                asfaf
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="#737373"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </MenuButton>
+              <DropdownButton
+                class="w-full"
+                label={selectedMemberType !== ''
+                  ? selectedMemberType + ' members'
+                  : 'Please select a member type'}
+              />
               {#if open}
                 <div>
                   <MenuItems
                     class="top-[265px] left-6 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
                   >
-                    <MenuItem
-                      class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                    >
-                      ags
-                    </MenuItem>
+                    {#each memberType as item}
+                      <MenuItem
+                        on:click={() => selectMemberType(item)}
+                        class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                      >
+                        {item} members
+                      </MenuItem>
+                    {/each}
                   </MenuItems>
                 </div>
               {/if}
             </Menu>
             <Menu as="div" class="w-full mx-2" let:open>
-              <MenuButton
-                class="text-white border-2 border-neutral-700 flex items-center relative w-full h-12 px-2 gap-2 rounded-md"
-              >
-                asfaf
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="#737373"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </MenuButton>
+              <DropdownButton
+                class="w-full"
+                label={selectedTimeType !== ''
+                  ? selectedTimeType + ' tahun'
+                  : 'Please select a time type'}
+              />
               {#if open}
                 <div>
                   <MenuItems
                     class="top-[265px] right- z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
                   >
-                    <MenuItem
-                      class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                    >
-                      ags
-                    </MenuItem>
+                    {#each timeType as item}
+                      <MenuItem
+                        on:click={() => selectTimeType(item)}
+                        class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                      >
+                        {item} tahun
+                      </MenuItem>
+                    {/each}
                   </MenuItems>
                 </div>
               {/if}

@@ -106,3 +106,41 @@ export const officialLinks = {
   tutorial: 'https://www.youtube.com/watch?v=GO-3CS9OYEY',
   youtubeChannel: 'https://www.youtube.com/channel/UC4kUcG-bHD1ARIPINkS_n8A',
 };
+
+export const connectionsTable = [
+  { name: 'Name', id: 'profileData->>firstname' },
+  { name: 'Job', id: 'profileData->>job' },
+  { name: 'Company', id: 'profileData->>company' },
+  {
+    name: 'Connected At',
+    id: 'dateConnected',
+  },
+  {
+    name: 'By',
+    id: 'by',
+  },
+];
+
+export const connectionsTableMobile = [
+  { name: 'Name', id: 'profileData->>firstname' },
+  {
+    name: 'Connected At',
+    id: 'dateConnected',
+  },
+  {
+    name: 'By',
+    id: 'by',
+  },
+];
+
+export const connectionSearchMenu = [
+  { name: 'Name', col: 'profileData->>firstname' },
+  { name: 'Job', col: 'profileData->>job' },
+  { name: 'Company', col: 'profileData->>company' },
+];
+
+export const memberSearchMenu = [
+  { name: 'Name', col: 'team_profile->>firstname' },
+  { name: 'Job', col: 'team_profile->>job' },
+  { name: 'Company', col: 'team_profile->>company' },
+];

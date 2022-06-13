@@ -49,7 +49,7 @@
       >
         {#if item.team_id.metadata.logo === ''}
           <div
-            class="bg-neutral-700 w-12 h-12 rounded-full flex justify-center items-center mr-2"
+            class="bg-neutral-700 w-12 h-12 rounded-md flex justify-center items-center mr-2"
           >
             {item.team_id.name.charAt(0).toUpperCase()}
           </div>
@@ -57,10 +57,13 @@
           <img
             src={item.team_id.metadata.logo}
             alt={item.team_id.name + ' logo'}
-            class="h-12 w-12 mr-2 rounded-full"
+            class="h-12 w-12 mr-2 rounded-md"
           />
         {/if}
-        <p>{item.team_id.name}</p>
+        <p>
+          {item.team_id.name.charAt(0).toUpperCase() +
+            item.team_id.name.slice(1) ?? 'No team name'}
+        </p>
       </div>
     {/each}
     {#if isHasPermission}

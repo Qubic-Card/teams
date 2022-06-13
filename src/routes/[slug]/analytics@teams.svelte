@@ -1,12 +1,13 @@
 <script>
-  import { toastFailed } from '@lib/utils/toast';
   import { onMount } from 'svelte';
+  import Cookies from 'js-cookie';
+  import { page } from '$app/stores';
+  import { getTeamId } from '@lib/query/getId';
+  import { toastFailed } from '@lib/utils/toast';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
-  import { page } from '$app/stores';
-  import { getTeamId } from '@lib/query/getId';
-  import Cookies from 'js-cookie';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
@@ -69,6 +70,11 @@
   {#await getContacts()}
     <AnalyticsPageSkeleton {isHasPermission} />
   {:then name}
+    <!-- <DropdownButton class="w-52" label="Download CSV" /> -->
+    <button
+      class="w-52 h-16 p-4 mb-4 border-2 border-neutral-700 rounded-lg self-end"
+      >Download CSV</button
+    >
     <div class="flex justify-between gap-4">
       {#each dummy as item}
         <div
@@ -129,7 +135,7 @@
         {/if}
       </div>
       <!-- {:else}
-    <p>you dont have access to this page, you cant see the analytics</p> -->
+      <p>you dont have access to this page, you cant see the analytics</p> -->
     {/if}
   {:catch}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">

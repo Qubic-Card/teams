@@ -62,7 +62,7 @@
     },
   };
   let isHasPermissionToWriteTeam = false;
-  let isHasPermissionToReadTeam = false;
+  let isHasPermissionToReadTeam = null;
 
   // handle filepond events
   function handleInit() {
@@ -541,10 +541,13 @@
         Some error occurred. Please reload the page and try again.
       </h1>
     {/await}
-  {:else}
+  {:else if isHasPermissionToReadTeam === false}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-      You are not allowed to access this page. Please contact your administrator
+      You are not allowed to access this page. Please contact your
+      administrator.
     </h1>
+  {:else}
+    <TeamEditorSkeleton />
   {/if}
 </div>
 

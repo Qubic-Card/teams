@@ -2,6 +2,7 @@
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
 
   export let loading, logs;
+  $: console.log(logs);
 </script>
 
 <div class="bg-neutral-800 rounded-lg p-2 border border-neutral-500 pb-6">
@@ -22,11 +23,11 @@
             class="even:bg-neutral-700 odd:bg-neutral-900 text-white hover:border"
           >
             <td class="pl-4 p-2 w-48">
-              {new Date(row.timestamp).toDateString().slice(4)}
+              {new Date(row.created_at).toDateString().slice(4)}
             </td>
             <td class="pl-4 w-auto">{row.data.message}</td>
             <td class="flex flex-col h-[40px] justify-center">
-              {row.platform}
+              {row.platform ?? 'Unknown'}
             </td>
           </tr>
         {/each}

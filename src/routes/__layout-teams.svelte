@@ -27,7 +27,7 @@
     roleMapping = await getRoleMapsByProfile($user?.id, teamId);
     team = await getTeamData(teamId);
   });
-  $: console.log(roleMapping);
+  // $: console.log(roleMapping);
   $: setUserData(roleMapping);
   let sidebarItems = [
     {
