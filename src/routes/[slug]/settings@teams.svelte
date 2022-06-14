@@ -75,10 +75,12 @@
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
     <div class="flex flex-col my-4">
-      <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-        <h1 class="font-bold text-3xl">Billing</h1>
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4"
+      >
+        <h1 class="font-bold text-xl md:text-3xl">Billing</h1>
         <button
-          class="p-4 md:w-48 lg:w-56 bg-blue-600 text-white rounded-lg"
+          class="p-4 w-full md:w-48 lg:w-56 bg-blue-600 text-white rounded-lg"
           on:click={async () => await console.log('billing')}
           >Tambah saldo</button
         >
@@ -106,8 +108,10 @@
         </Switch>
       </div>
     </div>
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="font-bold text-3xl">Role Settings</h1>
+    <div
+      class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
+    >
+      <h1 class="font-bold text-xl md:text-3xl">Role Settings</h1>
       <AddRoleModal />
     </div>
     {#await getTeamsRoleMapping()}
@@ -168,10 +172,10 @@
     {/await}
   </div>
   <div class="flex flex-col w-1/3 rounded-lg gap-4">
-    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
+    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-xl lg:text-2xl">
       <p class="mb-4">Atur subscription dalam billing</p>
     </div>
-    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
+    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-xl lg:text-2xl">
       <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
       <p>Berikan permissions yang sesuai di setiap role.</p>
     </div>

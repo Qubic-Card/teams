@@ -51,6 +51,7 @@
     company: '',
     description: '',
     address: '',
+    logo: '',
     email: '',
     phone: '',
     avatar: '',
@@ -152,7 +153,9 @@
     if (data) {
       console.log(data);
       const team = data[0].metadata;
+      console.log(team);
       teamData = { ...team };
+      console.log(teamData);
       teamNickname = data[0].nickname;
       $socials = team['socials'];
       $links = team['links'];
@@ -185,6 +188,11 @@
       <div class="w-full">
         <div class="text-black">
           <div class="flex flex-col w-full">
+            <!-- <img
+              src={teamData.logo}
+              alt={teamData.company + ' logo'}
+              class="w-64 h-64"
+            /> -->
             <TabGroup>
               <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
                 <Tab

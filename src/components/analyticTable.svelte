@@ -1,10 +1,24 @@
 <script>
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
+  import Pagination from '@comp/pagination.svelte';
 
-  export let loading, logs;
+  export let loading, totalPages, isAlreadySeeMore;
+
+  let page = 0;
+  let currentPageRows = [];
+  let active = 0;
+
+  $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
+
+  const setPage = (p) => {
+    if (p >= 0 && p < totalPages.length) {
+      page = p;
+      active = p;
+    }
+  };
 </script>
 
-<div class="bg-neutral-800 rounded-lg p-2 border border-neutral-500 pb-6">
+<div class="bg-neutral-800 rounded-lg p-2 border border-neutral-700 pb-6">
   <table class="text-black w-full mt-2">
     <thead class="text-neutral-200">
       <tr>
@@ -15,9 +29,11 @@
     </thead>
     <tbody>
       {#if loading}
-        <TableSkeleton colLength={3} />
+        {#each currentPageRows as item}
+          <TableSkeleton colLength={3} />
+        {/each}
       {:else}
-        {#each logs as row}
+        {#each currentPageRows as row}
           <tr
             class="even:bg-neutral-700 odd:bg-neutral-900 text-white hover:border"
           >
@@ -33,9 +49,17 @@
       {/if}
     </tbody>
   </table>
-  {#if logs.length === 0 && !loading}
+  {#if !isAlreadySeeMore && currentPageRows.length !== 0}
+    <button
+      class="self-center w-full mt-3 p-2 h-12 bg-neutral-700 hover:bg-neutral-900"
+      on:click>See more</button
+    >
+  {/if}
+  {#if currentPageRows.length === 0 && !loading}
     <div class="text-center">
       <h1 class="text-xl my-4">No activity found</h1>
     </div>
   {/if}
 </div>
+
+<Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />

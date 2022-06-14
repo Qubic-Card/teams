@@ -202,7 +202,7 @@
     console.log(isHasWriteProfilePermission, isHasWriteMembersPermission);
   }
 
-  $: console.log($userData);
+  $: console.log($page);
 </script>
 
 {#if $page.params.slug === $user?.id}

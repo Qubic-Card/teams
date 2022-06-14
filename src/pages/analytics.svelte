@@ -7,6 +7,7 @@
   import { getMemberId } from '@lib/query/getId';
   import getDates from '@lib/utils/getDates';
   import Cookies from 'js-cookie';
+  import count from '@lib/utils/count';
 
   let connectionData = {
     labels: [],
@@ -68,25 +69,29 @@
   let loading = false;
   let isHasPermission = false;
 
+  let itemsPerPage = 10;
+  let totalPages = [];
+  let maxLimit = 5;
+  let isAlreadySeeMore = false;
+
   const today = new Date().setDate(new Date().getDate());
   const last7Days = getDates(
     new Date(new Date().setDate(new Date().getDate() - 6)),
     today
   );
 
-  const count = (days, data) => {
-    let result = [];
-    for (let i = 0; i < days.length; i++) {
-      let count = 0;
-      for (let j = 0; j < data.length; j++) {
-        if (days[i] === data[j]) {
-          count++;
-        }
-      }
+  const setLimit = (value) => {
+    maxLimit = value;
+    isAlreadySeeMore = true;
+  };
 
-      result.push(count);
-    }
-    return result;
+  const paginate = (items) => {
+    const pages = Math.ceil(items.length / itemsPerPage);
+    const paginatedItems = Array.from({ length: pages }, (_, index) => {
+      const start = index * itemsPerPage;
+      return items.slice(start, start + itemsPerPage);
+    });
+    totalPages = [...paginatedItems];
   };
 
   const getConnectionsList = async () => {
@@ -148,8 +153,8 @@
         .gte('created_at', new Date(last7Days[0]).toISOString())
         .order('created_at', {
           ascending: false,
-        })
-        .limit(5);
+        });
+      // .limit(maxLimit ?? 5);
 
       if (logs) {
         let newArr = [];
@@ -167,6 +172,7 @@
         }, 1000);
 
         userLogs = logs;
+        // paginate(userLogs);
       }
     } catch (error) {
       loading = false;
@@ -186,8 +192,8 @@
         .select('*', { count: 'estimated' })
         .eq('team', teamId)
         .gte('created_at', new Date(last7Days[0]).toISOString())
-        .order('created_at', { ascending: false })
-        .limit(5);
+        .order('created_at', { ascending: false });
+      // .limit(maxLimit ?? 100);
 
       if (logs) {
         let newArr = [];
@@ -205,6 +211,8 @@
         }, 1000);
         // console.log('logs', logs);
         teamLogs = logs;
+
+        // paginate(teamLogs);
       }
     } catch (error) {
       loading = false;
@@ -244,15 +252,9 @@
     if (item === 'allow_read_analytics') isHasPermission = true;
   });
 
-  $: {
-    if (isHasPermission) {
-      teamConnection();
-      TeamActivityHandler();
-    } else {
-      connection();
-      activityHandler();
-    }
-  }
+  $: isHasPermission
+    ? paginate(teamLogs.slice(0, maxLimit))
+    : paginate(userLogs.slice(0, maxLimit));
 </script>
 
 <div class="h-auto flex justify-center mt-8">
@@ -267,7 +269,7 @@
               <h1 class="text-2xl font-semibold">{item.label}</h1>
             </div>
             <div
-              class="h-80 border-neutral-500 bg-neutral-800 border rounded-xl mt-4"
+              class="h-80 border-neutral-700 bg-neutral-800 border rounded-xl mt-4"
             >
               {#if isHasPermission}
                 <Chart
@@ -316,7 +318,7 @@
         class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[150px] my-4 space-x-0 md:space-x-2"
       >
         <div
-          class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
+          class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-8"
         >
           <p class="">New connections this week</p>
           <p class="font-bold text-4xl">
@@ -324,7 +326,7 @@
           </p>
         </div>
         <div
-          class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
+          class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-8"
         >
           <p class="">Your activity this week</p>
           <p class="font-bold text-4xl">
@@ -332,7 +334,7 @@
           </p>
         </div>
         <div
-          class="rounded-lg bg-neutral-800 border border-neutral-500 h-full p-8"
+          class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-8"
         >
           <p class="">Unique People this week</p>
           <p class="font-bold text-4xl">
@@ -341,7 +343,12 @@
         </div>
       </div>
       <div class="hidden lg:flex lg:flex-col">
-        <AnalyticTable logs={isHasPermission ? teamLogs : userLogs} {loading} />
+        <AnalyticTable
+          {loading}
+          {totalPages}
+          on:click={() => setLimit(500)}
+          {isAlreadySeeMore}
+        />
       </div>
       <div class="flex lg:hidden w-full justify-center mt-8">
         View more on desktop
@@ -353,3 +360,6 @@
     {/await}
   </div>
 </div>
+<!-- {"card":"b9069595-2a92-487a-8756-2ab437c29758","message":"Your profile was opened through QRScan"} -->
+<!-- INFO -->
+<!-- 76900f13-9d11-424a-b111-71b1f2cd6def -->
