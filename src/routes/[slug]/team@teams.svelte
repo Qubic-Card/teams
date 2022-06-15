@@ -32,6 +32,7 @@
   import toNewTab from '@lib/utils/newTab';
   import { page } from '$app/stores';
   import Cookies from 'js-cookie';
+  import BorderButton from '@comp/buttons/borderButton.svelte';
 
   // Register the plugins
   registerPlugin(
@@ -178,6 +179,11 @@
     console.log($userData);
     console.log(isHasPermissionToReadTeam, isHasPermissionToWriteTeam);
   }
+
+  import { socialIcons } from '@lib/constants';
+  import { theme } from '@lib/profileTheme';
+
+  let currentTheme = theme[teamData.design?.theme?.toString() ?? 'dark'];
 </script>
 
 <div class="flex justify-center">
@@ -188,11 +194,44 @@
       <div class="w-full">
         <div class="text-black">
           <div class="flex flex-col w-full">
-            <!-- <img
-              src={teamData.logo}
-              alt={teamData.company + ' logo'}
-              class="w-64 h-64"
-            /> -->
+            <div class="flex p-4 border-2 border-neutral-700 mb-4 gap-6">
+              <img
+                src={teamData.logo}
+                alt={teamData.company + ' logo'}
+                class="w-48 h-48"
+              />
+              <div class="text-white flex flex-col gap-2">
+                <h1 class="text-4xl font-bold">{teamData.company}</h1>
+                <h1 class="text-xl">{teamData.address}</h1>
+                <h1 class="text-xl">{teamData.description}</h1>
+                <div
+                  class="flex justify-between flex-wrap items-start gap-1 my-1"
+                >
+                  {#each teamData.socials as item}
+                    {#if item.isActive}
+                      <BorderButton
+                        on:click={() => {
+                          // go(
+                          //   item.type,
+                          //   item.data,
+                          //   $page.url.searchParams.get('type'),
+                          //   cardId,
+                          //   profileUid
+                          // );
+                        }}
+                        class="p-2 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+                        ><img
+                          src={socialIcons[item.type]}
+                          width="28"
+                          height="28"
+                          alt=""
+                        /></BorderButton
+                      >
+                    {/if}
+                  {/each}
+                </div>
+              </div>
+            </div>
             <TabGroup>
               <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
                 <Tab

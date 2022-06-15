@@ -132,10 +132,13 @@
     }
   };
 
-  $: searchQuery !== ''
-    ? (searchQuery, selectedSearchMenu, searchProfileHandler())
-    : (searchQuery, searchProfileHandler());
-
+  // $: searchQuery !== ''
+  //   ? (searchQuery, selectedSearchMenu, searchProfileHandler())
+  //   : (searchQuery, searchProfileHandler());
+  $: searchQuery, selectedSearchMenu, searchProfileHandler();
+  $: tabs;
+  $: console.log(userConnections);
+  $: console.log(teamConnections);
   const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
 </script>
 
@@ -156,9 +159,9 @@
               tabs === 'all' ? 'bg-white text-black' : ''
             } p-2 w-full md:w-1/3`}
             on:click={async () => {
-              await getTeamConnectionsList();
               setTabs('all');
               searchQuery = '';
+              await getTeamConnectionsList();
             }}
           >
             All
@@ -166,9 +169,9 @@
           <button
             class={`${tabs !== 'all' ? 'bg-white text-black' : ''} p-2 w-full`}
             on:click={async () => {
-              await getUserConnectionsList();
               setTabs('user');
               searchQuery = '';
+              await getUserConnectionsList();
             }}
           >
             My connections
@@ -210,7 +213,7 @@
               {/if}
             </tr>
           </thead>
-          {#if teamConnections.length > 0}
+          {#if teamConnections.length > 0 || userConnections.length > 0}
             <tbody>
               {#if tabs === 'all'}
                 {#each teamConnections as connection, i}
@@ -228,7 +231,11 @@
           <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
             {searchNotFoundMsg}
           </h1>
-        {:else if teamConnections.length === 0}
+        {:else if tabs === 'all' && teamConnections.length === 0}
+          <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+            No connection found.
+          </h1>
+        {:else if tabs !== 'all' && userConnections.length === 0}
           <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
             No connection found.
           </h1>

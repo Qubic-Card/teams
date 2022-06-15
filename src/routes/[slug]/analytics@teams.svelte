@@ -77,7 +77,22 @@
       analyticsData[2].data = data.length;
     }
   };
+
+  const getActiveMember = async () => {
+    const { data, error } = await supabase
+      .from('team_logs')
+      .select('*')
+      .eq('team', teamId);
+    // .eq('status', true);
+
+    if (error) console.log(error);
+    if (data) {
+      console.log(data);
+    }
+  };
+
   onMount(async () => {
+    await getActiveMember();
     // contactsCount = await getContacts();
     console.log(analyticsData);
   });
