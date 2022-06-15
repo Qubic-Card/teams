@@ -1,45 +1,42 @@
 <script>
-  import { user, userData } from '@lib/stores/userStore';
+  import Cookies from 'js-cookie';
+  import { setUserData, user, userData } from '@lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
+  import { browser } from '$app/env';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
+  import { onMount } from 'svelte';
 
   let roleMaps = [];
 
-  // const getRoleMaps = async () => {
-  //   const { data, error } = await supabase
-  //     .from('team_members')
-  //     .select('role_maps')
-  //     .eq('uid', $user.id);
-
-  //   if (error) console.log(error);
-
-  //   if (data) {
-  //     return data[0].role_maps;
-  //   }
-  // };
-
   $user = supabase.auth.user();
-  // $: console.log('wrap', $user);
-  $: console.log(supabase.auth.user());
-  $: console.log('user data', $page.url.pathname);
-  $: redirect()
-  $: redirectToLogin()
-  // $: console.log('wrap', $page);
+
+  // $: console.log('Auth Wrapper', $userData);
+  $: console.log('Auth Wrapper', $user);
+  let teamId = Cookies.get('qubicTeamId');
+
+  // onMount(
+  //   async () => (roleMaps = await getRoleMapsByProfile($user.id, teamId))
+  // );
+
   const redirect = () => {
-    if($user && $page.url.pathname === '/')
-    goto('/select-teams');
-  }
+    if ($user && $page.url.pathname === '/') goto('/select-teams');
+  };
 
   const redirectToLogin = () => {
-    if(!$user && $page.url.pathname !== '/')
-    goto('/');
-  }
+    if (!$user && $page.url.pathname !== '/') goto('/');
+  };
+
+  $: if (browser) redirect();
+  $: if (browser) redirectToLogin();
 
   supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('auth state change', event, session);
+    // console.log('auth state change', event, session);
     if (event == 'SIGNED_IN') {
-      // userData.set(roleMaps);
+      // console.log('signed in');
+      // roleMaps = await getRoleMaps($user?.id);
+      // setUserData(roleMaps);
       user.set(session.user);
     }
     if (event == 'TOKEN_REFRESHED') {

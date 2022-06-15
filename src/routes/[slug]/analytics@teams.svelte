@@ -1,24 +1,28 @@
 <script>
-  import { memberRights } from '@lib/stores/memberRightsStore';
-  import { toastFailed } from '@lib/utils/toast';
   import { onMount } from 'svelte';
-  import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
-  import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
+  import Cookies from 'js-cookie';
+  import { page } from '$app/stores';
   import { getTeamId } from '@lib/query/getId';
+  import { toastFailed } from '@lib/utils/toast';
+  import supabase from '@lib/db';
+  import { user, userData } from '@lib/stores/userStore';
+  import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
+  import getDates from '@lib/utils/getDates';
 
+  let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
 
-  const dummy = [
-    { percentage: '20', data: 3, type: 'Active' },
+  const analyticsData = [
+    { percentage: '20', data: 0, type: 'Active' },
     {
       percentage: '30',
-      data: 2,
+      data: 0,
       type: 'Contacts',
     },
     {
       percentage: '40',
-      data: 1,
+      data: 0,
       type: 'Taps',
     },
   ];
@@ -33,53 +37,90 @@
   ];
   let selectedTopic = null;
   let state = 'idle';
-  $: $memberRights?.filter((item) => {
+  let contactsCount = 0;
+
+  $: $userData?.filter((item) => {
     if (item === 'allow_read_analytics') isHasPermission = true;
   });
 
   const selectTopic = (topic) => (selectedTopic = topic);
   const setState = (newState) => (state = newState);
-  let contactsCount = 0;
+  const today = new Date().setDate(new Date().getDate());
+  const last7Days = getDates(
+    new Date(new Date().setDate(new Date().getDate() - 6)),
+    today
+  );
 
   const getContacts = async () => {
-    let teamId = await getTeamId($user.id);
     const { data, error } = await supabase
-      .from(isHasPermission ? 'team_connection_acc' : 'connection_acc')
+      .from('team_connection_acc')
       .select('*')
-      .eq(
-        isHasPermission ? 'team_id' : 'uid',
-        isHasPermission ? teamId ?? '' : $user.id ?? ''
-      );
+      .eq('team_id', teamId)
+      .gte('dateConnected', new Date(last7Days[0]).toUTCString());
 
     if (error) console.log(error);
     if (data) {
-      return data.length;
+      analyticsData[1].data = data.length;
     }
   };
+
+  const getTaps = async () => {
+    const { data, error, count } = await supabase
+      .from('team_logs')
+      .select('*', { count: 'estimated' })
+      .eq('team', teamId)
+      .gte('created_at', new Date(last7Days[0]).toUTCString());
+
+    if (error) console.log(error);
+    if (data) {
+      analyticsData[0].data = count;
+      analyticsData[2].data = data.length;
+    }
+  };
+
+  const getActiveMember = async () => {
+    const { data, error } = await supabase
+      .from('team_logs')
+      .select('*')
+      .eq('team', teamId);
+    // .eq('status', true);
+
+    if (error) console.log(error);
+    if (data) {
+      console.log(data);
+    }
+  };
+
   onMount(async () => {
-    contactsCount = await getContacts();
-    console.log(contactsCount);
+    await getActiveMember();
+    // contactsCount = await getContacts();
+    console.log(analyticsData);
   });
 </script>
 
 <div class="flex flex-col w-full h-full">
-  {#await getContacts()}
-    <AnalyticsPageSkeleton {isHasPermission} />
+  {#await (getContacts(), getTaps())}
+    <AnalyticsPageSkeleton />
   {:then name}
-    <div class="flex justify-between gap-4">
-      {#each dummy as item}
-        <div
-          class="flex flex-col justify-between w-full h-72 bg-neutral-800 first:bg-gradient-to-bl from-blue-500 to-green-500 first:hover:bg-gradient-to-tr hover:from-blue-500 hover:to-green-500 transform transition duration-200 rounded-lg p-6"
-        >
-          <p class="text-4xl self-end text-green-600">^ {item.percentage}%</p>
-          <div>
-            <h1 class="text-4xl">{item.data} <span>{item.type}</span></h1>
-            <h2 class="text-2xl">in 7 days</h2>
-          </div>
-        </div>
-      {/each}
-    </div>
+    <!-- <DropdownButton class="w-52" label="Download CSV" /> -->
     {#if isHasPermission}
+      <button
+        class="w-52 h-16 p-4 mb-4 border-2 border-neutral-700 rounded-lg self-end"
+        >Download CSV</button
+      >
+      <div class="flex justify-between gap-4">
+        {#each analyticsData as item}
+          <div
+            class="flex flex-col justify-between w-full h-72 bg-neutral-800 first:bg-gradient-to-bl from-blue-500 to-green-500 first:hover:bg-gradient-to-tr hover:from-blue-500 hover:to-green-500 transform transition duration-200 rounded-lg p-6"
+          >
+            <p class="text-4xl self-end text-green-600">^ {item.percentage}%</p>
+            <div>
+              <h1 class="text-4xl">{item.data} <span>{item.type}</span></h1>
+              <h2 class="text-2xl">in 7 days</h2>
+            </div>
+          </div>
+        {/each}
+      </div>
       <div
         class="flex flex-col w-full h-full bg-neutral-800 my-4 rounded-lg p-8 justify-between"
       >
@@ -125,8 +166,8 @@
           </div>
         {/if}
       </div>
-      <!-- {:else}
-    <p>you dont have access to this page, you cant see the analytics</p> -->
+    {:else}
+      <p>you dont have access to this page, you cant see the analytics</p>
     {/if}
   {:catch}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">

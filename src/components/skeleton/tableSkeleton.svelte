@@ -7,8 +7,8 @@
   }
 </script>
 
-<tr class="animate-pulse my-1">
+<tr class="animate-pulse odd:bg-neutral-900 even:bg-neutral-700 my-2">
   {#each totalCol as item}
-    <td class="bg-neutral-700 h-12 roun" />
+    <td class="h-10" />
   {/each}
 </tr>

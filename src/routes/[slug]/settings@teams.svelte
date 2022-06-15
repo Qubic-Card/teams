@@ -1,13 +1,8 @@
 <script lang="ts">
-  import { slide } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
   import roleMapping from '@lib/role';
   import supabase from '@lib/db';
-  import {
-    role,
-    roleName,
-    setNewRole,
-    setRoleName,
-  } from '@lib/stores/roleStore';
+  import { role, roleName, setRoleName } from '@lib/stores/roleStore';
   import {
     Disclosure,
     DisclosureButton,
@@ -17,32 +12,32 @@
   import AddRoleModal from '@comp/modals/addRoleModal.svelte';
   import RenameModal from '@comp/modals/renameModal.svelte';
   import Checkboxes from '@comp/checkbox.svelte';
-  import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
   import RoleSettingsSkeleton from '@comp/skeleton/roleSettingsSkeleton.svelte';
-  import { getTeamId } from '@lib/query/getId';
-  import { user } from '@lib/stores/userStore';
+  import { setUserData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import getRoleMaps from '@lib/query/getRoleMaps';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
+  import Cookies from 'js-cookie';
 
   let roles = [];
+  let roleMaps = [];
   let isAutoRenew = false;
   let isClicked = true;
   let loading = false;
+  let teamId = Cookies.get('qubicTeamId');
 
   const getTeamsRoleMapping = async () => {
+    // let teamId = await getTeamId($user?.id);
     try {
-      let teamId = await getTeamId($user.id);
-      console.log(teamId);
       const { data, error } = await supabase
         .from('team_roles')
         .select('*')
-        .eq('team_id', teamId);
+        .eq('team_id', teamId)
+        .order('role_name', { ascending: true });
 
       if (error) throw error;
 
       if (data) {
         roles = data;
-        console.log(roles);
       }
     } catch (error) {
       console.log(error);
@@ -74,20 +69,18 @@
     // }
   };
 
-  let roleMaps = [];
-
-  $: setMemberRights(roleMaps);
-
   const clicked = (e) => (isClicked = e.detail);
 </script>
 
 <div class="min-h-screen flex gap-4">
   <div class="bg-zinc-700/70 w-2/3 rounded-lg p-4">
     <div class="flex flex-col my-4">
-      <div class="flex justify-between items-center mb-4">
-        <h1 class="font-bold text-3xl">Billing</h1>
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4"
+      >
+        <h1 class="font-bold text-xl md:text-3xl">Billing</h1>
         <button
-          class="p-4 w-56 bg-blue-600 text-white rounded-lg"
+          class="p-4 w-full md:w-48 lg:w-56 bg-blue-600 text-white rounded-lg"
           on:click={async () => await console.log('billing')}
           >Tambah saldo</button
         >
@@ -115,54 +108,63 @@
         </Switch>
       </div>
     </div>
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="font-bold text-3xl">Role Settings</h1>
+    <div
+      class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
+    >
+      <h1 class="font-bold text-xl md:text-3xl">Role Settings</h1>
       <AddRoleModal />
     </div>
     {#await getTeamsRoleMapping()}
       <RoleSettingsSkeleton />
     {:then}
-      {#each roles as role}
-        <Disclosure let:open>
-          <div class="flex justify-between items-center">
-            <DisclosureButton
-              on:click={() => setRoleName(role.role_name)}
-              class="text-2xl my-2 w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between mr-2"
-            >
-              {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
-              <!-- {role.role_name} -->
-            </DisclosureButton>
-            <RenameModal roleName={role.role_name} id={role.id} />
-            {#if open}
-              <button
-                class="w-24 p-4 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
-                on:click={async () => {
-                  await updateTeamsRoleMapping(role.id);
-                  roleMaps = await getRoleMaps($user.id);
-                }}
-                disabled={isClicked}
+      {#if roles.length > 0}
+        {#each roles as role}
+          <Disclosure let:open>
+            <div class="flex justify-between items-center">
+              <DisclosureButton
+                class="text-xl w-full text-left hover:bg-neutral-800 p-4 rounded-lg flex justify-between mr-2"
               >
-                {#if loading}
-                  Saving...
-                {:else}
-                  Save
-                {/if}
-              </button>
-            {/if}
-          </div>
-          {#if open}
-            <div transition:slide|local={{ duration: 500 }} class="mb-4">
-              <DisclosurePanel static>
-                <Checkboxes
-                  checkboxes={roleMapping}
-                  bind:checked={role.role_maps}
-                  on:clicked={clicked}
-                />
-              </DisclosurePanel>
+                {role.role_name.charAt(0).toUpperCase() +
+                  role.role_name.slice(1)}
+              </DisclosureButton>
+              <RenameModal roleName={role.role_name} id={role.id} />
+              {#if open}
+                <button
+                  transition:fade|local={{ duration: 200 }}
+                  class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
+                  on:click={async () => {
+                    await updateTeamsRoleMapping(role.id);
+                    roleMaps = await getRoleMapsByProfile($user?.id, teamId);
+                    setUserData(roleMaps);
+                  }}
+                  disabled={isClicked}
+                >
+                  {#if loading}
+                    Saving...
+                  {:else}
+                    Save
+                  {/if}
+                </button>
+              {/if}
             </div>
-          {/if}
-        </Disclosure>
-      {/each}
+            {#if open}
+              <div transition:slide|local={{ duration: 500 }} class="mb-4">
+                <DisclosurePanel static>
+                  <Checkboxes
+                    checkboxes={roleMapping}
+                    bind:checked={role.role_maps}
+                    on:clicked={clicked}
+                  />
+                </DisclosurePanel>
+              </div>
+            {/if}
+          </Disclosure>
+        {/each}
+      {:else}
+        <div class="flex justify-center items-center">
+          <p class="text-xl text-center">No roles found</p>
+        </div>
+      {/if}
     {:catch error}
       <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
         Some error occurred. Please reload the page and try again.
@@ -170,84 +172,12 @@
     {/await}
   </div>
   <div class="flex flex-col w-1/3 rounded-lg gap-4">
-    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
+    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-xl lg:text-2xl">
       <p class="mb-4">Atur subscription dalam billing</p>
     </div>
-    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-2xl">
+    <div class="bg-zinc-700/70 h-1/2 p-4 rounded-lg text-xl lg:text-2xl">
       <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
-      <p>Berikan permissions yang sesuai di setiao role.</p>
+      <p>Berikan permissions yang sesuai di setiap role.</p>
     </div>
   </div>
 </div>
-
-<!-- <style>
-  /* Customize the label (the container) */
-  .container {
-    display: block;
-    position: relative;
-    /* padding-left: 35px; */
-    /* margin-bottom: 12px; */
-    cursor: pointer;
-    /* font-size: 22px; */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  /* Hide the browser's default checkbox */
-  .container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-
-  /* Create a custom checkbox */
-  .checkmark {
-    position: absolute;
-    /* top: 0; */
-    bottom: -15px;
-    left: 0;
-    height: 35px;
-    width: 35px;
-    background-color: #404040;
-    border: solid 1px #0c0c0d;
-  }
-
-  /* On mouse-over, add a grey background color */
-  .container:hover input ~ .checkmark {
-    background-color: #ccc;
-  }
-
-  /* When the checkbox is checked, add a blue background */
-  .container input:checked ~ .checkmark {
-    background-color: #ccc;
-  }
-
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
-    content: '';
-    position: absolute;
-    display: none;
-  }
-
-  /* Show the checkmark when checked */
-  .container input:checked ~ .checkmark:after {
-    display: block;
-  }
-
-  /* Style the checkmark/indicator */
-  .container .checkmark:after {
-    left: 20px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-</style> -->

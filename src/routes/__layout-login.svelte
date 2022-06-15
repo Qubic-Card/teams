@@ -1,5 +1,6 @@
 <script>
   import '../app.css';
+  import { SvelteToast } from '@zerodevx/svelte-toast';
 </script>
 
 <svelte:head>
@@ -7,5 +8,6 @@
 </svelte:head>
 
 <div class="relative min-h-screen">
+  <SvelteToast />
   <slot />
 </div>

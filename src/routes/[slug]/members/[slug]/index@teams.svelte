@@ -17,8 +17,7 @@
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
   import supabase from '@lib/db';
-  import { memberRights } from '@lib/stores/memberRightsStore';
-  import { user } from '@lib/stores/userStore';
+  import { user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -34,6 +33,8 @@
   } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
   import toNewTab from '@lib/utils/newTab';
+  import { getTeamId } from '@lib/query/getId';
+  import Cookies from 'js-cookie';
 
   // Register the plugins
   registerPlugin(
@@ -47,6 +48,7 @@
 
   let pond;
   let name = 'filepond';
+  let teamIdCookies = Cookies.get('qubicTeamId');
 
   // handle filepond events
   function handleInit() {
@@ -56,13 +58,13 @@
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
       .from('avatars')
-      .upload(`${$user.id}/${file.filename}`, output[1].file, {
+      .upload(`${$user?.id}/${file.filename}`, output[1].file, {
         contentType: 'image/jpeg',
       });
 
     const { publicURL, error } = supabase.storage
       .from('avatars')
-      .getPublicUrl(`${$user.id}/${file.filename}`);
+      .getPublicUrl(`${$user?.id}/${file.filename}`);
 
     profileData.avatar = publicURL;
     await handleSave();
@@ -141,12 +143,13 @@
   };
 
   const handleSave = async () => {
+    // let teamId = await getTeamId($user?.id);
     profileData.socials = $socials;
     profileData.links = $links;
     const { error } = await supabase
       .from('team_members')
       .update({ team_profile: profileData }, { returning: 'minimal' })
-      .eq('uid', $page.params.slug);
+      .eq('uid', teamIdCookies);
     if (error) {
       toastFailed();
       console.log(error);
@@ -185,8 +188,8 @@
   let isHasWriteMembersPermission = false;
 
   $: {
-    $memberRights?.filter((item) => {
-      if ($page.params.slug === $user.id) {
+    $userData?.filter((item) => {
+      if ($page.params.slug === $user?.id) {
         if (item === 'allow_write_profile') {
           isHasWriteProfilePermission = true;
         }
@@ -199,10 +202,10 @@
     console.log(isHasWriteProfilePermission, isHasWriteMembersPermission);
   }
 
-  $: console.log($memberRights);
+  $: console.log($page);
 </script>
 
-{#if $page.params.slug === $user.id}
+{#if $page.params.slug === $user?.id}
   {#if isHasWriteProfilePermission === false}
     <div
       class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${

@@ -3,43 +3,40 @@
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
+  import { getTeamId } from '@lib/query/getId';
+  import { user } from '@lib/stores/userStore';
+  import Input from '@comp/input.svelte';
+  import Cookies from 'js-cookie';
 
+  let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
   let showModal = false;
   let loading = false;
-
-  const getTeamId = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id');
-
-    if (error) console.log(error);
-    if (data) {
-      return data[0].team_id;
-    }
-  };
 
   const toggleModal = () => (showModal = !showModal);
 
   const addRoleHandler = async () => {
     loading = true;
     try {
-      let teamId = await getTeamId();
+      // let teamId = await getTeamId($user?.id);
       const { data, error } = await supabase
         .from('team_roles')
         .insert({
-          role_maps: roleMapping.map((role) => role.name),
+          role_maps: roleMapping,
           role_name: roleName,
           team_id: teamId,
         })
         .eq('id', teamId);
       if (error) {
         loading = false;
-        throw new Error(error);
+        throw new Error(error.message);
       } else {
         loading = false;
         toastSuccess('Role added successfully');
         toggleModal();
+        setTimeout(() => {
+          location.reload();
+        }, 500);
       }
     } catch (error) {
       loading = false;
@@ -76,17 +73,16 @@
         <div
           class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
         >
-          {#if loading}
-            <h1>Loading</h1>
-          {/if}
-          <input
-            type="text"
+          <Input
+            placeholder="Role Name"
+            title="Role Name"
             bind:value={roleName}
-            placeholder="Role name"
-            class="p-3 w-full text-black"
+            class="w-full"
+            isEmptyChecking={true}
           />
           <button
-            class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg"
+            disabled={roleName === '' ? true : false}
+            class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500"
             on:click={async () => await addRoleHandler()}
           >
             {#if loading}

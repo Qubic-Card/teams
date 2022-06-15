@@ -27,7 +27,7 @@
             value={checkbox.name}
             on:change={() => dispatch('change', checked)}
           />
-          <p class="ml-4">
+          <p class="ml-4 w-72">
             {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
           </p>
         </label>

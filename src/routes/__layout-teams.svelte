@@ -5,36 +5,30 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { user } from '@lib/stores/userStore';
+  import { setUserData, user } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
-  import useAuth from '@lib/useAuth.js';
   import { onMount } from 'svelte';
-  import { role } from '@lib/stores/roleStore';
-  import { memberRights, setMemberRights } from '@lib/stores/memberRightsStore';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
+  import { getTeamId } from '@lib/query/getId';
   import supabase from '@lib/db';
-  import getRoleMaps from '@lib/query/getRoleMaps';
-
-  // $: console.log($page);
-  // const useAuth = async () => {
-  //   if (user) await goto('/');
-  // };
-  // $: useAuth($user);
-  $: console.log('team layout', $user);
+  import getTeamData from '@lib/query/getTeamData';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
-  let userImg = '';
 
-  let teamName = Cookies.get('qubicTeamName');
+  let roleMapping = [];
+  let team = [];
+  let teamId = Cookies.get('qubicTeamId');
+
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
 
-  let roleMapping = [];
-
-  onMount(async () => (roleMapping = await getRoleMaps($user.id)));
-
-  $: setMemberRights(roleMapping);
-
+  onMount(async () => {
+    roleMapping = await getRoleMapsByProfile($user?.id, teamId);
+    team = await getTeamData(teamId);
+  });
+  // $: console.log(team);
+  $: setUserData(roleMapping);
   let sidebarItems = [
     {
       title: 'dashboard',
@@ -42,7 +36,7 @@
       urldefault:
         'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
       handler: () => {
-        goto(`/${teamName}/dashboard`);
+        goto(`/${team.id}/dashboard`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -52,7 +46,7 @@
       urldefault:
         'https://img.icons8.com/external-icongeek26-outline-icongeek26/64/ffffff/external-connection-data-analytics-icongeek26-outline-icongeek26.png',
       handler: () => {
-        goto(`/${teamName}/connections`);
+        goto(`/${team.id}/connections`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -62,7 +56,7 @@
       urldefault:
         'https://img.icons8.com/external-kiranshastry-lineal-kiranshastry/64/ffffff/external-team-business-and-management-kiranshastry-lineal-kiranshastry-2.png',
       handler: () => {
-        goto(`/${teamName}/team`);
+        goto(`/${team.id}/team`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -71,7 +65,7 @@
       routeId: '[slug]/analytics@teams',
       urldefault: 'https://img.icons8.com/windows/96/ffffff/area-chart.png',
       handler: () => {
-        goto(`/${teamName}/analytics`);
+        goto(`/${team.id}/analytics`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -81,7 +75,7 @@
       urldefault:
         'https://img.icons8.com/ios/100/ffffff/user-group-man-man.png',
       handler: () => {
-        goto(`/${teamName}/members`);
+        goto(`/${team.id}/members`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -91,7 +85,7 @@
       urldefault:
         'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
       handler: () => {
-        goto(`/${teamName}/settings`);
+        goto(`/${team.id}/settings`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -110,34 +104,66 @@
       }`}
     >
       <div class="flex justify-center items-center h-auto">
-        {#if isSidebarOpened}
-          <img
-            src="/close-white.svg"
-            alt="close"
-            class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
-            on:click={sidebarHandler}
-          />
+        {#if team.name}
+          {#if isSidebarOpened}
+            <img
+              src="/close-white.svg"
+              alt="close"
+              class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
+              on:click={sidebarHandler}
+            />
+          {:else}
+            <img
+              src="/menu-white.svg"
+              alt="humberger-menu"
+              class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
+              on:click={sidebarHandler}
+            />
+          {/if}
         {:else}
-          <img
-            src="/menu-white.svg"
-            alt="humberger-menu"
-            class="cursor-pointer px-6 w-20 py-6 border-r-2 border-neutral-700"
-            on:click={sidebarHandler}
-          />
+          <div
+            class="w-20 h-20 border-r-2 border-neutral-700 flex justify-center items-center animate-pulse"
+          >
+            <div class="bg-neutral-700 w-12 h-12 rounded-lg" />
+          </div>
         {/if}
-        <h1 class="text-5xl font-bold ml-4">{$page.params.slug ?? ''}</h1>
+        {#if team.name}
+          <p class="text-3xl md:text-4xl lg:text-5xl font-bold ml-4">
+            {team.name}
+          </p>
+        {:else}
+          <div class="animate-pulse p-4">
+            <p
+              class="text-5xl w-full h-12 text-neutral-700 bg-neutral-700 rounded-lg"
+            >
+              {team.name}
+            </p>
+          </div>
+        {/if}
       </div>
-      {#if $user}
-        <p>logged in</p>
+      {#if team.logo}
+        <img
+          on:click={menuHandler}
+          src={team.logo}
+          alt="avatar"
+          class="rounded-full w-12 h-12 cursor-pointer"
+        />
+      {:else if team.logo === ''}
+        <div
+          on:click={menuHandler}
+          class="bg-neutral-700 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
+        >
+          {team.name.charAt(0).toUpperCase()}
+        </div>
       {:else}
-        <p>not logged in</p>
+        <div class="animate-pulse p-4">
+          <p
+            class="text-5xl w-12 h-12 text-neutral-700 bg-neutral-700 rounded-full"
+          >
+            1
+          </p>
+        </div>
       {/if}
-      <img
-        on:click={menuHandler}
-        src={userImg ?? ''}
-        alt="avatar"
-        class="rounded-full cursor-pointer"
-      />
       {#if isMenuOpened}
         <MenuButton />
       {/if}
@@ -150,27 +176,37 @@
     >
       <nav class="space-y-2 w-full flex flex-col items-center">
         {#each sidebarItems as item}
-          <div
-            class={`flex cursor-pointer items-center justify-between h-16 w-full text-gray-100 ${
-              isSidebarOpened && 'px-12 w-full'
-            } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''} ${
-              isSidebarOpened && $page.routeId === item.routeId
-                ? 'bg-neutral-900'
-                : ''
-            }`}
-            on:click={item.handler}
-          >
-            {#if isSidebarOpened}
-              <p>
-                {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
+          {#if team.name}
+            <!-- skeleton -->
+            <div
+              class={`flex cursor-pointer items-center justify-between h-16 w-full text-gray-100 ${
+                isSidebarOpened && 'px-12 w-full'
+              } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''} ${
+                isSidebarOpened && $page.routeId === item.routeId
+                  ? 'bg-neutral-900'
+                  : ''
+              }`}
+              on:click={item.handler}
+            >
+              {#if isSidebarOpened}
+                <p>
+                  {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
+                </p>
+              {/if}
+              <img src={item.urldefault} alt={item.title} class="w-9 ml-5" />
+            </div>
+          {:else}
+            <div class="animate-pulse gap-5">
+              <p
+                class="text-5xl w-full h-16 text-neutral-700 bg-neutral-700 rounded-lg"
+              >
+                qb
               </p>
-            {/if}
-            <img src={item.urldefault} alt={item.title} class="w-9 ml-5" />
-          </div>
+            </div>
+          {/if}
         {/each}
       </nav>
     </div>
-
     <div
       class="absolute top-20 bottom-0 pt-4 pl-24 pr-4 bg-black text-white overflow-y-auto w-full"
     >

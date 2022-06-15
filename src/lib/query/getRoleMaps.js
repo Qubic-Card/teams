@@ -1,10 +1,11 @@
 import supabase from '@lib/db';
 
-const getRoleMaps = async (uid) => {
+export const getRoleMapsByProfile = async (uid, teamId) => {
   const { data, error } = await supabase
     .from('team_members')
-    .select('role(*)')
-    .eq('uid', uid);
+    .select('role(*), role')
+    .eq('uid', uid)
+    .eq('team_id', teamId);
 
   if (error) console.log(error);
 
@@ -13,4 +14,29 @@ const getRoleMaps = async (uid) => {
   }
 };
 
-export default getRoleMaps;
+export const getAllRoleByTeam = async (teamId) => {
+  const { data, error } = await supabase
+    .from('team_roles')
+    .select('role_name, id')
+    .eq('team_id', teamId);
+
+  if (error) console.log(error);
+
+  if (data) {
+    return data;
+  }
+};
+
+export const getMemberRole = async (uid, memberUid) => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('role(role_name, id)')
+    .eq('uid', uid)
+    .eq('team_id', memberUid);
+
+  if (error) console.log(error);
+
+  if (data) {
+    return data[0].role;
+  }
+};
