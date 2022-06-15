@@ -95,23 +95,12 @@
     class="flex flex-col justify-between w-full h-56 md:h-72 bg-neutral-800 p-4 z-10 rounded-md"
   >
     <div
-      class="flex justify-between cursor-pointer h-full gap-4"
+      class="flex cursor-pointer h-full gap-4"
       on:click={() => toProfileEditor(member.uid)}
     >
-      <div>
-        <h1 class="text-2xl md:text-3xl lg:text-4xl">
-          {member.team_profile.firstname === ''
-            ? 'No name'
-            : member.team_profile.firstname}
-          {member.team_profile.lastname}
-        </h1>
-        <h2 class="text-xl md:text-2xl lg:text-3xl">
-          {member.team_profile.job}
-        </h2>
-      </div>
       {#if member.team_profile.avatar === ''}
         <div
-          class="flex justify-center items-center w-16 h-16 rounded-full bg-neutral-700 text-2xl"
+          class="flex justify-center items-center w-24 h-24 rounded-full bg-neutral-700 text-2xl"
         >
           Q
         </div>
@@ -119,9 +108,23 @@
         <img
           src="https://placeimg.com/640/480/any"
           alt="Profile"
-          class="w-16 h-16 rounded-md"
+          class="w-24 h-24 rounded-md"
         />
       {/if}
+      <div>
+        <h1 class="text-xl flex-grow text-left md:text-2xl lg:text-3xl">
+          {member.team_profile.firstname === ''
+            ? 'No name'
+            : member.team_profile.firstname}
+          {member.team_profile.lastname}
+        </h1>
+        <h2 class="text-neutral-300">
+          {member.team_profile.job}
+        </h2>
+        <h2 class="text-neutral-300">
+          {member.member_from}
+        </h2>
+      </div>
     </div>
 
     <Switch

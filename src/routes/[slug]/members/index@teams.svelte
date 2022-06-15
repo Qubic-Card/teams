@@ -31,7 +31,7 @@
     // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_members')
-      .select('team_profile, uid, id')
+      .select('member_from, team_profile, uid, id')
       .eq('team_id', teamId);
 
     if (error) console.log(error);

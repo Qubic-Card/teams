@@ -9,7 +9,6 @@
 
   $: console.log($user);
   let teams = [];
-  let isHasPermission = false;
 
   const getTeamsList = async () => {
     const { data, error } = await supabase
@@ -24,9 +23,6 @@
     }
   };
 
-  $: $userData?.filter((item) => {
-    if (item === 'allow_write_team') isHasPermission = true;
-  });
   $: console.log(teams);
   const chooseTeam = (teamId) => {
     Cookies.set('qubicTeamId', teamId);
@@ -66,9 +62,7 @@
         </p>
       </div>
     {/each}
-    {#if isHasPermission}
       <AddTeamModal />
-    {/if}
   {:catch}
     <h1>Something went wrong. Please try again later.</h1>
   {/await}
