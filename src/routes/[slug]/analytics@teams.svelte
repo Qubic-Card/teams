@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import Cookies from 'js-cookie';
   import { page } from '$app/stores';
-  import { getTeamId } from '@lib/query/getId';
+  import { getMembersId, getTeamId } from '@lib/query/getId';
   import { toastFailed } from '@lib/utils/toast';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
@@ -73,6 +73,7 @@
 
     if (error) console.log(error);
     if (data) {
+      console.log(data.map((item) => item.team_member));
       analyticsData[0].data = count;
       analyticsData[2].data = data.length;
     }
@@ -92,13 +93,15 @@
   };
 
   onMount(async () => {
-    await getActiveMember();
+    let a = await getMembersId(teamId);
+    console.log(a);
+    // await getActiveMember();
     // contactsCount = await getContacts();
     console.log(analyticsData);
   });
 </script>
 
-<div class="flex flex-col w-full h-full">
+<div class="flex flex-col w-full h-full pt-4 pl-24 pr-4">
   {#await (getContacts(), getTaps())}
     <AnalyticsPageSkeleton />
   {:then name}

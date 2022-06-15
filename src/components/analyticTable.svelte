@@ -18,9 +18,9 @@
   };
 </script>
 
-<div class="bg-neutral-800 rounded-lg p-2 border border-neutral-700 pb-6">
-  <table class="text-black w-full mt-2">
-    <thead class="text-neutral-200">
+<div class="bg-neutral-800 rounded-lg border border-neutral-700 p-2">
+  <table class="text-black w-full">
+    <thead class="text-neutral-200 bg-black/60">
       <tr>
         <th class="text-left pl-4 p-2">Date</th>
         <th class="text-left pl-4 p-2">Description</th>
@@ -35,7 +35,7 @@
       {:else}
         {#each currentPageRows as row}
           <tr
-            class="even:bg-neutral-700 odd:bg-neutral-900 text-white hover:border"
+            class="bg-neutral-800 text-neutral-300 border-b border-neutral-700 hover:border"
           >
             <td class="pl-4 p-2 w-48">
               {new Date(row.created_at).toDateString().slice(4)}
@@ -51,7 +51,7 @@
   </table>
   {#if !isAlreadySeeMore && currentPageRows.length !== 0}
     <button
-      class="self-center w-full mt-3 p-2 h-12 bg-neutral-700 hover:bg-neutral-900"
+      class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
       on:click>See more</button
     >
   {/if}

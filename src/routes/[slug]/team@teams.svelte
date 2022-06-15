@@ -33,6 +33,8 @@
   import { page } from '$app/stores';
   import Cookies from 'js-cookie';
   import BorderButton from '@comp/buttons/borderButton.svelte';
+  import { socialIcons } from '@lib/constants';
+  import { theme } from '@lib/profileTheme';
 
   // Register the plugins
   registerPlugin(
@@ -65,6 +67,7 @@
   };
   let isHasPermissionToWriteTeam = false;
   let isHasPermissionToReadTeam = null;
+  let currentTheme = theme[teamData.design?.theme?.toString() ?? 'dark'];
 
   // handle filepond events
   function handleInit() {
@@ -179,18 +182,13 @@
     console.log($userData);
     console.log(isHasPermissionToReadTeam, isHasPermissionToWriteTeam);
   }
-
-  import { socialIcons } from '@lib/constants';
-  import { theme } from '@lib/profileTheme';
-
-  let currentTheme = theme[teamData.design?.theme?.toString() ?? 'dark'];
 </script>
 
-<div class="flex justify-center">
-  {#if isHasPermissionToReadTeam}
-    {#await getTeamsDetail()}
-      <TeamEditorSkeleton />
-    {:then}
+<div class="flex justify-center pt-4 pl-24 pr-4">
+  {#await getTeamsDetail()}
+    <TeamEditorSkeleton />
+  {:then}
+    {#if isHasPermissionToReadTeam}
       <div class="w-full">
         <div class="text-black">
           <div class="flex flex-col w-full">
@@ -233,34 +231,33 @@
               </div>
             </div>
             <TabGroup>
-              <TabList class="w-full grid grid-cols-3 border rounded-md p-2">
+              <TabList
+                class="w-full grid grid-cols-3 border-2 border-neutral-700 p-2"
+              >
                 <Tab
                   class={({ selected }) =>
                     selected
-                      ? 'bg-white text-black p-2 rounded-md'
-                      : 'bg-neutral-800 text-white p-2 rounded-l-md'}
-                  >Team Profile</Tab
+                      ? 'bg-neutral-700 text-white p-2'
+                      : 'text-white p-2 rounded-l-md'}>Team Profile</Tab
                 >
                 <Tab
                   class={({ selected }) =>
                     selected
-                      ? 'bg-white text-black p-2 rounded-md'
-                      : 'bg-neutral-800 text-white p-2'}>Socials</Tab
+                      ? 'bg-neutral-700 text-white p-2'
+                      : 'text-white p-2'}>Socials</Tab
                 >
                 <Tab
                   class={({ selected }) =>
                     selected
-                      ? 'bg-white text-black p-2 rounded-md'
-                      : 'bg-neutral-800 text-white p-2 rounded-r-md'}>Links</Tab
+                      ? 'bg-neutral-700 text-white p-2'
+                      : 'text-white p-2 rounded-r-md'}>Links</Tab
                 >
               </TabList>
               <TabPanels class="mt-4">
                 <TabPanel>
                   <!-- BIO EDITOR -->
-                  <div class="border-b-zinc-300 border mb-4">
-                    <div
-                      class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5 mt-2"
-                    >
+                  <div class="border-2 border-neutral-700 mb-4 pt-2">
+                    <div class="px-3 grid grid-cols-2 space-x-5">
                       <Input
                         on:change={handleSave}
                         placeholder="Company Name"
@@ -276,7 +273,7 @@
                         disabled={isHasPermissionToWriteTeam ? false : true}
                       />
                     </div>
-                    <div class="px-3 bg-neutral-800">
+                    <div class="px-3">
                       <Input
                         on:change={handleSave}
                         placeholder="Address"
@@ -292,7 +289,7 @@
                         disabled={isHasPermissionToWriteTeam ? false : true}
                       />
                     </div>
-                    <div class="px-3 bg-neutral-800 grid grid-cols-2 space-x-5">
+                    <div class="px-3 grid grid-cols-2 space-x-5">
                       <Input
                         on:change={handleSave}
                         placeholder="Email"
@@ -309,7 +306,7 @@
                       />
                     </div>
                     <div
-                      class={`p-3 bg-neutral-800 ${
+                      class={`p-3 ${
                         isHasPermissionToWriteTeam ? '' : 'hidden'
                       }`}
                     >
@@ -343,7 +340,7 @@
                 </TabPanel>
                 <TabPanel>
                   <!-- SOCIAL EDITOR -->
-                  <div class="border mb-4 p-4 bg-neutral-800">
+                  <div class="border-2 border-neutral-700 mb-4 p-4">
                     <div class="flex justify-between items-center">
                       <h1 class="font-bold text-lg text-white">Socials</h1>
                       <AddSocialsModal
@@ -506,7 +503,7 @@
                 </TabPanel>
                 <TabPanel>
                   <!-- Link Editor -->
-                  <div class="border p-4 mb-0 lg:mb-20 bg-neutral-800">
+                  <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-20">
                     <div class="flex justify-between items-center">
                       <h1 class="font-bold text-lg text-white">Links</h1>
                       <img
@@ -584,19 +581,17 @@
           </div>
         </div>
       </div>
-    {:catch}
+    {:else}
       <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-        Some error occurred. Please reload the page and try again.
+        You are not allowed to access this page. Please contact your
+        administrator.
       </h1>
-    {/await}
-  {:else}
+    {/if}
+  {:catch}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-      You are not allowed to access this page. Please contact your
-      administrator.
+      Some error occurred. Please reload the page and try again.
     </h1>
-    <!-- {:else}
-    <TeamEditorSkeleton /> -->
-  {/if}
+  {/await}
 </div>
 
 <style global>

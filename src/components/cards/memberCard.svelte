@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import { slide, fly } from 'svelte/transition';
   import supabase from '@lib/db';
   import {
     getAllRoleByTeam,
@@ -25,6 +25,7 @@
 
   let statusMember = false;
   let cardId = null;
+  let card = null;
   let selectedRole = '';
   let memberRole = null;
   let teamId = Cookies.get('qubicTeamId');
@@ -37,12 +38,13 @@
   const getMembersStatusCard = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .select('status, id')
+      .select('status, id, card_id(*)')
       .eq('team_member_id', id);
 
     if (error) console.log(error);
 
     if (data) {
+      card = data[0].card_id;
       statusMember = data[0].status;
       cardId = data[0].id;
     }
@@ -61,7 +63,6 @@
       return;
     }
 
-    console.log(stat);
     if (stat) {
       toastSuccess('Card has been activated');
     } else {
@@ -83,16 +84,32 @@
     }
   };
 
+  const deleteMemberHandler = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toastFailed();
+      return;
+    } else {
+      toastSuccess('Member has been deleted');
+      goto(`/${$page.params.slug}/members`);
+    }
+  };
+
   onMount(async () => {
     memberRole = await getMemberRole(memberUid, teamId);
+    console.log(card);
   });
 
   $: getMembersStatusCard();
 </script>
 
-<div class="flex flex-col justify-between z-10">
+<div class="flex flex-col justify-between">
   <div
-    class="flex flex-col justify-between w-full h-56 md:h-72 bg-neutral-800 p-4 z-10 rounded-md"
+    class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 p-4 rounded-md"
   >
     <div
       class="flex cursor-pointer h-full gap-4"
@@ -108,7 +125,7 @@
         <img
           src="https://placeimg.com/640/480/any"
           alt="Profile"
-          class="w-24 h-24 rounded-md"
+          class="w-40 h-40 rounded-md"
         />
       {/if}
       <div>
@@ -116,16 +133,59 @@
           {member.team_profile.firstname === ''
             ? 'No name'
             : member.team_profile.firstname}
+        </h1>
+        <h1 class="text-xl flex-grow text-left md:text-2xl lg:text-3xl">
           {member.team_profile.lastname}
         </h1>
-        <h2 class="text-neutral-300">
+        <h2 class="text-neutral-300 mt-2">
           {member.team_profile.job}
         </h2>
         <h2 class="text-neutral-300">
-          {member.member_from}
+          Joined since {new Date(member.member_from).toDateString().slice(4)}
         </h2>
+        <h2 class="text-neutral-300 mt-3">Card:</h2>
+        <p class="text-neutral-300">
+          {card?.type.charAt(0).toUpperCase() + card?.type.slice(1)}
+          {card?.color.charAt(0).toUpperCase() + card?.color.slice(1) ?? '-'}
+        </p>
       </div>
     </div>
+
+    <Menu class="absolute flex flex-row-reverse self-end" let:open>
+      <MenuButton
+        class={`text-white flex justify-between items-center h-12 p-2 gap-2 rounded-md relative ${$$props.class}`}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="white"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+          />
+        </svg>
+      </MenuButton>
+
+      {#if open}
+        <div transition:fly|local={{ x: -20 }}>
+          <MenuItems
+            class="top-0 left-72 z-50 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
+          >
+            <MenuItem
+              class="flex hover:bg-neutral-800 text-red-600 px-2 py-2 rounded-md"
+              on:click={deleteMemberHandler}
+            >
+              Remove user
+            </MenuItem>
+          </MenuItems>
+        </div>
+      {/if}
+    </Menu>
 
     <Switch
       checked={statusMember}
@@ -133,8 +193,8 @@
         await setStatus(cardId, e.detail, index);
         statusMember = e.detail;
       }}
-      class={`justify-center items-center self-end relative rounded-full w-16 h-10 z-50 ${
-        statusMember ? 'bg-green-600' : 'bg-neutral-600'
+      class={`justify-center items-center self-end relative rounded-lg w-16 h-10 z-50 ${
+        statusMember ? 'bg-green-300' : 'bg-neutral-600'
       } ${isHasPermission ? 'flex' : 'hidden'}`}
     >
       <span
@@ -147,7 +207,7 @@
     </Switch>
 
     <Menu
-      class="absolute translate-y-[140px] md:translate-y-[200px] mt-3"
+      class="absolute translate-y-[140px] md:translate-y-[233px] mt-3"
       let:open
     >
       <DropdownButton

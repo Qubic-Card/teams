@@ -12,7 +12,7 @@
 
 {#each checkboxes as checkbox}
   <div
-    class="flex w-full justify-between items-center bg-neutral-800 p-4 rounded-lg mb-2"
+    class="flex w-full justify-between items-center bg-neutral-800 p-4 rounded-lg mb-2 first:mt-2"
   >
     <div class="block">
       <div class="mt-2">

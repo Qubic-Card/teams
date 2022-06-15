@@ -143,7 +143,7 @@
 </script>
 
 <svelte:window bind:innerWidth />
-<div class="flex flex-col">
+<div class="flex flex-col pt-4 pl-24 pr-4">
   {#if isHasPermission === true}
     {#await getTeamConnectionsList()}
       <ConnectionsSkeletion />
@@ -156,7 +156,7 @@
         >
           <button
             class={`${
-              tabs === 'all' ? 'bg-white text-black' : ''
+              tabs === 'all' ? 'bg-neutral-800' : ''
             } p-2 w-full md:w-1/3`}
             on:click={async () => {
               setTabs('all');
@@ -167,7 +167,7 @@
             All
           </button>
           <button
-            class={`${tabs !== 'all' ? 'bg-white text-black' : ''} p-2 w-full`}
+            class={`${tabs !== 'all' ? 'bg-neutral-800' : ''} p-2 w-full`}
             on:click={async () => {
               setTabs('user');
               searchQuery = '';
@@ -190,7 +190,7 @@
         class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
       >
         <table class="snap-center text-black w-full mt-6">
-          <thead class="text-left text-neutral-400">
+          <thead class="text-left text-neutral-400 bg-black/60">
             <tr>
               {#if innerWidth > 640}
                 <ConnectionTableHead
@@ -264,7 +264,7 @@
         class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
       >
         <table class="snap-center text-black w-full mt-6">
-          <thead class="text-left text-neutral-400">
+          <thead class="text-left text-neutral-400 bg-black/70">
             <tr>
               {#if innerWidth > 640}
                 <ConnectionTableHead

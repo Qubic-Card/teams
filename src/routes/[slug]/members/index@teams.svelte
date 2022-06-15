@@ -18,6 +18,7 @@
   let searchQuery = '';
   let searchNotFoundMsg = '';
   let loading = false;
+  let innerWidth = 0;
 
   let selectedSearchMenu = null;
   let roles = [];
@@ -83,19 +84,13 @@
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
-<div class="flex flex-col pb-20">
+<svelte:window bind:innerWidth />
+<div class="flex flex-col pb-20 bg-black min-h-screen pt-4 pl-24 pr-4">
   {#await getTeamMembers()}
     <MemberSkeleton />
   {:then}
     <div
-      class="flex justify-center items-center bg-no-repeat bg-cover bg-neutral-800 w-full h-96 text-4xl font-bold brightness-50"
-      style="background-image: url(https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1632&q=80)"
-    >
-      {$page.params.slug}
-    </div>
-
-    <div
-      class={`items-center w-full justify-end gap-2 mt-4 ${
+      class={`items-center w-full justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
         isHasPermission ? 'flex' : 'hidden'
       }`}
     >
@@ -109,7 +104,9 @@
       />
     </div>
     <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-flow-row my-8 gap-4"
+      class={`grid grid-flow-row my-8 gap-4 ${
+        innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
+      }`}
     >
       {#each members as member, i}
         {#if isHasPermission === false && member.uid === ownProfile.uid}

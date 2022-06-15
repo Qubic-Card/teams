@@ -80,6 +80,16 @@
       },
     },
     {
+      title: 'cards',
+      routeId: '[slug]/cards@teams',
+      urldefault:
+        'https://img.icons8.com/ios-glyphs/90/undefined/card-wallet.png',
+      handler: () => {
+        goto(`/${team.id}/cards`);
+        isSidebarOpened && sidebarHandler();
+      },
+    },
+    {
       title: 'settings',
       routeId: '[slug]/settings@teams',
       urldefault:
@@ -99,9 +109,7 @@
 <AuthWrapper>
   <div class="relative min-h-screen">
     <div
-      class={`fixed left-0 right-0 h-20 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 ${
-        isSidebarOpened ? 'bg-black' : 'bg-zinc-900/50'
-      }`}
+      class="fixed left-0 right-0 h-20 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
         {#if team.name}
@@ -122,9 +130,9 @@
           {/if}
         {:else}
           <div
-            class="w-20 h-20 border-r border-neutral-700 flex justify-center items-center animate-pulse"
+            class="w-20 h-20 border-r border-neutral-800 flex justify-center items-center animate-pulse"
           >
-            <div class="bg-neutral-700 w-12 h-12 rounded-lg" />
+            <div class="bg-neutral-800 w-12 h-12 rounded-lg" />
           </div>
         {/if}
         {#if team.name}
@@ -133,11 +141,7 @@
           </p>
         {:else}
           <div class="animate-pulse p-4">
-            <p
-              class="text-xl w-full h-12 text-neutral-700 bg-neutral-700 rounded-lg"
-            >
-              Teams
-            </p>
+            <div class="text-xl w-60 h-12 bg-neutral-800 rounded-lg" />
           </div>
         {/if}
       </div>
@@ -151,17 +155,13 @@
       {:else if team.logo === ''}
         <div
           on:click={menuHandler}
-          class="bg-neutral-700 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
+          class="bg-neutral-800 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
         >
           T
         </div>
       {:else}
         <div class="animate-pulse p-4">
-          <p
-            class="text-5xl w-12 h-12 text-neutral-700 bg-neutral-700 rounded-full"
-          >
-            T
-          </p>
+          <div class="text-5xl w-12 h-12 bg-neutral-800 rounded-full" />
         </div>
       {/if}
       {#if isMenuOpened}
@@ -170,8 +170,8 @@
     </div>
 
     <div
-      class={`overflow-y-auto border-r border-neutral-700 w-20 fixed top-20 bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
-        isSidebarOpened ? 'w-full md:w-72 bg-black' : 'bg-zinc-900/50'
+      class={`overflow-y-auto border-r border-neutral-700 bg-black w-20 fixed top-20 bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
+        isSidebarOpened ? 'w-full md:w-72' : ''
       }`}
     >
       <nav class="space-y-2 w-full flex flex-col justify-center items-center">
@@ -179,9 +179,11 @@
           {#if team.name}
             <!-- skeleton -->
             <div
-              class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${isSidebarOpened ? "justify-between" : "justify-center"} ${
-                isSidebarOpened && 'px-12 w-full'
-              } ${$page.routeId === item.routeId ? 'w-full bg-black' : ''} ${
+              class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
+                isSidebarOpened ? 'justify-between' : 'justify-center'
+              } ${isSidebarOpened && 'px-12 w-full'} ${
+                $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
+              } ${
                 isSidebarOpened && $page.routeId === item.routeId
                   ? 'bg-neutral-900'
                   : ''
@@ -198,9 +200,9 @@
           {:else}
             <div class="animate-pulse gap-5">
               <p
-                class="text-5xl w-full h-16 text-neutral-700 bg-neutral-700 rounded-lg"
+                class="text-5xl h-16 text-neutral-800 bg-neutral-800 rounded-lg"
               >
-                Teams
+                QT
               </p>
             </div>
           {/if}
@@ -208,7 +210,7 @@
       </nav>
     </div>
     <div
-      class="absolute top-20 bottom-0 pt-4 pl-24 pr-4 bg-black text-white overflow-y-auto w-full"
+      class="absolute top-20 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
     >
       <SvelteToast />
       <slot />
