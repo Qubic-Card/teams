@@ -9,6 +9,7 @@
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
   import DropdownButton from '@comp/buttons/dropdownButton.svelte';
   import getDates from '@lib/utils/getDates';
+  import { CSVDownloader } from 'svelte-csv';
 
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
@@ -50,16 +51,77 @@
     new Date(new Date().setDate(new Date().getDate() - 6)),
     today
   );
+  let contact = {
+    dateConnected: '',
+    firstName: '',
+    lastName: '',
+    company: '',
+    job: '',
+    socials: '',
+    links: '',
+    message: '',
+    link: '',
+    by: '',
+  };
 
   const getContacts = async () => {
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*')
+      .select(
+        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)'
+      )
       .eq('team_id', teamId)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString());
 
     if (error) console.log(error);
     if (data) {
+      // console.log(data[0].profileData);
+      console.log(
+        data.map((item) => {
+          return {
+            dateConnected: item.dateConnected,
+            firstname: item.firstname,
+            lastname: item.lastname,
+            company: item.company,
+            job: item.job,
+            socials: item.socials,
+            message: item.message,
+            link: item.link,
+            by: item.by.firstname,
+          };
+        })
+      );
+      // contact = data;
+      contact = data.map((item) => {
+        console.log(item);
+        return {
+          dateConnected: item.dateConnected,
+          firstname: item.firstname,
+          lastname: item.lastname,
+          company: item.company,
+          job: item.job,
+          socials: item.socials.map((socials) => {
+            return socials.data;
+          }),
+          links: item.links.map((link) => {
+            return link.link;
+          }),
+          message: item.message,
+          link: item.link,
+          by: item.by.firstname + ' ' + item.by.lastname,
+        };
+      });
+      console.log(contact);
+      // contact = data;
+      // data.map((item, i) => {
+      //   contact[i].by = item.by;
+      //   contact[i].date = item.dateConnected;
+      //   contact[i].id = item.id;
+      //   contact[i].message = item.message;
+      //   contact[i].link = item.link;
+      //   contact[i].job = item.profileData.job;
+      //   contact[i].team_id = item.team_id;
+      // });
       analyticsData[1].data = data.length;
     }
   };
@@ -73,7 +135,6 @@
 
     if (error) console.log(error);
     if (data) {
-      console.log(data.map((item) => item.team_member));
       analyticsData[0].data = count;
       analyticsData[2].data = data.length;
     }
@@ -93,11 +154,12 @@
   };
 
   onMount(async () => {
-    let a = await getMembersId(teamId);
-    console.log(a);
+    await getContacts();
+    // let a = await getMembersId(teamId);
+    // console.log(a);
     // await getActiveMember();
     // contactsCount = await getContacts();
-    console.log(analyticsData);
+    console.log(contact);
   });
 </script>
 
@@ -107,10 +169,26 @@
   {:then name}
     <!-- <DropdownButton class="w-52" label="Download CSV" /> -->
     {#if isHasPermission}
-      <button
-        class="w-52 h-16 p-4 mb-4 border-2 border-neutral-700 rounded-lg self-end"
-        >Download CSV</button
+      <CSVDownloader
+        data={contact}
+        filename={'qubic-analytics'}
+        bom={true}
+        type={'button'}
       >
+        Download CSV
+      </CSVDownloader>
+      <!-- <button
+        class="w-52 h-16 p-4 mb-4 border-2 border-neutral-700 rounded-lg self-end"
+      >
+        <CSVDownloader
+          data={contact}
+          filename={'filename'}
+          bom={true}
+          type={'button'}
+        >
+          Download CSV
+        </CSVDownloader>
+      </button> -->
       <div class="flex justify-between gap-4">
         {#each analyticsData as item}
           <div

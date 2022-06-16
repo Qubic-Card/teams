@@ -23,6 +23,9 @@ const config = {
           '@lib': path.resolve('./src/lib'),
         },
       },
+      optimizeDeps: {
+        include: ['papaparse'],
+      },
     },
   },
 };
