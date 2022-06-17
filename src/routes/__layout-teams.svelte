@@ -27,7 +27,7 @@
     roleMapping = await getRoleMapsByProfile($user?.id, teamId);
     team = await getTeamData(teamId);
   });
-  // $: console.log(team);
+  // $: console.log($page);
   $: setUserData(roleMapping);
   let sidebarItems = [
     {
@@ -182,6 +182,10 @@
               class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
                 isSidebarOpened ? 'justify-between' : 'justify-center'
               } ${isSidebarOpened && 'px-12 w-full'} ${
+                $page.routeId === '[slug]/dashboard/team@teams'
+                  ? 'first:bg-neutral-900'
+                  : ''
+              }  ${
                 $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
               } ${
                 isSidebarOpened && $page.routeId === item.routeId
@@ -212,6 +216,27 @@
     <div
       class="absolute top-20 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
     >
+      {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
+        <div class="border-b-2 border-neutral-700 pl-24 mt-8 gap-4 flex">
+          <button
+            on:click={() => goto(`/${team.id}/dashboard`)}
+            class={`pb-2 text-lg ${
+              $page.routeId === '[slug]/dashboard@teams'
+                ? 'border-b-2 border-neutral-200 font-bold'
+                : ''
+            }`}>Personal</button
+          >
+          <button
+            on:click={() => goto(`/${team.id}/dashboard/team`)}
+            class={`pb-2 text-lg ${
+              $page.routeId === '[slug]/dashboard/team@teams'
+                ? 'border-b-2 border-neutral-200 font-bold'
+                : ''
+            }`}>Team</button
+          >
+        </div>
+      {/if}
+
       <SvelteToast />
       <slot />
     </div>

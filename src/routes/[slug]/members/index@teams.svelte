@@ -95,7 +95,7 @@
       }`}
     >
       <Search
-        class="top-[480px] right-7"
+        class="top-24 mt-2 right-10"
         searchMenu={memberSearchMenu}
         {loading}
         bind:value={searchQuery}

@@ -8,7 +8,14 @@
   import getDates from '@lib/utils/getDates';
   import Cookies from 'js-cookie';
   import count from '@lib/utils/count';
-
+  import CsvDropdownButton from '@comp/buttons/csvDropdownButton.svelte';
+  import {
+    Menu,
+    MenuItems,
+    MenuItem,
+    MenuButton,
+  } from '@rgossiaux/svelte-headlessui';
+  import { CSVDownloader } from 'svelte-csv';
   import { onMount } from 'svelte';
   // import Chart from '@comp/chart.svelte';
   import Chart from 'chart.js/auto/auto.js';
@@ -66,8 +73,8 @@
     data: connectionsChartData,
     options: {
       responsive: true,
-      cutout: '95%',
-      spacing: 2,
+      aspectRatio: 1,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           display: false,
@@ -81,8 +88,8 @@
     data: logsChartData,
     options: {
       responsive: true,
-      cutout: '95%',
-      spacing: 2,
+      aspectRatio: 1,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           display: false,
@@ -99,6 +106,19 @@
     new Date(new Date().setDate(new Date().getDate() - 6)),
     today
   );
+
+  let connections = {
+    dateConnected: '',
+    firstName: '',
+    lastName: '',
+    company: '',
+    job: '',
+    socials: '',
+    links: '',
+    message: '',
+    link: '',
+    by: '',
+  };
 
   const setLimit = (value) => {
     maxLimit = value;
@@ -146,7 +166,10 @@
       count,
     } = await supabase
       .from('team_connection_acc')
-      .select('dateConnected', { count: 'estimated' })
+      .select(
+        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
+        { count: 'estimated' }
+      )
       .eq('team_id', teamId)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
@@ -157,6 +180,68 @@
       teamDateConnected = connection_profile.map((item) =>
         new Date(item.dateConnected).toDateString().slice(4)
       );
+
+      connections = connection_profile.map((item) => {
+        console.log(item.socials);
+        // let res = item.socials.map((social) => ({
+        //   type: social.type,
+        //   data: social.data,
+        // }));
+
+        // new Map(
+        //   item.socials.map((object) => {
+        //     console.log([object.type, object.data]);
+        //     return [object.type, object.data];
+        //   })
+        // );
+
+        return {
+          Date: item.dateConnected,
+          Firstname: item.firstname,
+          Lastname: item.lastname,
+          Company: item.company,
+          Job: item.job,
+
+          Twitter: item.socials.map((social) => {
+            if (social.type === 'twitter') return social.data;
+          }),
+          Linkedin: item.socials.map((social) => {
+            if (social.type === 'linkedin') return social.data;
+          }),
+          Whatsapp: item.socials.map((social) => {
+            if (social.type === 'whatsapp') return social.data;
+          }),
+          Email: item.socials.map((social) => {
+            if (social.type === 'email') return social.data;
+          }),
+          Phone: item.socials.map((social) => {
+            if (social.type === 'phone') return social.data;
+          }),
+          Line: item.socials.map((social) => {
+            if (social.type === 'line') return social.data;
+          }),
+          Tiktok: item.socials.map((social) => {
+            if (social.type === 'tiktok') return social.data;
+          }),
+          Instagram: item.socials.map((social) => {
+            if (social.type === 'instagram') return social.data;
+          }),
+          Facebook: item.socials.map((social) => {
+            if (social.type === 'facebook') return social.data;
+          }),
+          Youtube: item.socials.map((social) => {
+            if (social.type === 'youtube') return social.data;
+          }),
+          Links: item.links.map((link) => {
+            return link.link;
+          }),
+          Message: item.message,
+          Link: item.link,
+          By: item.by.firstname + ' ' + item.by.lastname,
+        };
+      });
+      console.log(connections);
+      console.log(connection_profile);
     }
     if (error_profile) console.log(error_profile);
   };
@@ -235,6 +320,7 @@
         // console.log('logs', logs);
         teamLogs = logs;
 
+        // console.log(teamLogs);
         // paginate(teamLogs);
       }
     } catch (error) {
@@ -290,6 +376,17 @@
     <!-- {#await }
       <AnalyticsSkeleton />
     {:then} -->
+    <!-- <div class="border-2 border-neutral-700 p-2 w-52 text-center mb-4">
+      <CSVDownloader
+        data={connections}
+        filename={'filename'}
+        bom={true}
+        type={'button'}
+      >
+        Download CSV
+      </CSVDownloader>
+    </div> -->
+    <CsvDropdownButton data={connections} />
     <div class="flex flex-col lg:flex-row justify-between">
       <!-- <Chart element={connectionsChart} data={connectionsChartData} />
       <Chart element={logsChart} data={logsChartData} /> -->
@@ -298,9 +395,9 @@
           <h1 class="text-2xl font-semibold">Weekly New Connections</h1>
         </div>
         <div
-          class="h-80 border-neutral-700 bg-neutral-800 px-2 pt-4 border rounded-xl mt-4"
+          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-4 outer"
         >
-          <canvas height="140" bind:this={connectionsChart} />
+          <canvas id="chart" bind:this={connectionsChart} />
         </div>
       </div>
       <div class="flex flex-col w-full lg:w-[49.5%] pt-4 lg:pt-0">
@@ -308,9 +405,9 @@
           <h1 class="text-2xl font-semibold">Weekly Activities</h1>
         </div>
         <div
-          class="h-80 border-neutral-700 bg-neutral-800 px-2 pt-4 border rounded-xl mt-4"
+          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-4 outer"
         >
-          <canvas height="140" bind:this={logsChart} />
+          <canvas bind:this={logsChart} />
         </div>
       </div>
     </div>
@@ -360,4 +457,3 @@
     {/await} -->
   </div>
 </div>
-<!-- {"card":"b9069595-2a92-487a-8756-2ab437c29758","message":"Your profile was opened through QRScan"} -->

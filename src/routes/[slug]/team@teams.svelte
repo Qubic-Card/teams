@@ -193,15 +193,29 @@
         <div class="text-black">
           <div class="flex flex-col w-full">
             <div class="flex p-4 border-2 border-neutral-700 mb-4 gap-6">
-              <img
-                src={teamData.logo}
-                alt={teamData.company + ' logo'}
-                class="w-48 h-48"
-              />
+              {#if teamData.logo}
+                <img
+                  src={teamData.logo}
+                  alt={teamData.company + ' logo'}
+                  class="w-48 h-48"
+                />
+              {:else}
+                <div
+                  class="w-48 h-48 bg-neutral-800 text-white text-7xl font-bold flex justify-center items-center"
+                >
+                  Q
+                </div>
+              {/if}
               <div class="text-white flex flex-col gap-2">
-                <h1 class="text-4xl font-bold">{teamData.company}</h1>
-                <h1 class="text-xl">{teamData.address}</h1>
-                <h1 class="text-xl">{teamData.description}</h1>
+                <h1 class="text-4xl font-bold">
+                  {teamData.company === '' ? '-' : teamData.company}
+                </h1>
+                <h1 class="text-xl">
+                  {teamData.address === '' ? '-' : teamData.address}
+                </h1>
+                <h1 class="text-xl">
+                  {teamData.description === '' ? '-' : teamData.description}
+                </h1>
                 <div
                   class="flex justify-between flex-wrap items-start gap-1 my-1"
                 >

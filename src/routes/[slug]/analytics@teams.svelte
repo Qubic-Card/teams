@@ -7,9 +7,7 @@
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
-  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
   import getDates from '@lib/utils/getDates';
-  import { CSVDownloader } from 'svelte-csv';
 
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
@@ -51,18 +49,6 @@
     new Date(new Date().setDate(new Date().getDate() - 6)),
     today
   );
-  let contact = {
-    dateConnected: '',
-    firstName: '',
-    lastName: '',
-    company: '',
-    job: '',
-    socials: '',
-    links: '',
-    message: '',
-    link: '',
-    by: '',
-  };
 
   const getContacts = async () => {
     const { data, error } = await supabase
@@ -75,53 +61,6 @@
 
     if (error) console.log(error);
     if (data) {
-      // console.log(data[0].profileData);
-      console.log(
-        data.map((item) => {
-          return {
-            dateConnected: item.dateConnected,
-            firstname: item.firstname,
-            lastname: item.lastname,
-            company: item.company,
-            job: item.job,
-            socials: item.socials,
-            message: item.message,
-            link: item.link,
-            by: item.by.firstname,
-          };
-        })
-      );
-      // contact = data;
-      contact = data.map((item) => {
-        console.log(item);
-        return {
-          dateConnected: item.dateConnected,
-          firstname: item.firstname,
-          lastname: item.lastname,
-          company: item.company,
-          job: item.job,
-          socials: item.socials.map((socials) => {
-            return socials.data;
-          }),
-          links: item.links.map((link) => {
-            return link.link;
-          }),
-          message: item.message,
-          link: item.link,
-          by: item.by.firstname + ' ' + item.by.lastname,
-        };
-      });
-      console.log(contact);
-      // contact = data;
-      // data.map((item, i) => {
-      //   contact[i].by = item.by;
-      //   contact[i].date = item.dateConnected;
-      //   contact[i].id = item.id;
-      //   contact[i].message = item.message;
-      //   contact[i].link = item.link;
-      //   contact[i].job = item.profileData.job;
-      //   contact[i].team_id = item.team_id;
-      // });
       analyticsData[1].data = data.length;
     }
   };
@@ -153,42 +92,16 @@
     }
   };
 
-  onMount(async () => {
-    await getContacts();
-    // let a = await getMembersId(teamId);
-    // console.log(a);
-    // await getActiveMember();
-    // contactsCount = await getContacts();
-    console.log(contact);
-  });
+  // onMount(async () => {
+  //   await getContacts();
+  // });
 </script>
 
 <div class="flex flex-col w-full h-full pt-4 pl-24 pr-4">
   {#await (getContacts(), getTaps())}
     <AnalyticsPageSkeleton />
   {:then name}
-    <!-- <DropdownButton class="w-52" label="Download CSV" /> -->
     {#if isHasPermission}
-      <CSVDownloader
-        data={contact}
-        filename={'qubic-analytics'}
-        bom={true}
-        type={'button'}
-      >
-        Download CSV
-      </CSVDownloader>
-      <!-- <button
-        class="w-52 h-16 p-4 mb-4 border-2 border-neutral-700 rounded-lg self-end"
-      >
-        <CSVDownloader
-          data={contact}
-          filename={'filename'}
-          bom={true}
-          type={'button'}
-        >
-          Download CSV
-        </CSVDownloader>
-      </button> -->
       <div class="flex justify-between gap-4">
         {#each analyticsData as item}
           <div
