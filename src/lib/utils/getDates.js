@@ -14,4 +14,20 @@ const getDates = (startDate, stopDate) => {
   return dateArray;
 };
 
+export const today = new Date().setDate(new Date().getDate());
+
+export const last7Days = getDates(
+  new Date(new Date().setDate(new Date().getDate() - 6)),
+  today
+);
+
+export const last30Days = getDates(
+  new Date(new Date().setDate(new Date().getDate() - 29)),
+  today
+);
+export const last90Days = getDates(
+  new Date(new Date().setDate(new Date().getDate() - 89)),
+  today
+);
+
 export default getDates;

@@ -5,16 +5,17 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { setUserData, user } from '@lib/stores/userStore';
+  import { setUserData, user, userData } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { getTeamId } from '@lib/query/getId';
-  import supabase from '@lib/db';
+
   import getTeamData from '@lib/query/getTeamData';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
+  let isHasPermission = false;
 
   let roleMapping = [];
   let team = [];
@@ -27,8 +28,19 @@
     roleMapping = await getRoleMapsByProfile($user?.id, teamId);
     team = await getTeamData(teamId);
   });
-  // $: console.log($page);
+
   $: setUserData(roleMapping);
+
+  $: $userData?.filter((item) => {
+    if (item === 'allow_read_analytics') {
+      isHasPermission = true;
+    }
+  });
+
+  // $: console.log($page);
+  // $: console.log($userData);
+  // $: console.log(isHasPermission);
+  // $: isHasPermission;
   let sidebarItems = [
     {
       title: 'dashboard',
@@ -76,16 +88,6 @@
         'https://img.icons8.com/ios/100/ffffff/user-group-man-man.png',
       handler: () => {
         goto(`/${team.id}/members`);
-        isSidebarOpened && sidebarHandler();
-      },
-    },
-    {
-      title: 'cards',
-      routeId: '[slug]/cards@teams',
-      urldefault:
-        'https://img.icons8.com/ios-glyphs/90/undefined/card-wallet.png',
-      handler: () => {
-        goto(`/${team.id}/cards`);
         isSidebarOpened && sidebarHandler();
       },
     },
@@ -216,25 +218,27 @@
     <div
       class="absolute top-20 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
     >
-      {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
-        <div class="border-b-2 border-neutral-700 pl-24 mt-8 gap-4 flex">
-          <button
-            on:click={() => goto(`/${team.id}/dashboard`)}
-            class={`pb-2 text-lg ${
-              $page.routeId === '[slug]/dashboard@teams'
-                ? 'border-b-2 border-neutral-200 font-bold'
-                : ''
-            }`}>Personal</button
-          >
-          <button
-            on:click={() => goto(`/${team.id}/dashboard/team`)}
-            class={`pb-2 text-lg ${
-              $page.routeId === '[slug]/dashboard/team@teams'
-                ? 'border-b-2 border-neutral-200 font-bold'
-                : ''
-            }`}>Team</button
-          >
-        </div>
+      {#if isHasPermission}
+        {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
+          <div class="border-b-2 border-neutral-700 pl-24 mt-8 gap-4 flex">
+            <button
+              on:click={() => goto(`/${team.id}/dashboard`)}
+              class={`pb-2 text-lg ${
+                $page.routeId === '[slug]/dashboard@teams'
+                  ? 'border-b-2 border-neutral-200 font-bold'
+                  : ''
+              }`}>Personal</button
+            >
+            <button
+              on:click={() => goto(`/${team.id}/dashboard/team`)}
+              class={`pb-2 text-lg ${
+                $page.routeId === '[slug]/dashboard/team@teams'
+                  ? 'border-b-2 border-neutral-200 font-bold'
+                  : ''
+              }`}>Team</button
+            >
+          </div>
+        {/if}
       {/if}
 
       <SvelteToast />

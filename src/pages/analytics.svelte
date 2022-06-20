@@ -1,24 +1,18 @@
 <script>
   import supabase from '@lib/db.js';
-  // import Chart from 'svelte-frappe-charts';
   import AnalyticTable from '@comp/analyticTable.svelte';
   import { user, userData } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getMemberId } from '@lib/query/getId';
-  import getDates from '@lib/utils/getDates';
+  import { last30Days, last7Days, last90Days } from '@lib/utils/getDates';
   import Cookies from 'js-cookie';
-  import count from '@lib/utils/count';
+  import { count } from '@lib/utils/count';
   import CsvDropdownButton from '@comp/buttons/csvDropdownButton.svelte';
-  import {
-    Menu,
-    MenuItems,
-    MenuItem,
-    MenuButton,
-  } from '@rgossiaux/svelte-headlessui';
-  import { CSVDownloader } from 'svelte-csv';
   import { onMount } from 'svelte';
   // import Chart from '@comp/chart.svelte';
   import Chart from 'chart.js/auto/auto.js';
+  import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
+  import { analyticsChartConfig } from '@lib/constants';
 
   let teamId = Cookies.get('qubicTeamId');
 
@@ -29,21 +23,17 @@
   let dateConnected = [];
   let userLogs = [];
 
-  let teamUniqueCount = 0;
-  let teamActivityCount = 0;
-  let teamConnectionCount = 0;
-  let teamActivity = [];
-  let teamDateConnected = [];
-  let teamLogs = [];
-
   let loading = false;
-  let isHasPermission = false;
 
   let itemsPerPage = 10;
   let totalPages = [];
   let maxLimit = 5;
   let isAlreadySeeMore = false;
-
+  let selectedDays = null;
+  const selectedDaysHandler = (e) => {
+    console.log(e);
+    selectedDays = e.target.value;
+  };
   let logsChartData = {
     labels: [],
     datasets: [
@@ -71,54 +61,22 @@
   const connectionsConfig = {
     type: 'line',
     data: connectionsChartData,
-    options: {
-      responsive: true,
-      aspectRatio: 1,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    },
+    options: analyticsChartConfig,
   };
 
   const logsConfig = {
     type: 'line',
     data: logsChartData,
-    options: {
-      responsive: true,
-      aspectRatio: 1,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-    },
+    options: analyticsChartConfig,
   };
 
   let logsChart;
   let connectionsChart;
 
-  const today = new Date().setDate(new Date().getDate());
-  const last7Days = getDates(
-    new Date(new Date().setDate(new Date().getDate() - 6)),
-    today
-  );
+  $: console.log(last30Days[0]);
 
-  let connections = {
-    dateConnected: '',
-    firstName: '',
-    lastName: '',
-    company: '',
-    job: '',
-    socials: '',
-    links: '',
-    message: '',
-    link: '',
-    by: '',
-  };
+  let connectionsCsv = {};
+  let logsCsv = {};
 
   const setLimit = (value) => {
     maxLimit = value;
@@ -143,7 +101,10 @@
       count,
     } = await supabase
       .from('team_connection_acc')
-      .select('dateConnected', { count: 'estimated' })
+      .select(
+        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
+        { count: 'estimated' }
+      )
       .eq('by', id)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString())
       .order('dateConnected', { ascending: false });
@@ -155,45 +116,9 @@
       dateConnected = connection_profile.map((item) =>
         new Date(item.dateConnected).toDateString().slice(4)
       );
-    }
-  };
 
-  const getTeamConnectionsList = async () => {
-    loading = true;
-    let {
-      data: connection_profile,
-      error: error_profile,
-      count,
-    } = await supabase
-      .from('team_connection_acc')
-      .select(
-        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
-        { count: 'estimated' }
-      )
-      .eq('team_id', teamId)
-      .gte('dateConnected', new Date(last7Days[0]).toUTCString())
-      .order('dateConnected', { ascending: false });
-
-    loading = false;
-    if (connection_profile) {
-      teamConnectionCount = count;
-      teamDateConnected = connection_profile.map((item) =>
-        new Date(item.dateConnected).toDateString().slice(4)
-      );
-
-      connections = connection_profile.map((item) => {
+      connectionsCsv = connection_profile.map((item) => {
         console.log(item.socials);
-        // let res = item.socials.map((social) => ({
-        //   type: social.type,
-        //   data: social.data,
-        // }));
-
-        // new Map(
-        //   item.socials.map((object) => {
-        //     console.log([object.type, object.data]);
-        //     return [object.type, object.data];
-        //   })
-        // );
 
         return {
           Date: item.dateConnected,
@@ -201,49 +126,26 @@
           Lastname: item.lastname,
           Company: item.company,
           Job: item.job,
-
-          Twitter: item.socials.map((social) => {
-            if (social.type === 'twitter') return social.data;
-          }),
-          Linkedin: item.socials.map((social) => {
-            if (social.type === 'linkedin') return social.data;
-          }),
-          Whatsapp: item.socials.map((social) => {
-            if (social.type === 'whatsapp') return social.data;
-          }),
-          Email: item.socials.map((social) => {
-            if (social.type === 'email') return social.data;
-          }),
-          Phone: item.socials.map((social) => {
-            if (social.type === 'phone') return social.data;
-          }),
-          Line: item.socials.map((social) => {
-            if (social.type === 'line') return social.data;
-          }),
-          Tiktok: item.socials.map((social) => {
-            if (social.type === 'tiktok') return social.data;
-          }),
-          Instagram: item.socials.map((social) => {
-            if (social.type === 'instagram') return social.data;
-          }),
-          Facebook: item.socials.map((social) => {
-            if (social.type === 'facebook') return social.data;
-          }),
-          Youtube: item.socials.map((social) => {
-            if (social.type === 'youtube') return social.data;
-          }),
+          Twitter: getSocialMediaCsv(item.socials, 'twitter'),
+          Linkedin: getSocialMediaCsv(item.socials, 'linkedin'),
+          Whatsapp: getSocialMediaCsv(item.socials, 'whatsapp'),
+          Email: getSocialMediaCsv(item.socials, 'email'),
+          Phone: getSocialMediaCsv(item.socials, 'phone'),
+          Line: getSocialMediaCsv(item.socials, 'line'),
+          Tiktok: getSocialMediaCsv(item.socials, 'tiktok'),
+          Instagram: getSocialMediaCsv(item.socials, 'instagram'),
+          Facebook: getSocialMediaCsv(item.socials, 'facebook'),
+          Youtube: getSocialMediaCsv(item.socials, 'youtube'),
           Links: item.links.map((link) => {
             return link.link;
           }),
           Message: item.message,
-          Link: item.link,
+          Attached_link: item.link,
           By: item.by.firstname + ' ' + item.by.lastname,
         };
       });
-      console.log(connections);
-      console.log(connection_profile);
+      console.log(connectionsCsv);
     }
-    if (error_profile) console.log(error_profile);
   };
 
   const getWeeklyLogsActivity = async () => {
@@ -256,7 +158,12 @@
         count,
       } = await supabase
         .from('team_logs')
-        .select('*', { count: 'estimated' })
+        .select(
+          'created_at, data->card, data->message, type, team, team_member(*)',
+          {
+            count: 'estimated',
+          }
+        )
         .eq('team_member', id)
         .gte('created_at', new Date(last7Days[0]).toISOString())
         .order('created_at', {
@@ -278,50 +185,24 @@
         setTimeout(() => {
           loading = false;
         }, 1000);
-
-        userLogs = logs;
-        // paginate(userLogs);
-      }
-    } catch (error) {
-      loading = false;
-      console.log(error);
-    }
-  };
-
-  const getTeamWeeklyLogsActivity = async () => {
-    loading = true;
-    try {
-      let {
-        data: logs,
-        error,
-        count,
-      } = await supabase
-        .from('team_logs')
-        .select('*', { count: 'estimated' })
-        .eq('team', teamId)
-        .gte('created_at', new Date(last7Days[0]).toISOString())
-        .order('created_at', { ascending: false });
-      // .limit(maxLimit ?? 100);
-
-      if (logs) {
-        let newArr = [];
-        logs.map((log) => {
-          if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
+        // console.log(logs);
+        logsCsv = logs.map((log) => {
+          // console.log(log);
+          return {
+            Date: log.created_at,
+            Card: log.card,
+            Message: log.message,
+            Type: log.type,
+            Team: log.team,
+            TeamMember:
+              log.team_member.team_profile.firstname +
+              ' ' +
+              log.team_member.team_profile.lastname,
+          };
         });
-        teamUniqueCount = newArr.length;
-        teamActivityCount = count;
-        teamActivity = logs.map((log) =>
-          new Date(log.created_at).toDateString().slice(4)
-        );
-
-        setTimeout(() => {
-          loading = false;
-        }, 1000);
-        // console.log('logs', logs);
-        teamLogs = logs;
-
-        // console.log(teamLogs);
-        // paginate(teamLogs);
+        userLogs = logs;
+        // console.log(logsCsv);
+        // paginate(userLogs);
       }
     } catch (error) {
       loading = false;
@@ -331,33 +212,19 @@
 
   const activityHandler = async () => {
     await getWeeklyLogsActivity();
-    await getTeamWeeklyLogsActivity();
 
     logsChartData.labels = last7Days;
-    logsChartData.datasets[0].data = count(
-      last7Days,
-      isHasPermission ? teamActivity : activity
-    );
+    logsChartData.datasets[0].data = count(last7Days, activity);
   };
 
   const connection = async () => {
     await getConnectionsList();
-    await getTeamConnectionsList();
 
     connectionsChartData.labels = last7Days;
-    connectionsChartData.datasets[0].data = count(
-      last7Days,
-      isHasPermission ? teamDateConnected : dateConnected
-    );
+    connectionsChartData.datasets[0].data = count(last7Days, dateConnected);
   };
 
-  $: $userData?.filter((item) => {
-    if (item === 'allow_read_analytics') isHasPermission = true;
-  });
-
-  $: isHasPermission
-    ? paginate(teamLogs.slice(0, maxLimit))
-    : paginate(userLogs.slice(0, maxLimit));
+  $: paginate(userLogs.slice(0, maxLimit));
 
   onMount(async () => {
     await connection();
@@ -376,31 +243,23 @@
     <!-- {#await }
       <AnalyticsSkeleton />
     {:then} -->
-    <!-- <div class="border-2 border-neutral-700 p-2 w-52 text-center mb-4">
-      <CSVDownloader
-        data={connections}
-        filename={'filename'}
-        bom={true}
-        type={'button'}
-      >
-        Download CSV
-      </CSVDownloader>
-    </div> -->
-    <CsvDropdownButton data={connections} />
-    <div class="flex flex-col lg:flex-row justify-between">
+    <!-- <CsvDropdownButton data={connectionsCsv} class="top-[385px]" /> -->
+    <div class="flex flex-col lg:flex-row justify-between gap-2">
       <!-- <Chart element={connectionsChart} data={connectionsChartData} />
       <Chart element={logsChart} data={logsChartData} /> -->
-      <div class="flex flex-col w-full lg:w-[49.5%] pt-4 lg:pt-0">
+      <div class="flex flex-col w-full pt-4 lg:pt-0">
+        <CsvDropdownButton data={connectionsCsv} class="top-[385px]" />
         <div class="flex w-full justify-between">
           <h1 class="text-2xl font-semibold">Weekly New Connections</h1>
         </div>
         <div
           class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-4 outer"
         >
-          <canvas id="chart" bind:this={connectionsChart} />
+          <canvas bind:this={connectionsChart} />
         </div>
       </div>
-      <div class="flex flex-col w-full lg:w-[49.5%] pt-4 lg:pt-0">
+      <div class="flex flex-col w-full pt-4 lg:pt-0">
+        <CsvDropdownButton data={logsCsv} class="top-[385px]" />
         <div class="flex w-full justify-between">
           <h1 class="text-2xl font-semibold">Weekly Activities</h1>
         </div>
@@ -419,7 +278,7 @@
       >
         <p class="">New connections this week</p>
         <p class="font-bold text-4xl">
-          {isHasPermission ? teamConnectionCount : connectionCount}
+          {connectionCount}
         </p>
       </div>
       <div
@@ -427,7 +286,7 @@
       >
         <p class="">Your activity this week</p>
         <p class="font-bold text-4xl">
-          {isHasPermission ? teamActivityCount : activityCount}
+          {activityCount}
         </p>
       </div>
       <div
@@ -435,7 +294,7 @@
       >
         <p class="">Unique People this week</p>
         <p class="font-bold text-4xl">
-          {isHasPermission ? teamUniqueCount : uniqueCount}
+          {uniqueCount}
         </p>
       </div>
     </div>

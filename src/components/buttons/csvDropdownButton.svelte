@@ -7,8 +7,14 @@
   } from '@rgossiaux/svelte-headlessui';
   import getDates from '@lib/utils/getDates';
   import { CSVDownloader } from 'svelte-csv';
+  import { createEventDispatcher } from 'svelte';
 
   export let data;
+
+  const dispatch = createEventDispatcher();
+  const select = () => {
+    console.log('select');
+  };
 
   let day = ['7 Days', '30 Days', '90 Days'];
 </script>
@@ -32,17 +38,18 @@
 
   {#if open}
     <MenuItems
-      class={`top-[310px] z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40`}
+      class={`${$$props.class} z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40`}
     >
       {#each day as item}
-        <div class="p-2">
+        <div class="p-2 hover:bg-black" on:click={select}>
           <CSVDownloader
+            on:click={select}
             {data}
             filename={'qubic-analytics'}
             bom={true}
             type={'button'}
           >
-            Download CSV
+            {item}
           </CSVDownloader>
         </div>
       {/each}

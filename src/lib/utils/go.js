@@ -23,6 +23,9 @@ const go = async (type, data) => {
     case 'instagram':
       await goto('https://instagram.com/' + data);
       break;
+    case 'line':
+      await goto('https://line.me/R/ti/p/~' + data);
+      break;
     case 'email':
       await goto('mailto:' + data);
       break;

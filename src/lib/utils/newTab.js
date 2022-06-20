@@ -21,6 +21,9 @@ const toNewTab = async (type, data) => {
     case 'instagram':
       await window.open('https://instagram.com/' + data, '_blank').focus();
       break;
+    case 'line':
+      await window.open('https://line.me/R/ti/p/~' + data, '_blank').focus();
+      break;
     case 'email':
       await window.open('mailto:' + data, '_blank').focus();
       break;

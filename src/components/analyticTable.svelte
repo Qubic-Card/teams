@@ -40,7 +40,7 @@
             <td class="pl-4 p-2 w-48">
               {new Date(row.created_at).toDateString().slice(4)}
             </td>
-            <td class="pl-4 w-auto">{row.data.message}</td>
+            <td class="pl-4 w-auto">{row.message}</td>
             <td class="flex flex-col h-[40px] justify-center">
               {row.platform ?? 'Unknown'}
             </td>
