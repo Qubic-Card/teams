@@ -16,8 +16,18 @@ const getDates = (startDate, stopDate) => {
 
 export const today = new Date().setDate(new Date().getDate());
 
+export const last3Days = getDates(
+  new Date(new Date().setDate(new Date().getDate() - 2)),
+  today
+);
+
 export const last7Days = getDates(
   new Date(new Date().setDate(new Date().getDate() - 6)),
+  today
+);
+
+export const last14Days = getDates(
+  new Date(new Date().setDate(new Date().getDate() - 13)),
   today
 );
 
@@ -27,6 +37,11 @@ export const last30Days = getDates(
 );
 export const last90Days = getDates(
   new Date(new Date().setDate(new Date().getDate() - 89)),
+  today
+);
+
+export const last1Year = getDates(
+  new Date(new Date().setDate(new Date().getDate() - 364)),
   today
 );
 

@@ -1,11 +1,9 @@
 <script>
   import { setNewRole } from '@lib/stores/roleStore';
   import { createEventDispatcher } from 'svelte';
+
   export let checkboxes, checked;
   const dispatch = createEventDispatcher();
-  const isArrayHaveChanged = () => {
-    console.log('isArrayHaveChanged');
-  };
 
   $: setNewRole(checked);
 </script>

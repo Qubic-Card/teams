@@ -4,15 +4,21 @@
   import { user, userData } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getMemberId } from '@lib/query/getId';
-  import { last30Days, last7Days, last90Days } from '@lib/utils/getDates';
+  import {
+    last3Days,
+    last7Days,
+    last14Days,
+    last30Days,
+  } from '@lib/utils/getDates';
   import Cookies from 'js-cookie';
   import { count } from '@lib/utils/count';
-  import CsvDropdownButton from '@comp/buttons/csvDropdownButton.svelte';
+  import AnalyticsDropdownButton from '@comp/buttons/analyticsDropdownButton.svelte';
   import { onMount } from 'svelte';
   // import Chart from '@comp/chart.svelte';
   import Chart from 'chart.js/auto/auto.js';
   import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
   import { analyticsChartConfig } from '@lib/constants';
+  import { getConnectionsCsv } from '@lib/utils/getCsvData';
 
   let teamId = Cookies.get('qubicTeamId');
 
@@ -29,11 +35,7 @@
   let totalPages = [];
   let maxLimit = 5;
   let isAlreadySeeMore = false;
-  let selectedDays = null;
-  const selectedDaysHandler = (e) => {
-    console.log(e);
-    selectedDays = e.target.value;
-  };
+
   let logsChartData = {
     labels: [],
     datasets: [
@@ -73,10 +75,9 @@
   let logsChart;
   let connectionsChart;
 
-  $: console.log(last30Days[0]);
-
   let connectionsCsv = {};
   let logsCsv = {};
+  let selectedDays = '3 Days';
 
   const setLimit = (value) => {
     maxLimit = value;
@@ -92,6 +93,8 @@
     totalPages = [...paginatedItems];
   };
 
+  const selectDaysHandler = (e) => (selectedDays = e.detail);
+
   const getConnectionsList = async () => {
     let id = await getMemberId($user?.id, teamId);
     loading = true;
@@ -106,7 +109,18 @@
         { count: 'estimated' }
       )
       .eq('by', id)
-      .gte('dateConnected', new Date(last7Days[0]).toUTCString())
+      .gte(
+        'dateConnected',
+        new Date(
+          selectedDays === '7 Days'
+            ? last7Days[0]
+            : selectedDays === '14 Days'
+            ? last14Days[0]
+            : selectedDays === '30 Days'
+            ? last30Days[0]
+            : last3Days[0]
+        ).toUTCString()
+      )
       .order('dateConnected', { ascending: false });
 
     loading = false;
@@ -116,35 +130,6 @@
       dateConnected = connection_profile.map((item) =>
         new Date(item.dateConnected).toDateString().slice(4)
       );
-
-      connectionsCsv = connection_profile.map((item) => {
-        console.log(item.socials);
-
-        return {
-          Date: item.dateConnected,
-          Firstname: item.firstname,
-          Lastname: item.lastname,
-          Company: item.company,
-          Job: item.job,
-          Twitter: getSocialMediaCsv(item.socials, 'twitter'),
-          Linkedin: getSocialMediaCsv(item.socials, 'linkedin'),
-          Whatsapp: getSocialMediaCsv(item.socials, 'whatsapp'),
-          Email: getSocialMediaCsv(item.socials, 'email'),
-          Phone: getSocialMediaCsv(item.socials, 'phone'),
-          Line: getSocialMediaCsv(item.socials, 'line'),
-          Tiktok: getSocialMediaCsv(item.socials, 'tiktok'),
-          Instagram: getSocialMediaCsv(item.socials, 'instagram'),
-          Facebook: getSocialMediaCsv(item.socials, 'facebook'),
-          Youtube: getSocialMediaCsv(item.socials, 'youtube'),
-          Links: item.links.map((link) => {
-            return link.link;
-          }),
-          Message: item.message,
-          Attached_link: item.link,
-          By: item.by.firstname + ' ' + item.by.lastname,
-        };
-      });
-      console.log(connectionsCsv);
     }
   };
 
@@ -165,7 +150,18 @@
           }
         )
         .eq('team_member', id)
-        .gte('created_at', new Date(last7Days[0]).toISOString())
+        .gte(
+          'created_at',
+          new Date(
+            selectedDays === '7 Days'
+              ? last7Days[0]
+              : selectedDays === '14 Days'
+              ? last14Days[0]
+              : selectedDays === '30 Days'
+              ? last30Days[0]
+              : last3Days[0]
+          ).toISOString()
+        )
         .order('created_at', {
           ascending: false,
         });
@@ -182,33 +178,16 @@
           new Date(log.created_at).toDateString().slice(4)
         );
 
-        setTimeout(() => {
-          loading = false;
-        }, 1000);
-        // console.log(logs);
-        logsCsv = logs.map((log) => {
-          // console.log(log);
-          return {
-            Date: log.created_at,
-            Card: log.card,
-            Message: log.message,
-            Type: log.type,
-            Team: log.team,
-            TeamMember:
-              log.team_member.team_profile.firstname +
-              ' ' +
-              log.team_member.team_profile.lastname,
-          };
-        });
         userLogs = logs;
-        // console.log(logsCsv);
-        // paginate(userLogs);
+        loading = false;
       }
     } catch (error) {
       loading = false;
       console.log(error);
     }
   };
+
+  $: selectedDays, getWeeklyLogsActivity(), getConnectionsList();
 
   const activityHandler = async () => {
     await getWeeklyLogsActivity();
@@ -243,12 +222,15 @@
     <!-- {#await }
       <AnalyticsSkeleton />
     {:then} -->
-    <!-- <CsvDropdownButton data={connectionsCsv} class="top-[385px]" /> -->
+    <AnalyticsDropdownButton
+      class="top-[385px]"
+      on:select={selectDaysHandler}
+    />
+    <!-- <AnalyticsDropdownButton data={connectionsCsv} class="top-[385px]" /> -->
     <div class="flex flex-col lg:flex-row justify-between gap-2">
       <!-- <Chart element={connectionsChart} data={connectionsChartData} />
       <Chart element={logsChart} data={logsChartData} /> -->
       <div class="flex flex-col w-full pt-4 lg:pt-0">
-        <CsvDropdownButton data={connectionsCsv} class="top-[385px]" />
         <div class="flex w-full justify-between">
           <h1 class="text-2xl font-semibold">Weekly New Connections</h1>
         </div>
@@ -259,7 +241,6 @@
         </div>
       </div>
       <div class="flex flex-col w-full pt-4 lg:pt-0">
-        <CsvDropdownButton data={logsCsv} class="top-[385px]" />
         <div class="flex w-full justify-between">
           <h1 class="text-2xl font-semibold">Weekly Activities</h1>
         </div>

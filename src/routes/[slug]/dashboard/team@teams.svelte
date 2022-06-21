@@ -9,9 +9,14 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import { user, userData } from '@lib/stores/userStore';
-  import { last30Days, last7Days, last90Days } from '@lib/utils/getDates';
+  import {
+    last30Days,
+    last7Days,
+    last3Days,
+    last14Days,
+  } from '@lib/utils/getDates';
   import supabase from '@lib/db';
-  import CsvDropdownButton from '@comp/buttons/csvDropdownButton.svelte';
+  import AnalyticsDropdownButton from '@comp/buttons/analyticsDropdownButton.svelte';
   import { tapCount } from '@lib/utils/count';
   import { doughnutChartBgColor, socialIcons } from '@lib/constants';
 
@@ -21,6 +26,7 @@
   let teamActivity = [];
   let teamDateConnected = [];
   let teamLogs = [];
+  let teamLogsChart = [];
   let loading = false;
 
   const analyticsData = [
@@ -50,6 +56,7 @@
       },
     ],
   };
+
   const config = {
     type: 'doughnut',
     data: data,
@@ -57,7 +64,7 @@
       responsive: true,
       aspectRatio: 1,
       maintainAspectRatio: false,
-      cutout: '80%',
+      cutout: '40%',
       plugins: {
         legend: {
           position: 'bottom',
@@ -76,7 +83,9 @@
 
   let teamId = Cookies.get('qubicTeamId');
   let teamLogsCsv = {};
-  // $: console.log(last7Days);
+  let selectedDays = '3 Days';
+
+  const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getTeamConnectionsList = async () => {
     loading = true;
@@ -92,7 +101,18 @@
       // )
       .select('profileData->socials', { count: 'estimated' })
       .eq('team_id', teamId)
-      .gte('dateConnected', new Date(last7Days[0]).toUTCString())
+      .gte(
+        'dateConnected',
+        new Date(
+          selectedDays === '7 Days'
+            ? last7Days[0]
+            : selectedDays === '14 Days'
+            ? last14Days[0]
+            : selectedDays === '30 Days'
+            ? last30Days[0]
+            : last3Days[0]
+        ).toUTCString()
+      )
       .order('dateConnected', { ascending: false });
 
     loading = false;
@@ -121,7 +141,18 @@
           { count: 'estimated' }
         )
         .eq('team', teamId)
-        .gte('created_at', new Date(last7Days[0]).toISOString())
+        .gte(
+          'created_at',
+          new Date(
+            selectedDays === '7 Days'
+              ? last7Days[0]
+              : selectedDays === '14 Days'
+              ? last14Days[0]
+              : selectedDays === '30 Days'
+              ? last30Days[0]
+              : last3Days[0]
+          ).toISOString()
+        )
         .order('created_at', { ascending: false });
       // .limit(maxLimit ?? 100);
 
@@ -136,26 +167,15 @@
           new Date(log.created_at).toDateString().slice(4)
         );
 
-        setTimeout(() => {
-          loading = false;
-        }, 1000);
         // console.log('logs', logs);
         analyticsData[0].data = count;
         analyticsData[2].data = logs.length;
 
+        teamLogsChart = logs;
         teamLogs = logs;
-        // Csv
-        teamLogsCsv = teamLogs.map((log) => {
-          return {
-            date: new Date(log.created_at).toDateString().slice(4),
-            type: log.type,
-            team: log.team,
-            member: log.team_member.firstname + ' ' + log.team_member.lastname,
-            card: log.card,
-            link: log.link,
-            message: `${log.team_member.firstname}'s ${log.message.slice(4)}`,
-          };
-        });
+
+        // data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
+
         // Grouping by date
         teamLogs = teamLogs.reduce((acc, log) => {
           const date = new Date(log.created_at).toDateString().slice(4);
@@ -176,6 +196,7 @@
         console.log(teamLogsCsv);
         console.log(teamLogs);
         // paginate(teamLogs);
+        loading = false;
       }
     } catch (error) {
       loading = false;
@@ -183,13 +204,17 @@
     }
   };
 
+  $: selectedDays, getTeamWeeklyLogsActivity(), getTeamConnectionsList();
+
   onMount(async () => {
     await getTeamConnectionsList();
     await getTeamWeeklyLogsActivity();
 
-    data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogsCsv);
-    console.log(data.datasets[0].data.every((item) => item === 0));
-    console.log(data.datasets[0].data.map((item) => item === 0));
+    data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
+    // console.log(data.datasets[0].data.every((item) => item === 0));
+    // console.log(data.datasets[0].data.map((item) => item === 0));
+    console.log(data.datasets[0].data);
+    console.log(teamLogsChart);
     const ctx = chart.getContext('2d');
     new Chart(ctx, config);
   });
@@ -248,7 +273,11 @@
       <div class="flex justify-between">
         <h1 class="text-2xl font-bold">Team performance</h1>
         <!-- <button class="bg-blue-600 p-2 rounded-lg w-48">Download CSV</button> -->
-        <CsvDropdownButton data={teamLogsCsv} class="top-[385px]" />
+        <AnalyticsDropdownButton
+          data={teamLogsCsv}
+          class="top-[400px]"
+          on:select={selectDaysHandler}
+        />
       </div>
       {#each teamLogs as log}
         <div class="pl-5">
@@ -271,10 +300,10 @@
       {/each}
     </div>
     <div
-      class="flex flex-col justify-around w-1/3 h-[500px] px-4 py-16 lg:py-10 bg-neutral-800 rounded-lg"
+      class="flex flex-col justify-around w-1/3 h-[500px] px-8 py-16 lg:py-10 bg-neutral-800 rounded-lg"
     >
       <canvas bind:this={chart} />
-      <CsvDropdownButton data={teamLogsCsv} class="top-[385px]" />
+      <!-- <AnalyticsDropdownButton data={teamLogsCsv} class="top-[385px]" /> -->
 
       <!-- <button class="bg-blue-600 p-2 rounded-lg min-w-1/3 self-end mt-2 text-md"
         >Download CSV</button

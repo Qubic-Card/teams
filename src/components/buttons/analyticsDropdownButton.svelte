@@ -5,28 +5,25 @@
     MenuItem,
     MenuButton,
   } from '@rgossiaux/svelte-headlessui';
-  import getDates from '@lib/utils/getDates';
-  import { CSVDownloader } from 'svelte-csv';
   import { createEventDispatcher } from 'svelte';
-  import { user } from '@lib/stores/userStore';
-  import { selectCsv, setSelectCsv } from '@lib/stores/selectCsv';
-
-  export let data, updateLogs;
 
   const dispatch = createEventDispatcher();
 
+  let selectedDays = '3 Days';
+
   const select = (day) => {
+    selectedDays = day;
     dispatch('select', day);
   };
 
-  let days = ['7 Days', '30 Days', '90 Days', 'All'];
+  let days = ['3 Days', '7 Days', '14 Days', '30 Days'];
 </script>
 
 <Menu as="div" class="mx-2 flex justify-end mb-2" let:open>
   <MenuButton
     class={`text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative `}
   >
-    Download CSV
+    {selectedDays ?? '3 Days'}
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="h-6 w-5"
@@ -45,23 +42,10 @@
     >
       {#each days as item}
         <div
-          class="p-2 hover:bg-black"
-          on:click={async () => {
-            console.log(`${$user.id} has been downloaded csv for ${item}`);
-            // select(item);
-            // await setSelectCsv(item);
-            await selectCsv.set(item);
-            await updateLogs();
-          }}
+          class="p-2 hover:bg-black cursor-pointer"
+          on:click={() => select(item)}
         >
-          <CSVDownloader
-            {data}
-            filename={'qubic-analytics'}
-            bom={true}
-            type={'button'}
-          >
-            {item}
-          </CSVDownloader>
+          {item}
         </div>
       {/each}
     </MenuItems>
