@@ -101,19 +101,19 @@
               </button>
               <div
                 class={`w-full p-4 mb-4 flex-wrap justify-center items-center gap-3 bg-neutral-800 rounded-md ${
-                  connection.profileData.socials.length > 0
-                    ? 'grid grid-cols-3 grid-flow-row px-44'
+                  connection.profileData.socials
+                    ? 'grid grid-cols-3 grid-flow-row 12 md:20 lg:px-32'
                     : 'flex'
                 }`}
               >
-                {#if connection.profileData.socials.length > 0}
+                {#if connection.profileData.socials}
                   {#each connection.profileData.socials as item}
                     {#if item.isActive}
                       <BorderButton
                         on:click={async () => await go(item.type, item.data)}
                         ><img
                           src={socialIcons[item.type]}
-                          class="w-10 md:w-16 h-10 md:h-16 mx-auto p-2"
+                          class="w-10 md:12 lg:w-16 h-10 md:h-12 lg:h-16 mx-auto p-2"
                           alt=""
                         /></BorderButton
                       >

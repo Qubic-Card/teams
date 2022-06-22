@@ -2,12 +2,11 @@
   import { onMount } from 'svelte';
   import Cookies from 'js-cookie';
   import { page } from '$app/stores';
-  import { getTeamId } from '@lib/query/getId';
+  import { getMembersId, getTeamId } from '@lib/query/getId';
   import { toastFailed } from '@lib/utils/toast';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
-  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
   import getDates from '@lib/utils/getDates';
 
   let teamId = Cookies.get('qubicTeamId');
@@ -54,7 +53,9 @@
   const getContacts = async () => {
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*')
+      .select(
+        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)'
+      )
       .eq('team_id', teamId)
       .gte('dateConnected', new Date(last7Days[0]).toUTCString());
 
@@ -91,23 +92,16 @@
     }
   };
 
-  onMount(async () => {
-    await getActiveMember();
-    // contactsCount = await getContacts();
-    console.log(analyticsData);
-  });
+  // onMount(async () => {
+  //   await getContacts();
+  // });
 </script>
 
-<div class="flex flex-col w-full h-full">
+<div class="flex flex-col w-full h-full pt-4 pl-24 pr-4">
   {#await (getContacts(), getTaps())}
     <AnalyticsPageSkeleton />
   {:then name}
-    <!-- <DropdownButton class="w-52" label="Download CSV" /> -->
     {#if isHasPermission}
-      <button
-        class="w-52 h-16 p-4 mb-4 border-2 border-neutral-700 rounded-lg self-end"
-        >Download CSV</button
-      >
       <div class="flex justify-between gap-4">
         {#each analyticsData as item}
           <div

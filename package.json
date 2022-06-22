@@ -13,7 +13,7 @@
   "devDependencies": {
     "@rgossiaux/svelte-headlessui": "^1.0.0-beta.12",
     "@supabase/supabase-js": "^1.30.7",
-    "@sveltejs/adapter-auto": "next",
+    "@sveltejs/adapter-netlify": "^1.0.0-next.26",
     "@sveltejs/kit": "next",
     "autoprefixer": "^10.4.4",
     "@types/vcards-js": "^2.10.2",
@@ -30,6 +30,7 @@
   "type": "module",
   "dependencies": {
     "@covve/easy-vcard": "^1.1.0",
+    "chart.js": "^3.8.0",
     "filepond": "^4.30.3",
     "filepond-plugin-file-validate-size": "^2.2.5",
     "filepond-plugin-file-validate-type": "^1.2.6",
@@ -39,6 +40,7 @@
     "filepond-plugin-image-resize": "^2.0.10",
     "filepond-plugin-image-transform": "^3.8.7",
     "js-cookie": "^3.0.1",
+    "svelte-csv": "^1.2.8",
     "svelte-filepond": "^0.2.0",
     "svelte-frappe-charts": "^1.9.1"
   }

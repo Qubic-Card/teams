@@ -65,7 +65,9 @@
   const modalHandler = () => (showModal = !showModal);
 </script>
 
-<div class="flex flex-col justify-between text-white gap-4 mb-8">
+<div
+  class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-24 pr-4"
+>
   <div class="flex flex-col">
     <QuickActionsModal {showModal} on:showModal={modalHandler} />
     <h1 class="text-2xl font-bold">Quick Actions</h1>

@@ -144,3 +144,27 @@ export const memberSearchMenu = [
   { name: 'Job', col: 'team_profile->>job' },
   { name: 'Company', col: 'team_profile->>company' },
 ];
+
+export const doughnutChartBgColor = [
+  '#1d9bf0',
+  '#0b84ed',
+  '#ff0000',
+  '#0a66c2',
+  '#00e676',
+  '#fe079a',
+  '#000000',
+  '#fd7d00',
+  '#f0b938',
+  '#069231',
+];
+
+export const analyticsChartConfig = {
+  responsive: true,
+  aspectRatio: 1,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+};

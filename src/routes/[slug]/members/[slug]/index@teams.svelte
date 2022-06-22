@@ -149,7 +149,7 @@
     const { error } = await supabase
       .from('team_members')
       .update({ team_profile: profileData }, { returning: 'minimal' })
-      .eq('uid', teamIdCookies);
+      .eq('uid', $page.params.slug);
     if (error) {
       toastFailed();
       console.log(error);
@@ -205,29 +205,29 @@
   $: console.log($page);
 </script>
 
-{#if $page.params.slug === $user?.id}
-  {#if isHasWriteProfilePermission === false}
+{#await getProfile()}
+  <ProfileEditorSkeleton />
+{:then}
+  {#if $page.params.slug === $user?.id}
+    {#if isHasWriteProfilePermission === false}
+      <div
+        class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${
+          isHasWriteProfilePermission ? 'hidden' : ''
+        }`}
+      >
+        You dont have permission to edit your profile
+      </div>
+    {/if}
+  {:else if isHasWriteMembersPermission === false}
     <div
       class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${
-        isHasWriteProfilePermission ? 'hidden' : ''
+        isHasWriteMembersPermission ? 'hidden' : ''
       }`}
     >
-      You dont have permission to edit your profile
+      You dont have permission to edit this member's profile
     </div>
   {/if}
-{:else if isHasWriteMembersPermission === false}
-  <div
-    class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${
-      isHasWriteMembersPermission ? 'hidden' : ''
-    }`}
-  >
-    You dont have permission to edit this member's profile
-  </div>
-{/if}
-<div class="min-h-screen flex justify-center">
-  {#await getProfile()}
-    <ProfileEditorSkeleton />
-  {:then}
+  <div class="min-h-screen flex justify-center pl-20">
     <div class="md:px-20 px-4 w-full bg-black">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
@@ -610,12 +610,12 @@
         </div>
       </div>
     </div>
-  {:catch}
-    <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-      Some error occurred. Please reload the page and try again.
-    </h1>
-  {/await}
-</div>
+  </div>
+{:catch}
+  <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+    Some error occurred. Please reload the page and try again.
+  </h1>
+{/await}
 
 <style global>
   @import 'filepond/dist/filepond.css';

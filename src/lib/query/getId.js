@@ -9,7 +9,6 @@ export const getMemberId = async (uid, teamId) => {
 
   if (error) console.log(error);
   if (data) {
-    // console.log('get member', data);
     return data[0].id;
   }
 };
@@ -22,7 +21,6 @@ export const getProfileId = async (uid) => {
 
   if (error) console.log(error);
   if (data) {
-    console.log(data);
     return data[0].id;
   }
 };
@@ -35,7 +33,18 @@ export const getTeamId = async (uid) => {
 
   if (error) console.log(error);
   if (data) {
-    console.log(data);
     return data[0].team_id;
+  }
+};
+
+export const getMembersId = async (teamId) => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('id')
+    .eq('team_id', teamId);
+
+  if (error) console.log(error);
+  if (data) {
+    return data;
   }
 };
