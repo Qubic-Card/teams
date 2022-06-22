@@ -111,7 +111,7 @@
 <AuthWrapper>
   <div class="relative min-h-screen">
     <div
-      class="fixed left-0 right-0 h-20 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
+      class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
         {#if team.name}
@@ -119,22 +119,22 @@
             <img
               src="/close-white.svg"
               alt="close"
-              class="cursor-pointer px-6 w-20 py-6 border-r border-neutral-700"
+              class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
               on:click={sidebarHandler}
             />
           {:else}
             <img
               src="/menu-white.svg"
               alt="humberger-menu"
-              class="cursor-pointer px-6 w-20 py-6 border-r border-neutral-700"
+              class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
               on:click={sidebarHandler}
             />
           {/if}
         {:else}
           <div
-            class="w-20 h-20 border-r border-neutral-800 flex justify-center items-center animate-pulse"
+            class="w-16 h-16 border-r-2 border-neutral-800 flex justify-center items-center animate-pulse"
           >
-            <div class="bg-neutral-800 w-12 h-12 rounded-lg" />
+            <div class="bg-neutral-800 w-10 h-12 rounded-lg" />
           </div>
         {/if}
         {#if team.name}
@@ -143,7 +143,7 @@
           </p>
         {:else}
           <div class="animate-pulse p-4">
-            <div class="text-xl w-60 h-12 bg-neutral-800 rounded-lg" />
+            <div class="text-xl w-60 h-10 bg-neutral-800 rounded-lg" />
           </div>
         {/if}
       </div>
@@ -152,7 +152,7 @@
           on:click={menuHandler}
           src={team.logo}
           alt="avatar"
-          class="rounded-full w-12 h-12 cursor-pointer"
+          class="rounded-full w-10 h-10 cursor-pointer"
         />
       {:else if team.logo === ''}
         <div
@@ -172,7 +172,7 @@
     </div>
 
     <div
-      class={`overflow-y-auto border-r border-neutral-700 bg-black w-20 fixed top-20 bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
+      class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed top-16 bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
         isSidebarOpened ? 'w-full md:w-72' : ''
       }`}
     >
@@ -197,11 +197,11 @@
               on:click={item.handler}
             >
               {#if isSidebarOpened}
-                <p>
+                <p class="text-sm">
                   {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                 </p>
               {/if}
-              <img src={item.urldefault} alt={item.title} class="w-6" />
+              <img src={item.urldefault} alt={item.title} class="w-5" />
             </div>
           {:else}
             <div class="animate-pulse gap-5">
@@ -216,7 +216,7 @@
       </nav>
     </div>
     <div
-      class="absolute top-20 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
+      class="absolute top-16 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
     >
       {#if isHasPermission}
         {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}

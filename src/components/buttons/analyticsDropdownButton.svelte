@@ -10,18 +10,25 @@
   const dispatch = createEventDispatcher();
 
   let selectedDays = '3 Days';
+  let showed = false;
 
   const select = (day) => {
     selectedDays = day;
     dispatch('select', day);
   };
 
+  const show = (newValue) => {
+    showed = newValue;
+  };
+
+  $: console.log(showed);
   let days = ['3 Days', '7 Days', '14 Days', '30 Days'];
 </script>
 
-<Menu as="div" class="mx-2 flex justify-end" let:open>
+<Menu as="div" class="mx-2 flex justify-end">
   <MenuButton
     class={`text-white border-2 border-neutral-700 flex justify-between items-center h-10 text-sm p-2 gap-2 rounded-md relative `}
+    on:click={() => show(true)}
   >
     {selectedDays ?? '3 Days'}
     <svg
@@ -36,14 +43,19 @@
     </svg>
   </MenuButton>
 
-  {#if open}
+  {#if showed}
     <MenuItems
       class={`${$$props.class} z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-40`}
     >
       {#each days as item}
         <div
-          class="p-2 hover:bg-black cursor-pointer"
-          on:click={() => select(item)}
+          class={`p-2 hover:bg-black cursor-pointer rounded-md ${
+            item === selectedDays ? 'bg-black' : ''
+          }`}
+          on:click={() => {
+            select(item);
+            show(false);
+          }}
         >
           {item}
         </div>

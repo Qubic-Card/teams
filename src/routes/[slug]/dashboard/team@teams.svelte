@@ -88,7 +88,7 @@
   const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getTeamConnectionsList = async () => {
-    console.log("getting connections")
+    console.log('getting connections');
     loading = true;
     let {
       data: connection_profile,
@@ -129,7 +129,7 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    console.log("getting logs")
+    console.log('getting logs');
     loading = true;
     try {
       let {
@@ -199,8 +199,7 @@
         console.log(teamLogs);
         // paginate(teamLogs);
         data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
-        if(chartctx)
-        chartctx.update()
+        if (chartctx) chartctx.update();
         loading = false;
       }
     } catch (error) {
@@ -209,20 +208,19 @@
     }
   };
 
-
   $: selectedDays, getTeamWeeklyLogsActivity(), getTeamConnectionsList();
 
   let chartctx;
   onMount(async () => {
     await getTeamWeeklyLogsActivity();
     await getTeamConnectionsList();
-    
+
     // console.log(data.datasets[0].data.every((item) => item === 0));
     // console.log(data.datasets[0].data.map((item) => item === 0));
     console.log(data.datasets[0].data);
     console.log(teamLogsChart);
     const ctx = chart.getContext('2d');
-    chartctx =  new Chart(ctx, config);
+    chartctx = new Chart(ctx, config);
   });
 </script>
 
@@ -260,7 +258,9 @@
       </div>
     {/each}
   </div>
-  <div class="flex justify-between items-center border border-neutral-700 bg-neutral-800 pr-5 rounded-lg">
+  <div
+    class="flex justify-between items-center border border-neutral-700 bg-neutral-800 pr-5 rounded-lg"
+  >
     <Menu>
       <MenuButton class="bg-neutral-100 text-black p-3 text-sm rounded-l-lg"
         >Most active member <span class="pl-12">&#x25BC;</span></MenuButton
@@ -279,10 +279,7 @@
       <div class="flex justify-between">
         <h1 class="text-2xl font-bold">Team Activity</h1>
         <!-- <button class="bg-blue-600 p-2 rounded-lg w-48">Download CSV</button> -->
-        <AnalyticsDropdownButton
-          data={teamLogsCsv}
-          on:select={selectDaysHandler}
-        />
+        <AnalyticsDropdownButton on:select={selectDaysHandler} />
       </div>
       {#each teamLogs as log}
         <div class="pl-5 mb-1">
@@ -296,7 +293,9 @@
                   {`${item.team_member.firstname}'s` + item.message.slice(4)}
                 </h1>
                 <p class="text-neutral-500">
-                  {new Date(item.created_at).getHours() + ':' + new Date(item.created_at).getMinutes()}
+                  {new Date(item.created_at).getHours() +
+                    ':' +
+                    new Date(item.created_at).getMinutes()}
                 </p>
               </div>
             {/each}
