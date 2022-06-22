@@ -70,14 +70,14 @@
 >
   <div class="flex flex-col">
     <QuickActionsModal {showModal} on:showModal={modalHandler} />
-    <h1 class="text-2xl font-bold">Quick Actions</h1>
+    <h1 class="text-lg font-bold">Quick Actions</h1>
     <div
-      class="snap-container snap-x mx-auto snap-mandatory h-24 lg:h-32 flex w-full overflow-x-auto mt-8 gap-2"
+      class="snap-container snap-x mx-auto snap-mandatory h-16 lg:h-12 flex w-full overflow-x-auto mt-2 gap-2"
     >
       {#each quickActions as item}
         <div
           on:click={item.handler}
-          class="flex justify-center items-center bg-neutral-800 p-4 rounded-lg snap-center text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer mb-3"
+          class="flex justify-center items-center px-4 bg-neutral-800 text-sm rounded-md border border-neutral-700 snap-center text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
         >
           {item.name}
         </div>
@@ -87,7 +87,7 @@
 
   <Analytics />
 
-  <div class="flex flex-col mt-4">
+  <div class="flex flex-col mt-2">
     <h1 class="text-2xl font-bold">Learn More</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-52 md:h-56 lg:h-80 flex w-full overflow-x-auto mt-8 gap-2"

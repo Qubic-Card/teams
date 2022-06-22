@@ -24,7 +24,7 @@
       loading = false;
       isSuccessful = true;
       // setTimeout(() => location.reload(), 4000);
-      setTimeout(() => goto('/select-teams'), 4000);
+      setTimeout(() => goto('/select-teams'), 1000);
     } catch (error) {
       toastFailed();
       loading = false;

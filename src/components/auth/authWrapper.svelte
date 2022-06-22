@@ -22,37 +22,32 @@
 
   const redirect = () => {
     if ($user && $page.url.pathname === '/') goto('/select-teams');
+    if (!$user) goto('/');
   };
 
-  const redirectToLogin = () => {
-    if (!$user && $page.url.pathname !== '/') goto('/');
-  };
-
+  
   $: if (browser) redirect();
-  $: if (browser) redirectToLogin();
-
+  
   supabase.auth.onAuthStateChange(async (event, session) => {
     // console.log('auth state change', event, session);
     if (event == 'SIGNED_IN') {
       // console.log('signed in');
       // roleMaps = await getRoleMaps($user?.id);
       // setUserData(roleMaps);
-      user.set(session.user);
+      $user = supabase.auth.user()
     }
     if (event == 'TOKEN_REFRESHED') {
-      user.set(session.user);
+      $user = supabase.auth.user()
     }
     if (event == 'PASSWORD_RECOVERY') {
-      user.set(null);
+      $user = null;
       await goto('/resetPassword' + '?reset=' + session.access_token, {
         noscroll: true,
       });
     }
     if (event == 'SIGNED_OUT') {
-      user.set(null);
+      $user = null;
       await goto('/', { noscroll: true });
-    } else {
-      user.set(null);
     }
   });
 </script>

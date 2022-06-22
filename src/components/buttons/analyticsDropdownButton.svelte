@@ -19,9 +19,9 @@
   let days = ['3 Days', '7 Days', '14 Days', '30 Days'];
 </script>
 
-<Menu as="div" class="mx-2 flex justify-end mb-2" let:open>
+<Menu as="div" class="mx-2 flex justify-end" let:open>
   <MenuButton
-    class={`text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative `}
+    class={`text-white border-2 border-neutral-700 flex justify-between items-center h-10 text-sm p-2 gap-2 rounded-md relative `}
   >
     {selectedDays ?? '3 Days'}
     <svg

@@ -96,7 +96,9 @@
   const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getConnectionsList = async () => {
+    console.log("user id:::",$user?.id)
     let id = await getMemberId($user?.id, teamId);
+    console.log("id::", id)
     loading = true;
     let {
       data: connection_profile,
@@ -122,8 +124,9 @@
         ).toUTCString()
       )
       .order('dateConnected', { ascending: false });
-
+    
     loading = false;
+    console.log(connection_profile)
     if (error_profile) console.log(error_profile);
     if (connection_profile) {
       connectionCount = count;
@@ -166,7 +169,7 @@
           ascending: false,
         });
       // .limit(maxLimit ?? 5);
-
+        console.log(error)
       if (logs) {
         let newArr = [];
         logs.map((log) => {
@@ -194,6 +197,8 @@
 
     logsChartData.labels = last7Days;
     logsChartData.datasets[0].data = count(last7Days, activity);
+    if(logChartCtx)
+    logChartCtx.update()
   };
 
   const connection = async () => {
@@ -201,79 +206,82 @@
 
     connectionsChartData.labels = last7Days;
     connectionsChartData.datasets[0].data = count(last7Days, dateConnected);
+    if(connectionChartCtx)
+    connectionChartCtx.update()
   };
 
   $: paginate(userLogs.slice(0, maxLimit));
 
+  let connectionChartCtx;
+  let logChartCtx;
   onMount(async () => {
     await connection();
     await activityHandler();
 
     const connectionsCtx = connectionsChart.getContext('2d');
-    new Chart(connectionsCtx, connectionsConfig);
+    connectionChartCtx = new Chart(connectionsCtx, connectionsConfig);
 
     const logsCtx = logsChart.getContext('2d');
-    new Chart(logsCtx, logsConfig);
+    logChartCtx = new Chart(logsCtx, logsConfig);
   });
 </script>
 
-<div class="h-auto flex justify-center mt-8">
+<div class="h-auto flex justify-center mt-2">
   <div class="w-full">
     <!-- {#await }
       <AnalyticsSkeleton />
     {:then} -->
     <AnalyticsDropdownButton
-      class="top-[385px]"
       on:select={selectDaysHandler}
     />
     <!-- <AnalyticsDropdownButton data={connectionsCsv} class="top-[385px]" /> -->
     <div class="flex flex-col lg:flex-row justify-between gap-2">
       <!-- <Chart element={connectionsChart} data={connectionsChartData} />
       <Chart element={logsChart} data={logsChartData} /> -->
-      <div class="flex flex-col w-full pt-4 lg:pt-0">
+      <div class="flex flex-col w-full">
         <div class="flex w-full justify-between">
-          <h1 class="text-2xl font-semibold">Weekly New Connections</h1>
+          <h1 class="text-lg font-semibold">New Connections</h1>
         </div>
         <div
-          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-4 outer"
+          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-2 outer"
         >
           <canvas bind:this={connectionsChart} />
         </div>
       </div>
       <div class="flex flex-col w-full pt-4 lg:pt-0">
         <div class="flex w-full justify-between">
-          <h1 class="text-2xl font-semibold">Weekly Activities</h1>
+          <h1 class="text-lg font-semibold">Activities</h1>
         </div>
         <div
-          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-4 outer"
+          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-2 outer"
         >
           <canvas bind:this={logsChart} />
         </div>
       </div>
     </div>
     <div
-      class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[150px] my-4 space-x-0 md:space-x-2"
+      class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[100px] my-2 space-x-0 md:space-x-2"
     >
       <div
-        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-8"
+        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-4"
       >
-        <p class="">New connections this week</p>
+        <p class="text-sm text-neutral-300">New connections</p>
         <p class="font-bold text-4xl">
           {connectionCount}
         </p>
       </div>
       <div
-        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-8"
+        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-4"
       >
-        <p class="">Your activity this week</p>
+        <p class="text-sm text-neutral-300">Your activity</p>
         <p class="font-bold text-4xl">
           {activityCount}
         </p>
       </div>
       <div
-        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-8"
+        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-4"
       >
-        <p class="">Unique People this week</p>
+        <p class="text-sm text-neutral-300">Unique People</p>
         <p class="font-bold text-4xl">
           {uniqueCount}
         </p>

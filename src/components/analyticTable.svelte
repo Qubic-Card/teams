@@ -18,7 +18,7 @@
   };
 </script>
 
-<div class="bg-neutral-800 rounded-lg border border-neutral-700 p-2">
+<div class="bg-neutral-800 rounded-lg border border-neutral-700">
   <table class="text-black w-full">
     <thead class="text-neutral-200 bg-black/60">
       <tr>
@@ -27,7 +27,7 @@
         <th class="text-left">Device</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="p-2">
       {#if loading}
         {#each currentPageRows as item}
           <TableSkeleton colLength={3} />

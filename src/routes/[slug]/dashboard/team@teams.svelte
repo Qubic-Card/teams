@@ -88,6 +88,7 @@
   const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getTeamConnectionsList = async () => {
+    console.log("getting connections")
     loading = true;
     let {
       data: connection_profile,
@@ -128,6 +129,7 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
+    console.log("getting logs")
     loading = true;
     try {
       let {
@@ -196,6 +198,9 @@
         console.log(teamLogsCsv);
         console.log(teamLogs);
         // paginate(teamLogs);
+        data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
+        if(chartctx)
+        chartctx.update()
         loading = false;
       }
     } catch (error) {
@@ -204,19 +209,20 @@
     }
   };
 
+
   $: selectedDays, getTeamWeeklyLogsActivity(), getTeamConnectionsList();
 
+  let chartctx;
   onMount(async () => {
-    await getTeamConnectionsList();
     await getTeamWeeklyLogsActivity();
-
-    data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
+    await getTeamConnectionsList();
+    
     // console.log(data.datasets[0].data.every((item) => item === 0));
     // console.log(data.datasets[0].data.map((item) => item === 0));
     console.log(data.datasets[0].data);
     console.log(teamLogsChart);
     const ctx = chart.getContext('2d');
-    new Chart(ctx, config);
+    chartctx =  new Chart(ctx, config);
   });
 </script>
 
@@ -224,12 +230,12 @@
   <div class="flex justify-between gap-4">
     {#each analyticsData as item}
       <div
-        class="flex flex-col justify-between w-full h-40 bg-neutral-800 rounded-lg p-6"
+        class="flex flex-col justify-between w-full h-32 bg-neutral-800 border border-neutral-700 rounded-lg p-6"
       >
         <div class="flex justify-between items-center">
-          <h1 class="text-3xl">{item.data} <span>{item.type}</span></h1>
+          <h1 class="text-xl">{item.data} <span>{item.type}</span></h1>
           <div
-            class="bg-blue-600 flex justify-center items-center w-12 h-full rounded-lg"
+            class="bg-blue-600 flex justify-center aspect-square items-center p-1 h-full rounded-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -247,20 +253,20 @@
             </svg>
           </div>
         </div>
-        <div class="flex justify-between items-center text-2xl">
+        <div class="flex justify-between items-center text-sm">
           <h2 class="text-neutral-400">in 7 days</h2>
           <p class="text-green-600">^ {item.percentage}%</p>
         </div>
       </div>
     {/each}
   </div>
-  <div class="flex justify-between items-center bg-neutral-800 pr-5 rounded-lg">
+  <div class="flex justify-between items-center border border-neutral-700 bg-neutral-800 pr-5 rounded-lg">
     <Menu>
-      <MenuButton class="bg-neutral-100 text-black p-5 rounded-l-lg"
+      <MenuButton class="bg-neutral-100 text-black p-3 text-sm rounded-l-lg"
         >Most active member <span class="pl-12">&#x25BC;</span></MenuButton
       >
       <MenuItems
-        class="mt-4 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-80"
+        class="mt-4 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-3 w-80"
       >
         <MenuItem class="p-2">Choose one</MenuItem>
       </MenuItems>
@@ -271,27 +277,26 @@
   <div class="flex gap-4">
     <div class="flex flex-col w-2/3 gap-4">
       <div class="flex justify-between">
-        <h1 class="text-2xl font-bold">Team performance</h1>
+        <h1 class="text-2xl font-bold">Team Activity</h1>
         <!-- <button class="bg-blue-600 p-2 rounded-lg w-48">Download CSV</button> -->
         <AnalyticsDropdownButton
           data={teamLogsCsv}
-          class="top-[400px]"
           on:select={selectDaysHandler}
         />
       </div>
       {#each teamLogs as log}
-        <div class="pl-5">
-          <h1 class="text-xl">
+        <div class="pl-5 mb-1">
+          <h1 class="text-sm font-bold text-neutral-500">
             {log.date}
           </h1>
           <div class="flex flex-col pl-7">
             {#each log.logs as item}
-              <div class="text-lg flex justify-between">
-                <h1 class="text-neutral-100">
+              <div class="text-sm flex justify-between">
+                <h1 class="text-white">
                   {`${item.team_member.firstname}'s` + item.message.slice(4)}
                 </h1>
-                <p class="text-neutral-400">
-                  {new Date(item.created_at).toDateString().slice(4)}
+                <p class="text-neutral-500">
+                  {new Date(item.created_at).getHours() + ':' + new Date(item.created_at).getMinutes()}
                 </p>
               </div>
             {/each}
