@@ -9,7 +9,7 @@
   let active = 0;
 
   $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
-  $: console.log(currentPageRows);
+  $: console.log(currentPageRows, isAlreadySeeMore);
   const setPage = (p) => {
     if (p >= 0 && p < totalPages.length) {
       page = p;
@@ -49,13 +49,13 @@
       {/if}
     </tbody>
   </table>
-  {#if !isAlreadySeeMore && currentPageRows.length !== 0 && currentPageRows.length >= 5}
+  {#if !isAlreadySeeMore && currentPageRows.length !== 0 && currentPageRows.length > 4}
     <button
       class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
       on:click>See more</button
     >
   {/if}
-  {#if totalPages.length > 0}
+  {#if totalPages.length === 0}
     {#if currentPageRows.length === 0 && !loading}
       <div class="text-center">
         <h1 class="text-xl my-4">No activity found</h1>

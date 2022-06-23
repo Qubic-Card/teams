@@ -8,32 +8,24 @@
   import { user, userData } from '@lib/stores/userStore';
   import AnalyticsPageSkeleton from '@comp/skeleton/analyticsPageSkeleton.svelte';
   import getDates from '@lib/utils/getDates';
+  import {
+    Tab,
+    TabGroup,
+    TabList,
+    TabPanel,
+    TabPanels,
+  } from '@rgossiaux/svelte-headlessui';
+  import Input from '@comp/input.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
+  let isTeamTab = false;
 
-  const analyticsData = [
-    { percentage: '20', data: 0, type: 'Active' },
-    {
-      percentage: '30',
-      data: 0,
-      type: 'Contacts',
-    },
-    {
-      percentage: '40',
-      data: 0,
-      type: 'Taps',
-    },
-  ];
+  let type = '';
+  let from = '';
+  let to = '';
+  let fileName = '';
 
-  const topics = [
-    'Cunsumer Behavior',
-    'Team Performance',
-    'Performa Penjualan',
-    'Performa Lapangan',
-    'Top Performer',
-    'Coming Soon',
-  ];
   let selectedTopic = null;
   let state = 'idle';
   let contactsCount = 0;
@@ -50,54 +42,59 @@
     today
   );
 
-  const getContacts = async () => {
-    const { data, error } = await supabase
-      .from('team_connection_acc')
-      .select(
-        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)'
-      )
-      .eq('team_id', teamId)
-      .gte('dateConnected', new Date(last7Days[0]).toUTCString());
-
-    if (error) console.log(error);
-    if (data) {
-      analyticsData[1].data = data.length;
-    }
-  };
-
-  const getTaps = async () => {
-    const { data, error, count } = await supabase
-      .from('team_logs')
-      .select('*', { count: 'estimated' })
-      .eq('team', teamId)
-      .gte('created_at', new Date(last7Days[0]).toUTCString());
-
-    if (error) console.log(error);
-    if (data) {
-      analyticsData[0].data = count;
-      analyticsData[2].data = data.length;
-    }
-  };
-
-  const getActiveMember = async () => {
-    const { data, error } = await supabase
-      .from('team_logs')
-      .select('*')
-      .eq('team', teamId);
-    // .eq('status', true);
-
-    if (error) console.log(error);
-    if (data) {
-      console.log(data);
-    }
-  };
-
   // onMount(async () => {
   //   await getContacts();
   // });
 </script>
 
-<div class="flex flex-col w-full h-full pt-4 pl-24 pr-4">
+<div class="flex flex-col w-full h-full pt-4 pl-216">
+  <TabGroup class="h-full">
+    <TabList
+      class="w-full flex justify-between pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
+    >
+      <div class="flex gap-8">
+        <Tab
+          on:click={() => {
+            isTeamTab = false;
+          }}
+          class={({ selected }) =>
+            selected
+              ? 'text-white font-bold border-b-2 border-white pb-2'
+              : 'text-white pb-2'}>Personal</Tab
+        >
+        <Tab
+          on:click={() => {
+            isTeamTab = true;
+          }}
+          class={({ selected }) =>
+            selected
+              ? 'text-white font-bold border-b-2 border-white pb-2'
+              : 'text-white pb-2'}>Team</Tab
+        >
+      </div>
+      <h1>0/5GB</h1>
+    </TabList>
+    <TabPanels class="h-full">
+      <TabPanel class="flex h-full">
+        <div
+          class="w-1/4 flex flex-col justify-between gap-4 border-r-2 border-neutral-700 h-full"
+        >
+          <div class="pl-20 pt-4 pr-4">
+            <Input placeholder="Type" title="Type" bind:value={type} />
+            <Input placeholder="From" title="From" bind:value={type} />
+            <Input placeholder="To" title="To" bind:value={type} />
+            <Input placeholder="Filename" title="Filename" bind:value={type} />
+          </div>
+          <button class="bg-blue-600 pl-20 p-3"> Create record -></button>
+        </div>
+        <div class="w-3/4 pt-4">afasfa</div>
+      </TabPanel>
+      <TabPanel>afasasvas</TabPanel>
+    </TabPanels>
+  </TabGroup>
+</div>
+
+<!-- <div class="flex flex-col w-full h-full pt-4 pl-24 pr-4">
   {#await (getContacts(), getTaps())}
     <AnalyticsPageSkeleton />
   {:then name}
@@ -168,4 +165,4 @@
       Some error occurred. Please reload the page and try again.
     </h1>
   {/await}
-</div>
+</div> -->

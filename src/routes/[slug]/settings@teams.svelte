@@ -68,7 +68,7 @@
     //   return data;
     // }
   };
-
+  $: console.log(roles);
   const clicked = (e) => (isClicked = e.detail);
 </script>
 
@@ -81,11 +81,18 @@
             class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4"
           >
             <h1 class="font-bold text-xl md:text-3xl">Billing</h1>
-            <button
-              class="p-4 w-full md:w-48 lg:w-56 bg-blue-600 text-white rounded-lg"
-              on:click={async () => await console.log('billing')}
-              >Tambah saldo</button
-            >
+            <div>
+              <button
+                class="p-4 w-auto bg-blue-600 text-white rounded-lg"
+                on:click={async () => await console.log('billing')}
+                >Change subscription</button
+              >
+              <button
+                class="p-4 w-auto bg-blue-600 text-white rounded-lg"
+                on:click={async () => await console.log('billing')}
+                >Tambah saldo</button
+              >
+            </div>
           </div>
           <p>Subscription valid hingga: 12 Feb 2023</p>
           <p>Saldo tersisa: 0</p>
@@ -111,7 +118,7 @@
           </div>
         </div>
       </div>
-      <div class="bg-zinc-700/70 p-4 w-1/4 rounded-lg text-xl lg:text-2xl">
+      <div class="bg-zinc-700/70 p-4 w-1/4 rounded-lg text-xl">
         <p class="mb-4">Atur subscription dalam billing</p>
       </div>
     </div>
@@ -122,7 +129,7 @@
           class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
         >
           <h1 class="font-bold text-xl md:text-3xl">Role Settings</h1>
-          <AddRoleModal />
+          <AddRoleModal {roles} />
         </div>
         {#await getTeamsRoleMapping()}
           <RoleSettingsSkeleton />
@@ -184,10 +191,15 @@
           </h1>
         {/await}
       </div>
-      <div class="bg-zinc-700/70 w-1/4 p-4 rounded-lg text-xl lg:text-2xl">
+      <div class="bg-zinc-700/70 w-1/4 p-4 rounded-lg text-xl">
         <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
         <p>Berikan permissions yang sesuai di setiap role.</p>
       </div>
+    </div>
+    <div class="flex flex-col bg-zinc-700/70 p-4 rounded-lg">
+      <h1 class="text-xl font-bold">Contact us</h1>
+      <a href="mailto:support@qubic.id">Email: support@qubic.id</a>
+      <a href="https://wa.me/628113087599">Whatsapp: +62 811 3087599</a>
     </div>
   </div>
 

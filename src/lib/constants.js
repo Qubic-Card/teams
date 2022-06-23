@@ -119,6 +119,10 @@ export const connectionsTable = [
     name: 'By',
     id: 'by',
   },
+  {
+    name: 'Action',
+    id: 'action',
+  },
 ];
 
 export const connectionsTableMobile = [

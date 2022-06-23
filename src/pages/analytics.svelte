@@ -81,7 +81,10 @@
   let connectionsCsv = {};
   let logsCsv = {};
   let selectedDays = '3 Days';
-
+  let oldSelectedDays = selectedDays;
+  if (oldSelectedDays != selectedDays) console.log('selectedDays changed');
+  let isSelectedDaysHasChanged = false;
+  $: console.log('isSelectedDaysHasChanged', isSelectedDaysHasChanged);
   const setLimit = (value) => {
     maxLimit = value;
     isAlreadySeeMore = true;
@@ -96,7 +99,10 @@
     totalPages = [...paginatedItems];
   };
 
-  const selectDaysHandler = (e) => (selectedDays = e.detail);
+  const selectDaysHandler = (e) => {
+    selectedDays = e.detail;
+    isSelectedDaysHasChanged = true;
+  };
 
   const getConnectionsList = async () => {
     let id = await getMemberId($user?.id, teamId);
@@ -213,6 +219,8 @@
     );
 
     if (logChartCtx) logChartCtx.update();
+    isSelectedDaysHasChanged = false;
+    isAlreadySeeMore = false;
   };
 
   const connection = async () => {
@@ -238,11 +246,15 @@
     );
 
     if (connectionChartCtx) connectionChartCtx.update();
+    isSelectedDaysHasChanged = false;
+    isAlreadySeeMore = false;
   };
 
   $: paginate(userLogs.slice(0, maxLimit));
   $: selectedDays, connection(), activityHandler();
+  $: if (isSelectedDaysHasChanged && maxLimit > 5) setLimit(5);
   $: console.log(loading);
+
   onMount(async () => {
     const connectionsCtx = connectionsChart.getContext('2d');
     connectionChartCtx = new Chart(connectionsCtx, connectionsConfig);

@@ -94,22 +94,13 @@
     }
   };
 
-  const searchProfileHandler = async () => {
+  const searchTeamHandler = async () => {
     loading = true;
-
-    let id;
-    let col;
-
-    tabs === 'all'
-      ? (id = isHasPermission ? teamId : await getMemberId($user?.id, teamId))
-      : (id = await getMemberId($user?.id, teamId));
-
-    tabs === 'all' ? (col = isHasPermission ? 'team_id' : 'by') : (col = 'by');
 
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq(col, id)
+      .eq('team_id', teamId)
       .ilike(
         selectedSearchMenu ? selectedSearchMenu.col : 'profileData->>firstname',
         `%${searchQuery}%`
@@ -118,11 +109,7 @@
     loading = false;
     if (error) console.log(error);
     if (data) {
-      tabs === 'all'
-        ? isHasPermission
-          ? (teamConnections = data)
-          : (userConnections = data)
-        : (userConnections = data);
+      teamConnections = data;
 
       data.length === 0
         ? (searchNotFoundMsg = 'No connection found.')
@@ -132,13 +119,40 @@
     }
   };
 
-  // $: searchQuery !== ''
-  //   ? (searchQuery, selectedSearchMenu, searchProfileHandler())
-  //   : (searchQuery, searchProfileHandler());
-  $: searchQuery, selectedSearchMenu, searchProfileHandler();
-  $: tabs;
-  $: console.log(userConnections);
-  $: console.log(teamConnections);
+  const searchPersonalHandler = async () => {
+    loading = true;
+    let id = await getMemberId($user?.id, teamId);
+
+    const { data, error } = await supabase
+      .from('team_connection_acc')
+      .select('*, by(*)')
+      .eq('by', id)
+      .ilike(
+        selectedSearchMenu ? selectedSearchMenu.col : 'profileData->>firstname',
+        `%${searchQuery}%`
+      );
+
+    loading = false;
+    if (error) console.log(error);
+    if (data) {
+      userConnections = data;
+
+      data.length === 0
+        ? (searchNotFoundMsg = 'No connection found.')
+        : (searchNotFoundMsg = '');
+
+      return data;
+    }
+  };
+
+  $: if (isHasPermission && tabs === 'all') {
+    searchQuery, selectedSearchMenu, searchTeamHandler();
+  } else if (isHasPermission && tabs === 'user') {
+    searchQuery, selectedSearchMenu, searchPersonalHandler();
+  } else {
+    searchQuery, selectedSearchMenu, searchPersonalHandler();
+  }
+
   const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
 </script>
 
@@ -149,32 +163,32 @@
       <ConnectionsSkeletion />
     {:then}
       <div
-        class="flex md:flex-row flex-col justify-between items-center mt-2 gap-4"
+        class="flex md:flex-row flex-col justify-between items-center mt-2 gap-4 border-b-2 border-neutral-700"
       >
-        <div
-          class="flex justify-between border-2 border-neutral-700 p-2 w-full md:w-64 text-white gap-1"
-        >
+        <div class="flex w-full md:w-48 text-white gap-1">
           <button
             class={`${
-              tabs === 'all' ? 'bg-neutral-800' : ''
-            } p-2 w-full md:w-1/3`}
+              tabs === 'all' ? 'font-bold border-b-2 border-white' : ''
+            } w-full md:w-1/2 h-16`}
             on:click={async () => {
               setTabs('all');
               searchQuery = '';
               await getTeamConnectionsList();
             }}
           >
-            All
+            Team
           </button>
           <button
-            class={`${tabs !== 'all' ? 'bg-neutral-800' : ''} p-2 w-full`}
+            class={`${
+              tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
+            } w-1/2 h-16`}
             on:click={async () => {
               setTabs('user');
               searchQuery = '';
               await getUserConnectionsList();
             }}
           >
-            My connections
+            Personal
           </button>
         </div>
         <Search
@@ -194,7 +208,7 @@
             <tr>
               {#if innerWidth > 640}
                 <ConnectionTableHead
-                  class="w-1/5"
+                  class="w-1/6"
                   data={connectionsTable}
                   on:sort={async (e) => {
                     asc = !asc;
@@ -268,7 +282,7 @@
             <tr>
               {#if innerWidth > 640}
                 <ConnectionTableHead
-                  class="w-1/5"
+                  class="w-1/6"
                   data={connectionsTable}
                   on:sort={async (e) => {
                     asc = !asc;

@@ -146,7 +146,7 @@
             Connect with Me
           </BorderButton>
           <ConnectModal
-            on:showModal={modalHandler}
+            {modalHandler}
             {showModal}
             {profileUid}
             {cardId}

@@ -1,12 +1,17 @@
 <script>
+  import DeleteModal from '@comp/modals/deleteModal.svelte';
   import ConnectionsModal from '@comp/modals/connectionsModal.svelte';
+  import { createEventDispatcher } from 'svelte';
+  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
   export let innerWidth;
   export let connection;
   export let i;
+  let showDeleteModal = false;
   let showModal = false;
 
   const modalHandler = () => (showModal = !showModal);
+  const modalHandlerr = () => (showDeleteModal = !showDeleteModal);
 </script>
 
 <tr
@@ -35,5 +40,22 @@
     {connection.by.team_profile.firstname ?? '-'}
     {connection.by.team_profile.lastname ?? '-'}
   </td>
+  <td class="flex-1 h-12 truncate pl-4 pr-4 flex justify-around items-center">
+    <img src="/edit-icon.svg" alt="" class="w-6 h-6 cursor-pointer" />
+    <DeleteModal {connection} />
+    <img
+      src="/download-icon.svg"
+      alt=""
+      class="w-6 h-6 cursor-pointer"
+      on:click={modalHandlerr}
+    />
+    <ModalWrapper
+      showModal={showDeleteModal}
+      title="Delete"
+      on:showModal={modalHandlerr}
+    >
+      <p>asfajfsn</p>
+    </ModalWrapper>
+  </td>
 </tr>
-<ConnectionsModal on:showModal={modalHandler} {showModal} {connection} />
+<ConnectionsModal {modalHandler} {showModal} {connection} />

@@ -12,6 +12,7 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import DropdownButton from '@comp/buttons/dropdownButton.svelte';
+  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
   let nickname = '';
   let commercialName = '';
@@ -117,128 +118,111 @@
 </script>
 
 <button class="cursor-pointer p-2" on:click={toggleModal}> + add team </button>
-{#if showModal}
+<ModalWrapper
+  title="Add Team"
+  on:showModal={toggleModal}
+  {showModal}
+  class="w-1/2"
+>
   <div
-    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
+    class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-6"
   >
-    <div class="relative w-1/2 my-6 mx-auto md:max-w-3xl max-w-md">
-      <!--content-->
-      <div
-        class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-900 outline-none focus:outline-none"
-      >
-        <!--header-->
-        <div class="p-5 border-b border-solid rounded-t">
-          <div class="flex w-full justify-between items-center">
-            <h3 class="text-xl font-semibold">Register a new team</h3>
-            <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
-              x
-            </p>
-          </div>
-        </div>
-        <!--body-->
-        <div
-          class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-6"
-        >
-          <div class="flex w-full border-b-2 border-neutral-700 pb-4 gap-2">
-            <Input
-              placeholder="Commercial Name"
-              title="Commercial Name"
-              bind:value={nickname}
-              class="w-full"
-              isEmptyChecking={true}
-            />
-            <Input
-              placeholder="Nickname"
-              title="Nickname"
-              bind:value={commercialName}
-              class="w-full"
-              isEmptyChecking={true}
-            />
-          </div>
-          <div class="flex w-full gap-2">
-            <Menu as="div" class="w-full mx-2" let:open>
-              <DropdownButton
-                class="w-full"
-                label={selectedMemberType !== ''
-                  ? selectedMemberType + ' members'
-                  : 'Please select a member type'}
-              />
-              {#if open}
-                <div>
-                  <MenuItems
-                    class="top-[265px] left-6 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
-                  >
-                    {#each memberType as item}
-                      <MenuItem
-                        on:click={() => selectMemberType(item)}
-                        class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                      >
-                        {item} members
-                      </MenuItem>
-                    {/each}
-                  </MenuItems>
-                </div>
-              {/if}
-            </Menu>
-            <Menu as="div" class="w-full mx-2" let:open>
-              <DropdownButton
-                class="w-full"
-                label={selectedTimeType !== ''
-                  ? selectedTimeType + ' tahun'
-                  : 'Please select a time type'}
-              />
-              {#if open}
-                <div>
-                  <MenuItems
-                    class="top-[265px] right- z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
-                  >
-                    {#each timeType as item}
-                      <MenuItem
-                        on:click={() => selectTimeType(item)}
-                        class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                      >
-                        {item} tahun
-                      </MenuItem>
-                    {/each}
-                  </MenuItems>
-                </div>
-              {/if}
-            </Menu>
-          </div>
-          <div class="flex w-full border-b-2 border-neutral-700 pb-4 gap-2">
-            <Input
-              placeholder="Discount Code"
-              title="Discount Code"
-              bind:value={discCode}
-              class="w-full"
-              isEmptyChecking={true}
-            />
-            <Input
-              placeholder=""
-              title=""
-              bind:value={disc}
-              class="w-full justify-end"
-              disabled={true}
-            />
-          </div>
-          <button
-            on:click={async () => {
-              nickname === ''
-                ? toastFailed('Team name is required')
-                : await addTeam();
-            }}
-            disabled={nickname === '' || commercialName === '' ? true : false}
-            class="flex justify-center items-center p-3 w-full bg-neutral-700 hover:bg-neutral-800 hover:border hover:border-neutral-500 disabled:opacity-30"
-          >
-            {#if loading}
-              <Spinner class="w-7 h-7" />
-            {:else}
-              Add
-            {/if}
-          </button>
-        </div>
-      </div>
+    <div class="flex w-full border-b-2 border-neutral-700 pb-4 gap-2">
+      <Input
+        placeholder="Commercial Name"
+        title="Commercial Name"
+        bind:value={nickname}
+        class="w-full"
+        isEmptyChecking={true}
+      />
+      <Input
+        placeholder="Nickname"
+        title="Nickname"
+        bind:value={commercialName}
+        class="w-full"
+        isEmptyChecking={true}
+      />
     </div>
+    <div class="flex w-full gap-2">
+      <Menu as="div" class="w-full mx-2" let:open>
+        <DropdownButton
+          class="w-full"
+          label={selectedMemberType !== ''
+            ? selectedMemberType + ' members'
+            : 'Please select a member type'}
+        />
+        {#if open}
+          <div>
+            <MenuItems
+              class="top-[265px] left-6 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
+            >
+              {#each memberType as item}
+                <MenuItem
+                  on:click={() => selectMemberType(item)}
+                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                >
+                  {item} members
+                </MenuItem>
+              {/each}
+            </MenuItems>
+          </div>
+        {/if}
+      </Menu>
+      <Menu as="div" class="w-full mx-2" let:open>
+        <DropdownButton
+          class="w-full"
+          label={selectedTimeType !== ''
+            ? selectedTimeType + ' tahun'
+            : 'Please select a time type'}
+        />
+        {#if open}
+          <div>
+            <MenuItems
+              class="top-[265px] right- z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-[45%]"
+            >
+              {#each timeType as item}
+                <MenuItem
+                  on:click={() => selectTimeType(item)}
+                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                >
+                  {item} tahun
+                </MenuItem>
+              {/each}
+            </MenuItems>
+          </div>
+        {/if}
+      </Menu>
+    </div>
+    <div class="flex w-full border-b-2 border-neutral-700 pb-4 gap-2">
+      <Input
+        placeholder="Discount Code"
+        title="Discount Code"
+        bind:value={discCode}
+        class="w-full"
+        isEmptyChecking={true}
+      />
+      <Input
+        placeholder=""
+        title=""
+        bind:value={disc}
+        class="w-full justify-end"
+        disabled={true}
+      />
+    </div>
+    <button
+      on:click={async () => {
+        nickname === ''
+          ? toastFailed('Team name is required')
+          : await addTeam();
+      }}
+      disabled={nickname === '' || commercialName === '' ? true : false}
+      class="flex justify-center items-center p-3 w-full bg-neutral-700 hover:bg-neutral-800 hover:border hover:border-neutral-500 disabled:opacity-30"
+    >
+      {#if loading}
+        <Spinner class="w-7 h-7" />
+      {:else}
+        Add
+      {/if}
+    </button>
   </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
-{/if}
+</ModalWrapper>

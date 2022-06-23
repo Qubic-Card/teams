@@ -1,4 +1,5 @@
 <script>
+  import { fade } from 'svelte/transition';
   import Cookies from 'js-cookie';
   import { onMount } from 'svelte';
   import Chart from 'chart.js/auto/auto.js';
@@ -218,7 +219,7 @@
     // console.log(data.datasets[0].data.every((item) => item === 0));
     // console.log(data.datasets[0].data.map((item) => item === 0));
     console.log(data.datasets[0].data);
-    console.log(teamLogsChart);
+    console.log(teamLogs);
     const ctx = chart.getContext('2d');
     chartctx = new Chart(ctx, config);
   });
@@ -252,7 +253,7 @@
           </div>
         </div>
         <div class="flex justify-between items-center text-sm">
-          <h2 class="text-neutral-400">in 7 days</h2>
+          <h2 class="text-neutral-400">{selectedDays}</h2>
           <p class="text-green-600">^ {item.percentage}%</p>
         </div>
       </div>
@@ -281,37 +282,56 @@
         <!-- <button class="bg-blue-600 p-2 rounded-lg w-48">Download CSV</button> -->
         <AnalyticsDropdownButton on:select={selectDaysHandler} />
       </div>
-      {#each teamLogs as log}
-        <div class="pl-5 mb-1">
-          <h1 class="text-sm font-bold text-neutral-500">
-            {log.date}
-          </h1>
-          <div class="flex flex-col pl-7">
-            {#each log.logs as item}
-              <div class="text-sm flex justify-between">
-                <h1 class="text-white">
-                  {`${item.team_member.firstname}'s` + item.message.slice(4)}
-                </h1>
-                <p class="text-neutral-500">
-                  {new Date(item.created_at).getHours() +
-                    ':' +
-                    new Date(item.created_at).getMinutes()}
-                </p>
+      {#if teamLogs}
+        {#if teamLogs.length > 0}
+          {#each teamLogs as log}
+            <div class="pl-5 mb-1" in:fade|local>
+              <h1 class="text-sm font-bold text-neutral-500">
+                {log.date}
+              </h1>
+              <div class="flex flex-col pl-7">
+                {#each log.logs as item}
+                  <div class="text-sm flex justify-between">
+                    <h1 class="text-white">
+                      {`${item.team_member.firstname}'s` +
+                        item.message.slice(4)}
+                    </h1>
+                    <p class="text-neutral-500">
+                      {new Date(item.created_at).getHours() +
+                        ':' +
+                        new Date(item.created_at).getMinutes()}
+                    </p>
+                  </div>
+                {/each}
               </div>
-            {/each}
+            </div>
+          {/each}
+        {:else}
+          <div class="flex justify-center" in:fade|local>
+            <h1 class="text-sm font-bold text-white">No logs</h1>
           </div>
-        </div>
-      {/each}
+        {/if}
+      {/if}
     </div>
+    {#if data.datasets[0].data.every((item) => item === 0)}
+      <div
+        in:fade|local
+        class="w-1/3 h-[500px] flex justify-center items-center bg-neutral-800 p-4"
+      >
+        <h1 class="text-2xl font-bold text-center">No data to display</h1>
+      </div>
+    {/if}
     <div
-      class="flex flex-col justify-around w-1/3 h-[500px] px-8 py-16 lg:py-10 bg-neutral-800 rounded-lg"
+      class={`${
+        data.datasets[0].data.every((item) => item === 0) ? 'hidden' : 'flex'
+      } flex-col justify-around w-1/3 h-[500px] px-8 py-16 lg:py-10 bg-neutral-800 rounded-lg`}
     >
       <canvas bind:this={chart} />
       <!-- <AnalyticsDropdownButton data={teamLogsCsv} class="top-[385px]" /> -->
 
       <!-- <button class="bg-blue-600 p-2 rounded-lg min-w-1/3 self-end mt-2 text-md"
-        >Download CSV</button
-      > -->
+          >Download CSV</button
+        > -->
     </div>
   </div>
 </div>

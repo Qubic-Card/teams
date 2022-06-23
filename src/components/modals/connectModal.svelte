@@ -6,11 +6,14 @@
   import Input from '@comp/input.svelte';
   import Spinner from '@comp/loading/spinner.svelte';
   import { log } from '@lib/logger/logger';
+  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
-  export let showModal;
   export let profileUid;
   export let cardId;
   export let data;
+  export let showModal;
+  export let connection;
+  export let modalHandler;
 
   let profileData = data;
   let firstName = '';
@@ -160,95 +163,71 @@
   };
 </script>
 
-{#if showModal}
-  <div
-    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
-  >
-    <div
-      class="relative w-full lg:w-1/2 my-6 mx-auto h-auto md:max-w-3xl max-w-md pt-2 md:mt-6 lg:mt-0 px-2 md:px-6 lg:px-0"
-    >
-      <!--content-->
-      <div
-        class="border-0 shadow-lg relative flex flex-col w-full rounded-lg bg-white outline-none focus:outline-none"
-      >
-        <!--header-->
-        <div class="border-b border-solid rounded-t">
-          <div class="flex w-full justify-between items-center">
-            <div class="flex flex-col w-full">
-              <p
-                on:click={toggleModal}
-                class="cursor-pointer text-3xl self-end pr-4 text-black"
-              >
-                x
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-col p-8 text-black">
-          {#if $user}
-            <h1 class={'text-md lg:text-xl text-gray-400 font-bold'}>
-              Halo, {$user.email}!
-            </h1>
-          {:else}
-            <Input
-              placeholder="First Name"
-              title="First Name"
-              bind:value={firstName}
-              isEmptyChecking={true}
-            />
-            <Input
-              placeholder="Last Name"
-              title="Last Name"
-              bind:value={lastName}
-              isEmptyChecking={true}
-            />
-            <Input
-              placeholder="Email"
-              title="Email"
-              bind:value={email}
-              isEmailInput={true}
-              isEmptyChecking={true}
-            />
-            <Input
-              placeholder="Phone"
-              title="Phone"
-              bind:value={phone}
-              isEmptyChecking={true}
-              isPhoneInput={true}
-            />
-          {/if}
-          <Input placeholder="Link (Optional)" title="Link" bind:value={link} />
-          <div class="mt-1">
-            <h1 class="text-gray-400">About me</h1>
-            <textarea
-              bind:value={message}
-              name="aboutme"
-              id="aboutme"
-              maxlength="50"
-              cols="15"
-              rows="5"
-              placeholder="About me (Optional)"
-              class="h-24 w-full text-black bg-neutral-100 rounded-md my-2 p-2"
-            />
-          </div>
-          {#if loading}
-            <button class="p-3 bg-black text-white mt-2 flex justify-center">
-              <Spinner class="h-5 w-5 pr-2 border-white mr-4" />
-              <p>Loading...</p>
-            </button>
-          {:else}
-            <button
-              class={'p-3 bg-black text-white mt-2 hover:font-bold transition-all duration-500'}
-              on:click={submitHandler}
-            >
-              Connect With Me
-            </button>
-          {/if}
-        </div>
-      </div>
+<ModalWrapper
+  title="Connect with me"
+  on:showModal={modalHandler}
+  {showModal}
+  class="w-1/2"
+>
+  <div class="flex flex-col p-8 text-white">
+    {#if $user}
+      <h1 class={'text-md lg:text-xl text-white font-bold'}>
+        Halo, {$user.email}!
+      </h1>
+    {:else}
+      <Input
+        placeholder="First Name"
+        title="First Name"
+        bind:value={firstName}
+        isEmptyChecking={true}
+      />
+      <Input
+        placeholder="Last Name"
+        title="Last Name"
+        bind:value={lastName}
+        isEmptyChecking={true}
+      />
+      <Input
+        placeholder="Email"
+        title="Email"
+        bind:value={email}
+        isEmailInput={true}
+        isEmptyChecking={true}
+      />
+      <Input
+        placeholder="Phone"
+        title="Phone"
+        bind:value={phone}
+        isEmptyChecking={true}
+        isPhoneInput={true}
+      />
+    {/if}
+    <Input placeholder="Link (Optional)" title="Link" bind:value={link} />
+    <div class="mt-1">
+      <h1 class="text-gray-400">About me</h1>
+      <textarea
+        bind:value={message}
+        name="aboutme"
+        id="aboutme"
+        maxlength="50"
+        cols="15"
+        rows="5"
+        placeholder="About me (Optional)"
+        class="h-24 w-full text-white bg-neutral-700 rounded-md my-2 p-2"
+      />
     </div>
+    {#if loading}
+      <button class="p-3 bg-black text-white mt-2 flex justify-center">
+        <Spinner class="h-5 w-5 pr-2 border-white mr-4" />
+        <p>Loading...</p>
+      </button>
+    {:else}
+      <button
+        class={'p-3 bg-black text-white mt-2 hover:font-bold transition-all duration-500'}
+        on:click={submitHandler}
+      >
+        Connect With Me
+      </button>
+    {/if}
   </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
-{/if}
-
-<!-- disabled={alreadyConnectedMsg !== '' ? false : false} -->
+</ModalWrapper>
