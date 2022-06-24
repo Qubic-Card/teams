@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  export let title, showModal, isOverflowY;
+  export let title, showModal;
 
   const dispatch = createEventDispatcher();
 

@@ -9,7 +9,7 @@
   let active = 0;
 
   $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
-  $: console.log(currentPageRows, isAlreadySeeMore);
+
   const setPage = (p) => {
     if (p >= 0 && p < totalPages.length) {
       page = p;

@@ -1,6 +1,6 @@
 <script>
   import supabase from '@lib/db.js';
-  import AnalyticTable from '@comp/analyticTable.svelte';
+  import AnalyticTable from '@comp/tables/analyticTable.svelte';
   import { user, userData } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getMemberId } from '@lib/query/getId';
@@ -81,10 +81,8 @@
   let connectionsCsv = {};
   let logsCsv = {};
   let selectedDays = '3 Days';
-  let oldSelectedDays = selectedDays;
-  if (oldSelectedDays != selectedDays) console.log('selectedDays changed');
   let isSelectedDaysHasChanged = false;
-  $: console.log('isSelectedDaysHasChanged', isSelectedDaysHasChanged);
+
   const setLimit = (value) => {
     maxLimit = value;
     isAlreadySeeMore = true;

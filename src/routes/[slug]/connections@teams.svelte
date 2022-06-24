@@ -1,7 +1,7 @@
 <script>
   import supabase from '@lib/db';
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
-  import ConnectionTableBody from '@comp/connectionTableBody.svelte';
+  import ConnectionTableBody from '@comp/tables/connectionTableBody.svelte';
   import { user, userData } from '@lib/stores/userStore';
   import { getMemberId } from '@lib/query/getId';
   import Cookies from 'js-cookie';
@@ -11,7 +11,7 @@
     connectionSearchMenu,
   } from '@lib/constants';
   import Search from '@comp/search.svelte';
-  import ConnectionTableHead from '@comp/connectionTableHead.svelte';
+  import TableHead from '@comp/tables/tableHead.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
   let innerWidth;
@@ -207,7 +207,7 @@
           <thead class="text-left text-neutral-400 bg-black/60">
             <tr>
               {#if innerWidth > 640}
-                <ConnectionTableHead
+                <TableHead
                   class="w-1/6"
                   data={connectionsTable}
                   on:sort={async (e) => {
@@ -216,7 +216,7 @@
                   }}
                 />
               {:else}
-                <ConnectionTableHead
+                <TableHead
                   class="w-1/4"
                   data={connectionsTableMobile}
                   on:sort={async (e) => {
@@ -281,7 +281,7 @@
           <thead class="text-left text-neutral-400 bg-black/70">
             <tr>
               {#if innerWidth > 640}
-                <ConnectionTableHead
+                <TableHead
                   class="w-1/6"
                   data={connectionsTable}
                   on:sort={async (e) => {
@@ -290,7 +290,7 @@
                   }}
                 />
               {:else}
-                <ConnectionTableHead
+                <TableHead
                   class="w-1/4"
                   data={connectionsTable}
                   on:sort={async (e) => {

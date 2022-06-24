@@ -2,7 +2,7 @@
   import supabase from '@lib/db';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
-  export let connection;
+  export let data;
 
   let showModal = false;
   let loading = false;
@@ -12,9 +12,8 @@
     //   .from('team_connection_acc')
     //   .delete()
     //   .match({ id: 666 });
-    console.log(connection);
+    console.log(data);
   };
-
   const toggleModal = () => (showModal = !showModal);
 </script>
 
@@ -35,8 +34,8 @@
   >
     <h1 class="text-xl text-white font-bold text-center">
       Are you sure you want to delete <br />
-      {connection.profileData.firstname}
-      {connection.profileData.lastname} from your connection ?
+      {data.profileData?.firstname ?? data?.filename}
+      {data.profileData?.lastname ?? ''} ?
     </h1>
     <p class="text-sm text-neutral-100 font-semibold">
       This action cannot be undone.

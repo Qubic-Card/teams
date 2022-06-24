@@ -12,6 +12,7 @@
   import { getTeamId } from '@lib/query/getId';
 
   import getTeamData from '@lib/query/getTeamData';
+  import { sidebarItems } from '@lib/constants';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -37,61 +38,10 @@
     }
   });
 
-  // $: console.log($page);
-  // $: console.log($userData);
-  // $: console.log(isHasPermission);
-  // $: isHasPermission;
-  let sidebarItems = [
-    {
-      title: 'dashboard',
-      routeId: '[slug]/dashboard@teams',
-      urldefault:
-        'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
-      handler: () => {
-        goto(`/${team?.id}/dashboard`);
-        isSidebarOpened && sidebarHandler();
-      },
-    },
-    {
-      title: 'connections',
-      routeId: '[slug]/connections@teams',
-      urldefault:
-        'https://img.icons8.com/external-icongeek26-outline-icongeek26/64/ffffff/external-connection-data-analytics-icongeek26-outline-icongeek26.png',
-      handler: () => {
-        goto(`/${team?.id}/connections`);
-        isSidebarOpened && sidebarHandler();
-      },
-    },
-    {
-      title: 'records',
-      routeId: '[slug]/records@teams',
-      urldefault: 'https://img.icons8.com/windows/96/ffffff/area-chart.png',
-      handler: () => {
-        goto(`/${team?.id}/records`);
-        isSidebarOpened && sidebarHandler();
-      },
-    },
-    {
-      title: 'members',
-      routeId: '[slug]/members@teams',
-      urldefault:
-        'https://img.icons8.com/ios/100/ffffff/user-group-man-man.png',
-      handler: () => {
-        goto(`/${team?.id}/members`);
-        isSidebarOpened && sidebarHandler();
-      },
-    },
-    {
-      title: 'settings',
-      routeId: '[slug]/settings@teams',
-      urldefault:
-        'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
-      handler: () => {
-        goto(`/${team?.id}/settings`);
-        isSidebarOpened && sidebarHandler();
-      },
-    },
-  ];
+  const handler = (id, title) => {
+    goto(`/${id}/${title}`);
+    isSidebarOpened && sidebarHandler();
+  };
 </script>
 
 <svelte:head>
@@ -184,7 +134,7 @@
                   ? 'bg-neutral-900'
                   : ''
               }`}
-              on:click={item.handler}
+              on:click={() => handler(team?.id, item.title)}
             >
               {#if isSidebarOpened}
                 <p class="text-sm">

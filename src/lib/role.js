@@ -34,6 +34,11 @@ const roleMapping = [
     desc: 'Perbolehkan user untuk mengedit profile',
     name: 'allow_write_profile',
   },
+  {
+    id: 7,
+    desc: 'Perbolehkan user untuk membuat team records',
+    name: 'allow_write_records',
+  },
 ];
 
 export default roleMapping;

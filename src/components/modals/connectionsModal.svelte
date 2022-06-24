@@ -11,7 +11,12 @@
   export let modalHandler;
 </script>
 
-<ModalWrapper on:showModal={modalHandler} {showModal} class="w-1/2">
+<ModalWrapper
+  on:showModal={modalHandler}
+  {showModal}
+  class="w-1/2"
+  title="Connection profile"
+>
   <div class="flex w-full justify-between items-center text-white">
     <div class="flex flex-col w-full">
       <div class="flex flex-col lg:flex-row items-center lg:pl-24 pb-4">

@@ -13,6 +13,8 @@
     isPhoneValid,
     isNumber,
     numberRegex,
+    filenameValidator,
+    isFilenameValid,
   } from '../lib/validation.js';
   import { fade } from 'svelte/transition';
 
@@ -27,6 +29,8 @@
   export let isPhoneInput = false;
   export let isEmptyChecking = false;
   export let isTwitterInput = false;
+  export let isFilenameInput = false;
+
   let isWhatsappInvalid = false;
 
   const whatsappValidator = () => {
@@ -51,6 +55,7 @@
   $: value && isInstagramInput && withAtValidator(value, 'ig');
   $: value && isTiktokInput && withAtValidator(value, 'tiktok');
   $: value && isTwitterInput && withAtValidator(value, 'twitter');
+  $: value && isFilenameInput && filenameValidator(value);
   $: value && isPhoneInput;
 </script>
 
@@ -100,5 +105,8 @@
   {/if}
   {#if isNumber}
     <p class="text-red-500">Invalid input. Please enter a number.</p>
+  {/if}
+  {#if isFilenameInput && !isFilenameValid}
+    <p class="text-red-500">Invalid filename input</p>
   {/if}
 </div>
