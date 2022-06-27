@@ -13,7 +13,6 @@
   let teamId = Cookies.get('qubicTeamId');
 
   let members = [];
-  let teamCard = [];
   let ownProfile = [];
   let isHasPermission = false;
   let searchQuery = '';
@@ -24,10 +23,7 @@
   let selectedSearchMenu = null;
   let roles = [];
 
-  const selectMenu = (menu) => {
-    selectedSearchMenu = menu.detail;
-    console.log(menu);
-  };
+  const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
 
   const getTeamMembers = async () => {
     // let teamId = await getTeamId($user?.id);
@@ -43,21 +39,6 @@
     }
   };
 
-  const getTeamCardCon = async () => {
-    // let teamId = await getTeamId($user?.id);
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .select('id, card_id(*), team_member_id(*), status');
-    // .eq('team_id', teamId); ini belum ada column team_id di team_cardcon
-
-    if (error) console.log(error);
-
-    if (data) {
-      teamCard = data;
-      // console.log(data);
-    }
-  };
-  // $: console.log(getTeamCardCon());
   const searchMemberHandler = async () => {
     // let teamId = await getTeamId($user?.id);
     loading = true;
@@ -86,7 +67,6 @@
   };
 
   $: {
-    console.log(teamCard);
     $userData?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
@@ -102,7 +82,7 @@
 
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-4 pl-24 pr-4">
-  {#await (getTeamMembers(), getTeamCardCon())}
+  {#await getTeamMembers()}
     <MemberSkeleton />
   {:then}
     <div
@@ -124,21 +104,7 @@
         innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
       }`}
     >
-      {#each teamCard as cardData, i}
-        <MemberCard
-          member={cardData.team_member_id}
-          {isHasPermission}
-          id={cardData.team_member_id?.id}
-          index={i}
-          {members}
-          memberUid={cardData.team_member_id?.uid}
-          {roles}
-          card={cardData?.card_id}
-          status={cardData?.status}
-          cardId={cardData?.id}
-        />
-      {/each}
-      <!-- {#each members as member, i}
+      {#each members as member, i}
         {#if isHasPermission === false && member.uid === ownProfile.uid}
           <MemberCard
             member={ownProfile}
@@ -160,7 +126,7 @@
             {roles}
           />
         {/if}
-      {/each} -->
+      {/each}
     </div>
     {#if searchNotFoundMsg !== ''}
       <div class="text-2xl font-bold text-white text-center w-full mt-8">

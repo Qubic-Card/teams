@@ -85,6 +85,7 @@
     } else if (!isHasWriteTeamPermission && isTeamTab) {
       message = "You dont have permission to edit this team's profile";
     }
+    console.log(message);
   }
 </script>
 

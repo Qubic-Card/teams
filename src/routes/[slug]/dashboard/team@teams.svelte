@@ -234,7 +234,7 @@
         <div class="flex justify-between items-center">
           <h1 class="text-xl">{item.data} <span>{item.type}</span></h1>
           <div
-            class="bg-blue-600 flex justify-center aspect-square items-center p-1 h-full rounded-lg"
+            class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -260,10 +260,11 @@
     {/each}
   </div>
   <div
-    class="flex justify-between items-center border border-neutral-700 bg-neutral-800 pr-5 rounded-lg"
+    class="flex justify-between items-center border border-neutral-700 bg-neutral-800 pr-5 rounded-lg h-12"
   >
     <Menu>
-      <MenuButton class="bg-neutral-100 text-black p-3 text-sm rounded-l-lg"
+      <MenuButton
+        class="bg-neutral-100 text-black p-3 text-sm rounded-l-lg hidden"
         >Most active member <span class="pl-12">&#x25BC;</span></MenuButton
       >
       <MenuItems
@@ -273,7 +274,7 @@
       </MenuItems>
     </Menu>
 
-    <h1>dsafasd</h1>
+    <h1 class="hidden">dsafasd</h1>
   </div>
   <div class="flex gap-4">
     <div class="flex flex-col w-2/3 gap-4">
@@ -291,7 +292,9 @@
               </h1>
               <div class="flex flex-col pl-7">
                 {#each log.logs as item}
-                  <div class="text-sm flex justify-between">
+                  <div
+                    class="text-sm flex justify-between hover:border hover:border-neutral-700 hover:p-1"
+                  >
                     <h1 class="text-white">
                       {`${item.team_member.firstname}'s` +
                         item.message.slice(4)}

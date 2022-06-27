@@ -6,6 +6,9 @@
   const dispatch = createEventDispatcher();
 
   $: setNewRole(checked);
+  $: if (checked.includes('allow_write_members', 0)) {
+    checked = [...checked, 'allow_write_profile'];
+  }
 </script>
 
 {#each checkboxes as checkbox}
@@ -20,10 +23,14 @@
         >
           <input
             type="checkbox"
-            class="w-7 h-7 cursor-pointer"
+            class="w-7 h-7 cursor-pointer disabled:cursor-default"
             bind:group={checked}
             value={checkbox.name}
             on:change={() => dispatch('change', checked)}
+            disabled={checkbox.name === 'allow_write_profile' &&
+            checked.includes('allow_write_members', 0)
+              ? true
+              : false}
           />
           <p class="ml-4 w-72">
             {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}

@@ -74,7 +74,7 @@
 
 <div class="flex justify-center pt-4 pl-24 pr-4">
   <div class="flex flex-col w-full gap-4">
-    <div class="flex gap-4">
+    <div class="gap-4 hidden">
       <div class="bg-zinc-700/70 rounded-lg p-4 w-3/4">
         <div class="flex flex-col my-4">
           <div
