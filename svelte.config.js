@@ -24,7 +24,7 @@ const config = {
         },
       },
       optimizeDeps: {
-        include: ['papaparse', 'just-throttle', 'dayjs'],
+        include: ['papaparse'],
       },
     },
   },

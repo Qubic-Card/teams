@@ -9,18 +9,18 @@
   import 'flatpickr/dist/themes/dark.css';
   import { last30Days } from '@lib/utils/getDates';
 
-  let value;
-  let formattedValue;
+  let fromDatevalue = new Date();
+  let toDatevalue = new Date();
 
   const options = {
-    element: '#my-picker',
+    // element: '#my-picker',
     enableTime: false,
     onChange(selectedDates, dateStr) {
       console.log('flatpickr hook', selectedDates, dateStr);
     },
     // mode: 'range',
     // minDate: new Date(last30Days[0]),
-    // maxDate: new Date(),
+    maxDate: new Date(),
   };
 
   export let records;
@@ -32,13 +32,18 @@
   let type = '';
   let fileName = '';
   let selectedType = '';
+  let fromDate = '';
+  let toDate = '';
 
   const selectTypeHandler = (e) => {
     selectedType = e.detail;
   };
 
   const createRecordHandler = () => {
-    console.log('createRecordHandler', fileName, selectedType);
+    console.log('createRecordHandler', fileName);
+    console.log(selectedType);
+    console.log(fromDatevalue);
+    console.log(toDatevalue);
   };
 </script>
 
@@ -46,29 +51,26 @@
   class="w-1/4 flex flex-col justify-between gap-4 border-r-2 border-neutral-700 h-full"
 >
   <div class="pl-20 pt-4 pr-4 flex flex-col gap-4">
-    <h1>PERSONAL</h1>
-
     <RecordTypeDropdownButton on:select={selectTypeHandler} />
-    <Flatpickr {options} bind:value element="#my-picker">
-      <div id="my-picker">
-        <input
-          type="text"
-          placeholder="Select Date..."
-          data-input
-          class="text-white placeholder:text-neutral-300 bg-neutral-700 p-2 mr-2 w-full rounded-md"
-        />
-      </div>
-    </Flatpickr>
-    <!-- <Flatpickr {options} bind:value element="#my-picker">
-      <div class="flatpickr" id="my-picker">
-        <input
-          type="text"
-          placeholder="Select Date..."
-          data-input
-          class="text-white placeholder:text-neutral-300 bg-neutral-700 p-2 mr-2 w-full rounded-md"
-        />
-      </div>
-    </Flatpickr> -->
+
+    <div class="flex flex-col gap-2">
+      <p>From</p>
+      <Flatpickr
+        {options}
+        bind:value={fromDatevalue}
+        name="date"
+        class="w-full bg-neutral-700 rounded-md p-2"
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <p>To</p>
+      <Flatpickr
+        {options}
+        bind:value={toDatevalue}
+        name="date"
+        class="w-full bg-neutral-700 rounded-md p-2"
+      />
+    </div>
     <Input
       placeholder="Filename"
       title="Filename"

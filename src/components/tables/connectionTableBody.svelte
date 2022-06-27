@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
+  import { socials } from '@lib/stores/editorStore';
 
   export let innerWidth;
   export let connection;
@@ -15,6 +16,7 @@
   const editModalHandler = () => (showEditModal = !showEditModal);
   const modalHandler = () => (showModal = !showModal);
   const modalHandlerr = () => (showDeleteModal = !showDeleteModal);
+  $: $socials = connection.profileData.socials;
 </script>
 
 <tr
