@@ -47,9 +47,6 @@
         <div
           class="p-2 hover:bg-black"
           on:click={async () => {
-            console.log(`${$user.id} has been downloaded csv for ${item}`);
-            // select(item);
-            // await setSelectCsv(item);
             await selectCsv.set(item);
             await updateLogs();
           }}

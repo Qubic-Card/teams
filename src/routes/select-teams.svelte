@@ -23,7 +23,6 @@
     }
   };
 
-  $: console.log(teams);
   const chooseTeam = (teamId) => {
     Cookies.set('qubicTeamId', teamId);
     goto(`/${teamId}/dashboard`);
@@ -62,7 +61,7 @@
         </p>
       </div>
     {/each}
-      <AddTeamModal />
+    <AddTeamModal />
   {:catch}
     <h1>Something went wrong. Please try again later.</h1>
   {/await}

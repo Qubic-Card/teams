@@ -20,6 +20,7 @@
   import AnalyticsDropdownButton from '@comp/buttons/analyticsDropdownButton.svelte';
   import { tapCount } from '@lib/utils/count';
   import { doughnutChartBgColor, socialIcons } from '@lib/constants';
+  import Pagination from '@comp/pagination.svelte';
 
   let teamUniqueCount = 0;
   let teamActivityCount = 0;
@@ -89,7 +90,6 @@
   const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getTeamConnectionsList = async () => {
-    console.log('getting connections');
     loading = true;
     let {
       data: connection_profile,
@@ -130,7 +130,6 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    console.log('getting logs');
     loading = true;
     try {
       let {
@@ -176,6 +175,7 @@
 
         teamLogsChart = logs;
         teamLogs = logs;
+        console.log('teamLogs', teamLogsChart);
 
         // data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
 
@@ -196,8 +196,6 @@
           };
         });
 
-        console.log(teamLogsCsv);
-        console.log(teamLogs);
         // paginate(teamLogs);
         data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
         if (chartctx) chartctx.update();
@@ -211,15 +209,35 @@
 
   $: selectedDays, getTeamWeeklyLogsActivity(), getTeamConnectionsList();
 
+  let page = 0;
+  let currentPageRows = [];
+  let active = 0;
+  let itemsPerPage = 5;
+  let totalPages = [];
+  let maxLimit = 5;
+
+  $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
+
+  const setPage = (p) => {
+    if (p >= 0 && p < totalPages.length) {
+      page = p;
+      active = p;
+    }
+  };
+  const paginate = (items) => {
+    const pages = Math.ceil(items.length / itemsPerPage);
+    const paginatedItems = Array.from({ length: pages }, (_, index) => {
+      const start = index * itemsPerPage;
+      return items.slice(start, start + itemsPerPage);
+    });
+    totalPages = [...paginatedItems];
+  };
+
   let chartctx;
   onMount(async () => {
     await getTeamWeeklyLogsActivity();
     await getTeamConnectionsList();
 
-    // console.log(data.datasets[0].data.every((item) => item === 0));
-    // console.log(data.datasets[0].data.map((item) => item === 0));
-    console.log(data.datasets[0].data);
-    console.log(teamLogs);
     const ctx = chart.getContext('2d');
     chartctx = new Chart(ctx, config);
   });
@@ -314,6 +332,7 @@
             <h1 class="text-sm font-bold text-white">No logs</h1>
           </div>
         {/if}
+        <!-- <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} /> -->
       {/if}
     </div>
     {#if data.datasets[0].data.every((item) => item === 0)}

@@ -68,7 +68,7 @@
     //   return data;
     // }
   };
-  $: console.log(roles);
+
   const clicked = (e) => (isClicked = e.detail);
 </script>
 

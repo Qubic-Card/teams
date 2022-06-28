@@ -15,7 +15,7 @@
 
   let teamId = Cookies.get('qubicTeamId');
   let innerWidth;
-  let asc = true;
+  let asc = false;
   let searchQuery = '';
   let searchNotFoundMsg = '';
 
@@ -24,7 +24,7 @@
   let isHasPermission = false;
   let teamConnections = [];
   let userConnections = [];
-  let selectedSearchMenu = null;
+  let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
 
   let tabs = 'all';
 
@@ -35,7 +35,6 @@
   const setTabs = (tab) => (tabs = tab);
 
   const getTeamConnectionsList = async () => {
-    // let id = isHasPermission ? teamId : await getMemberId($user?.id, teamId);
     let id = teamId;
 
     const { data, error } = await supabase
@@ -45,10 +44,7 @@
       .order('dateConnected', { ascending: true });
 
     if (error) console.log(error);
-    if (data) {
-      // isHasPermission ? (teamConnections = data) : (userConnections = data);
-      teamConnections = data;
-    }
+    if (data) teamConnections = data;
   };
 
   const getUserConnectionsList = async () => {
@@ -83,7 +79,7 @@
       .select('*, by(*)')
       .eq(column, id)
       .order(col, { ascending: asc });
-    console.log(id);
+
     if (error) console.log(error);
     if (data) {
       tabs === 'all'
@@ -101,10 +97,7 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq('team_id', teamId)
-      .ilike(
-        selectedSearchMenu ? selectedSearchMenu.col : 'profileData->>firstname',
-        `%${searchQuery}%`
-      );
+      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`);
 
     loading = false;
     if (error) console.log(error);
@@ -127,10 +120,7 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq('by', id)
-      .ilike(
-        selectedSearchMenu ? selectedSearchMenu.col : 'profileData->>firstname',
-        `%${searchQuery}%`
-      );
+      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`);
 
     loading = false;
     if (error) console.log(error);
@@ -145,6 +135,15 @@
     }
   };
 
+  // $: if (searchQuery !== '') {
+  //   if (isHasPermission && tabs === 'all') {
+  //     searchQuery, selectedSearchMenu, searchTeamHandler();
+  //   } else if (isHasPermission && tabs === 'user') {
+  //     searchQuery, selectedSearchMenu, searchPersonalHandler();
+  //   } else {
+  //     searchQuery, selectedSearchMenu, searchPersonalHandler();
+  //   }
+  // }
   $: if (isHasPermission && tabs === 'all') {
     searchQuery, selectedSearchMenu, searchTeamHandler();
   } else if (isHasPermission && tabs === 'user') {
@@ -212,7 +211,7 @@
                   data={connectionsTable}
                   on:sort={async (e) => {
                     asc = !asc;
-                    await sortHandler(e.detail ?? 'profileData->>firstname');
+                    await sortHandler(e.detail);
                   }}
                 />
               {:else}
@@ -221,7 +220,7 @@
                   data={connectionsTableMobile}
                   on:sort={async (e) => {
                     asc = !asc;
-                    await sortHandler(e.detail ?? 'profileData->>firstname');
+                    await sortHandler(e.detail);
                   }}
                 />
               {/if}
@@ -286,7 +285,7 @@
                   data={connectionsTable}
                   on:sort={async (e) => {
                     asc = !asc;
-                    await sortHandler(e.detail ?? 'profileData->>firstname');
+                    await sortHandler(e.detail);
                   }}
                 />
               {:else}
@@ -295,7 +294,7 @@
                   data={connectionsTable}
                   on:sort={async (e) => {
                     asc = !asc;
-                    await sortHandler(e.detail ?? 'profileData->>firstname');
+                    await sortHandler(e.detail);
                   }}
                 />
               {/if}

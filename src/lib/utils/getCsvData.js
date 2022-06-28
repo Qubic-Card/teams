@@ -3,8 +3,6 @@ import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
 export const getConnectionsCsv = (data) => {
   let connectionsCsv = null;
   connectionsCsv = data.map((item) => {
-    // console.log(item.socials);
-
     return {
       Date: item.dateConnected,
       Firstname: item.firstname,
@@ -36,7 +34,6 @@ export const getConnectionsCsv = (data) => {
 export const getLogsCsv = (data) => {
   let logsCsv = null;
   logsCsv = data.map((log) => {
-    // console.log(log);
     return {
       Date: log.created_at,
       Card: log.card,

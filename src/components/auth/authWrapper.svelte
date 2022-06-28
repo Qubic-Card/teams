@@ -8,36 +8,21 @@
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { onMount } from 'svelte';
 
-  let roleMaps = [];
-
   $user = supabase.auth.user();
-
-  // $: console.log('Auth Wrapper', $userData);
-  $: console.log('Auth Wrapper', $user);
-  let teamId = Cookies.get('qubicTeamId');
-
-  // onMount(
-  //   async () => (roleMaps = await getRoleMapsByProfile($user.id, teamId))
-  // );
 
   const redirect = () => {
     if ($user && $page.url.pathname === '/') goto('/select-teams');
     if (!$user) goto('/');
   };
 
-  
   $: if (browser) redirect();
-  
+
   supabase.auth.onAuthStateChange(async (event, session) => {
-    // console.log('auth state change', event, session);
     if (event == 'SIGNED_IN') {
-      // console.log('signed in');
-      // roleMaps = await getRoleMaps($user?.id);
-      // setUserData(roleMaps);
-      $user = supabase.auth.user()
+      $user = supabase.auth.user();
     }
     if (event == 'TOKEN_REFRESHED') {
-      $user = supabase.auth.user()
+      $user = supabase.auth.user();
     }
     if (event == 'PASSWORD_RECOVERY') {
       $user = null;

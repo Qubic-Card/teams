@@ -251,7 +251,6 @@
   $: paginate(userLogs.slice(0, maxLimit));
   $: selectedDays, connection(), activityHandler();
   $: if (isSelectedDaysHasChanged && maxLimit > 5) setLimit(5);
-  $: console.log(loading);
 
   onMount(async () => {
     const connectionsCtx = connectionsChart.getContext('2d');

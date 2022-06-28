@@ -101,7 +101,6 @@
 
   onMount(async () => {
     memberRole = await getMemberRole(memberUid, teamId);
-    console.log(card);
   });
 
   $: getMembersStatusCard();

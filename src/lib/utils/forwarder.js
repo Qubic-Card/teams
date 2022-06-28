@@ -112,7 +112,6 @@ export const go = async (type, data, pageState, cardId, profileUid) => {
       window.location.href = 'mailto:' + data;
       break;
     case 'phone':
-      console.log(data);
       if (pageState != 'Preview') {
         await log(
           `Your ${type} was opened`,

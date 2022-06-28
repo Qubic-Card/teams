@@ -17,7 +17,6 @@
   let showModal = false;
   let loading = false;
   let checkedRole = [];
-  $: console.log(checkedRole);
 
   const toggleModal = () => {
     if (roles.length < 5) {
