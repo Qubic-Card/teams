@@ -34,6 +34,9 @@
   let itemsPerPage = 10;
   let totalPages = [];
   let maxLimit = 5;
+  let page = 0;
+  let currentPageRows = [];
+  let active = 0;
   let isAlreadySeeMore = false;
 
   let connectionChartCtx;
@@ -80,7 +83,7 @@
 
   let connectionsCsv = {};
   let logsCsv = {};
-  let selectedDays = '3 Days';
+  let selectedDays = '';
   let isSelectedDaysHasChanged = false;
 
   const setLimit = (value) => {
@@ -95,6 +98,13 @@
       return items.slice(start, start + itemsPerPage);
     });
     totalPages = [...paginatedItems];
+  };
+
+  const setPage = (p) => {
+    if (p >= 0 && p < totalPages?.length) {
+      page = p;
+      active = p;
+    }
   };
 
   const selectDaysHandler = (e) => {
@@ -248,9 +258,14 @@
     isAlreadySeeMore = false;
   };
 
-  $: paginate(userLogs.slice(0, maxLimit));
+  $: selectedDays, paginate(userLogs.slice(0, maxLimit));
   $: selectedDays, connection(), activityHandler();
   $: if (isSelectedDaysHasChanged && maxLimit > 5) setLimit(5);
+  $: currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
+  $: if (selectedDays !== '') {
+    page = 0;
+    active = 0;
+  }
 
   onMount(async () => {
     const connectionsCtx = connectionsChart.getContext('2d');
@@ -326,6 +341,10 @@
         {totalPages}
         on:click={() => setLimit(500)}
         {isAlreadySeeMore}
+        {setPage}
+        {page}
+        {currentPageRows}
+        {active}
       />
     </div>
     <div class="flex lg:hidden w-full justify-center mt-8">

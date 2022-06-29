@@ -13,6 +13,7 @@
 
   import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
+  import supabase from '@lib/db';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -21,13 +22,28 @@
   let roleMapping = [];
   let team = null;
   let teamId = Cookies.get('qubicTeamId');
+  let teamCount = 0;
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
 
+  const getTeamCount = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_id')
+      .eq('uid', $user?.id);
+
+    if (error) console.log(error);
+
+    if (data) {
+      teamCount = data.length;
+    }
+  };
+
   onMount(async () => {
     roleMapping = await getRoleMapsByProfile($user?.id, teamId);
     team = await getTeamData(teamId);
+    await getTeamCount();
   });
 
   $: setUserData(roleMapping);
@@ -107,7 +123,7 @@
         </div>
       {/if}
       {#if isMenuOpened}
-        <MenuButton />
+        <MenuButton {teamCount} />
       {/if}
     </div>
 

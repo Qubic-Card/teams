@@ -2,7 +2,8 @@
   import { setNewRole } from '@lib/stores/roleStore';
   import { createEventDispatcher } from 'svelte';
 
-  export let checkboxes, checked;
+  export let checkboxes, checked, roleName;
+  $: console.log(roleName);
   const dispatch = createEventDispatcher();
 
   $: setNewRole(checked);
@@ -22,8 +23,16 @@
     <div class="block">
       <div class="mt-2">
         <label
-          class="flex cursor-pointer"
-          on:click={() => dispatch('clicked', false)}
+          class={`flex ${
+            roleName === 'admin' ? 'cursor-default' : 'cursor-pointer'
+          }`}
+          on:click={() => {
+            if (roleName === 'admin') {
+              return;
+            } else {
+              dispatch('clicked', false);
+            }
+          }}
         >
           <input
             type="checkbox"
@@ -31,8 +40,9 @@
             bind:group={checked}
             value={checkbox.name}
             on:change={() => dispatch('change', checked)}
-            disabled={checkbox.name === 'allow_write_profile' &&
-            checked.includes('allow_write_members', 0)
+            disabled={(checkbox.name === 'allow_write_profile' &&
+              checked.includes('allow_write_members', 0)) ||
+            roleName === 'admin'
               ? true
               : false}
           />
@@ -56,8 +66,16 @@
     <div class="block">
       <div class="mt-2">
         <label
-          class="flex cursor-pointer"
-          on:click={() => dispatch('clicked', false)}
+          class={`flex ${
+            roleName === 'admin' ? 'cursor-default' : 'cursor-pointer'
+          }`}
+          on:click={() => {
+            if (roleName === 'admin') {
+              return;
+            } else {
+              dispatch('clicked', false);
+            }
+          }}
         >
           <input
             type="checkbox"
@@ -65,8 +83,9 @@
             bind:group={checked}
             value={checkbox.name}
             on:change={() => dispatch('change', checked)}
-            disabled={checkbox.name === 'allow_write_profile' &&
-            checked.includes('allow_write_members', 0)
+            disabled={(checkbox.name === 'allow_write_profile' &&
+              checked.includes('allow_write_members', 0)) ||
+            roleName === 'admin'
               ? true
               : false}
           />

@@ -64,7 +64,11 @@
   $: {
     $userData?.filter((item) => {
       if ($page.params.slug === $user?.id) {
-        if (item === 'allow_write_profile') isHasWriteProfilePermission = true;
+        if (item === 'allow_write_profile') {
+          isHasWriteProfilePermission = true;
+        } else if (item === 'allow_write_team') {
+          isHasWriteTeamPermission = true;
+        }
       } else if (item === 'allow_write_members') {
         isHasWriteMembersPermission = true;
       } else if (item === 'allow_write_team') {
@@ -85,6 +89,7 @@
     } else if (!isHasWriteTeamPermission && isTeamTab) {
       message = "You dont have permission to edit this team's profile";
     }
+    // console.log(message);
   }
 </script>
 

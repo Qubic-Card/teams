@@ -21,14 +21,9 @@
   import { tapCount } from '@lib/utils/count';
   import { doughnutChartBgColor, socialIcons } from '@lib/constants';
   import Pagination from '@comp/pagination.svelte';
+  import TeamAnalytics from '@pages/teamAnalytics.svelte';
 
-  let teamUniqueCount = 0;
-  let teamActivityCount = 0;
-  let teamConnectionCount = 0;
-  let teamActivity = [];
-  let teamDateConnected = [];
   let teamLogs = [];
-  let teamLogsChart = [];
   let loading = false;
 
   const analyticsData = [
@@ -46,6 +41,8 @@
   ];
 
   let chart;
+  let chartctx;
+
   const data = {
     labels: Object.keys(socialIcons).map(
       (key) => key.charAt(0).toUpperCase() + key.slice(1)
@@ -86,8 +83,34 @@
   let teamId = Cookies.get('qubicTeamId');
   let teamLogsCsv = {};
   let selectedDays = '3 Days';
+  let itemsPerPage = 20;
+  let totalPages = [];
+  let page = 0;
+  let active = 0;
+  let paginatedLogs = [];
+  let currentPageRows = [];
 
-  const selectDaysHandler = (e) => (selectedDays = e.detail);
+  const selectDaysHandler = (e) => {
+    selectedDays = e.detail;
+    page = 0;
+    active = 0;
+  };
+
+  const paginate = (items) => {
+    const pages = Math.ceil(items.length / itemsPerPage);
+    const paginatedItems = Array.from({ length: pages }, (_, index) => {
+      const start = index * itemsPerPage;
+      return items.slice(start, start + itemsPerPage);
+    });
+    totalPages = [...paginatedItems];
+  };
+
+  const setPage = (p) => {
+    if (p >= 0 && p < totalPages?.length) {
+      page = p;
+      active = p;
+    }
+  };
 
   const getTeamConnectionsList = async () => {
     loading = true;
@@ -97,10 +120,6 @@
       count,
     } = await supabase
       .from('team_connection_acc')
-      // .select(
-      //   'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
-      //   { count: 'estimated' }
-      // )
       .select('profileData->socials', { count: 'estimated' })
       .eq('team_id', teamId)
       .gte(
@@ -119,10 +138,6 @@
 
     loading = false;
     if (connection_profile) {
-      teamConnectionCount = count;
-      teamDateConnected = connection_profile.map((item) =>
-        new Date(item.dateConnected).toDateString().slice(4)
-      );
       analyticsData[1].data = connection_profile.length;
       // console.log(connection_profile);
     }
@@ -163,22 +178,13 @@
         logs.map((log) => {
           if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
         });
-        teamUniqueCount = newArr.length;
-        teamActivityCount = count;
-        teamActivity = logs.map((log) =>
-          new Date(log.created_at).toDateString().slice(4)
-        );
 
         // console.log('logs', logs);
         analyticsData[0].data = count;
         analyticsData[2].data = logs.length;
 
-        teamLogsChart = logs;
         teamLogs = logs;
-        console.log('teamLogs', teamLogsChart);
-
-        // data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
-
+        paginatedLogs = logs;
         // Grouping by date
         teamLogs = teamLogs.reduce((acc, log) => {
           const date = new Date(log.created_at).toDateString().slice(4);
@@ -196,7 +202,6 @@
           };
         });
 
-        // paginate(teamLogs);
         data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
         if (chartctx) chartctx.update();
         loading = false;
@@ -208,32 +213,23 @@
   };
 
   $: selectedDays, getTeamWeeklyLogsActivity(), getTeamConnectionsList();
-
-  let page = 0;
-  let currentPageRows = [];
-  let active = 0;
-  let itemsPerPage = 5;
-  let totalPages = [];
-  let maxLimit = 5;
-
+  $: paginate(paginatedLogs);
   $: currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
-
-  const setPage = (p) => {
-    if (p >= 0 && p < totalPages.length) {
-      page = p;
-      active = p;
+  $: currentPageRows = currentPageRows.reduce((acc, log) => {
+    const date = new Date(log.created_at).toDateString().slice(4);
+    if (!acc[date]) {
+      acc[date] = [];
     }
-  };
-  const paginate = (items) => {
-    const pages = Math.ceil(items.length / itemsPerPage);
-    const paginatedItems = Array.from({ length: pages }, (_, index) => {
-      const start = index * itemsPerPage;
-      return items.slice(start, start + itemsPerPage);
-    });
-    totalPages = [...paginatedItems];
-  };
+    acc[date].push(log);
+    return acc;
+  }, {});
+  $: currentPageRows = Object.keys(currentPageRows).map((date) => {
+    return {
+      date,
+      logs: currentPageRows[date],
+    };
+  });
 
-  let chartctx;
   onMount(async () => {
     await getTeamWeeklyLogsActivity();
     await getTeamConnectionsList();
@@ -301,39 +297,8 @@
         <!-- <button class="bg-blue-600 p-2 rounded-lg w-48">Download CSV</button> -->
         <AnalyticsDropdownButton on:select={selectDaysHandler} />
       </div>
-      {#if teamLogs}
-        {#if teamLogs.length > 0}
-          {#each teamLogs as log}
-            <div class="pl-5 mb-1" in:fade|local>
-              <h1 class="text-sm font-bold text-neutral-500">
-                {log.date}
-              </h1>
-              <div class="flex flex-col pl-7">
-                {#each log.logs as item}
-                  <div
-                    class="text-sm flex justify-between hover:border hover:border-neutral-700 hover:p-1"
-                  >
-                    <h1 class="text-white">
-                      {`${item.team_member.firstname}'s` +
-                        item.message.slice(4)}
-                    </h1>
-                    <p class="text-neutral-500">
-                      {new Date(item.created_at).getHours() +
-                        ':' +
-                        new Date(item.created_at).getMinutes()}
-                    </p>
-                  </div>
-                {/each}
-              </div>
-            </div>
-          {/each}
-        {:else}
-          <div class="flex justify-center" in:fade|local>
-            <h1 class="text-sm font-bold text-white">No logs</h1>
-          </div>
-        {/if}
-        <!-- <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} /> -->
-      {/if}
+
+      <TeamAnalytics {currentPageRows} {totalPages} {page} {active} {setPage} />
     </div>
     {#if data.datasets[0].data.every((item) => item === 0)}
       <div

@@ -43,7 +43,12 @@
   };
 </script>
 
-<button type="button" on:click={toggleModal} class="p-3 bg-white rounded-lg">
+<button
+  type="button"
+  on:click={toggleModal}
+  class="p-3 bg-white rounded-lg disabled:bg-white/60"
+  disabled={roleName === 'admin' ? true : false}
+>
   <img
     class="h-4 w-4"
     src="https://img.icons8.com/external-becris-lineal-becris/64/undefined/external-edit-mintab-for-ios-becris-lineal-becris.png"

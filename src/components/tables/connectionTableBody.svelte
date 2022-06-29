@@ -45,7 +45,7 @@
     {connection.by.team_profile.firstname ?? '-'}
     {connection.by.team_profile.lastname ?? '-'}
   </td>
-  <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
+  <td class="flex-1 h-12 truncate pl-4 pr-4 hidden gap-4 items-center">
     <!-- <img src="/edit-icon.svg" alt="" class="w-6 h-6 cursor-pointer" /> -->
     <!-- <img
       src="/edit-icon.svg"

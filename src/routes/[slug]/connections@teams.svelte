@@ -97,7 +97,8 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq('team_id', teamId)
-      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`);
+      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
+      .order('dateConnected', { ascending: true });
 
     loading = false;
     if (error) console.log(error);
@@ -120,7 +121,8 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq('by', id)
-      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`);
+      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
+      .order('dateConnected', { ascending: true });
 
     loading = false;
     if (error) console.log(error);

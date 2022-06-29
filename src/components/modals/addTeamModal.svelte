@@ -117,7 +117,9 @@
   };
 </script>
 
-<button class="cursor-pointer p-2" on:click={toggleModal}> + add team </button>
+<button class="cursor-pointer hidden p-2" on:click={toggleModal}>
+  + add team
+</button>
 <ModalWrapper
   title="Add Team"
   on:showModal={toggleModal}

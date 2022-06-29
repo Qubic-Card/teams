@@ -4,26 +4,12 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
 
-  let teamCount = 0;
+  export let teamCount;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     location.reload();
   };
-
-  const getTeamCount = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id')
-      .eq('uid', $user?.id);
-
-    if (error) console.log(error);
-
-    if (data) {
-      teamCount = data.length;
-    }
-  };
-  $: getTeamCount();
 </script>
 
 <div

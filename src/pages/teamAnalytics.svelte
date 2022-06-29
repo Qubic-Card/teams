@@ -1,0 +1,39 @@
+<script>
+  import Pagination from '@comp/pagination.svelte';
+  import { fade } from 'svelte/transition';
+
+  export let totalPages, active, page, currentPageRows, setPage;
+</script>
+
+{#if currentPageRows}
+  {#if currentPageRows.length > 0}
+    {#each currentPageRows as log}
+      <div class="pl-5 mb-1" in:fade|local>
+        <h1 class="text-sm font-bold text-neutral-500">
+          {log.date}
+        </h1>
+        <div class="flex flex-col pl-7">
+          {#each log.logs as item}
+            <div
+              class="text-sm flex justify-between hover:border hover:border-neutral-700 hover:p-1"
+            >
+              <h1 class="text-white">
+                {`${item.team_member.firstname}'s` + item.message.slice(4)}
+              </h1>
+              <p class="text-neutral-500">
+                {new Date(item.created_at).getHours() +
+                  ':' +
+                  new Date(item.created_at).getMinutes()}
+              </p>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/each}
+  {:else}
+    <div class="flex justify-center" in:fade|local>
+      <h1 class="text-sm font-bold text-white">No logs</h1>
+    </div>
+  {/if}
+  <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
+{/if}

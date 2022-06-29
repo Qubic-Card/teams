@@ -29,7 +29,20 @@
   let selectedRole = '';
   let memberRole = null;
   let teamId = Cookies.get('qubicTeamId');
+  let roleName;
 
+  const getMemberRoleName = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('role(role_name)')
+      .eq('uid', $user?.id)
+      .eq('team_id', teamId);
+
+    if (error) console.log(error);
+    if (data) {
+      roleName = data[0].role.role_name;
+    }
+  };
   const toProfileEditor = (slug) =>
     goto(`/${$page.params.slug}/members/${slug}`);
 
@@ -74,7 +87,8 @@
     const { data, error } = await supabase
       .from('team_members')
       .update({ role: id }, { returning: 'minimal' })
-      .eq('uid', memberUid);
+      .eq('uid', memberUid)
+      .eq('team_id', teamId);
 
     if (error) {
       toastFailed();
@@ -103,7 +117,7 @@
     memberRole = await getMemberRole(memberUid, teamId);
   });
 
-  $: getMembersStatusCard();
+  $: getMembersStatusCard(), getMemberRoleName();
 </script>
 
 <div class="flex flex-col justify-between">
@@ -194,7 +208,7 @@
       }}
       class={`justify-center items-center self-end relative rounded-lg w-16 h-10 z-50 ${
         statusMember ? 'bg-green-300' : 'bg-neutral-600'
-      } ${isHasPermission ? 'flex' : 'hidden'}`}
+      } ${isHasPermission && roleName === 'admin' ? 'flex' : 'hidden'}`}
     >
       <span
         class={`inline-block w-7 h-7 bg-white rounded-full transition-transform duration-300 ease-in-out ${
@@ -206,36 +220,52 @@
     </Switch>
 
     <Menu
-      class="absolute translate-y-[140px] md:translate-y-[233px] mt-3"
+      class="absolute translate-y-[140px] md:translate-y-[233px] mt-3 block"
       let:open
     >
-      <DropdownButton
-        class="w-auto"
-        label={selectedRole !== ''
-          ? selectedRole
-          : memberRole?.role_name
-          ? memberRole.role_name.charAt(0).toUpperCase() +
-            memberRole.role_name.slice(1)
-          : 'Loading...'}
-      />
-      {#if open}
-        <div transition:slide|local>
-          <MenuItems
-            class="top-2 z-40 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
-          >
-            {#each roles as item}
-              <MenuItem
-                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                on:click={async () => {
-                  await setMemberRole(item.id);
-                  selectRole(item.role_name);
-                }}
-              >
-                {item.role_name}
-              </MenuItem>
-            {/each}
-          </MenuItems>
-        </div>
+      {#if roleName === 'admin'}
+        <DropdownButton
+          class="w-auto"
+          label={selectedRole !== ''
+            ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+            : memberRole?.role_name
+            ? memberRole.role_name.charAt(0).toUpperCase() +
+              memberRole.role_name.slice(1)
+            : 'Loading...'}
+        />
+      {:else}
+        <p
+          class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+        >
+          {selectedRole !== ''
+            ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+            : memberRole?.role_name
+            ? memberRole.role_name.charAt(0).toUpperCase() +
+              memberRole.role_name.slice(1)
+            : 'Loading...'}
+        </p>
+      {/if}
+
+      {#if roleName === 'admin'}
+        {#if open}
+          <div transition:slide|local>
+            <MenuItems
+              class="top-2 z-40 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
+            >
+              {#each roles as item}
+                <MenuItem
+                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                  on:click={async () => {
+                    await setMemberRole(item.id);
+                    selectRole(item.role_name);
+                  }}
+                >
+                  {item.role_name}
+                </MenuItem>
+              {/each}
+            </MenuItems>
+          </div>
+        {/if}
       {/if}
     </Menu>
   </div>
