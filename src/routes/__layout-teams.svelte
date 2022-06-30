@@ -90,7 +90,7 @@
           <div
             class="w-16 h-16 border-r-2 border-neutral-800 flex justify-center items-center animate-pulse"
           >
-            <div class="bg-neutral-800 w-10 h-12 rounded-lg" />
+            <div class="bg-neutral-800 w-10 h-10" />
           </div>
         {/if}
         {#if team?.name}
@@ -114,9 +114,7 @@
         <div
           on:click={menuHandler}
           class="bg-neutral-800 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
-        >
-          T
-        </div>
+        />
       {:else}
         <div class="animate-pulse p-4">
           <div class="text-5xl w-12 h-12 bg-neutral-800 rounded-full" />
@@ -161,11 +159,7 @@
             </div>
           {:else}
             <div class="animate-pulse gap-5">
-              <p
-                class="text-5xl h-16 text-neutral-800 bg-neutral-800 rounded-lg"
-              >
-                QT
-              </p>
+              <p class="text-5xl h-16 w-16 text-neutral-800 bg-neutral-800" />
             </div>
           {/if}
         {/each}

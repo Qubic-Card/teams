@@ -42,6 +42,7 @@
     "js-cookie": "^3.0.1",
     "svelte-csv": "^1.2.8",
     "svelte-filepond": "^0.2.0",
-    "svelte-flatpickr": "^3.2.6"
+    "svelte-flatpickr": "^3.2.6",
+    "tappin-vcards-js": "^2.10.0"
   }
 }

@@ -414,14 +414,20 @@
                                     class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md"
                                     on:click={() => handleUpSocial(item, i)}
                                   >
-                                    <img
-                                      draggable="false"
-                                      class="cursor-pointer mr-2"
-                                      width="20"
-                                      height="20"
-                                      src="/icons/arrow_up.png"
-                                      alt=""
-                                    />
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      class="h-6 w-6"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M7 11l5-5m0 0l5 5m-5-5v12"
+                                      />
+                                    </svg>
                                     <p>Move up</p>
                                   </MenuItem>
                                 {/if}

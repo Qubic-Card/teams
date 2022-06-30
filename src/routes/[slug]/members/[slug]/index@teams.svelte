@@ -2,7 +2,7 @@
   import Profile from '@pages/profile.svelte';
   import { socials, links } from '@lib/stores/editorStore';
   import { go } from '@lib/utils/forwarder';
-  import ProfileEditorSkeleton from '@comp/skeleton/profileEditorSkeleton.svelte';
+  import EditorSkeleton from '@comp/skeleton/editorSkeleton.svelte';
 
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
@@ -23,7 +23,31 @@
   let isHasWriteMembersPermission = false;
   let isHasReadTeamPermission = false;
   let isHasWriteTeamPermission = false;
+  let isCheckRoleDone = false;
 
+  $: $userData?.filter((item) => {
+    if ($page.params.slug === $user?.id) {
+      if (item === 'allow_write_profile') {
+        isHasWriteProfilePermission = true;
+      } else if (item === 'allow_write_team') {
+        isHasWriteTeamPermission = true;
+      }
+      isCheckRoleDone = true;
+    } else if (item === 'allow_write_members') {
+      isHasWriteMembersPermission = true;
+      isCheckRoleDone = true;
+    } else if (item === 'allow_write_team') {
+      isHasWriteTeamPermission = true;
+      isCheckRoleDone = true;
+    }
+
+    if (item === 'allow_read_team') {
+      isHasReadTeamPermission = true;
+      isCheckRoleDone = true;
+    }
+  });
+
+  let teamId = Cookies.get('qubicTeamId');
   let profileData = {
     firstname: '',
     lastname: '',
@@ -38,7 +62,7 @@
     },
   };
   let profileId = null;
-  let teamId = null;
+  $: console.log(teamId);
   let message = '';
   let isTeamTab = false;
 
@@ -46,63 +70,48 @@
     let { data, error } = await supabase
       .from('team_members')
       .select('team_profile, uid, team_id')
-      .eq('uid', $page.params.slug);
+      .eq('uid', $page.params.slug)
+      .eq('team_id', teamId);
 
     if (data) {
+      console.log(data);
       const profile = data[0]['team_profile'];
       profileData = { ...profile };
       $socials = profile['socials'];
       $links = profile['links'];
       profileId = data[0]['id'];
-      teamId = data[0]['team_id'];
     }
     if (error) console.log(error);
 
     return data;
   };
-
-  $: {
-    $userData?.filter((item) => {
-      if ($page.params.slug === $user?.id) {
-        if (item === 'allow_write_profile') {
-          isHasWriteProfilePermission = true;
-        } else if (item === 'allow_write_team') {
-          isHasWriteTeamPermission = true;
-        }
-      } else if (item === 'allow_write_members') {
-        isHasWriteMembersPermission = true;
-      } else if (item === 'allow_write_team') {
-        isHasWriteTeamPermission = true;
-      }
-
-      if (item === 'allow_read_team') isHasReadTeamPermission = true;
-    });
-
-    if ($page.params.slug === $user?.id) {
-      if (!isHasWriteProfilePermission && !isTeamTab) {
-        message = "You don't have permission to edit your profile";
-      } else if (!isHasWriteTeamPermission && isTeamTab) {
-        message = "You dont have permission to edit this team's profile";
-      }
-    } else if (!isHasWriteMembersPermission && !isTeamTab) {
-      message = "You don't have permission to edit this member's profile";
-    } else if (!isHasWriteTeamPermission && isTeamTab) {
-      message = "You dont have permission to edit this team's profile";
-    }
-    // console.log(message);
-  }
 </script>
 
 {#await getProfile()}
-  <ProfileEditorSkeleton />
+  <EditorSkeleton />
 {:then}
-  <div
-    class={`flex justify-center bg-blue-600 text-white p-2 rounded-lg ${
-      message === '' ? 'hidden' : ''
-    }`}
-  >
-    {message}
-  </div>
+  {#if isCheckRoleDone}
+    {#if $page.params.slug === $user?.id}
+      {#if !isHasWriteProfilePermission && !isTeamTab}
+        <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
+          You don't have permission to edit your profile
+        </div>
+      {:else if !isHasWriteTeamPermission && isTeamTab}
+        <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
+          You dont have permission to edit this team's profile
+        </div>
+      {/if}
+    {:else if !isHasWriteMembersPermission && !isTeamTab}
+      <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
+        You don't have permission to edit this member's profile
+      </div>
+    {:else if !isHasWriteTeamPermission && isTeamTab}
+      <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
+        You dont have permission to edit this team's profile
+      </div>
+    {/if}
+  {/if}
+
   <div class="min-h-screen flex justify-center pl-16">
     <div class="md:px-20 px-4 w-full bg-black">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
@@ -136,7 +145,6 @@
               <TabPanels>
                 <TabPanel>
                   <PersonalEditor
-                    {profileData}
                     {isHasWriteMembersPermission}
                     {isHasWriteProfilePermission}
                   />
@@ -148,7 +156,6 @@
             </TabGroup>
           {:else if !isHasReadTeamPermission}
             <PersonalEditor
-              {profileData}
               {isHasWriteMembersPermission}
               {isHasWriteProfilePermission}
             />

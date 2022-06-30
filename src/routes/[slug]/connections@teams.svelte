@@ -137,15 +137,6 @@
     }
   };
 
-  // $: if (searchQuery !== '') {
-  //   if (isHasPermission && tabs === 'all') {
-  //     searchQuery, selectedSearchMenu, searchTeamHandler();
-  //   } else if (isHasPermission && tabs === 'user') {
-  //     searchQuery, selectedSearchMenu, searchPersonalHandler();
-  //   } else {
-  //     searchQuery, selectedSearchMenu, searchPersonalHandler();
-  //   }
-  // }
   $: if (isHasPermission && tabs === 'all') {
     searchQuery, selectedSearchMenu, searchTeamHandler();
   } else if (isHasPermission && tabs === 'user') {

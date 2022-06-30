@@ -16,7 +16,7 @@
   const editModalHandler = () => (showEditModal = !showEditModal);
   const modalHandler = () => (showModal = !showModal);
   const modalHandlerr = () => (showDeleteModal = !showDeleteModal);
-  $: $socials = connection.profileData.socials;
+  $: $socials = connection?.profileData?.socials;
 </script>
 
 <tr
@@ -26,14 +26,14 @@
     on:click={modalHandler}
     class="font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1"
   >
-    {connection.profileData.firstname ?? '-'}
-    {connection.profileData.lastname ?? '-'}
+    {connection?.profileData?.firstname ?? '-'}
+    {connection?.profileData?.lastname ?? '-'}
   </td>
 
   {#if innerWidth > 640}
-    <td class="flex-1 truncate pl-4">{connection.profileData.job ?? '-'}</td>
+    <td class="flex-1 truncate pl-4">{connection?.profileData?.job ?? '-'}</td>
     <td class="flex-1 truncate pl-4">
-      {connection.profileData.company ?? '-'}
+      {connection?.profileData?.company ?? '-'}
     </td>
   {/if}
 
@@ -42,8 +42,8 @@
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">
-    {connection.by.team_profile.firstname ?? '-'}
-    {connection.by.team_profile.lastname ?? '-'}
+    {connection?.by?.team_profile?.firstname ?? '-'}
+    {connection?.by?.team_profile?.lastname ?? '-'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 hidden gap-4 items-center">
     <!-- <img src="/edit-icon.svg" alt="" class="w-6 h-6 cursor-pointer" /> -->

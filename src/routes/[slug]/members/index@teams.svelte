@@ -30,7 +30,8 @@
     const { data, error } = await supabase
       .from('team_members')
       .select('member_from, team_profile, uid, id')
-      .eq('team_id', teamId);
+      .eq('team_id', teamId)
+      .order('member_from', { ascending: true });
 
     if (error) console.log(error);
 

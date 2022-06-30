@@ -3,8 +3,9 @@
   import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';
   import go from '@lib/utils/go';
-  import addToContactHandler from '@lib/utils/addToContact';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
+  import download from '@lib/utils/download';
+  import { genvcard } from '@lib/vcard/vcardgen';
 
   export let showModal;
   export let connection;
@@ -102,7 +103,8 @@
       class="flex flex-col items-center px-4 md:px-12 py-4 bg-neutral-900 rounded-b-lg"
     >
       <button
-        on:click={() => addToContactHandler(connection.profileData)}
+        on:click={async () =>
+          download(await genvcard(connection.profileData), 'contact')}
         class="w-full bg-black rounded-md hover:font-bold text-white mx-auto p-4 mb-4"
       >
         Add to Contacts

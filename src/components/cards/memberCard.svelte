@@ -97,7 +97,7 @@
       toastSuccess('Role has been updated');
     }
   };
-
+  $: console.log(memberUid);
   const deleteMemberHandler = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -116,7 +116,7 @@
   onMount(async () => {
     memberRole = await getMemberRole(memberUid, teamId);
   });
-
+  $: console.log(memberRole?.role_name);
   $: getMembersStatusCard(), getMemberRoleName();
 </script>
 
@@ -224,15 +224,28 @@
       let:open
     >
       {#if roleName === 'admin'}
-        <DropdownButton
-          class="w-auto"
-          label={selectedRole !== ''
-            ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
-            : memberRole?.role_name
-            ? memberRole.role_name.charAt(0).toUpperCase() +
-              memberRole.role_name.slice(1)
-            : 'Loading...'}
-        />
+        {#if memberRole?.role_name === 'admin'}
+          <p
+            class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+          >
+            {selectedRole !== ''
+              ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+              : memberRole?.role_name
+              ? memberRole.role_name.charAt(0).toUpperCase() +
+                memberRole.role_name.slice(1)
+              : 'Loading...'}
+          </p>
+        {:else}
+          <DropdownButton
+            class="w-auto"
+            label={selectedRole !== ''
+              ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+              : memberRole?.role_name
+              ? memberRole.role_name.charAt(0).toUpperCase() +
+                memberRole.role_name.slice(1)
+              : 'Loading...'}
+          />
+        {/if}
       {:else}
         <p
           class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
