@@ -87,7 +87,7 @@
     <MemberSkeleton />
   {:then}
     <div
-      class={`items-center w-full justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
+      class={`items-center w-full rounded-md justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
         isHasPermission ? 'flex' : 'hidden'
       }`}
     >

@@ -1,174 +1,12 @@
 import { default as vCardJS } from 'tappin-vcards-js';
-
-const nl = () => '\n';
-
-const iOS = () => {
-  return (
-    [
-      'iPad Simulator',
-      'iPhone Simulator',
-      'iPod Simulator',
-      'iPad',
-      'iPhone',
-      'iPod',
-    ].includes(navigator.platform) ||
-    // iPad on iOS 13 detection
-    (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
-  );
-};
-
-const formatter = (vcard) => {
-  const formatted = vcard.split('\n').map((line, i) => {
-    if (line.startsWith('BEGIN:VCARD')) return line;
-    if (line.startsWith('VERSION')) return line;
-    if (line.startsWith('FN')) return line;
-    if (line.startsWith('N')) return line;
-    if (line.startsWith('PHOTO')) return line;
-    if (line.startsWith('LOGO')) return line;
-    if (line.startsWith('LABEL')) return line;
-    if (line.startsWith('ADR')) return line;
-    if (line.startsWith('TEL')) return line;
-    if (line.startsWith('NOTE')) return line;
-    if (line.startsWith('EMAIL')) return line;
-    if (line.startsWith('TITLE')) return line;
-    if (line.startsWith('ORG')) return line;
-    if (line.startsWith('X-SOCIALPROFILE')) {
-      if (iOS()) {
-        let username = line.split(':')[1];
-        let http = line.split(':')[1];
-        let url = line.split(':')[2];
-        let isCompany = line.includes('company');
-
-        if (line.includes('facebook')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'Facebook Company' : 'Facebook'
-          }:https://facebook.com/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'Facebook Company' : 'Facebook'
-          }`;
-        } else if (line.includes('instagram')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'Instagram Company' : 'Instagram'
-          }:https://instagram.com/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'Instagram Company' : 'Instagram'
-          }`;
-        } else if (line.includes('twitter')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'Twitter Company' : 'Twitter'
-          }:https://twitter.com/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'Twitter Company' : 'Twitter'
-          }`;
-        } else if (line.includes('linkedin')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'LinkedIn Company' : 'LinkedIn'
-          }:https://linkedin.com/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'LinkedIn Company' : 'LinkedIn'
-          }`;
-        } else if (line.includes('youtube')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'YouTube Company' : 'YouTube'
-          }:https://youtube.com/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'YouTube Company' : 'YouTube'
-          }`;
-        } else if (line.includes('whatsapp')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'WhatsApp Company' : 'WhatsApp'
-          }:https://wa.me/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'WhatsApp Company' : 'WhatsApp'
-          }`;
-        } else if (line.includes('tiktok')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'TikTok Company' : 'TikTok'
-          }:https://tiktok.com/${username} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'TikTok Company' : 'TikTok'
-          }`;
-        } else if (line.includes('line')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'Line Company' : 'Line'
-          }:https://line.me/R/ti/p/~${username} ${nl()}item${
-            i - 17
-          }.X-ABLabel:${isCompany ? 'Line Company' : 'Line'}`;
-        } else if (!line.includes('email')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'URL Company' : 'URL'
-          }:${http + ':' + url} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'Website Company' : 'Website'
-          }`;
-        } else {
-          line = '';
-        }
-      } else {
-        let username = line.split(':')[1];
-        let http = line.split(':')[1];
-        let url = line.split(':')[2];
-        let isCompany = line.includes('company');
-
-        if (line.includes('facebook')) {
-          line = `URL;LABEL=${
-            isCompany ? 'Facebook Company' : 'Facebook'
-          }:https://facebook.com/${username}`;
-        } else if (line.includes('instagram')) {
-          line = `URL;LABEL=${
-            isCompany ? 'Instagram Company' : 'Instagram'
-          }:https://instagram.com/${username}`;
-        } else if (line.includes('twitter')) {
-          line = `URL;LABEL=${
-            isCompany ? 'Twitter Company' : 'Twitter'
-          }:https://twitter.com/${username}`;
-        } else if (line.includes('linkedin')) {
-          line = `URL;LABEL=${
-            isCompany ? 'LinkedIn Company' : 'LinkedIn'
-          }:https://linkedin.com/${username}`;
-        } else if (line.includes('youtube')) {
-          line = `URL;LABEL=${
-            isCompany ? 'YouTube Company' : 'YouTube'
-          }:https://youtube.com/${username}`;
-        } else if (line.includes('whatsapp')) {
-          line = `URL;LABEL=${
-            isCompany ? 'WhatsApp Company' : 'WhatsApp'
-          }:https://wa.me/${username}`;
-        } else if (line.includes('tiktok')) {
-          line = `URL;LABEL=${
-            isCompany ? 'TikTok Company' : 'TikTok'
-          }:https://tiktok.com/${username}`;
-        } else if (line.includes('line')) {
-          line = `URL;LABEL=${
-            isCompany ? 'Line Company' : 'Line'
-          }:https://line.me/R/ti/p/~${username}`;
-        } else if (!line.includes('email')) {
-          line = `URL;LABEL=${isCompany ? 'URL Company' : 'URL'}:${
-            http + ':' + url
-          }`;
-        } else {
-          line = '';
-        }
-      }
-
-      return line;
-    }
-    if (line.startsWith('SOURCE')) return line;
-    if (line.startsWith('REV')) return line;
-    if (line.startsWith('END:VCARD')) {
-      return line;
-    }
-  });
-
-  return formatted.join(nl());
-};
+import formatter from '@lib/vcard/formatter';
+import getBase64FromUrl from '@lib/utils/getBase64';
 
 export const genvcard = async (prop, team) => {
   let phoneNumber;
+  let teamPhoneNumber;
   let personalEmail;
-  prop.socials.map((social) => {
-    if (social.type === 'email') personalEmail = social.data;
-    if (social.type === 'phone') {
-      phoneNumber = social.data;
-      if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
-      if (phoneNumber.startsWith('0')) {
-        phoneNumber = phoneNumber.slice(1);
-        phoneNumber = '62' + phoneNumber;
-      }
-    }
-  });
+  let teamEmail;
 
   let vCard = new vCardJS();
   //set basic properties shown before
@@ -217,11 +55,20 @@ export const genvcard = async (prop, team) => {
 
     if (team.socials) {
       team.socials.map((e) => {
+        if (e.type === 'phone') {
+          teamPhoneNumber = e.data;
+          if (teamPhoneNumber.startsWith('+'))
+            teamPhoneNumber = teamPhoneNumber.slice(1);
+          if (teamPhoneNumber.startsWith('0')) {
+            teamPhoneNumber = teamPhoneNumber.slice(1);
+            teamPhoneNumber = '62' + teamPhoneNumber;
+          }
+        }
+        if (e.type === 'email') teamEmail = e.data;
         if (e.type == 'phone') return (vCard.workPhone = e.data);
-        if (e.type == 'email') return (vCard.email = [e.data, personalEmail]);
         if (e.type === 'whatsapp') {
           if (e.data !== phoneNumber) {
-            vCard.workPhone = [e.data, phoneNumber];
+            vCard.workPhone = [e.data, teamPhoneNumber];
           }
         }
 
@@ -240,12 +87,17 @@ export const genvcard = async (prop, team) => {
   if (prop.socials) {
     prop.socials.map((e) => {
       if (e.isActive) {
-        if (e.type == 'phone') return (vCard.cellPhone = e.data);
-        if (team) {
-          return;
-        } else {
-          if (e.type == 'email') return (vCard.email = e.data);
+        if (e.type === 'email') personalEmail = e.data;
+        if (e.type === 'phone') {
+          phoneNumber = e.data;
+          if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
+          if (phoneNumber.startsWith('0')) {
+            phoneNumber = phoneNumber.slice(1);
+            phoneNumber = '62' + phoneNumber;
+          }
         }
+        if (e.type == 'phone') return (vCard.cellPhone = e.data);
+
         if (e.type === 'whatsapp') {
           if (e.data !== phoneNumber) vCard.cellPhone = [e.data, phoneNumber];
         }
@@ -253,6 +105,12 @@ export const genvcard = async (prop, team) => {
         return (vCard.socialUrls[e.type] = e.data);
       }
     });
+  }
+
+  if (teamEmail === undefined) {
+    vCard.email = personalEmail;
+  } else {
+    vCard.email = [teamEmail, personalEmail];
   }
 
   if (prop.links) {
@@ -275,17 +133,4 @@ export const genvcard = async (prop, team) => {
   const formatted = formatter(vCard.getFormattedString());
 
   return formatted;
-};
-
-const getBase64FromUrl = async (url) => {
-  const data = await fetch(url);
-  const blob = await data.blob();
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = () => {
-      const base64data = reader.result.slice(23);
-      resolve(base64data);
-    };
-  });
 };
