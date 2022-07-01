@@ -1,5 +1,4 @@
 <script>
-  import ConnectModal from '@comp/modals/connectModal.svelte';
   import AvatarCard from '@comp/cards/avatarCard.svelte';
   import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';

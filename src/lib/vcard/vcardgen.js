@@ -156,8 +156,6 @@ const formatter = (vcard) => {
 };
 
 export const genvcard = async (prop, team) => {
-  console.log(prop);
-  console.log(team);
   let phoneNumber;
   let personalEmail;
   prop.socials.map((social) => {
@@ -243,7 +241,11 @@ export const genvcard = async (prop, team) => {
     prop.socials.map((e) => {
       if (e.isActive) {
         if (e.type == 'phone') return (vCard.cellPhone = e.data);
-        // if (e.type == 'email') return (vCard.email = e.data);
+        if (team) {
+          return;
+        } else {
+          if (e.type == 'email') return (vCard.email = e.data);
+        }
         if (e.type === 'whatsapp') {
           if (e.data !== phoneNumber) vCard.cellPhone = [e.data, phoneNumber];
         }

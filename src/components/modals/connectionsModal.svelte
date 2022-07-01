@@ -10,6 +10,7 @@
   export let showModal;
   export let connection;
   export let modalHandler;
+  $: console.log(connection);
 </script>
 
 <ModalWrapper
