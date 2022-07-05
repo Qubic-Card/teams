@@ -1,6 +1,6 @@
-import { default as vCardJS } from 'tappin-vcards-js';
 import formatter from '@lib/vcard/formatter';
 import getBase64FromUrl from '@lib/utils/getBase64';
+import { default as vCardJS } from 'tappin-vcards-js';
 
 export const genvcard = async (prop, team) => {
   let phoneNumber;
@@ -105,6 +105,11 @@ export const genvcard = async (prop, team) => {
         return (vCard.socialUrls[e.type] = e.data);
       }
     });
+  }
+
+  if (prop.address) {
+    vCard.homeAddress.label = 'Home Address';
+    vCard.homeAddress.street = prop.address;
   }
 
   if (teamEmail === undefined) {

@@ -9,14 +9,19 @@
   export let innerWidth;
   export let connection;
   export let i;
+  export let tab;
+  export let deleteHandler;
+
+  let loading = false;
   let showDeleteModal = false;
   let showModal = false;
   let showEditModal = false;
 
+  const toggleModal = () => (showModal = !showModal);
   const editModalHandler = () => (showEditModal = !showEditModal);
   const modalHandler = () => (showModal = !showModal);
-  const modalHandlerr = () => (showDeleteModal = !showDeleteModal);
-  $: $socials = connection?.profileData?.socials;
+  const deletModalHandler = () => (showDeleteModal = !showDeleteModal);
+  // $: $socials = connection?.profileData?.socials;
 </script>
 
 <tr
@@ -46,20 +51,22 @@
     {connection?.by?.team_profile?.lastname ?? '-'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 hidden gap-4 items-center">
-    <!-- <img src="/edit-icon.svg" alt="" class="w-6 h-6 cursor-pointer" /> -->
-    <!-- <img
-      src="/edit-icon.svg"
-      alt=""
-      class="w-6 h-6 cursor-pointer"
-      on:click={editModalHandler}
-    /> -->
     <EditConnectionsModal data={connection} />
-    <DeleteModal data={connection} />
+    <DeleteModal
+      on:click={() => {
+        deleteHandler(connection.id, tab);
+        deletModalHandler();
+      }}
+      data={connection}
+      id={connection.id}
+      showModal={showDeleteModal}
+      toggleModal={deletModalHandler}
+    />
     <img
       src="/download-icon.svg"
       alt=""
       class="w-6 h-6 cursor-pointer"
-      on:click={modalHandlerr}
+      on:click={modalHandler}
     />
   </td>
 </tr>

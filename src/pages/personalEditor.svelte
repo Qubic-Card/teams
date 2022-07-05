@@ -94,6 +94,7 @@
     job: '',
     company: '',
     avatar: '',
+    address: '',
     socials: $socials,
     links: $links,
     design: {
@@ -263,6 +264,17 @@
                       placeholder="Hiring Manager"
                       title="Job"
                       bind:value={profileData.job}
+                      disabled={isHasWriteProfilePermission
+                        ? false
+                        : isHasWriteMembersPermission
+                        ? false
+                        : true}
+                    />
+                    <Input
+                      on:change={handleSave}
+                      placeholder="Address"
+                      title="Address"
+                      bind:value={profileData.address}
                       disabled={isHasWriteProfilePermission
                         ? false
                         : isHasWriteMembersPermission

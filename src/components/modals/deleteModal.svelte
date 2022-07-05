@@ -1,20 +1,7 @@
 <script>
-  import supabase from '@lib/db';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
-  export let data;
-
-  let showModal = false;
-  let loading = false;
-
-  const deleteConnectionHandler = async () => {
-    // const { data, error } = await supabase
-    //   .from('team_connection_acc')
-    //   .delete()
-    //   .match({ id: 666 });
-    console.log(data);
-  };
-  const toggleModal = () => (showModal = !showModal);
+  export let data, showModal, toggleModal;
 </script>
 
 <img
@@ -41,7 +28,7 @@
       This action cannot be undone.
     </p>
     <button
-      on:click={deleteConnectionHandler}
+      on:click
       class="text-lg font-semibold text-red-600 p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800"
       >Delete
     </button>

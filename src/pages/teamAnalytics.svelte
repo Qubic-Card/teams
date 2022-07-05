@@ -1,11 +1,12 @@
 <script>
   import Pagination from '@comp/pagination.svelte';
+  import TeamAnalyticsLogsSkeleton from '@comp/skeleton/teamAnalyticsLogsSkeleton.svelte';
   import { fade } from 'svelte/transition';
 
-  export let totalPages, active, page, currentPageRows, setPage;
+  export let totalPages, active, page, currentPageRows, setPage, loading;
 </script>
 
-{#if currentPageRows}
+{#if !loading}
   {#if currentPageRows.length > 0}
     {#each currentPageRows as log}
       <div class="pl-5 mb-1" in:fade|local>
@@ -36,4 +37,6 @@
     </div>
   {/if}
   <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
+{:else}
+  <TeamAnalyticsLogsSkeleton />
 {/if}

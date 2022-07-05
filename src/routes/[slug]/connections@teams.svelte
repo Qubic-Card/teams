@@ -12,6 +12,7 @@
   } from '@lib/constants';
   import Search from '@comp/search.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
   let teamId = Cookies.get('qubicTeamId');
   let innerWidth;
@@ -41,7 +42,7 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq('team_id', id)
-      .order('dateConnected', { ascending: true });
+      .order('dateConnected', { ascending: false });
 
     if (error) console.log(error);
     if (data) teamConnections = data;
@@ -53,7 +54,7 @@
       .from('team_connection_acc')
       .select('*, by(*)')
       .eq('by', id)
-      .order('dateConnected', { ascending: true });
+      .order('dateConnected', { ascending: false });
 
     if (error) console.log(error);
     if (data) {
@@ -98,7 +99,7 @@
       .select('*, by(*)')
       .eq('team_id', teamId)
       .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
-      .order('dateConnected', { ascending: true });
+      .order('dateConnected', { ascending: false });
 
     loading = false;
     if (error) console.log(error);
@@ -122,7 +123,7 @@
       .select('*, by(*)')
       .eq('by', id)
       .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
-      .order('dateConnected', { ascending: true });
+      .order('dateConnected', { ascending: false });
 
     loading = false;
     if (error) console.log(error);
@@ -134,6 +135,24 @@
         : (searchNotFoundMsg = '');
 
       return data;
+    }
+  };
+
+  const deleteConnectionHandler = async (id, tab) => {
+    const { error } = await supabase
+      .from('team_connection_acc')
+      .delete()
+      .match({ id: id });
+    if (error) {
+      toastFailed('Failed to delete connection');
+    } else {
+      toastSuccess('Connection deleted');
+    }
+
+    if (tab === 'team') {
+      teamConnections = teamConnections.filter((item) => item.id !== id);
+    } else {
+      userConnections = userConnections.filter((item) => item.id !== id);
     }
   };
 
@@ -223,11 +242,23 @@
             <tbody>
               {#if tabs === 'all'}
                 {#each teamConnections as connection, i}
-                  <ConnectionTableBody {innerWidth} {connection} {i} />
+                  <ConnectionTableBody
+                    {innerWidth}
+                    {connection}
+                    {i}
+                    tab="team"
+                    deleteHandler={deleteConnectionHandler}
+                  />
                 {/each}
               {:else}
                 {#each userConnections as connection, i}
-                  <ConnectionTableBody {innerWidth} {connection} {i} />
+                  <ConnectionTableBody
+                    {innerWidth}
+                    {connection}
+                    {i}
+                    tab="user"
+                    deleteHandler={deleteConnectionHandler}
+                  />
                 {/each}
               {/if}
             </tbody>
@@ -295,7 +326,13 @@
           </thead>
           <tbody>
             {#each userConnections as connection, i}
-              <ConnectionTableBody {innerWidth} {connection} {i} />
+              <ConnectionTableBody
+                {innerWidth}
+                {connection}
+                {i}
+                tab="user"
+                deleteHandler={deleteConnectionHandler}
+              />
             {/each}
           </tbody>
         </table>
