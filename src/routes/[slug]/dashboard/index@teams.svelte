@@ -6,16 +6,12 @@
   import { page } from '$app/stores';
 
   let isHasPermissionToMemberPage = false;
-  let isHasPermissionToAnalyticsPage = false;
   let isHasPermissionToEditProfilePage = false;
   let showModal = false;
 
   $: $userData?.filter((item) => {
     if (item === 'allow_write_members') {
       isHasPermissionToMemberPage = true;
-    }
-    if (item === 'allow_read_analytics') {
-      isHasPermissionToAnalyticsPage = true;
     }
     if (item === 'allow_write_profile') {
       isHasPermissionToEditProfilePage = true;
@@ -29,20 +25,6 @@
           ? (showModal = true)
           : goto(`/${$page.params.slug}/members`),
       name: 'Add new member',
-    },
-    {
-      handler: () =>
-        isHasPermissionToAnalyticsPage === false
-          ? (showModal = true)
-          : goto(`/${$page.params.slug}/analytics`),
-      name: 'Analyze BI',
-    },
-    {
-      handler: () =>
-        isHasPermissionToAnalyticsPage === false
-          ? (showModal = true)
-          : goto(`/${$page.params.slug}/analytics`),
-      name: 'Manage billing',
     },
     {
       handler: () =>
@@ -69,7 +51,7 @@
   class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-24 pr-4"
 >
   <div class="flex flex-col">
-    <QuickActionsModal {showModal} on:showModal={modalHandler} />
+    <QuickActionsModal {showModal} {modalHandler} />
     <h1 class="text-lg font-bold">Quick Actions</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-16 lg:h-12 flex w-full overflow-x-auto mt-2 gap-2"

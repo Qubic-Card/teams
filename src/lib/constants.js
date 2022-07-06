@@ -1,3 +1,5 @@
+import { goto } from '$app/navigation';
+
 export const qubicGradient = 'bg-gradient-to-tl from-blue-400 to-indigo-500';
 
 export const socialIcons = {
@@ -119,6 +121,10 @@ export const connectionsTable = [
     name: 'By',
     id: 'by',
   },
+  // {
+  //   name: '',
+  //   id: 'actions',
+  // },
 ];
 
 export const connectionsTableMobile = [
@@ -168,3 +174,44 @@ export const analyticsChartConfig = {
     },
   },
 };
+
+export let sidebarItems = [
+  {
+    title: 'dashboard',
+    routeId: '[slug]/dashboard@teams',
+    urldefault:
+      'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
+  },
+  {
+    title: 'connections',
+    routeId: '[slug]/connections@teams',
+    urldefault: 'https://img.icons8.com/ios/100/FFFFFF/contact-card.png',
+  },
+  {
+    title: 'records',
+    routeId: '[slug]/records@teams',
+    urldefault:
+      'https://img.icons8.com/material-outlined/96/FFFFFF/add-database.png',
+  },
+  {
+    title: 'members',
+    routeId: '[slug]/members@teams',
+    urldefault: 'https://img.icons8.com/ios/100/FFFFFF/conference-call--v1.png',
+  },
+  {
+    title: 'settings',
+    routeId: '[slug]/settings@teams',
+    urldefault:
+      'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
+  },
+];
+
+export const recordsTable = [
+  { name: 'Filename', id: 'profileData->>firstname' },
+  { name: 'Created at', id: 'profileData->>job' },
+  { name: 'Type', id: 'profileData->>company' },
+  {
+    name: '',
+    id: 'actions',
+  },
+];

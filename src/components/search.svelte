@@ -18,7 +18,8 @@
   {/if}
   <input
     type="text"
-    class="w-full md:w-[300px] lg:w-[400px] h-12 p-2 border-2 border-neutral-700 text-white bg-neutral-900"
+    class="w-full md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700
+  text-white bg-neutral-900"
     placeholder="Search"
     bind:value
   />
@@ -32,10 +33,7 @@
           {#each searchMenu as item}
             <MenuItem
               class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-              on:click={() => {
-                selectHandler(item);
-                console.log(item);
-              }}
+              on:click={() => selectHandler(item)}
             >
               {item.name}
             </MenuItem>

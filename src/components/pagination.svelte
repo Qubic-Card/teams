@@ -4,7 +4,9 @@
 
 <div
   class={`justify-center my-4 ${
-    currentPageRows.length === 0 || currentPageRows.length === 5
+    currentPageRows?.length === 0 ||
+    currentPageRows?.length === 5 ||
+    currentPageRows?.length === 3
       ? 'hidden'
       : 'flex'
   }`}

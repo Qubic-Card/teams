@@ -7,13 +7,24 @@
   import { user } from '@lib/stores/userStore';
   import Input from '@comp/input.svelte';
   import Cookies from 'js-cookie';
+  import Checkboxes from '@comp/checkbox.svelte';
+  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
+
+  export let roles;
 
   let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
   let showModal = false;
   let loading = false;
+  let checkedRole = [];
 
-  const toggleModal = () => (showModal = !showModal);
+  const toggleModal = () => {
+    if (roles.length < 5) {
+      showModal = !showModal;
+    } else {
+      toastFailed('You can only add 5 roles');
+    }
+  };
 
   const addRoleHandler = async () => {
     loading = true;
@@ -22,7 +33,7 @@
       const { data, error } = await supabase
         .from('team_roles')
         .insert({
-          role_maps: roleMapping,
+          role_maps: checkedRole,
           role_name: roleName,
           team_id: teamId,
         })
@@ -46,54 +57,51 @@
 </script>
 
 <button
-  class="p-4 w-56 bg-blue-600 text-white rounded-lg"
+  class="p-4 w-auto bg-blue-600 text-white rounded-lg"
   on:click={toggleModal}
 >
   + Add new role
 </button>
-{#if showModal}
+<ModalWrapper
+  title="Add role"
+  {showModal}
+  on:showModal={toggleModal}
+  class="w-1/2"
+>
   <div
-    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
+    class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
   >
-    <div class="relative w-1/2 my-6 mx-auto md:max-w-3xl max-w-md">
-      <!--content-->
-      <div
-        class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-900 outline-none focus:outline-none"
-      >
-        <!--header-->
-        <div class="p-5 border-b border-solid rounded-t">
-          <div class="flex w-full justify-between items-center">
-            <h3 class="text-xl font-semibold">Add new role</h3>
-            <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
-              x
-            </p>
-          </div>
-        </div>
-        <!--body-->
-        <div
-          class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
-        >
-          <Input
-            placeholder="Role Name"
-            title="Role Name"
-            bind:value={roleName}
-            class="w-full"
-            isEmptyChecking={true}
-          />
-          <button
-            disabled={roleName === '' ? true : false}
-            class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500"
-            on:click={async () => await addRoleHandler()}
-          >
-            {#if loading}
-              <Spinner class="w-7 h-7" />
-            {:else}
-              Add role
-            {/if}
-          </button>
-        </div>
-      </div>
-    </div>
+    <Input
+      placeholder="Role Name"
+      title="Role Name"
+      bind:value={roleName}
+      class="w-full"
+      isEmptyChecking={true}
+    />
+    <Checkboxes checkboxes={roleMapping} bind:checked={checkedRole} />
+    <button
+      disabled={roleName === '' ? true : false}
+      class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500"
+      on:click={async () => await addRoleHandler()}
+    >
+      {#if loading}
+        <Spinner class="w-7 h-7" />
+      {:else}
+        Add role
+      {/if}
+    </button>
   </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
-{/if}
+</ModalWrapper>
+
+<style>
+  .snap-container::-webkit-scrollbar {
+    height: 10px;
+    width: 5px;
+  }
+  .snap-container::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+  }
+  .snap-container::-webkit-scrollbar-thumb {
+    background-color: #71717a;
+  }
+</style>

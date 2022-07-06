@@ -3,6 +3,7 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
   import Input from '@comp/input.svelte';
+  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
   export let roleName, id;
 
@@ -42,7 +43,12 @@
   };
 </script>
 
-<button type="button" on:click={toggleModal} class="p-3 bg-white rounded-lg">
+<button
+  type="button"
+  on:click={toggleModal}
+  class="p-3 bg-white rounded-lg disabled:bg-white/60"
+  disabled={roleName === 'admin' ? true : false}
+>
   <img
     class="h-4 w-4"
     src="https://img.icons8.com/external-becris-lineal-becris/64/undefined/external-edit-mintab-for-ios-becris-lineal-becris.png"
@@ -50,48 +56,32 @@
   />
   <!-- Rename -->
 </button>
-{#if showModal}
+
+<ModalWrapper
+  title="Rename role"
+  {showModal}
+  on:showModal={toggleModal}
+  class="w-1/2"
+>
   <div
-    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
+    class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
   >
-    <div class="relative w-1/2 my-6 mx-auto md:max-w-3xl max-w-md">
-      <!--content-->
-      <div
-        class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-900 outline-none focus:outline-none"
-      >
-        <!--header-->
-        <div class="p-5 border-b border-solid rounded-t">
-          <div class="flex w-full justify-between items-center">
-            <h3 class="text-xl font-semibold">Rename role name</h3>
-            <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
-              x
-            </p>
-          </div>
-        </div>
-        <!--body-->
-        <div
-          class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
-        >
-          <Input
-            placeholder="Role Name"
-            title="Role Name"
-            bind:value={roleName}
-            class="w-full"
-            isEmptyChecking={true}
-          />
-          <button
-            on:click={async () => await updateRoleName()}
-            class="flex justify-center items-center p-3 w-full bg-neutral-700 hover:bg-neutral-800 hover:border hover:border-neutral-500"
-          >
-            {#if loading}
-              <Spinner class="w-7 h-7" />
-            {:else}
-              Apply changes
-            {/if}
-          </button>
-        </div>
-      </div>
-    </div>
+    <Input
+      placeholder="Role Name"
+      title="Role Name"
+      bind:value={roleName}
+      class="w-full"
+      isEmptyChecking={true}
+    />
+    <button
+      on:click={async () => await updateRoleName()}
+      class="flex justify-center items-center p-3 w-full bg-neutral-700 hover:bg-neutral-800 hover:border hover:border-neutral-500"
+    >
+      {#if loading}
+        <Spinner class="w-7 h-7" />
+      {:else}
+        Apply changes
+      {/if}
+    </button>
   </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
-{/if}
+</ModalWrapper>

@@ -1,5 +1,4 @@
 <script>
-  import ConnectModal from '@comp/modals/connectModal.svelte';
   import AvatarCard from '@comp/cards/avatarCard.svelte';
   import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';
@@ -18,6 +17,8 @@
   } from '@rgossiaux/svelte-headlessui';
   import supabase from '@lib/db';
   import addToContactHandler from '@lib/utils/addToContact';
+  import { genvcard } from '@lib/vcard/vcardgen';
+  import download from '@lib/utils/download';
 
   export let data;
   export let isEditorMode = false;
@@ -32,6 +33,7 @@
   let companyAddress = null;
   let companyLogo = null;
   let currentTheme = theme[data.design?.theme?.toString() ?? 'dark'];
+  let teamData = null;
 
   const getTeams = async () => {
     const { data, error } = await supabase
@@ -41,6 +43,8 @@
 
     if (error) console.log(error);
     if (data) {
+      // console.log(data);
+      teamData = data[0].metadata;
       companyName = data[0].metadata.company;
       companyNickname = data[0].nickname;
       companyAddress = data[0].metadata.address;
@@ -50,6 +54,7 @@
     }
   };
   $: getTeams();
+
   const modalHandler = () => (showModal = !showModal);
   const downloadHandler = () => console.log('Brosur has been downloaded');
 </script>
@@ -115,11 +120,7 @@
             class="flex gap-2 flex-col w-full border-2 border-neutral-700 rounded-lg p-4"
           >
             <div class="flex">
-              <img
-                src={companyLogo ?? 'https://placeimg.com/80/80/any'}
-                alt=""
-                class="rounded-lg w-16 h-16 mr-2"
-              />
+              <img src={companyLogo} alt="" class="rounded-lg w-16 h-16 mr-2" />
               <h1>{companyName ?? '-'}</h1>
             </div>
             <p>{companyAddress ?? '-'}</p>
@@ -140,18 +141,12 @@
         <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
           <!-- UTILITIES -->
           <BorderButton
-            class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
+            disabled={true}
+            class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md cursor-default"
             on:click={modalHandler}
           >
             Connect with Me
           </BorderButton>
-          <ConnectModal
-            on:showModal={modalHandler}
-            {showModal}
-            {profileUid}
-            {cardId}
-            {data}
-          />
           <div class="flex justify-between flex-wrap items-start gap-1 my-1">
             {#each isEditorMode ? $socials : data.socials as item}
               {#if item.isActive}
@@ -178,7 +173,8 @@
           </div>
           <BorderButton
             class="w-full h-12 mb-10 {currentTheme.border} {currentTheme.secondary} rounded-md"
-            on:click={() => addToContactHandler(data)}
+            on:click={async () =>
+              download(await genvcard(data, teamData), 'contact')}
           >
             Add to Contacts
           </BorderButton>

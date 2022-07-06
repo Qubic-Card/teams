@@ -6,6 +6,17 @@ export let isTiktokValid = false;
 export let isPhoneValid = false;
 export let isNumber;
 export let isTwitterValid = false;
+export let isFilenameValid = true;
+
+export const filenameValidator = (filename) => {
+  if (filename !== '') {
+    if (filename.includes('.')) {
+      isFilenameValid = false;
+    } else {
+      isFilenameValid = true;
+    }
+  }
+};
 
 export const emailRegex = (email) => {
   const re =

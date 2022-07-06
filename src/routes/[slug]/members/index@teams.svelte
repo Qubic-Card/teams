@@ -23,17 +23,15 @@
   let selectedSearchMenu = null;
   let roles = [];
 
-  const selectMenu = (menu) => {
-    selectedSearchMenu = menu.detail;
-    console.log(menu);
-  };
+  const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
 
   const getTeamMembers = async () => {
     // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('team_members')
       .select('member_from, team_profile, uid, id')
-      .eq('team_id', teamId);
+      .eq('team_id', teamId)
+      .order('member_from', { ascending: true });
 
     if (error) console.log(error);
 
@@ -70,7 +68,6 @@
   };
 
   $: {
-    console.log(members);
     $userData?.filter((item) => {
       if (item === 'allow_read_members') isHasPermission = true;
     });
@@ -90,7 +87,7 @@
     <MemberSkeleton />
   {:then}
     <div
-      class={`items-center w-full justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
+      class={`items-center w-full rounded-md justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
         isHasPermission ? 'flex' : 'hidden'
       }`}
     >

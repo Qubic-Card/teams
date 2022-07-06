@@ -28,7 +28,6 @@
   let selectedRoleId = 0;
 
   const selectRole = (role) => {
-    console.log(role);
     selectedRole = role.role_name;
     selectedRoleId = role.id;
   };

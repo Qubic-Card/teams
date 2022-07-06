@@ -1,6 +1,6 @@
 <script>
   import supabase from '@lib/db.js';
-  import AnalyticTable from '@comp/analyticTable.svelte';
+  import AnalyticTable from '@comp/tables/analyticTable.svelte';
   import { user, userData } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getMemberId } from '@lib/query/getId';
@@ -34,7 +34,13 @@
   let itemsPerPage = 10;
   let totalPages = [];
   let maxLimit = 5;
+  let page = 0;
+  let currentPageRows = [];
+  let active = 0;
   let isAlreadySeeMore = false;
+
+  let connectionChartCtx;
+  let logChartCtx;
 
   let logsChartData = {
     labels: [],
@@ -77,7 +83,8 @@
 
   let connectionsCsv = {};
   let logsCsv = {};
-  let selectedDays = '3 Days';
+  let selectedDays = '';
+  let isSelectedDaysHasChanged = false;
 
   const setLimit = (value) => {
     maxLimit = value;
@@ -93,12 +100,21 @@
     totalPages = [...paginatedItems];
   };
 
-  const selectDaysHandler = (e) => (selectedDays = e.detail);
+  const setPage = (p) => {
+    if (p >= 0 && p < totalPages?.length) {
+      page = p;
+      active = p;
+    }
+  };
+
+  const selectDaysHandler = (e) => {
+    selectedDays = e.detail;
+    isSelectedDaysHasChanged = true;
+  };
 
   const getConnectionsList = async () => {
-    console.log("user id:::",$user?.id)
     let id = await getMemberId($user?.id, teamId);
-    console.log("id::", id)
+
     loading = true;
     let {
       data: connection_profile,
@@ -124,9 +140,7 @@
         ).toUTCString()
       )
       .order('dateConnected', { ascending: false });
-    
-    loading = false;
-    console.log(connection_profile)
+
     if (error_profile) console.log(error_profile);
     if (connection_profile) {
       connectionCount = count;
@@ -134,90 +148,126 @@
         new Date(item.dateConnected).toDateString().slice(4)
       );
     }
+    loading = false;
   };
 
   const getWeeklyLogsActivity = async () => {
     let id = await getMemberId($user?.id, teamId);
     loading = true;
-    try {
-      let {
-        data: logs,
-        error,
-        count,
-      } = await supabase
-        .from('team_logs')
-        .select(
-          'created_at, data->card, data->message, type, team, team_member(*)',
-          {
-            count: 'estimated',
-          }
-        )
-        .eq('team_member', id)
-        .gte(
-          'created_at',
-          new Date(
-            selectedDays === '7 Days'
-              ? last7Days[0]
-              : selectedDays === '14 Days'
-              ? last14Days[0]
-              : selectedDays === '30 Days'
-              ? last30Days[0]
-              : last3Days[0]
-          ).toISOString()
-        )
-        .order('created_at', {
-          ascending: false,
-        });
-      // .limit(maxLimit ?? 5);
-        console.log(error)
-      if (logs) {
-        let newArr = [];
-        logs.map((log) => {
-          if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
-        });
-        uniqueCount = newArr.length;
-        activityCount = count;
-        activity = logs.map((log) =>
-          new Date(log.created_at).toDateString().slice(4)
-        );
+    let {
+      data: logs,
+      error,
+      count,
+    } = await supabase
+      .from('team_logs')
+      .select(
+        'created_at, data->card, data->message, type, team, team_member(*)',
+        {
+          count: 'estimated',
+        }
+      )
+      .eq('team_member', id)
+      .gte(
+        'created_at',
+        new Date(
+          selectedDays === '7 Days'
+            ? last7Days[0]
+            : selectedDays === '14 Days'
+            ? last14Days[0]
+            : selectedDays === '30 Days'
+            ? last30Days[0]
+            : last3Days[0]
+        ).toISOString()
+      )
+      .order('created_at', {
+        ascending: false,
+      });
+    // .limit(maxLimit ?? 5);
 
-        userLogs = logs;
-        loading = false;
-      }
-    } catch (error) {
+    if (logs) {
+      let newArr = [];
+      logs.map((log) => {
+        if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
+      });
+      uniqueCount = newArr.length;
+      activityCount = count;
+      activity = logs.map((log) =>
+        new Date(log.created_at).toDateString().slice(4)
+      );
+
+      userLogs = logs;
       loading = false;
+    }
+    if (error) {
       console.log(error);
+      loading = false;
     }
   };
-
-  $: selectedDays, getWeeklyLogsActivity(), getConnectionsList();
 
   const activityHandler = async () => {
     await getWeeklyLogsActivity();
 
-    logsChartData.labels = last7Days;
-    logsChartData.datasets[0].data = count(last7Days, activity);
-    if(logChartCtx)
-    logChartCtx.update()
+    logsChartData.labels =
+      selectedDays === '7 Days'
+        ? last7Days
+        : selectedDays === '14 Days'
+        ? last14Days
+        : selectedDays === '30 Days'
+        ? last30Days
+        : last3Days;
+    logsChartData.datasets[0].data = count(
+      selectedDays === '7 Days'
+        ? last7Days
+        : selectedDays === '14 Days'
+        ? last14Days
+        : selectedDays === '30 Days'
+        ? last30Days
+        : last3Days,
+      activity
+    );
+
+    if (logChartCtx) logChartCtx.update();
+    isSelectedDaysHasChanged = false;
+    isAlreadySeeMore = false;
   };
 
   const connection = async () => {
     await getConnectionsList();
 
-    connectionsChartData.labels = last7Days;
-    connectionsChartData.datasets[0].data = count(last7Days, dateConnected);
-    if(connectionChartCtx)
-    connectionChartCtx.update()
+    connectionsChartData.labels =
+      selectedDays === '7 Days'
+        ? last7Days
+        : selectedDays === '14 Days'
+        ? last14Days
+        : selectedDays === '30 Days'
+        ? last30Days
+        : last3Days;
+    connectionsChartData.datasets[0].data = count(
+      selectedDays === '7 Days'
+        ? last7Days
+        : selectedDays === '14 Days'
+        ? last14Days
+        : selectedDays === '30 Days'
+        ? last30Days
+        : last3Days,
+      dateConnected
+    );
+
+    if (connectionChartCtx) connectionChartCtx.update();
+    isSelectedDaysHasChanged = false;
+    isAlreadySeeMore = false;
   };
 
-  $: paginate(userLogs.slice(0, maxLimit));
+  $: selectedDays, paginate(userLogs.slice(0, maxLimit));
+  $: selectedDays, connection(), activityHandler();
+  $: if (isSelectedDaysHasChanged && maxLimit > 5) setLimit(5);
+  $: currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
+  $: if (selectedDays !== '') {
+    page = 0;
+    active = 0;
+  }
 
-  let connectionChartCtx;
-  let logChartCtx;
   onMount(async () => {
-    await connection();
-    await activityHandler();
-
     const connectionsCtx = connectionsChart.getContext('2d');
     connectionChartCtx = new Chart(connectionsCtx, connectionsConfig);
 
@@ -231,9 +281,7 @@
     <!-- {#await }
       <AnalyticsSkeleton />
     {:then} -->
-    <AnalyticsDropdownButton
-      on:select={selectDaysHandler}
-    />
+    <AnalyticsDropdownButton on:select={selectDaysHandler} />
     <!-- <AnalyticsDropdownButton data={connectionsCsv} class="top-[385px]" /> -->
     <div class="flex flex-col lg:flex-row justify-between gap-2">
       <!-- <Chart element={connectionsChart} data={connectionsChartData} />
@@ -293,6 +341,10 @@
         {totalPages}
         on:click={() => setLimit(500)}
         {isAlreadySeeMore}
+        {setPage}
+        {page}
+        {currentPageRows}
+        {active}
       />
     </div>
     <div class="flex lg:hidden w-full justify-center mt-8">

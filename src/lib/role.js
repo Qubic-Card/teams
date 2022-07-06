@@ -20,19 +20,24 @@ const roleMapping = [
     name: 'allow_read_connections',
   },
   {
-    id: 4,
+    id: 5,
     desc: 'Perbolehkan user untuk mengedit user lain',
     name: 'allow_write_members',
   },
   {
-    id: 5,
+    id: 6,
     desc: 'Perbolehkan user untuk mengedit team',
     name: 'allow_write_team',
   },
   {
-    id: 6,
+    id: 7,
     desc: 'Perbolehkan user untuk mengedit profile',
     name: 'allow_write_profile',
+  },
+  {
+    id: 7,
+    desc: 'Perbolehkan user untuk membuat team records',
+    name: 'allow_write_records',
   },
 ];
 
