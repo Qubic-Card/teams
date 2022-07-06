@@ -1,5 +1,5 @@
 import preprocess from 'svelte-preprocess';
-import netlify from '@sveltejs/adapter-netlify';
+import adapter from '@sveltejs/adapter-node';
 import path from 'path';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -14,7 +14,7 @@ const config = {
   ],
 
   kit: {
-    adapter: netlify(),
+    adapter: adapter(),
     vite: {
       resolve: {
         alias: {
