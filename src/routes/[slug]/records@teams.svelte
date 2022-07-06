@@ -33,8 +33,13 @@
     isHasPermission ? 'h-[95%] pt-4' : 'h-full pt-0'
   }`}
 >
+  <div class="flex flex-col w-full h-full justify-center items-center">
+    <h1 class="font-bold text-6xl">Coming Soon</h1>
+  </div>
+
+  <!-- HIDDEN -->
   {#if isHasPermission}
-    <TabGroup class="h-full">
+    <TabGroup class="h-full hidden">
       <TabList
         class="w-full flex justify-between pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
       >
@@ -70,7 +75,7 @@
       </TabPanels>
     </TabGroup>
   {:else}
-    <div class="flex h-full">
+    <div class="flex h-full hidden">
       <PersonalRecords {records} />
     </div>
   {/if}
