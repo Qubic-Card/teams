@@ -13,9 +13,8 @@ phases:
   post_build:
     commands:
       - cp package.json build
-      - ls
 artifacts:
   files:
     - '**/*'
   discard-paths: no
-  base-directory: build/
+  base-directory: build
