@@ -7,44 +7,107 @@
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
-  import { last30Days } from '@lib/utils/getDates';
+  import supabase from '@lib/db';
+  import { user } from '@lib/stores/userStore';
+  import { getMemberId } from '@lib/query/getId';
+  import { onMount } from 'svelte';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
+  import getDates from '@lib/utils/getDates';
+
+  export let personalConnectionsCsv;
 
   let fromDatevalue = new Date();
   let toDatevalue = new Date();
+  let last60Days;
 
+  $: last60Days = getDates(
+    new Date(new Date().setDate(new Date().getDate() - 59)),
+    fromDatevalue
+  );
+
+  let isDenied = false;
   const options = {
     // element: '#my-picker',
     enableTime: false,
-    onChange(selectedDates, dateStr) {
-      console.log('flatpickr hook', selectedDates, dateStr);
+    onChange() {
+      let formattedDate = new Date(fromDatevalue[0]).toDateString().slice(4);
+
+      // console.log('selectedDates', formattedDate);
+      // console.log('last60Days', last60Days[0]);
+      if (formattedDate === last60Days[0]) {
+        isDenied = true;
+      }
     },
     // mode: 'range',
     // minDate: new Date(last30Days[0]),
     maxDate: new Date(),
   };
 
-  export let records;
+  // $: console.log(toDatevalue);
+  $: console.log(isDenied);
+  $: console.log(fromDatevalue);
+  $: console.log(last60Days[0]);
 
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
-  let isTeamTab = false;
 
   let type = '';
   let fileName = '';
   let selectedType = '';
   let fromDate = '';
   let toDate = '';
+  // let personalConnectionsCsv = [];
+  let isCreateRecord = false;
 
-  const selectTypeHandler = (e) => {
-    selectedType = e.detail;
+  const createRecordHandler = async () => {
+    let id = await getMemberId($user?.id, teamId);
+    const connectionsCsv = await getConnectionsRecords('by', id);
+    const logsCsv = await getLogsRecords('team_member', id);
+
+    const { data } = await supabase.storage
+      .from('records')
+      .upload(
+        `${teamId}/${$user?.id}/${fileName}-${
+          selectedType === 'Logs' ? 'logs' : 'connections'
+        }`,
+        selectedType === 'Logs' ? logsCsv : connectionsCsv,
+        {
+          contentType: 'text/csv',
+        }
+      );
+
+    isCreateRecord = true;
+    fileName = '';
+    selectedType = '';
+    // toDatevalue = new Date();
+    // fromDatevalue = new Date();
   };
 
-  const createRecordHandler = () => {
-    console.log('createRecordHandler', fileName);
-    console.log(selectedType);
-    console.log(fromDatevalue);
-    console.log(toDatevalue);
+  const getPersonalStorage = async () => {
+    const { data, error } = await supabase.storage
+      .from('records')
+      .list(`${teamId}/${$user?.id}`, {});
+
+    if (error) {
+      console.log(error);
+    } else {
+      personalConnectionsCsv = data;
+    }
   };
+
+  const deleteFromTable = (id) =>
+    (personalConnectionsCsv = personalConnectionsCsv.filter(
+      (item) => item.id !== id
+    ));
+
+  const selectTypeHandler = (e) => (selectedType = e.detail);
+  // onMount(async () => {
+  //   let id = await getMemberId($user?.id, teamId);
+  //   const connectionsCsv = await getConnectionsRecords('by', id);
+  //   console.log(connectionsCsv);
+  // });
+  $: if (isCreateRecord) isCreateRecord, getPersonalStorage();
 </script>
 
 <div
@@ -81,8 +144,12 @@
   </div>
   <button
     class="bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
-    disabled={fileName.includes('.') || fileName === '' ? true : false}
-    on:click={createRecordHandler}
+    disabled={fileName.includes('.') ||
+    fileName.length < 4 ||
+    selectedType === ''
+      ? true
+      : false}
+    on:click={async () => await createRecordHandler()}
   >
     Create record -></button
   >
@@ -106,8 +173,8 @@
       </tr>
     </thead>
     <tbody>
-      {#each records as record, i}
-        <RecordsTableBody {record} />
+      {#each personalConnectionsCsv as record, i}
+        <RecordsTableBody {record} {teamId} {deleteFromTable} />
       {/each}
     </tbody>
   </table>

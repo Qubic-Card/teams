@@ -5,11 +5,16 @@
   import RecordsTableBody from '@comp/tables/recordsTableBody.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
-  import { last30Days } from '@lib/utils/getDates';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
+  import { last30Days, last60Days } from '@lib/utils/getDates';
+  import supabase from '@lib/db';
+  import { user } from '@lib/stores/userStore';
+  import { getMemberId } from '@lib/query/getId';
+  import { onMount } from 'svelte';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
 
-  export let records;
   let fromDatevalue = new Date();
   let toDatevalue = new Date();
 
@@ -24,6 +29,8 @@
     maxDate: new Date(),
   };
 
+  export let records;
+
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
   let isTeamTab = false;
@@ -33,17 +40,66 @@
   let selectedType = '';
   let fromDate = '';
   let toDate = '';
+  let personalConnectionsCsv = [];
+  let isCreateRecord = false;
 
-  const selectTypeHandler = (e) => {
-    selectedType = e.detail;
+  const createRecordHandler = async () => {
+    const connectionsCsv = await getConnectionsRecords('team_id', teamId);
+    const logsCsv = await getLogsRecords('team', teamId);
+
+    const { data } = await supabase.storage
+      .from('records')
+      .upload(
+        `${teamId}/${$user?.id}/${fileName}-${
+          selectedType === 'Logs' ? 'logs' : 'connections'
+        }`,
+        selectedType === 'Logs' ? logsCsv : connectionsCsv,
+        {
+          contentType: 'text/csv',
+        }
+      );
+
+    isCreateRecord = true;
+    fileName = '';
+    // toDatevalue = new Date();
+    // fromDatevalue = new Date();
   };
 
-  const createRecordHandler = () => {
-    console.log('createRecordHandler', fileName);
-    console.log(selectedType);
-    console.log(fromDatevalue);
-    console.log(toDatevalue);
+  const getPersonalStorage = async () => {
+    const { data, error } = await supabase.storage
+      .from('records')
+      .list(`${teamId}/${$user?.id}`, {
+        // limit: 100,
+        // offset: 0,
+        // sortBy: { column: 'name', order: 'asc' },
+      });
+
+    if (error) {
+      console.log(error);
+    } else {
+      personalConnectionsCsv = data;
+      // console.log(data);
+    }
   };
+
+  const deleteFromTable = (id) =>
+    (personalConnectionsCsv = personalConnectionsCsv.filter(
+      (item) => item.id !== id
+    ));
+
+  const selectTypeHandler = (e) => (selectedType = e.detail);
+
+  // const createRecordHandler = () => {
+  //   console.log('createRecordHandler', fileName);
+  //   console.log(selectedType);
+  //   console.log(fromDatevalue);
+  //   console.log(toDatevalue);
+  // };
+  // $: console.log(toDatevalue);
+  // onMount(async () => {
+  //   await getPersonalStorage();
+  // });
+  $: isCreateRecord, getPersonalStorage();
 </script>
 
 <div
@@ -78,7 +134,17 @@
       isEmptyChecking={true}
     />
   </div>
-  <button class="bg-blue-600 pl-20 p-3"> Create record -></button>
+  <button
+    class="bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
+    disabled={fileName.includes('.') ||
+    fileName.length < 4 ||
+    selectedType === ''
+      ? true
+      : false}
+    on:click={async () => await createRecordHandler()}
+  >
+    Create record -></button
+  >
 </div>
 <div
   class="w-3/4 snap-container snap-x mx-auto snap-mandatory flex flex-col overflow-x-auto mb-8"
@@ -99,8 +165,8 @@
       </tr>
     </thead>
     <tbody>
-      {#each records as record, i}
-        <RecordsTableBody {record} />
+      {#each personalConnectionsCsv as record, i}
+        <RecordsTableBody {record} {teamId} {deleteFromTable} />
       {/each}
     </tbody>
   </table>

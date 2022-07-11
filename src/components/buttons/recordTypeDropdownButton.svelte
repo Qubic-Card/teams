@@ -10,6 +10,7 @@
   const select = (type) => {
     selectedType = type;
     dispatch('select', type);
+    // selectedType = 'Choose Type';
   };
 
   let days = ['Logs', 'Connections'];
@@ -32,6 +33,7 @@
           }`}
           on:click={() => {
             select(item);
+            // selectedType = 'Choose Type';
             open = false;
           }}
         >

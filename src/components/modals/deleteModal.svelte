@@ -21,7 +21,7 @@
   >
     <h1 class="text-xl text-white font-bold text-center">
       Are you sure you want to delete <br />
-      {data.profileData?.firstname ?? data?.filename}
+      {data.profileData?.firstname ?? data?.name}
       {data.profileData?.lastname ?? ''} ?
     </h1>
     <p class="text-sm text-neutral-100 font-semibold">
