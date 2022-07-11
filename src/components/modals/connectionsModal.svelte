@@ -21,17 +21,25 @@
   <div class="flex w-full justify-between items-center text-white">
     <div class="flex flex-col w-full">
       <div class="flex flex-col lg:flex-row items-center lg:pl-24 pb-4">
-        {#if connection.profileData.avatar === ''}
+        {#if connection.profileData.avatar}
+          {#if connection.profileData.avatar === ''}
+            <div
+              class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600 mr-2 lg:mr-10"
+            >
+              {connection.profileData.firstname.charAt(0).toUpperCase()}
+            </div>
+          {:else}
+            <AvatarCard
+              background={connection.profileData.avatar}
+              class="mr-2 lg:mr-10 w-24 md:w-32 lg:w-36"
+            />
+          {/if}
+        {:else}
           <div
             class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600 mr-2 lg:mr-10"
           >
-            {connection.profileData.firstname.charAt(0).toUpperCase()}
+            Q
           </div>
-        {:else}
-          <AvatarCard
-            background={connection.profileData.avatar}
-            class="mr-2 lg:mr-10 w-24 md:w-32 lg:w-36"
-          />
         {/if}
         <div class="flex flex-col w-72 mt-4 lg:mt-0 text-center lg:text-left">
           <p class="font-bold">
@@ -105,7 +113,7 @@
       <button
         on:click={async () =>
           download(await genvcard(connection.profileData), 'contact')}
-        class="w-full bg-black rounded-md hover:font-bold text-white mx-auto p-4 mb-4"
+        class="w-full bg-blue-600 rounded-md hover:font-bold text-white mx-auto p-4 mb-4"
       >
         Add to Contacts
       </button>

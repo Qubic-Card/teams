@@ -121,10 +121,10 @@ export const connectionsTable = [
     name: 'By',
     id: 'by',
   },
-  // {
-  //   name: '',
-  //   id: 'actions',
-  // },
+  {
+    name: '',
+    id: 'actions',
+  },
 ];
 
 export const connectionsTableMobile = [

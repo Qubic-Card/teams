@@ -28,7 +28,7 @@
   import Cache from 'timed-cache';
   // const cache = new Cache({ defaultTtl: 3600 * 1000 });
   let teamLogs = [];
-  let loading = false;
+  let loading = true;
 
   const analyticsData = [
     { percentage: 0, data: 0, type: 'Active' },
@@ -128,7 +128,7 @@
   };
 
   const getTeamConnectionsPreviousList = async () => {
-    loading = true;
+    // loading = true;
     let { error: team_error, count } = await supabase
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
@@ -154,7 +154,7 @@
   };
 
   const getTeamWeeklyLogsPreviousActivity = async () => {
-    loading = true;
+    // loading = true;
     try {
       let { error, count } = await supabase
         .from('team_logs')
@@ -182,7 +182,7 @@
   };
 
   const getTeamConnectionsList = async () => {
-    loading = true;
+    // loading = true;
     let { error: team_error, count } = await supabase
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
@@ -212,7 +212,7 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    loading = true;
+    // loading = true;
     try {
       let {
         data: logs,
@@ -238,7 +238,6 @@
           ).toISOString()
         )
         .order('created_at', { ascending: false });
-      // .limit(maxLimit ?? 100);
 
       if (logs) {
         let newArr = [];
@@ -304,14 +303,14 @@
   //   cookie = JSON.parse(cookie);
   //   if (cookie) console.log(`${selectedDays}`, cookie.timestamp);
   // }
-
+  $: console.log(loading);
   $: {
     selectedDays,
       getTeamWeeklyLogsActivity(),
       getTeamConnectionsList(),
       getTeamConnectionsPreviousList(),
       getTeamWeeklyLogsPreviousActivity();
-
+    console.log('rendered');
     analyticsData[0].percentage = getPercentage(
       currentTeamLogsCount,
       previousTeamLogsCount
