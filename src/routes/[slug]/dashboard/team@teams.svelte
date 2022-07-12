@@ -183,7 +183,11 @@
 
   const getTeamConnectionsList = async () => {
     // loading = true;
-    let { error: team_error, count } = await supabase
+    let {
+      data,
+      error: team_error,
+      count,
+    } = await supabase
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
       .eq('team_id', teamId)
@@ -202,7 +206,7 @@
       // .rangeLt('dateConnected', [a, b])
       .order('dateConnected', { ascending: false });
 
-    if (count) {
+    if (data) {
       analyticsData[1].data = count;
       currentConnectionCount = count;
     }
@@ -280,37 +284,15 @@
     }
   };
 
-  onMount(async () => {
-    await renderChart();
-  });
-  // var in30Minutes = 1 / 48;
-  // $: Cookies.set(
-  //   `${selectedDays}`,
-  //   JSON.stringify({
-  //     timestamp: new Date(),
-  //     logs: analyticsData[0].percentage,
-  //     connection: analyticsData[1].percentage,
-  //     currentPageRows: currentPageRows,
-  //     paginatedLogs: paginatedLogs,
-  //   }),
-  //   {
-  //     expires: in30Minutes,
-  //   }
-  // );
-  // let cookie;
-  // $: {
-  //   cookie = Cookies.get(`${selectedDays}`);
-  //   cookie = JSON.parse(cookie);
-  //   if (cookie) console.log(`${selectedDays}`, cookie.timestamp);
-  // }
-  $: console.log(loading);
+  onMount(async () => await renderChart());
+
   $: {
     selectedDays,
       getTeamWeeklyLogsActivity(),
       getTeamConnectionsList(),
       getTeamConnectionsPreviousList(),
       getTeamWeeklyLogsPreviousActivity();
-    console.log('rendered');
+
     analyticsData[0].percentage = getPercentage(
       currentTeamLogsCount,
       previousTeamLogsCount
@@ -350,73 +332,78 @@
     {#if loading}
       <TeamAnalyticsCardSkeleton />
     {:else}
-      {#each analyticsData as item}
-        <div
-          class="flex flex-col justify-between w-full h-32 bg-neutral-800 border border-neutral-700 rounded-lg p-6"
-        >
-          <div class="flex justify-between items-center">
-            <h1 class="text-xl">{item.data} <span>{item.type}</span></h1>
+      <div class="flex flex-col w-full gap-4">
+        <AnalyticsDropdownButton on:select={selectDaysHandler} />
+        <div class="flex gap-4">
+          {#each analyticsData as item}
             <div
-              class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
+              class="flex flex-col justify-between w-full h-32 bg-neutral-800 border border-neutral-700 rounded-lg p-6"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="white"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <div class="flex justify-between items-center">
+                <h1 class="text-xl">{item.data} <span>{item.type}</span></h1>
+                <div
+                  class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="white"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <h2 class="text-neutral-400">{selectedDays}</h2>
+                {#if item.percentage >= 0}
+                  <p class="text-green-600 flex gap-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                    {item.percentage}%
+                  </p>
+                {:else}
+                  <p class="text-red-600 flex gap-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                    {item.percentage}%
+                  </p>
+                {/if}
+              </div>
             </div>
-          </div>
-          <div class="flex justify-between items-center text-sm">
-            <h2 class="text-neutral-400">{selectedDays}</h2>
-            {#if item.percentage >= 0}
-              <p class="text-green-600 flex gap-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 15l7-7 7 7"
-                  />
-                </svg>
-                {item.percentage}%
-              </p>
-            {:else}
-              <p class="text-red-600 flex gap-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-                {item.percentage}%
-              </p>
-            {/if}
-          </div>
+          {/each}
         </div>
-      {/each}
+      </div>
     {/if}
   </div>
   <div
@@ -442,8 +429,6 @@
       <div class="flex flex-col w-2/3 gap-4">
         <div class="flex justify-between">
           <h1 class="text-2xl font-bold">Team Activity</h1>
-          <!-- <button class="bg-blue-600 p-2 rounded-lg w-48">Download CSV</button> -->
-          <AnalyticsDropdownButton on:select={selectDaysHandler} />
         </div>
 
         <TeamAnalytics
@@ -470,11 +455,6 @@
       } flex-col justify-around w-1/3 h-[500px] px-8 py-16 lg:py-10 bg-neutral-800 rounded-lg`}
     >
       <canvas bind:this={chart} />
-      <!-- <AnalyticsDropdownButton data={teamLogsCsv} class="top-[385px]" /> -->
-
-      <!-- <button class="bg-blue-600 p-2 rounded-lg min-w-1/3 self-end mt-2 text-md"
-            >Download CSV</button
-          > -->
     </div>
   </div>
 </div>

@@ -16,18 +16,39 @@
   let teamId = Cookies.get('qubicTeamId');
   let isHasPermission = false;
   let isTeamTab = false;
-  let personalConnectionsCsv;
+  let personalCsv;
+  let teamCsv;
 
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
       .from('records')
-      .list(`${teamId}/${$user?.id}`, {});
+      .list(`${teamId}/${$user?.id}`, {
+        // sortBy: { column: 'created_at', order: 'dsc' },
+      });
 
     if (error) {
       console.log(error);
     } else {
-      personalConnectionsCsv = data;
+      personalCsv = data;
       // console.log(data);
+    }
+
+    // $userData?.filter((item) => {
+    //   if (item === 'allow_write_records') isHasPermission = true;
+    // });
+  };
+
+  const getTeamStorage = async () => {
+    const { data, error } = await supabase.storage
+      .from('records')
+      .list(`${teamId}/${$user?.id}`, {
+        // sortBy: { column: 'created_at', order: 'dsc' },
+      });
+
+    if (error) {
+      console.log(error);
+    } else {
+      teamCsv = data;
     }
   };
 
@@ -36,7 +57,7 @@
   });
 </script>
 
-{#await getPersonalStorage()}
+{#await (getPersonalStorage(), getTeamStorage())}
   <RecordsSkeleton />
 {:then name}
   <div
@@ -73,16 +94,16 @@
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">
-            <PersonalRecords {personalConnectionsCsv} {getPersonalStorage} />
+            <PersonalRecords {personalCsv} />
           </TabPanel>
           <TabPanel class="flex h-full">
-            <TeamRecords />
+            <TeamRecords {teamCsv} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords />
+        <PersonalRecords {personalCsv} />
       </div>
     {/if}
   </div>

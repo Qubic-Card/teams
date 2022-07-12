@@ -5,7 +5,7 @@
 
   const dispatch = createEventDispatcher();
 
-  let selectedType = 'Choose Type';
+  export let selectedType;
 
   const select = (type) => {
     selectedType = type;
@@ -13,7 +13,7 @@
     // selectedType = 'Choose Type';
   };
 
-  let days = ['Logs', 'Connections'];
+  let days = ['Activities', 'Connections'];
 </script>
 
 <Menu as="div" class="flex w-full" let:open>

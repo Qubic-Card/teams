@@ -1,11 +1,10 @@
 <script>
-  import Spinner from '@comp/loading/spinner.svelte';
   import { Menu, MenuItems, MenuItem } from '@rgossiaux/svelte-headlessui';
   import { slide } from 'svelte/transition';
   import DropdownButton from '@comp/buttons/dropdownButton.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let loading, value, label, searchMenu;
+  export let value, label, searchMenu;
 
   const dispatch = createEventDispatcher();
 
@@ -13,9 +12,6 @@
 </script>
 
 <div class="flex w-full md:w-auto">
-  {#if loading}
-    <Spinner class="w-10 h-10 mr-2" />
-  {/if}
   <input
     type="text"
     class="w-full md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700

@@ -97,7 +97,7 @@
       toastSuccess('Role has been updated');
     }
   };
-  $: console.log(memberUid);
+
   const deleteMemberHandler = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -116,7 +116,7 @@
   onMount(async () => {
     memberRole = await getMemberRole(memberUid, teamId);
   });
-  $: console.log(memberRole?.role_name);
+
   $: getMembersStatusCard(), getMemberRoleName();
 </script>
 

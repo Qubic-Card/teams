@@ -7,123 +7,144 @@
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
-  import { last30Days, last60Days } from '@lib/utils/getDates';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { getMemberId } from '@lib/query/getId';
-  import { onMount } from 'svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
+  import getDates, { last30Days, today } from '@lib/utils/getDates';
+  import Spinner from '@comp/loading/spinner.svelte';
 
-  let fromDatevalue = new Date();
-  let toDatevalue = new Date();
-
-  const options = {
-    // element: '#my-picker',
-    enableTime: false,
-    // onChange(selectedDates, dateStr) {
-    //   console.log('flatpickr hook', selectedDates, dateStr);
-    // },
-    // mode: 'range',
-    // minDate: new Date(last30Days[0]),
-    maxDate: new Date(),
-  };
-
-  export let records;
+  export let teamCsv;
 
   let teamId = Cookies.get('qubicTeamId');
-  let isHasPermission = false;
-  let isTeamTab = false;
-
-  let type = '';
   let fileName = '';
-  let selectedType = '';
-  let fromDate = '';
-  let toDate = '';
-  let personalConnectionsCsv = [];
+  let selectedType = 'Choose Type';
   let isCreateRecord = false;
+  let fromDateValue = new Date();
+  let toDateValue = new Date();
+  let isLoading = false;
+
+  const fromDateOptions = {
+    onChange: (selectedDates, dateStr, instance) => {
+      const dateLimiter = getDates(
+        new Date(
+          new Date(selectedDates[0]).setDate(
+            new Date(selectedDates[0]).getDate() - 29
+          )
+        ),
+        new Date(selectedDates[0])
+      );
+
+      toDateOptions.maxDate = selectedDates[0];
+      toDateOptions.minDate = new Date(dateLimiter[0]);
+    },
+    enableTime: false,
+    maxDate: new Date(fromDateValue),
+  };
+
+  let toDateOptions = {
+    enableTime: false,
+    maxDate: new Date(),
+    minDate: new Date(last30Days[0]),
+  };
 
   const createRecordHandler = async () => {
-    const connectionsCsv = await getConnectionsRecords('team_id', teamId);
-    const logsCsv = await getLogsRecords('team', teamId);
+    isLoading = true;
+    const connectionsCsv = await getConnectionsRecords(
+      'team_id',
+      teamId,
+      fromDateValue,
+      toDateValue
+    );
+    const logsCsv = await getLogsRecords(
+      'team',
+      teamId,
+      fromDateValue,
+      toDateValue
+    );
 
-    const { data } = await supabase.storage
+    const { data, error } = await supabase.storage
       .from('records')
       .upload(
         `${teamId}/${$user?.id}/${fileName}-${
-          selectedType === 'Logs' ? 'logs' : 'connections'
+          selectedType === 'Activities' ? 'activities' : 'connections'
         }`,
-        selectedType === 'Logs' ? logsCsv : connectionsCsv,
+        selectedType === 'Activities' ? logsCsv : connectionsCsv,
         {
           contentType: 'text/csv',
         }
       );
 
+    if (error) {
+      console.log(error);
+      toastFailed(error.message);
+    }
+
+    if (data) {
+      // console.log(data);
+      toastSuccess(
+        `${fileName}-${
+          selectedType === 'Activities' ? 'activities' : 'connections'
+        } created successfully`
+      );
+      isLoading = false;
+    }
+
     isCreateRecord = true;
     fileName = '';
-    // toDatevalue = new Date();
-    // fromDatevalue = new Date();
+    selectedType = 'Choose Type';
+    toDateValue = new Date(today);
+    fromDateValue = new Date(today);
+    toDateOptions.maxDate = new Date(today);
+    isLoading = false;
   };
 
-  const getPersonalStorage = async () => {
+  const getTeamStorage = async () => {
     const { data, error } = await supabase.storage
       .from('records')
       .list(`${teamId}/${$user?.id}`, {
-        // limit: 100,
-        // offset: 0,
-        // sortBy: { column: 'name', order: 'asc' },
+        sortBy: { column: 'created_at', order: 'asc' },
       });
 
     if (error) {
       console.log(error);
     } else {
-      personalConnectionsCsv = data;
       // console.log(data);
+      teamCsv = data;
     }
   };
 
   const deleteFromTable = (id) =>
-    (personalConnectionsCsv = personalConnectionsCsv.filter(
-      (item) => item.id !== id
-    ));
+    (teamCsv = teamCsv.filter((item) => item.id !== id));
 
   const selectTypeHandler = (e) => (selectedType = e.detail);
 
-  // const createRecordHandler = () => {
-  //   console.log('createRecordHandler', fileName);
-  //   console.log(selectedType);
-  //   console.log(fromDatevalue);
-  //   console.log(toDatevalue);
-  // };
-  // $: console.log(toDatevalue);
-  // onMount(async () => {
-  //   await getPersonalStorage();
-  // });
-  $: isCreateRecord, getPersonalStorage();
+  $: if (isCreateRecord) isCreateRecord, getTeamStorage();
 </script>
 
 <div
   class="w-1/4 flex flex-col justify-between gap-4 border-r-2 border-neutral-700 h-full"
 >
   <div class="pl-20 pt-4 pr-4 flex flex-col gap-4">
-    <RecordTypeDropdownButton on:select={selectTypeHandler} />
+    <RecordTypeDropdownButton on:select={selectTypeHandler} {selectedType} />
 
     <div class="flex flex-col gap-2">
       <p>From</p>
       <Flatpickr
-        {options}
-        bind:value={fromDatevalue}
+        options={fromDateOptions}
+        bind:value={fromDateValue}
         name="date"
-        class="w-full bg-neutral-700 rounded-md p-2"
+        class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
       />
     </div>
     <div class="flex flex-col gap-2">
       <p>To</p>
       <Flatpickr
-        {options}
-        bind:value={toDatevalue}
+        options={toDateOptions}
+        bind:value={toDateValue}
         name="date"
-        class="w-full bg-neutral-700 rounded-md p-2"
+        class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer disabled:cursor-default"
       />
     </div>
     <Input
@@ -135,7 +156,7 @@
     />
   </div>
   <button
-    class="bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
+    class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
     disabled={fileName.includes('.') ||
     fileName.length < 4 ||
     selectedType === ''
@@ -143,7 +164,9 @@
       : false}
     on:click={async () => await createRecordHandler()}
   >
-    Create record -></button
+    {#if isLoading}
+      <Spinner class="w-8 h-8" />
+    {/if} <span>Create record -></span></button
   >
 </div>
 <div
@@ -165,9 +188,19 @@
       </tr>
     </thead>
     <tbody>
-      {#each personalConnectionsCsv as record, i}
-        <RecordsTableBody {record} {teamId} {deleteFromTable} />
-      {/each}
+      {#if teamCsv}
+        {#if teamCsv.length > 0}
+          {#each teamCsv as record, i}
+            <RecordsTableBody {record} {teamId} {deleteFromTable} />
+          {/each}
+        {:else}
+          <tr>
+            <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
+              No records found
+            </td>
+          </tr>
+        {/if}
+      {/if}
     </tbody>
   </table>
   <!-- {#if searchNotFoundMsg !== ''}

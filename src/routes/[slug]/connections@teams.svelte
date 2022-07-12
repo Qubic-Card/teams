@@ -171,7 +171,7 @@
 <div class="flex flex-col pt-4 pl-24 pr-4">
   {#if isHasPermission === true}
     {#await getTeamConnectionsList()}
-      <ConnectionsSkeletion />
+      <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
         class="flex md:flex-row flex-col justify-between items-center mt-2 gap-4 border-b-2 border-neutral-700"
@@ -211,73 +211,77 @@
           label={selectedSearchMenu?.name}
         />
       </div>
-      <div
-        class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
-      >
-        <table class="snap-center text-black w-full mt-6">
-          <thead class="text-left text-neutral-400 bg-black/60">
-            <tr>
-              {#if innerWidth > 640}
-                <TableHead
-                  class="w-1/6"
-                  data={connectionsTable}
-                  on:sort={async (e) => {
-                    asc = !asc;
-                    await sortHandler(e.detail);
-                  }}
-                />
-              {:else}
-                <TableHead
-                  class="w-1/4"
-                  data={connectionsTableMobile}
-                  on:sort={async (e) => {
-                    asc = !asc;
-                    await sortHandler(e.detail);
-                  }}
-                />
-              {/if}
-            </tr>
-          </thead>
-          {#if teamConnections.length > 0 || userConnections.length > 0}
-            <tbody>
-              {#if tabs === 'all'}
-                {#each teamConnections as connection, i}
-                  <ConnectionTableBody
-                    {innerWidth}
-                    {connection}
-                    {i}
-                    tab="team"
-                    deleteHandler={deleteConnectionHandler}
+      {#if loading}
+        <ConnectionsSkeletion />
+      {:else}
+        <div
+          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
+        >
+          <table class="snap-center text-black w-full mt-6">
+            <thead class="text-left text-neutral-400 bg-black/60">
+              <tr>
+                {#if innerWidth > 640}
+                  <TableHead
+                    class="w-1/6"
+                    data={connectionsTable}
+                    on:sort={async (e) => {
+                      asc = !asc;
+                      await sortHandler(e.detail);
+                    }}
                   />
-                {/each}
-              {:else}
-                {#each userConnections as connection, i}
-                  <ConnectionTableBody
-                    {innerWidth}
-                    {connection}
-                    {i}
-                    tab="user"
-                    deleteHandler={deleteConnectionHandler}
+                {:else}
+                  <TableHead
+                    class="w-1/4"
+                    data={connectionsTableMobile}
+                    on:sort={async (e) => {
+                      asc = !asc;
+                      await sortHandler(e.detail);
+                    }}
                   />
-                {/each}
-              {/if}
-            </tbody>
+                {/if}
+              </tr>
+            </thead>
+            {#if teamConnections.length > 0 || userConnections.length > 0}
+              <tbody>
+                {#if tabs === 'all'}
+                  {#each teamConnections as connection, i}
+                    <ConnectionTableBody
+                      {innerWidth}
+                      {connection}
+                      {i}
+                      tab="team"
+                      deleteHandler={deleteConnectionHandler}
+                    />
+                  {/each}
+                {:else}
+                  {#each userConnections as connection, i}
+                    <ConnectionTableBody
+                      {innerWidth}
+                      {connection}
+                      {i}
+                      tab="user"
+                      deleteHandler={deleteConnectionHandler}
+                    />
+                  {/each}
+                {/if}
+              </tbody>
+            {/if}
+          </table>
+          {#if searchNotFoundMsg !== ''}
+            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+              {searchNotFoundMsg}
+            </h1>
+          {:else if tabs === 'all' && teamConnections.length === 0}
+            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+              No connection found.
+            </h1>
+          {:else if tabs !== 'all' && userConnections.length === 0}
+            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+              No connection found.
+            </h1>
           {/if}
-        </table>
-        {#if searchNotFoundMsg !== ''}
-          <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            {searchNotFoundMsg}
-          </h1>
-        {:else if tabs === 'all' && teamConnections.length === 0}
-          <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            No connection found.
-          </h1>
-        {:else if tabs !== 'all' && userConnections.length === 0}
-          <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            No connection found.
-          </h1>
-        {/if}
-      </div>
+        </div>
+      {/if}
     {:catch}
       <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
         Some error occurred. Please reload the page and try again.
