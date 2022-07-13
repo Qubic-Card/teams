@@ -12,7 +12,7 @@
   <th class={`pl-4 p-2 ${$$props.class}`}>
     <div class="flex justify-between">
       <p>{item.name}</p>
-      {#if item.id !== 'actions'}
+      {#if item.id !== 'actions' && item.id !== 'type'}
         <img
           src="https://img.icons8.com/android/96/ffffff/sort.png"
           alt=""

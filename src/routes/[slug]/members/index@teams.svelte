@@ -84,7 +84,7 @@
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-4 pl-24 pr-4">
   {#await getTeamMembers()}
-    <MemberSkeleton />
+    <MemberSkeleton searchSkeletonVisible />
   {:then}
     <div
       class={`items-center w-full rounded-md justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
@@ -94,41 +94,44 @@
       <Search
         class="top-24 mt-2 right-10"
         searchMenu={memberSearchMenu}
-        {loading}
         bind:value={searchQuery}
         on:select={selectMenu}
         label={selectedSearchMenu?.name}
       />
     </div>
-    <div
-      class={`grid grid-flow-row my-8 gap-4 ${
-        innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
-      }`}
-    >
-      {#each members as member, i}
-        {#if isHasPermission === false && member.uid === ownProfile.uid}
-          <MemberCard
-            member={ownProfile}
-            {isHasPermission}
-            id={member.id}
-            index={i}
-            {members}
-            memberUid={member.uid}
-            {roles}
-          />
-        {:else if isHasPermission === true}
-          <MemberCard
-            {member}
-            {isHasPermission}
-            id={member.id}
-            index={i}
-            {members}
-            memberUid={member.uid}
-            {roles}
-          />
-        {/if}
-      {/each}
-    </div>
+    {#if loading}
+      <MemberSkeleton />
+    {:else}
+      <div
+        class={`grid grid-flow-row my-8 gap-4 ${
+          innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
+        }`}
+      >
+        {#each members as member, i}
+          {#if isHasPermission === false && member.uid === ownProfile.uid}
+            <MemberCard
+              member={ownProfile}
+              {isHasPermission}
+              id={member.id}
+              index={i}
+              {members}
+              memberUid={member.uid}
+              {roles}
+            />
+          {:else if isHasPermission === true}
+            <MemberCard
+              {member}
+              {isHasPermission}
+              id={member.id}
+              index={i}
+              {members}
+              memberUid={member.uid}
+              {roles}
+            />
+          {/if}
+        {/each}
+      </div>
+    {/if}
     {#if searchNotFoundMsg !== ''}
       <div class="text-2xl font-bold text-white text-center w-full mt-8">
         {searchNotFoundMsg}

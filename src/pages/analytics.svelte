@@ -14,11 +14,12 @@
   import { count } from '@lib/utils/count';
   import AnalyticsDropdownButton from '@comp/buttons/analyticsDropdownButton.svelte';
   import { onMount } from 'svelte';
-  // import Chart from '@comp/chart.svelte';
+  import ChartEl from '@comp/chart.svelte';
   import Chart from 'chart.js/auto/auto.js';
   import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
   import { analyticsChartConfig } from '@lib/constants';
   import { getConnectionsCsv } from '@lib/utils/getCsvData';
+  import PersonalAnalyticsCard from '@comp/cards/personalAnalyticsCard.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
 
@@ -278,62 +279,33 @@
 
 <div class="h-auto flex justify-center mt-2">
   <div class="w-full">
-    <!-- {#await }
-      <AnalyticsSkeleton />
-    {:then} -->
     <AnalyticsDropdownButton on:select={selectDaysHandler} />
-    <!-- <AnalyticsDropdownButton data={connectionsCsv} class="top-[385px]" /> -->
     <div class="flex flex-col lg:flex-row justify-between gap-2">
-      <!-- <Chart element={connectionsChart} data={connectionsChartData} />
-      <Chart element={logsChart} data={logsChartData} /> -->
-      <div class="flex flex-col w-full">
-        <div class="flex w-full justify-between">
-          <h1 class="text-lg font-semibold">New Connections</h1>
-        </div>
-        <div
-          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-2 outer"
-        >
-          <canvas bind:this={connectionsChart} />
-        </div>
-      </div>
-      <div class="flex flex-col w-full pt-4 lg:pt-0">
-        <div class="flex w-full justify-between">
-          <h1 class="text-lg font-semibold">Activities</h1>
-        </div>
-        <div
-          class="h-80 border-neutral-700 bg-neutral-800 p-4 border rounded-xl mt-2 outer"
-        >
-          <canvas bind:this={logsChart} />
-        </div>
-      </div>
+      <ChartEl label="New Connections">
+        <canvas bind:this={connectionsChart} />
+      </ChartEl>
+      <ChartEl label="New Activities">
+        <canvas bind:this={logsChart} />
+      </ChartEl>
     </div>
     <div
       class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[100px] my-2 space-x-0 md:space-x-2"
     >
-      <div
-        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-4"
-      >
-        <p class="text-sm text-neutral-300">New connections</p>
-        <p class="font-bold text-4xl">
-          {connectionCount}
-        </p>
-      </div>
-      <div
-        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-4"
-      >
-        <p class="text-sm text-neutral-300">Your activity</p>
-        <p class="font-bold text-4xl">
-          {activityCount}
-        </p>
-      </div>
-      <div
-        class="rounded-lg bg-neutral-800 border border-neutral-700 h-full p-4"
-      >
-        <p class="text-sm text-neutral-300">Unique People</p>
-        <p class="font-bold text-4xl">
-          {uniqueCount}
-        </p>
-      </div>
+      <PersonalAnalyticsCard
+        {loading}
+        label="New connections"
+        count={connectionCount}
+      />
+      <PersonalAnalyticsCard
+        {loading}
+        label="Your activity"
+        count={activityCount}
+      />
+      <PersonalAnalyticsCard
+        {loading}
+        label="Unique People"
+        count={uniqueCount}
+      />
     </div>
     <div class="hidden lg:flex lg:flex-col">
       <AnalyticTable
@@ -350,10 +322,5 @@
     <div class="flex lg:hidden w-full justify-center mt-8">
       View more on desktop
     </div>
-    <!-- {:catch}
-      <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-        Some error occurred. Please reload the page and try again.
-      </h1>
-    {/await} -->
   </div>
 </div>

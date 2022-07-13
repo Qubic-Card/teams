@@ -35,6 +35,7 @@
   import toNewTab from '@lib/utils/newTab';
   import { getTeamId } from '@lib/query/getId';
   import Cookies from 'js-cookie';
+  import { createEventDispatcher } from 'svelte';
 
   // Register the plugins
   registerPlugin(
@@ -57,6 +58,12 @@
     console.log('FilePond has initialised');
   }
 
+  const dispatch = createEventDispatcher();
+  const unsplashPicker = () =>
+    dispatch('unsplashPicker', profileData.design.background);
+  const photoProfilePicker = () =>
+    dispatch('photoProfilePicker', profileData.avatar);
+
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
       .from('avatars')
@@ -69,6 +76,7 @@
       .getPublicUrl(`${$user?.id}/${file.filename}`);
 
     profileData.avatar = publicURL;
+    photoProfilePicker();
     await handleSave();
   };
 
@@ -125,6 +133,8 @@
   const modalHandler = () => (showModal = !showModal);
   const handlePick = async (item) => {
     profileData.design.background = item.detail.urls.regular;
+    unsplashPicker();
+    modalHandler();
     await handleSave();
   };
 

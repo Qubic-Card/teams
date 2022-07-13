@@ -18,7 +18,8 @@
 />
 {#if showModal}
   <div
-    transition:fly|local={{ x: 200 }}
+    in:fly|local={{ x: 200 }}
+    out:fly|local={{ x: 400 }}
     class="flex flex-col h-screen w-1/3 p-4 pt-20 bottom-0 right-0 z-50 absolute bg-neutral-800 border-l-2 border-neutral-700 overflow-y-auto snap-y snap-mandatory"
   >
     <div

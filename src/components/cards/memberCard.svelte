@@ -97,7 +97,7 @@
       toastSuccess('Role has been updated');
     }
   };
-  $: console.log(memberUid);
+
   const deleteMemberHandler = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -116,55 +116,62 @@
   onMount(async () => {
     memberRole = await getMemberRole(memberUid, teamId);
   });
-  $: console.log(memberRole?.role_name);
+
   $: getMembersStatusCard(), getMemberRoleName();
 </script>
 
 <div class="flex flex-col justify-between">
   <div
-    class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 p-4 rounded-md"
+    class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
   >
     <div
-      class="flex cursor-pointer h-full gap-4"
+      class="flex cursor-pointer h-full gap-4 p-4"
       on:click={() => toProfileEditor(member.uid)}
     >
       {#if member.team_profile.avatar === ''}
         <div
-          class="flex justify-center items-center w-24 h-24 rounded-full bg-neutral-700 text-2xl"
+          class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
         >
           Q
         </div>
       {:else}
         <img
-          src="https://placeimg.com/640/480/any"
+          src={member.team_profile.avatar}
           alt="Profile"
-          class="w-40 h-40 rounded-md"
+          class="w-32 lg:w-36 h-32 lg:h-36 rounded-md"
         />
       {/if}
-      <div>
-        <h1 class="text-xl flex-grow text-left md:text-2xl lg:text-3xl">
-          {member.team_profile.firstname === ''
-            ? 'No name'
-            : member.team_profile.firstname}
-        </h1>
-        <h1 class="text-xl flex-grow text-left md:text-2xl lg:text-3xl">
-          {member.team_profile.lastname}
-        </h1>
-        <h2 class="text-neutral-300 mt-2">
-          {member.team_profile.job}
-        </h2>
-        <h2 class="text-neutral-300">
-          Joined since {new Date(member.member_from).toDateString().slice(4)}
-        </h2>
-        <h2 class="text-neutral-300 mt-3">Card:</h2>
-        <p class="text-neutral-300">
-          {card?.type.charAt(0).toUpperCase() + card?.type.slice(1)}
-          {card?.color.charAt(0).toUpperCase() + card?.color.slice(1) ?? '-'}
-        </p>
+      <div class="flex flex-col justify-between">
+        <div class="flex flex-col flex-wrap">
+          <h1 class="md:text-lg lg:text-xl text-left w-56">
+            {member.team_profile.firstname === ''
+              ? 'No name'
+              : member.team_profile.firstname}
+            {member.team_profile.lastname === ''
+              ? ''
+              : ' ' + member.team_profile.lastname}
+          </h1>
+          <!-- <h1 class="md:text-lg lg:text-xl flex-grow text-left">
+            {member.team_profile.lastname}
+          </h1> -->
+          <h2 class="text-neutral-300 text-md">
+            {member.team_profile.job}
+          </h2>
+          <h2 class="text-neutral-300 text-md">
+            Joined since {new Date(member.member_from).toDateString().slice(4)}
+          </h2>
+        </div>
+        <div>
+          <h2 class="text-neutral-300 mt-3">Card:</h2>
+          <p class="text-neutral-300">
+            {card?.type.charAt(0).toUpperCase() + card?.type.slice(1)}
+            {card?.color.charAt(0).toUpperCase() + card?.color.slice(1) ?? '-'}
+          </p>
+        </div>
       </div>
     </div>
 
-    <Menu class="absolute hidden flex-row-reverse self-end" let:open>
+    <Menu class="absolute flex flex-row-reverse self-end" let:open>
       <MenuButton
         class={`text-white flex justify-between items-center h-12 p-2 gap-2 rounded-md relative ${$$props.class}`}
       >
@@ -200,31 +207,34 @@
       {/if}
     </Menu>
 
-    <Switch
-      checked={statusMember}
-      on:change={async (e) => {
-        await setStatus(cardId, e.detail, index);
-        statusMember = e.detail;
-      }}
-      class={`justify-center items-center self-end relative rounded-lg w-16 h-10 z-50 ${
-        statusMember ? 'bg-green-300' : 'bg-neutral-600'
-      } ${isHasPermission && roleName === 'admin' ? 'flex' : 'hidden'}`}
+    <div
+      class="flex w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
     >
-      <span
-        class={`inline-block w-7 h-7 bg-white rounded-full transition-transform duration-300 ease-in-out ${
-          statusMember ? 'translate-x-3' : '-translate-x-3 '
-        }`}
-        class:toggle-on={statusMember}
-        class:toggle-off={!statusMember}
-      />
-    </Switch>
-
-    <Menu
-      class="absolute translate-y-[140px] md:translate-y-[233px] mt-3 block"
-      let:open
-    >
-      {#if roleName === 'admin'}
-        {#if memberRole?.role_name === 'admin'}
+      <Menu let:open>
+        {#if roleName === 'admin'}
+          {#if memberRole?.role_name === 'admin'}
+            <p
+              class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+            >
+              {selectedRole !== ''
+                ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+                : memberRole?.role_name
+                ? memberRole.role_name.charAt(0).toUpperCase() +
+                  memberRole.role_name.slice(1)
+                : 'No role'}
+            </p>
+          {:else}
+            <DropdownButton
+              class="w-auto"
+              label={selectedRole !== ''
+                ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+                : memberRole?.role_name
+                ? memberRole.role_name.charAt(0).toUpperCase() +
+                  memberRole.role_name.slice(1)
+                : 'No role'}
+            />
+          {/if}
+        {:else}
           <p
             class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
           >
@@ -235,51 +245,48 @@
                 memberRole.role_name.slice(1)
               : 'Loading...'}
           </p>
-        {:else}
-          <DropdownButton
-            class="w-auto"
-            label={selectedRole !== ''
-              ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
-              : memberRole?.role_name
-              ? memberRole.role_name.charAt(0).toUpperCase() +
-                memberRole.role_name.slice(1)
-              : 'Loading...'}
-          />
         {/if}
-      {:else}
-        <p
-          class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
-        >
-          {selectedRole !== ''
-            ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
-            : memberRole?.role_name
-            ? memberRole.role_name.charAt(0).toUpperCase() +
-              memberRole.role_name.slice(1)
-            : 'Loading...'}
-        </p>
-      {/if}
 
-      {#if roleName === 'admin'}
-        {#if open}
-          <div transition:slide|local>
-            <MenuItems
-              class="top-2 z-40 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
-            >
-              {#each roles as item}
-                <MenuItem
-                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
-                  on:click={async () => {
-                    await setMemberRole(item.id);
-                    selectRole(item.role_name);
-                  }}
-                >
-                  {item.role_name}
-                </MenuItem>
-              {/each}
-            </MenuItems>
-          </div>
+        {#if roleName === 'admin'}
+          {#if open}
+            <div transition:slide|local>
+              <MenuItems
+                class="top-2 z-40 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
+              >
+                {#each roles as item}
+                  <MenuItem
+                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md"
+                    on:click={async () => {
+                      await setMemberRole(item.id);
+                      selectRole(item.role_name);
+                    }}
+                  >
+                    {item.role_name}
+                  </MenuItem>
+                {/each}
+              </MenuItems>
+            </div>
+          {/if}
         {/if}
-      {/if}
-    </Menu>
+      </Menu>
+      <Switch
+        checked={statusMember}
+        on:change={async (e) => {
+          await setStatus(cardId, e.detail, index);
+          statusMember = e.detail;
+        }}
+        class={`justify-center items-center relative rounded-lg w-16 h-10 z-50 ${
+          statusMember ? 'bg-green-300' : 'bg-neutral-600'
+        } ${isHasPermission && roleName === 'admin' ? 'flex' : 'hidden'}`}
+      >
+        <span
+          class={`inline-block w-7 h-7 bg-white rounded-full transition-transform duration-300 ease-in-out ${
+            statusMember ? 'translate-x-3' : '-translate-x-3 '
+          }`}
+          class:toggle-on={statusMember}
+          class:toggle-off={!statusMember}
+        />
+      </Switch>
+    </div>
   </div>
 </div>

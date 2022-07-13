@@ -62,9 +62,12 @@
     },
   };
   let profileId = null;
-  $: console.log(teamId);
+
   let message = '';
   let isTeamTab = false;
+
+  const handlerPick = (item) => (profileData.design.background = item?.detail);
+  const handleAddPhoto = (item) => (profileData.avatar = item?.detail);
 
   const getProfile = async () => {
     let { data, error } = await supabase
@@ -74,7 +77,6 @@
       .eq('team_id', teamId);
 
     if (data) {
-      console.log(data);
       const profile = data[0]['team_profile'];
       profileData = { ...profile };
       $socials = profile['socials'];
@@ -147,6 +149,8 @@
                   <PersonalEditor
                     {isHasWriteMembersPermission}
                     {isHasWriteProfilePermission}
+                    on:unsplashPicker={handlerPick}
+                    on:photoProfilePicker={handleAddPhoto}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -158,6 +162,7 @@
             <PersonalEditor
               {isHasWriteMembersPermission}
               {isHasWriteProfilePermission}
+              on:unsplashPicker={handlerPick}
             />
           {/if}
         </div>

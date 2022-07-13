@@ -1,18 +1,60 @@
 <script>
   import DeleteModal from '@comp/modals/deleteModal.svelte';
+  import supabase from '@lib/db';
+  import { user } from '@lib/stores/userStore';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
-  export let record;
+  export let record, teamId, deleteFromTable;
 
   let showDeleteModal = false;
 
   const deleteModalHandler = () => (showDeleteModal = !showDeleteModal);
+
+  const deleteCsv = async () => {
+    const { error } = await supabase.storage
+      .from('records')
+      .remove([`${teamId}/${$user?.id}/${record.name}`]);
+
+    if (error) {
+      toastFailed('Failed to delete record');
+    } else {
+      toastSuccess(`${record.name} deleted successfully`);
+    }
+  };
+
+  const downloadCsv = async (filename) => {
+    const { publicURL, error } = await supabase.storage
+      .from('records')
+      .getPublicUrl(`${teamId}/${$user?.id}/${filename}`);
+
+    if (error) {
+      console.log(error);
+      toastFailed();
+    } else {
+      fetch(publicURL)
+        .then((resp) => resp.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+
+          a.download = `${filename}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          toastSuccess(`${filename} has been downloaded`);
+        })
+        .catch((err) => toastFailed());
+    }
+  };
 </script>
 
 <tr
   class="h-12 text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
 >
   <td class="font-bold text-ellipsis truncate pl-4 flex-1">
-    {record.filename ?? '-'}
+    {record.name ?? '-'}
   </td>
 
   <td class="flex-1 truncate pl-4">
@@ -20,10 +62,25 @@
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">
-    {record.type ?? '-'}
+    {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
-    <DeleteModal data={record} />
-    <img src="/download-icon.svg" alt="" class="w-6 h-6 cursor-pointer" />
+    <DeleteModal
+      data={record}
+      showModal={showDeleteModal}
+      toggleModal={deleteModalHandler}
+      on:click={async () => {
+        await deleteCsv();
+        deleteFromTable(record.id);
+        deleteModalHandler();
+      }}
+    />
+    <!-- 76900f13-9d11-424a-b111-71b1f2cd6def -->
+    <img
+      src="/download-icon.svg"
+      alt=""
+      class="w-6 h-6 cursor-pointer"
+      on:click={async () => await downloadCsv(record.name)}
+    />
   </td>
 </tr>

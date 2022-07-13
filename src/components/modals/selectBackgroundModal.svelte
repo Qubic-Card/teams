@@ -10,7 +10,6 @@
   let searchQuery = '';
   let selectedImage;
   let downloadLocation = '';
-
   const toAuthorProfile = (url) => window.open(url, '_blank');
 
   const getTrackDownloadLocation = async (id) => {
@@ -31,22 +30,19 @@
 
   const dispatch = createEventDispatcher();
 
-  const toggleModal = () => {
-    dispatch('showModal');
-  };
+  const toggleModal = () => dispatch('showModal');
 
   const pickHandler = (image) => {
     selectedImage = image;
 
     getTrackDownloadLocation(image.id);
     dispatch('pickImage', image);
+    searchQuery = '';
     toastSuccess('Background image changed successfully');
     toggleModal();
   };
 
-  const searchHandler = () => {
-    dispatch('searchQuery', searchQuery);
-  };
+  const searchHandler = () => dispatch('searchQuery', searchQuery);
 </script>
 
 <ModalWrapper
@@ -69,42 +65,48 @@
       />
     </div>
     <div
-      class="grid grid-cols-2 grid-flow-row p-8 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto"
+      class={`${
+        unsplashDatas.length > 0 ? 'grid' : 'flex'
+      } grid-cols-2 grid-flow-row p-8 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto`}
     >
-      {#if unsplashDatas === 0}
-        <h1>No image to display</h1>
-      {:else}
-        {#each unsplashDatas as item}
-          <div class="m-1 bg-black mt-2">
-            <div
-              on:click={() => pickHandler(item)}
-              class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
-                item.urls.regular === selectedImage
-                  ? 'border-4 border-black'
-                  : ''
-              }`}
-              style={`background-image: url('${item.urls.regular}')`}
-            >
-              <h1 class="uppercase text-center text-3xl">
-                {item.alt_description === null ? '' : item.alt_description}
-              </h1>
-            </div>
-            <div class="flex items-center bg-white pt-2">
-              By
-              <p
-                on:click={() => toAuthorProfile(item.user.portfolio_url)}
-                class="underline cursor-pointer ml-2"
+      {#if unsplashDatas}
+        {#if unsplashDatas.length > 0}
+          {#each unsplashDatas as item}
+            <div class="m-1 bg-black mt-2">
+              <div
+                on:click={() => pickHandler(item)}
+                class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
+                  item.urls.regular === selectedImage
+                    ? 'border-4 border-black'
+                    : ''
+                }`}
+                style={`background-image: url('${item.urls.regular}')`}
               >
-                {item.user.name}
-              </p>
-              <img
-                src="https://img.icons8.com/material-outlined/48/000000/external-link.png"
-                alt="external link"
-                class="w-4 h-4"
-              />
+                <h1 class="uppercase text-center text-3xl">
+                  {item.alt_description === null ? '' : item.alt_description}
+                </h1>
+              </div>
+              <div class="flex items-center bg-white pt-2">
+                By
+                <p
+                  on:click={() => toAuthorProfile(item.user.portfolio_url)}
+                  class="underline cursor-pointer ml-2"
+                >
+                  {item.user.name}
+                </p>
+                <img
+                  src="https://img.icons8.com/material-outlined/48/000000/external-link.png"
+                  alt="external link"
+                  class="w-4 h-4"
+                />
+              </div>
             </div>
-          </div>
-        {/each}
+          {/each}
+        {:else}
+          <h1 class="text-neutral-100 text-xl text-center w-full">
+            No image to display
+          </h1>
+        {/if}
       {/if}
     </div>
   </div>

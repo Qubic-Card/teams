@@ -1,20 +1,34 @@
 <script>
-  import { fly } from 'svelte/transition';
   import Input from '@comp/input.svelte';
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import EditModalWrapper from '@comp/modals/editModalWrapper.svelte';
-  import { socials } from '@lib/stores/editorStore';
-  import { socialIcons } from '@lib/constants';
+  import { links, socials } from '@lib/stores/editorStore';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
 
   export let data;
   let showModal = false;
-  // $: console.log(data.profileData.firstname, $socials);
-  const modalHandler = () => (showModal = !showModal);
-  // $: $socials = data.profileData.socials;
+  let activeSocialMedia = [];
+  let activeLinks = [];
+
+  const modalHandler = () => {
+    showModal = !showModal;
+    $socials = activeSocialMedia;
+    $links = activeLinks;
+  };
+
+  $: activeSocialMedia = data.profileData.socials.filter(
+    (social) => social.isActive
+  );
+  $: activeLinks = data.profileData.links.filter((link) => link.isActive);
+  // $: console.log(data.profileData.links);
+  // $: console.log(data.profileData.socials.map((social) => social.isActive));
   const updateConnectionsData = async () => {
-    // data.profileData.socials = $socials;
+    data.profileData.socials = $socials;
+    data.profileData.links = $links;
+    data.profileData = Object.assign(data.profileData, {
+      edited: new Date(),
+    });
     const { error } = await supabase
       .from('team_connection_acc')
       .update({ profileData: data.profileData }, { returning: 'minimal' })
@@ -25,17 +39,18 @@
     } else {
       toastSuccess('Connection data updated successfully');
       modalHandler();
-      location.reload();
     }
   };
-</script>
 
-<!-- <img
-  src="/edit-icon.svg"
-  alt=""
-  class="w-6 h-6 cursor-pointer"
-  on:click={modalHandler}
-/> -->
+  const addLink = () => {
+    $links.length < 5
+      ? links.set([
+          ...$links,
+          { title: 'My Website', link: 'https://qubic.id', isActive: true },
+        ])
+      : toastFailed('Only 5 link allowed for free members');
+  };
+</script>
 
 <EditModalWrapper
   title="Edit connection"
@@ -67,7 +82,7 @@
       <h1 class="font-bold text-xl text-white mb-2">Socials</h1>
       <AddSocialsModal />
     </div>
-    {#each data.profileData.socials as social}
+    {#each $socials as social}
       <Input
         class="flex-grow"
         title={social.type === 'tiktok'
@@ -104,14 +119,26 @@
   </div>
 
   <div class="flex flex-col mb-2">
-    <h1 class="font-bold text-xl text-white mb-2">link</h1>
-    {#each data.profileData.links as link}
-      <Input
-        class="flex-grow"
-        title={link.title}
-        placeholder="Website"
-        bind:value={link.link}
+    <div class="flex justify-between items-center">
+      <h1 class="font-bold text-xl text-white">Links</h1>
+      <img
+        class="h-10 w-10 cursor-pointer"
+        on:click={addLink}
+        src="/add-icon.svg"
+        alt="add"
       />
-    {/each}
+    </div>
+    {#if $links.length > 0}
+      {#each $links as link}
+        <Input
+          class="flex-grow"
+          title={link.title}
+          placeholder="Website"
+          bind:value={link.link}
+        />
+      {/each}
+    {:else}
+      <h1>No link found</h1>
+    {/if}
   </div>
 </EditModalWrapper>

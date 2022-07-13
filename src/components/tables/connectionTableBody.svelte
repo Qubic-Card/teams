@@ -5,6 +5,8 @@
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
   import { socials } from '@lib/stores/editorStore';
+  import download from '@lib/utils/download';
+  import { genvcard } from '@lib/vcard/vcardgen';
 
   export let innerWidth;
   export let connection;
@@ -15,13 +17,9 @@
   let loading = false;
   let showDeleteModal = false;
   let showModal = false;
-  let showEditModal = false;
 
-  const toggleModal = () => (showModal = !showModal);
-  const editModalHandler = () => (showEditModal = !showEditModal);
   const modalHandler = () => (showModal = !showModal);
   const deletModalHandler = () => (showDeleteModal = !showDeleteModal);
-  // $: $socials = connection?.profileData?.socials;
 </script>
 
 <tr
@@ -50,7 +48,7 @@
     {connection?.by?.team_profile?.firstname ?? '-'}
     {connection?.by?.team_profile?.lastname ?? '-'}
   </td>
-  <td class="flex-1 h-12 truncate pl-4 pr-4 hidden gap-4 items-center">
+  <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
     <EditConnectionsModal data={connection} />
     <DeleteModal
       on:click={() => {
@@ -66,8 +64,11 @@
       src="/download-icon.svg"
       alt=""
       class="w-6 h-6 cursor-pointer"
-      on:click={modalHandler}
+      on:click={async () => {
+        download(await genvcard(connection?.profileData), 'contact');
+      }}
     />
+    <small>{connection?.profileData.edited ? 'Edited' : ''}</small>
   </td>
 </tr>
 <ConnectionsModal {modalHandler} {showModal} {connection} />
