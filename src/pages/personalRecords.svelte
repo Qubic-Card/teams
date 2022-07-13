@@ -16,7 +16,7 @@
   import Spinner from '@comp/loading/spinner.svelte';
 
   export let personalCsv;
-  $: console.log(personalCsv);
+  // $: console.log(personalCsv);
   let teamId = Cookies.get('qubicTeamId');
   let fileName = '';
   let selectedType = 'Choose Type';
@@ -24,22 +24,19 @@
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
+  let asc = false;
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
-      const dateLimiter = getDates(
-        new Date(
-          new Date(selectedDates[0]).setDate(
-            new Date(selectedDates[0]).getDate() - 29
-          )
-        ),
-        new Date(selectedDates[0])
+      const dateLimiter = new Date(
+        new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 30)
       );
-
-      toDateOptions.maxDate = selectedDates[0];
-      toDateOptions.minDate = new Date(dateLimiter[0]);
+      toDateOptions.minDate = new Date(selectedDates[0]);
+      toDateOptions.maxDate = new Date(dateLimiter);
+      toDateValue = new Date(dateLimiter);
     },
     enableTime: false,
+    // minDate: new Date(last30Days[0]),
     maxDate: new Date(fromDateValue),
   };
 
@@ -52,20 +49,25 @@
   const createRecordHandler = async () => {
     isLoading = true;
     let id = await getMemberId($user?.id, teamId);
-    const connectionsCsv = await getConnectionsRecords(
-      'by',
-      id,
-      fromDateValue,
-      toDateValue
-    );
-    const logsCsv = await getLogsRecords(
-      'team_member',
-      id,
-      fromDateValue,
-      toDateValue
-    );
-    // console.log('connection', connectionsCsv);
-    // console.log('activities', logsCsv);
+    let logsCsv = null;
+    let connectionsCsv = null;
+
+    if (selectedType === 'Activities') {
+      logsCsv = await getLogsRecords(
+        'team_member',
+        id,
+        fromDateValue,
+        toDateValue
+      );
+    } else {
+      connectionsCsv = await getConnectionsRecords(
+        'by',
+        id,
+        fromDateValue,
+        toDateValue
+      );
+    }
+
     const { data, error } = await supabase.storage
       .from('records')
       .upload(
@@ -89,6 +91,7 @@
       } else {
         toastFailed(error.message);
       }
+      isLoading = false;
     }
 
     if (data) {
@@ -113,7 +116,22 @@
     const { data, error } = await supabase.storage
       .from('records')
       .list(`${teamId}/${$user?.id}`, {
-        sortBy: { column: 'created_at', order: 'asc' },
+        sortBy: { column: 'created_at', order: 'desc' },
+      });
+
+    if (error) {
+      console.log(error);
+    } else {
+      // console.log(data);
+      personalCsv = data;
+    }
+  };
+
+  const sortHandler = async (col) => {
+    const { data, error } = await supabase.storage
+      .from('records')
+      .list(`${teamId}/${$user?.id}`, {
+        sortBy: { column: col, order: asc ? 'asc' : 'desc' },
       });
 
     if (error) {
@@ -188,10 +206,8 @@
           class="w-1/4"
           data={recordsTable}
           on:sort={async (e) => {
-            // asc = !asc;
-            // await sortHandler(
-            //   e.detail ?? 'profileData->>firstname'
-            // );
+            asc = !asc;
+            await sortHandler(e.detail ?? 'name');
           }}
         />
       </tr>

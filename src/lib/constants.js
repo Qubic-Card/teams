@@ -207,9 +207,9 @@ export let sidebarItems = [
 ];
 
 export const recordsTable = [
-  { name: 'Filename', id: 'profileData->>firstname' },
-  { name: 'Created at', id: 'profileData->>job' },
-  { name: 'Type', id: 'profileData->>company' },
+  { name: 'Filename', id: 'name' },
+  { name: 'Created at', id: 'created_at' },
+  { name: 'Type', id: 'type' },
   {
     name: '',
     id: 'actions',

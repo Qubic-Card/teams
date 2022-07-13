@@ -62,7 +62,7 @@
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">
-    {record.name.includes('logs') ? 'Logs' : 'Connections'}
+    {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
     <DeleteModal
@@ -75,7 +75,7 @@
         deleteModalHandler();
       }}
     />
-
+    <!-- 76900f13-9d11-424a-b111-71b1f2cd6def -->
     <img
       src="/download-icon.svg"
       alt=""

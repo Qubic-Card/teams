@@ -12,7 +12,7 @@
   import { getMemberId } from '@lib/query/getId';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
-  import getDates, { last30Days, today } from '@lib/utils/getDates';
+  import { last30Days, today } from '@lib/utils/getDates';
   import Spinner from '@comp/loading/spinner.svelte';
 
   export let teamCsv;
@@ -27,19 +27,15 @@
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
-      const dateLimiter = getDates(
-        new Date(
-          new Date(selectedDates[0]).setDate(
-            new Date(selectedDates[0]).getDate() - 29
-          )
-        ),
-        new Date(selectedDates[0])
+      const dateLimiter = new Date(
+        new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 30)
       );
-
-      toDateOptions.maxDate = selectedDates[0];
-      toDateOptions.minDate = new Date(dateLimiter[0]);
+      toDateOptions.minDate = new Date(selectedDates[0]);
+      toDateOptions.maxDate = new Date(dateLimiter);
+      toDateValue = new Date(dateLimiter);
     },
     enableTime: false,
+    // minDate: new Date(last30Days[0]),
     maxDate: new Date(fromDateValue),
   };
 
@@ -51,18 +47,25 @@
 
   const createRecordHandler = async () => {
     isLoading = true;
-    const connectionsCsv = await getConnectionsRecords(
-      'team_id',
-      teamId,
-      fromDateValue,
-      toDateValue
-    );
-    const logsCsv = await getLogsRecords(
-      'team',
-      teamId,
-      fromDateValue,
-      toDateValue
-    );
+    let id = await getMemberId($user?.id, teamId);
+    let logsCsv = null;
+    let connectionsCsv = null;
+
+    if (selectedType === 'Activities') {
+      logsCsv = await getLogsRecords(
+        'team_member',
+        id,
+        fromDateValue,
+        toDateValue
+      );
+    } else {
+      connectionsCsv = await getConnectionsRecords(
+        'by',
+        id,
+        fromDateValue,
+        toDateValue
+      );
+    }
 
     const { data, error } = await supabase.storage
       .from('records')
@@ -77,12 +80,20 @@
       );
 
     if (error) {
-      console.log(error);
-      toastFailed(error.message);
+      if (
+        (error.message =
+          'duplicate key value violates unique constraint "bucketid_objname')
+      ) {
+        toastFailed(
+          'File already exists. Please rename the file and try again.'
+        );
+      } else {
+        toastFailed(error.message);
+      }
+      isLoading = false;
     }
 
     if (data) {
-      // console.log(data);
       toastSuccess(
         `${fileName}-${
           selectedType === 'Activities' ? 'activities' : 'connections'
@@ -104,7 +115,7 @@
     const { data, error } = await supabase.storage
       .from('records')
       .list(`${teamId}/${$user?.id}`, {
-        sortBy: { column: 'created_at', order: 'asc' },
+        sortBy: { column: 'created_at', order: 'desc' },
       });
 
     if (error) {

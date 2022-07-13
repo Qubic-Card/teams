@@ -19,8 +19,8 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
       'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)'
     )
     .eq(col, id)
-    .lte('dateConnected', new Date(fromDate).toUTCString())
-    .gte('dateConnected', new Date(toDate).toUTCString());
+    .gte('dateConnected', new Date(fromDate).toUTCString())
+    .lte('dateConnected', new Date(toDate).toUTCString());
   // .csv();
 
   if (error) {
@@ -41,16 +41,16 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
         Links3: item?.links[2]?.link,
         Links4: item?.links[3]?.link,
         Links5: item?.links[4]?.link,
-        Twitter: getSocialMediaCsv(item.socials, 'twitter'),
-        LinkedIn: getSocialMediaCsv(item.socials, 'linkedin'),
-        WhatsApp: getSocialMediaCsv(item.socials, 'whatsapp'),
-        Email: getSocialMediaCsv(item.socials, 'email'),
-        Phone: getSocialMediaCsv(item.socials, 'phone'),
-        Line: getSocialMediaCsv(item.socials, 'line'),
-        TikTok: getSocialMediaCsv(item.socials, 'tiktok'),
-        Instagram: getSocialMediaCsv(item.socials, 'instagram'),
-        Facebook: getSocialMediaCsv(item.socials, 'facebook'),
-        YouTube: getSocialMediaCsv(item.socials, 'youtube'),
+        Twitter: getSocialMediaCsv(item?.socials, 'twitter'),
+        LinkedIn: getSocialMediaCsv(item?.socials, 'linkedin'),
+        WhatsApp: getSocialMediaCsv(item?.socials, 'whatsapp'),
+        Email: getSocialMediaCsv(item?.socials, 'email'),
+        Phone: getSocialMediaCsv(item?.socials, 'phone'),
+        Line: getSocialMediaCsv(item?.socials, 'line'),
+        TikTok: getSocialMediaCsv(item?.socials, 'tiktok'),
+        Instagram: getSocialMediaCsv(item?.socials, 'instagram'),
+        Facebook: getSocialMediaCsv(item?.socials, 'facebook'),
+        YouTube: getSocialMediaCsv(item?.socials, 'youtube'),
         Message: item?.message,
         Link: item?.link,
         By: item?.by.firstname + ' ' + item.by.lastname,
@@ -64,14 +64,15 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
 };
 
 export const getLogsRecords = async (col, id, fromDate, toDate) => {
+  console.log(new Date(fromDate).toUTCString(), new Date(toDate).toUTCString());
   const { data, error } = await supabase
     .from('team_logs')
     .select(
       '*, team_member(team_profile->firstname, team_profile->lastname), team(metadata->company, name)'
     )
     .eq(col, id)
-    .lte('created_at', new Date(fromDate).toUTCString())
-    .gte('created_at', new Date(toDate).toUTCString());
+    .gte('created_at', new Date(fromDate).toUTCString())
+    .lte('created_at', new Date(toDate).toUTCString());
   // .csv();
 
   if (error) {
@@ -79,14 +80,15 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
   } else {
     let logs = data.map((log) => {
       return {
-        Created_at: log.created_at,
-        Id: log.id,
-        Type: log.type,
+        Created_at: log?.created_at,
+        Id: log?.id,
+        Type: log?.type,
         Team: log?.team?.name,
-        Company: log.team.company,
-        Message: log.data.message,
-        Link: log.data.link,
-        TeamMember: log.team_member.firstname + ' ' + log.team_member.lastname,
+        Company: log?.team?.company,
+        Message: log?.data?.message,
+        Link: log?.data?.link,
+        TeamMember:
+          log?.team_member?.firstname + ' ' + log.team_member?.lastname,
       };
     });
 

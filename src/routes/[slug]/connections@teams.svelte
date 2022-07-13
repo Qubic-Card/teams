@@ -289,7 +289,7 @@
     {/await}
   {:else}
     {#await getUserConnectionsList()}
-      <ConnectionsSkeletion />
+      <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div class="flex justify-end items-center mt-6 gap-2">
         <Search
@@ -301,55 +301,59 @@
           label={selectedSearchMenu?.name}
         />
       </div>
-      <div
-        class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
-      >
-        <table class="snap-center text-black w-full mt-6">
-          <thead class="text-left text-neutral-400 bg-black/70">
-            <tr>
-              {#if innerWidth > 640}
-                <TableHead
-                  class="w-1/6"
-                  data={connectionsTable}
-                  on:sort={async (e) => {
-                    asc = !asc;
-                    await sortHandler(e.detail);
-                  }}
+      {#if loading}
+        <ConnectionsSkeletion />
+      {:else}
+        <div
+          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
+        >
+          <table class="snap-center text-black w-full mt-6">
+            <thead class="text-left text-neutral-400 bg-black/70">
+              <tr>
+                {#if innerWidth > 640}
+                  <TableHead
+                    class="w-1/6"
+                    data={connectionsTable}
+                    on:sort={async (e) => {
+                      asc = !asc;
+                      await sortHandler(e.detail);
+                    }}
+                  />
+                {:else}
+                  <TableHead
+                    class="w-1/4"
+                    data={connectionsTable}
+                    on:sort={async (e) => {
+                      asc = !asc;
+                      await sortHandler(e.detail);
+                    }}
+                  />
+                {/if}
+              </tr>
+            </thead>
+            <tbody>
+              {#each userConnections as connection, i}
+                <ConnectionTableBody
+                  {innerWidth}
+                  {connection}
+                  {i}
+                  tab="user"
+                  deleteHandler={deleteConnectionHandler}
                 />
-              {:else}
-                <TableHead
-                  class="w-1/4"
-                  data={connectionsTable}
-                  on:sort={async (e) => {
-                    asc = !asc;
-                    await sortHandler(e.detail);
-                  }}
-                />
-              {/if}
-            </tr>
-          </thead>
-          <tbody>
-            {#each userConnections as connection, i}
-              <ConnectionTableBody
-                {innerWidth}
-                {connection}
-                {i}
-                tab="user"
-                deleteHandler={deleteConnectionHandler}
-              />
-            {/each}
-          </tbody>
-        </table>
-        {#if searchNotFoundMsg !== ''}
-          <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            {searchNotFoundMsg}
-          </h1>
-        {:else if userConnections.length === 0}
-          <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-            No connection found.
-          </h1>
-        {/if}
-      </div>
+              {/each}
+            </tbody>
+          </table>
+          {#if searchNotFoundMsg !== ''}
+            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+              {searchNotFoundMsg}
+            </h1>
+          {:else if userConnections.length === 0}
+            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+              No connection found.
+            </h1>
+          {/if}
+        </div>
+      {/if}
     {:catch}
       <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
         Some error occurred. Please reload the page and try again.

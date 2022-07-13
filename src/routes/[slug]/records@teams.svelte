@@ -23,7 +23,7 @@
     const { data, error } = await supabase.storage
       .from('records')
       .list(`${teamId}/${$user?.id}`, {
-        // sortBy: { column: 'created_at', order: 'dsc' },
+        sortBy: { column: 'created_at', order: 'desc' },
       });
 
     if (error) {
@@ -42,7 +42,7 @@
     const { data, error } = await supabase.storage
       .from('records')
       .list(`${teamId}/${$user?.id}`, {
-        // sortBy: { column: 'created_at', order: 'dsc' },
+        sortBy: { column: 'created_at', order: 'desc' },
       });
 
     if (error) {
