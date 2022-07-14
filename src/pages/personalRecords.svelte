@@ -71,7 +71,7 @@
     const { data, error } = await supabase.storage
       .from('records')
       .upload(
-        `${teamId}/${$user?.id}/${fileName}-${
+        `${teamId}/${$user?.id}/${fileName === '' ? 'qubic' : fileName}-${
           selectedType === 'Activities' ? 'activities' : 'connections'
         }`,
         selectedType === 'Activities' ? logsCsv : connectionsCsv,

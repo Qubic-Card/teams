@@ -53,6 +53,16 @@
       isHasPermission = true;
     }
   });
+  // $: console.log($userData);
+  // $: $userData.filter((item) => {
+  //   if (item === 'allow_read_analytics') $permissions.readAnalytics = true;
+  //   if (item === 'allow_write_analytics') $permissions.writeAnalytics = true;
+  //   if (item === 'allow_read_billing') $permissions.readBilling = true;
+  //   if (item === 'allow_write_billing') $permissions.writeBilling = true;
+  //   if (item === 'allow_read_roles') $permissions.readRoles = true;
+  //   if (item === 'allow_write_roles') $permissions.writeRoles = true;
+  // });
+  // $: console.log($permissions);
 
   const handler = (id, title) => {
     goto(`/${id}/${title}`);

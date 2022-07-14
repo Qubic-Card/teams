@@ -215,3 +215,14 @@ export const recordsTable = [
     id: 'actions',
   },
 ];
+
+export const cardImage = {
+  metalRed:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/cards/metal-card-red.webp',
+  pvcWhite:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/cards/pvc-wht.webp',
+  metalBlack:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/cards/Card+Editor/black+card+logo+black.png',
+  metalWhite:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/white-card-logo-white.webp',
+};

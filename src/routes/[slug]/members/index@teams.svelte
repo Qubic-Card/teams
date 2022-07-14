@@ -13,13 +13,17 @@
   let teamId = Cookies.get('qubicTeamId');
 
   let members = [];
-  let ownProfile = [];
-  let isHasPermission = false;
+  let ownProfile;
+  let permissions = {
+    readMembers: false,
+    writeRoles: false,
+    readRoles: false,
+  };
   let searchQuery = '';
   let searchNotFoundMsg = '';
   let loading = false;
   let innerWidth = 0;
-
+  let cards = null;
   let selectedSearchMenu = null;
   let roles = [];
 
@@ -37,6 +41,20 @@
 
     if (data) {
       members = data;
+    }
+  };
+
+  const getTeamCard = async () => {
+    const { data, error } = await supabase
+      .from('business_cards')
+      .select('id, type, color, team_id')
+      .eq('team_id', teamId)
+      .order('created_at', { ascending: true });
+
+    if (error) console.log(error);
+    if (data) {
+      cards = data;
+      console.log(data);
     }
   };
 
@@ -67,11 +85,17 @@
     }
   };
 
+  const deleteMemberFromUI = (id) =>
+    (members = members.filter((member) => member.id !== id));
+
   $: {
     $userData?.filter((item) => {
-      if (item === 'allow_read_members') isHasPermission = true;
+      if (item === 'allow_read_members') permissions.readMembers = true;
+      if (item === 'allow_write_roles') permissions.writeRoles = true;
+      if (item === 'allow_read_roles') permissions.readRoles = true;
     });
-
+    // TODO: get own profile
+    // TODO: search
     members.map((member) => {
       if (member.uid === $user?.id) ownProfile = member;
     });
@@ -83,12 +107,12 @@
 
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-4 pl-24 pr-4">
-  {#await getTeamMembers()}
+  {#await getTeamCard()}
     <MemberSkeleton searchSkeletonVisible />
   {:then}
     <div
       class={`items-center w-full rounded-md justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
-        isHasPermission ? 'flex' : 'hidden'
+        permissions.readMembers ? 'flex' : 'hidden'
       }`}
     >
       <Search
@@ -107,7 +131,17 @@
           innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
         }`}
       >
-        {#each members as member, i}
+        {#each cards as card, i}
+          <MemberCard
+            {card}
+            {cards}
+            index={i}
+            {roles}
+            {permissions}
+            {deleteMemberFromUI}
+          />
+        {/each}
+        <!-- {#each members as member, i}
           {#if isHasPermission === false && member.uid === ownProfile.uid}
             <MemberCard
               member={ownProfile}
@@ -117,6 +151,7 @@
               {members}
               memberUid={member.uid}
               {roles}
+              {deleteMemberFromUI}
             />
           {:else if isHasPermission === true}
             <MemberCard
@@ -127,9 +162,10 @@
               {members}
               memberUid={member.uid}
               {roles}
+              {deleteMemberFromUI}
             />
           {/if}
-        {/each}
+        {/each} -->
       </div>
     {/if}
     {#if searchNotFoundMsg !== ''}
