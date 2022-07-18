@@ -12,19 +12,42 @@
   let isSuccessful = false;
   let isForgotPassword = false;
 
+  const checkIsActiveMember = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('uid')
+      .eq('uid', $user.id);
+
+    if (error) console.log(error);
+    if (data) {
+      if (data.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   const handleLogin = async () => {
     try {
       loading = true;
-      const { error } = await supabase.auth.signIn({
+      const { user, error } = await supabase.auth.signIn({
         email: email,
         password: password,
       });
       if (error) throw error;
-      toastSuccess('Hello!');
-      loading = false;
-      isSuccessful = true;
-      // setTimeout(() => location.reload(), 4000);
-      setTimeout(() => goto('/select-teams'), 1000);
+
+      if (await checkIsActiveMember()) {
+        toastSuccess('Hello!');
+        loading = false;
+        isSuccessful = true;
+        setTimeout(() => goto('/select-teams'), 1000);
+      } else {
+        toastFailed('You are not a member of any team.');
+        loading = false;
+        isSuccessful = false;
+        // location.reload();
+      }
     } catch (error) {
       toastFailed();
       loading = false;
