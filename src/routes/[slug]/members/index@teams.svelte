@@ -2,14 +2,13 @@
   import { onMount } from 'svelte';
   import Cookies from 'js-cookie';
   import supabase from '@lib/db';
-  import { memberSearchMenu } from '@lib/constants.js';
   import { user, userData } from '@lib/stores/userStore';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
   import { getMemberId } from '@lib/query/getId';
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
-  import Search from '@comp/search.svelte';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
   let teamId = Cookies.get('qubicTeamId');
   let permissions = {
@@ -17,12 +16,10 @@
     writeRoles: false,
     readRoles: false,
   };
-  let searchQuery = '';
   let searchNotFoundMsg = '';
   let loading = false;
   let innerWidth = 0;
   let cards = [];
-  let selectedSearchMenu = null;
   let roles = [];
   let userCardId = null;
   let teamCardCon = [];
@@ -31,7 +28,6 @@
   let state = 'all';
 
   const setState = (newState) => (state = newState);
-  const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
 
   const getUserCardId = async () => {
     let memberId = await getMemberId($user?.id, teamId);
@@ -75,31 +71,6 @@
     }
   };
 
-  const searchMemberHandler = async () => {
-    loading = true;
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .select('team_member_id(*)')
-      .eq('team_member_id->>team_id', teamId)
-      .ilike(
-        selectedSearchMenu
-          ? selectedSearchMenu.col
-          : 'team_member_id.team_profile->>firstname',
-        `%${searchQuery}%`
-      );
-
-    loading = false;
-    if (error) console.log(error);
-    if (data) {
-      console.log(data);
-      data.length === 0
-        ? (searchNotFoundMsg = 'No member found.')
-        : (searchNotFoundMsg = '');
-
-      return data;
-    }
-  };
-
   const seperatingMembers = (arr1, arr2) => {
     let active = arr2.filter((item) => !arr1.includes(item));
 
@@ -116,6 +87,13 @@
     }
   };
 
+  const recieveDeletedMemberData = (e) => {
+    inactiveCards = [...inactiveCards, e.detail];
+    activeMembers = activeMembers.filter(
+      (member) => member?.card_id?.id !== e.detail?.card_id?.id
+    );
+  };
+
   $: if (cards && teamCardCon) seperatingMembers(cards, teamCardCon);
 
   $: {
@@ -124,7 +102,6 @@
       if (item === 'allow_write_roles') permissions.writeRoles = true;
       if (item === 'allow_read_roles') permissions.readRoles = true;
     });
-    // TODO: search
 
     if (activeMembers) {
       getUserCardId();
@@ -132,11 +109,7 @@
     }
   }
 
-  // $: searchQuery, selectedSearchMenu, searchMemberHandler();
-
-  onMount(async () => {
-    roles = await getAllRoleByTeam(teamId);
-  });
+  onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
 <svelte:window bind:innerWidth />
@@ -169,40 +142,41 @@
           } else setState('all');
         }}>Inactive</button
       >
-      <!-- <Search
-        class="top-24 mt-2 right-10"
-        searchMenu={memberSearchMenu}
-        bind:value={searchQuery}
-        on:select={selectMenu}
-        label={selectedSearchMenu?.name}
-      /> -->
     </div>
-    {#if loading}
-      <MemberSkeleton />
-    {:else}
-      <div
-        class={`grid grid-flow-row my-8 gap-4 ${
-          innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
-        }`}
-      >
-        {#if state === 'all'}
-          {#each activeMembers as member, i}
-            <MemberCard {member} {roles} {permissions} active />
-          {/each}
-          {#each inactiveCards as card, i}
-            <MemberCard {card} {permissions} />
-          {/each}
-        {:else if state === 'active'}
-          {#each activeMembers as member, i}
-            <MemberCard {member} {roles} {permissions} active />
-          {/each}
-        {:else if state === 'inactive'}
-          {#each inactiveCards as card, i}
-            <MemberCard {card} {permissions} />
-          {/each}
-        {/if}
-      </div>
-    {/if}
+    <div
+      class={`grid grid-flow-row my-8 gap-4 ${
+        innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
+      }`}
+    >
+      {#if state === 'all'}
+        {#each activeMembers as member, i}
+          <MemberCard
+            {member}
+            {roles}
+            {permissions}
+            active
+            on:deletedMemberData={recieveDeletedMemberData}
+          />
+        {/each}
+        {#each inactiveCards as card, i}
+          <MemberCard {card} {permissions} />
+        {/each}
+      {:else if state === 'active'}
+        {#each activeMembers as member, i}
+          <MemberCard
+            {member}
+            {roles}
+            {permissions}
+            active
+            on:deletedMemberData={recieveDeletedMemberData}
+          />
+        {/each}
+      {:else if state === 'inactive'}
+        {#each inactiveCards as card, i}
+          <MemberCard {card} {permissions} />
+        {/each}
+      {/if}
+    </div>
     {#if searchNotFoundMsg !== ''}
       <div class="text-2xl font-bold text-white text-center w-full mt-8">
         {searchNotFoundMsg}

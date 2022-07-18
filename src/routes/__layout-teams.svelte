@@ -9,16 +9,15 @@
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
-  import { getTeamId } from '@lib/query/getId';
-
   import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
   import supabase from '@lib/db';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
-  let isHasPermission = false;
-
+  let permissions = {
+    readAnalytics: false,
+  };
   let roleMapping = [];
   let team = null;
   let teamId = Cookies.get('qubicTeamId');
@@ -47,33 +46,23 @@
   });
 
   $: setUserData(roleMapping);
-
   $: $userData?.filter((item) => {
-    if (item === 'allow_read_analytics') {
-      isHasPermission = true;
-    }
+    if (item === 'allow_read_analytics') permissions.readAnalytics = true;
   });
-  // $: console.log($userData);
-  // $: $userData.filter((item) => {
-  //   if (item === 'allow_read_analytics') $permissions.readAnalytics = true;
-  //   if (item === 'allow_write_analytics') $permissions.writeAnalytics = true;
-  //   if (item === 'allow_read_billing') $permissions.readBilling = true;
-  //   if (item === 'allow_write_billing') $permissions.writeBilling = true;
-  //   if (item === 'allow_read_roles') $permissions.readRoles = true;
-  //   if (item === 'allow_write_roles') $permissions.writeRoles = true;
-  // });
-  // $: console.log($permissions);
 
   const handler = (id, title) => {
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
+  let y;
+  $: console.log(y);
 </script>
 
 <svelte:head>
   <title>Qubic Card | Teams</title>
 </svelte:head>
 
+<svelte:window bind:scrollY={y} />
 <AuthWrapper>
   <div class="relative min-h-screen">
     <div
@@ -178,7 +167,7 @@
     <div
       class="absolute top-16 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
     >
-      {#if isHasPermission}
+      {#if permissions.readAnalytics}
         {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
           <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
             <button

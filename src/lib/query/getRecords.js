@@ -26,7 +26,6 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
   if (error) {
     console.log(error);
   } else {
-    console.log(data);
     let items = data.map((item) => {
       return {
         DateConnected: item?.dateConnected,
@@ -64,7 +63,6 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
 };
 
 export const getLogsRecords = async (col, id, fromDate, toDate) => {
-  console.log(new Date(fromDate).toUTCString(), new Date(toDate).toUTCString());
   const { data, error } = await supabase
     .from('team_logs')
     .select(
@@ -78,6 +76,7 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
   if (error) {
     console.log(error);
   } else {
+    console.log(data);
     let logs = data.map((log) => {
       return {
         Created_at: log?.created_at,
@@ -89,6 +88,7 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
         Link: log?.data?.link,
         TeamMember:
           log?.team_member?.firstname + ' ' + log.team_member?.lastname,
+        Holder: log.card_holder ?? '-',
       };
     });
 

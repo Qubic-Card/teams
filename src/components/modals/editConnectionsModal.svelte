@@ -2,27 +2,27 @@
   import Input from '@comp/input.svelte';
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import EditModalWrapper from '@comp/modals/editModalWrapper.svelte';
   import { links, socials } from '@lib/stores/editorStore';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
+  import { Dialog, DialogTitle } from '@rgossiaux/svelte-headlessui';
 
+  let open = false;
   export let data;
-  let showModal = false;
-  let activeSocialMedia = [];
-  let activeLinks = [];
 
-  const modalHandler = () => {
-    showModal = !showModal;
+  const toggleModal = () => {
+    open = !open;
     $socials = activeSocialMedia;
     $links = activeLinks;
   };
+
+  let activeSocialMedia = [];
+  let activeLinks = [];
 
   $: activeSocialMedia = data.profileData.socials.filter(
     (social) => social.isActive
   );
   $: activeLinks = data.profileData.links.filter((link) => link.isActive);
-  // $: console.log(data.profileData.links);
-  // $: console.log(data.profileData.socials.map((social) => social.isActive));
+
   const updateConnectionsData = async () => {
     data.profileData.socials = $socials;
     data.profileData.links = $links;
@@ -38,7 +38,7 @@
       toastFailed('Failed to update connection data');
     } else {
       toastSuccess('Connection data updated successfully');
-      modalHandler();
+      toggleModal();
     }
   };
 
@@ -52,13 +52,38 @@
   };
 </script>
 
-<EditModalWrapper
-  title="Edit connection"
-  {showModal}
-  on:showModal={modalHandler}
-  on:save={async () => await updateConnectionsData()}
+<img
+  src="/edit-icon.svg"
+  alt=""
+  class="w-6 h-6 cursor-pointer"
+  on:click={toggleModal}
+/>
+<Dialog
+  {open}
+  on:close={() => (open = false)}
+  class="flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 absolute bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory"
 >
-  <div class="flex flex-col mb-2">
+  <div
+    class="fixed inset-0 bg-black/50 z-10"
+    aria-hidden="true"
+    on:click={() => (open = false)}
+  />
+  <DialogTitle class="text-xl pb-2 border-b-2 border-neutral-700 z-30"
+    >Edit Connection</DialogTitle
+  >
+
+  <div class="bottom flex gap-4 mb-4 z-30">
+    <button
+      class="p-2 border-2 border-neutral-700 w-full"
+      on:click={toggleModal}>Cancel</button
+    >
+    <button
+      class="p-2 bg-blue-600 w-full"
+      on:click={async () => await updateConnectionsData()}>Save</button
+    >
+  </div>
+
+  <div class="flex flex-col mb-2 z-30">
     <h1 class="font-bold text-xl text-white mb-2">Identity</h1>
     <Input
       placeholder="Firstname"
@@ -77,7 +102,7 @@
       bind:value={data.profileData.company}
     />
   </div>
-  <div class="flex flex-col mb-2">
+  <div class="flex flex-col mb-2 z-30">
     <div class="flex justify-between">
       <h1 class="font-bold text-xl text-white mb-2">Socials</h1>
       <AddSocialsModal />
@@ -118,7 +143,7 @@
     {/each}
   </div>
 
-  <div class="flex flex-col mb-2">
+  <div class="flex flex-col mb-2 z-30">
     <div class="flex justify-between items-center">
       <h1 class="font-bold text-xl text-white">Links</h1>
       <img
@@ -141,4 +166,4 @@
       <h1>No link found</h1>
     {/if}
   </div>
-</EditModalWrapper>
+</Dialog>

@@ -12,7 +12,7 @@
   import { getMemberId } from '@lib/query/getId';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
-  import { last30Days, today } from '@lib/utils/getDates';
+  import getDates, { last30Days, today } from '@lib/utils/getDates';
   import Spinner from '@comp/loading/spinner.svelte';
 
   export let teamCsv;
@@ -24,11 +24,12 @@
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
+  let asc = false;
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
       const dateLimiter = new Date(
-        new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 30)
+        new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 29)
       );
       toDateOptions.minDate = new Date(selectedDates[0]);
       toDateOptions.maxDate = new Date(dateLimiter);
@@ -53,15 +54,15 @@
 
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
-        'team_member',
-        id,
+        'team',
+        teamId,
         fromDateValue,
         toDateValue
       );
     } else {
       connectionsCsv = await getConnectionsRecords(
-        'by',
-        id,
+        'team_id',
+        teamId,
         fromDateValue,
         toDateValue
       );
@@ -70,7 +71,7 @@
     const { data, error } = await supabase.storage
       .from('records')
       .upload(
-        `${teamId}/${$user?.id}/${fileName}-${
+        `${teamId}/${$user?.id}/${fileName === '' ? 'qubic' : fileName}-${
           selectedType === 'Activities' ? 'activities' : 'connections'
         }`,
         selectedType === 'Activities' ? logsCsv : connectionsCsv,
@@ -111,11 +112,26 @@
     isLoading = false;
   };
 
-  const getTeamStorage = async () => {
+  const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
       .from('records')
       .list(`${teamId}/${$user?.id}`, {
         sortBy: { column: 'created_at', order: 'desc' },
+      });
+
+    if (error) {
+      console.log(error);
+    } else {
+      // console.log(data);
+      teamCsv = data;
+    }
+  };
+
+  const sortHandler = async (col) => {
+    const { data, error } = await supabase.storage
+      .from('records')
+      .list(`${teamId}/${$user?.id}`, {
+        sortBy: { column: col, order: asc ? 'asc' : 'desc' },
       });
 
     if (error) {
@@ -131,7 +147,7 @@
 
   const selectTypeHandler = (e) => (selectedType = e.detail);
 
-  $: if (isCreateRecord) isCreateRecord, getTeamStorage();
+  $: if (isCreateRecord) isCreateRecord, getPersonalStorage();
 </script>
 
 <div
@@ -190,10 +206,8 @@
           class="w-1/4"
           data={recordsTable}
           on:sort={async (e) => {
-            // asc = !asc;
-            // await sortHandler(
-            //   e.detail ?? 'profileData->>firstname'
-            // );
+            asc = !asc;
+            await sortHandler(e.detail ?? 'name');
           }}
         />
       </tr>
@@ -214,13 +228,4 @@
       {/if}
     </tbody>
   </table>
-  <!-- {#if searchNotFoundMsg !== ''}
-              <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-                {searchNotFoundMsg}
-              </h1>
-            {:else if userConnections.length === 0}
-              <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-                No connection found.
-              </h1>
-            {/if} -->
 </div>

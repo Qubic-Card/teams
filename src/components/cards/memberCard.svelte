@@ -14,17 +14,21 @@
     MenuItems,
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
+  import { createEventDispatcher } from 'svelte';
 
   export let permissions;
   export let card = null;
   export let roles = [];
   export let member = null;
   export let active = false;
-  // $: console.log(cards);
-  // $: console.log(permissions);
+  // export let deleteMemberHandler;
 
   let selectedRole = '';
   let memberRole = null;
+  const dispatch = createEventDispatcher();
+
+  const passDeletedMemberData = (member) =>
+    dispatch('deletedMemberData', member);
 
   const toProfileEditor = (slug) =>
     goto(`/${$page.params.slug}/members/${slug}`);
@@ -68,16 +72,18 @@
   };
   // eac9c236-da25-4d9c-a058-632bd92bc951
   // cf682da6-c300-4078-8088-f85993eda24d
-  const deleteMemberHandler = async () => {
+  const deleteMemberHandler = async (id, memberData) => {
+    console.log(id, memberData);
+
     const { error } = await supabase
       .from('team_cardcon')
       .delete()
-      .eq('team_member_id', member?.team_member_id?.id);
+      .eq('team_member_id', id);
 
     const { error: error_member } = await supabase
       .from('team_members')
       .update({ uid: null }, { returning: 'minimal' })
-      .eq('id', member?.team_member_id?.id);
+      .eq('id', id);
 
     if (error) {
       console.log(error);
@@ -88,11 +94,7 @@
       toastFailed();
       return;
     } else {
-      // if (memberData?.id === id) {
-      //   memberData = null;
-      //   // active = false;
-      // }
-      active = false;
+      passDeletedMemberData(memberData);
       toastSuccess('Member has been deleted');
     }
   };
@@ -308,7 +310,11 @@
                 class="top-0 right-0 z-50 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
               >
                 <MenuItem
-                  on:click={async () => await deleteMemberHandler()}
+                  on:click={async () =>
+                    await deleteMemberHandler(
+                      member?.team_member_id?.id,
+                      member
+                    )}
                   class="flex hover:bg-neutral-800 text-red-600 px-2 py-2 rounded-md cursor-pointer"
                 >
                   Remove user

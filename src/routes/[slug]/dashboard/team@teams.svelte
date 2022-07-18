@@ -4,12 +4,6 @@
   import { onMount } from 'svelte';
   import Chart from 'chart.js/auto/auto.js';
   import {
-    Menu,
-    MenuButton,
-    MenuItems,
-    MenuItem,
-  } from '@rgossiaux/svelte-headlessui';
-  import {
     last30Days,
     last7Days,
     last3Days,
@@ -20,6 +14,7 @@
     thirtyDays,
   } from '@lib/utils/getDates';
   import supabase from '@lib/db';
+  import TeamAnalyticsCard from '@comp/cards/teamAnalyticsCard.svelte';
   import AnalyticsDropdownButton from '@comp/buttons/analyticsDropdownButton.svelte';
   import { tapCount } from '@lib/utils/count';
   import { doughnutChartBgColor, socialIcons } from '@lib/constants';
@@ -64,6 +59,7 @@
     type: 'doughnut',
     data: data,
     options: {
+      hoverBackgroundColor: '#171717',
       responsive: true,
       aspectRatio: 1,
       maintainAspectRatio: false,
@@ -336,92 +332,11 @@
         <AnalyticsDropdownButton on:select={selectDaysHandler} />
         <div class="flex gap-4">
           {#each analyticsData as item}
-            <div
-              class="flex flex-col justify-between w-full h-32 bg-neutral-800 border border-neutral-700 rounded-lg p-6"
-            >
-              <div class="flex justify-between items-center">
-                <h1 class="text-xl">{item.data} <span>{item.type}</span></h1>
-                <div
-                  class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="white"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div class="flex justify-between items-center text-sm">
-                <h2 class="text-neutral-400">{selectedDays}</h2>
-                {#if item.percentage >= 0}
-                  <p class="text-green-600 flex gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M5 15l7-7 7 7"
-                      />
-                    </svg>
-                    {item.percentage}%
-                  </p>
-                {:else}
-                  <p class="text-red-600 flex gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                    {item.percentage}%
-                  </p>
-                {/if}
-              </div>
-            </div>
+            <TeamAnalyticsCard {item} {selectedDays} />
           {/each}
         </div>
       </div>
     {/if}
-  </div>
-  <div
-    class="flex justify-between items-center border border-neutral-700 bg-neutral-800 pr-5 rounded-lg h-12"
-  >
-    <Menu>
-      <MenuButton
-        class="bg-neutral-100 text-black p-3 text-sm rounded-l-lg hidden"
-        >Most active member <span class="pl-12">&#x25BC;</span></MenuButton
-      >
-      <MenuItems
-        class="mt-4 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-3 w-80"
-      >
-        <MenuItem class="p-2">Choose one</MenuItem>
-      </MenuItems>
-    </Menu>
-
-    <h1 class="hidden">dsafasd</h1>
   </div>
 
   <div class="flex gap-4">

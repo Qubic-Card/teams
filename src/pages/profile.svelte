@@ -19,6 +19,7 @@
   import addToContactHandler from '@lib/utils/addToContact';
   import { genvcard } from '@lib/vcard/vcardgen';
   import download from '@lib/utils/download';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
   export let data;
   export let isEditorMode = false;
@@ -55,7 +56,7 @@
   };
   $: getTeams();
 
-  const modalHandler = () => (showModal = !showModal);
+  const popup = () => toastFailed(`You can't connect to your profile`);
   const downloadHandler = () => console.log('Brosur has been downloaded');
 </script>
 
@@ -141,9 +142,8 @@
         <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
           <!-- UTILITIES -->
           <BorderButton
-            disabled={true}
-            class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md cursor-default"
-            on:click={modalHandler}
+            class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
+            on:click={popup}
           >
             Connect with Me
           </BorderButton>

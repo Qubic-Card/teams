@@ -24,7 +24,7 @@
         isHasPermissionToMemberPage === false
           ? (showModal = true)
           : goto(`/${$page.params.slug}/members`),
-      name: 'Add new member',
+      name: 'Manage Members',
     },
     {
       handler: () =>
@@ -45,8 +45,13 @@
     'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1632&q=80';
 
   const modalHandler = () => (showModal = !showModal);
+
+  let y = 0;
+  $: y;
+  $: console.log(y);
 </script>
 
+<svelte:window bind:scrollY={y} />
 <div
   class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-24 pr-4"
 >
@@ -68,7 +73,7 @@
   </div>
 
   <Analytics />
-
+  <p>{y}</p>
   <div class="flex flex-col mt-2">
     <h1 class="text-2xl font-bold">Learn More</h1>
     <div
