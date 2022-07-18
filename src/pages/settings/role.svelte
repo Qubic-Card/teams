@@ -22,8 +22,6 @@
   let loading = false;
   let teamId = Cookies.get('qubicTeamId');
 
-  let roleName;
-
   const updateTeamsRoleMapping = async (id) => {
     loading = true;
     const { data, error } = await supabase
@@ -39,16 +37,11 @@
     loading = false;
     if (error) {
       toastFailed('Failed to update role');
-      console.log(error);
     }
 
     isClicked = true;
     toastSuccess('Role updated');
-    // if (data) {
-    //   return data;
-    // }
   };
-  // $: getMemberRole();
 
   const clicked = (e) => (isClicked = e.detail);
 </script>
@@ -66,6 +59,8 @@
         />
       {/if}
     </div>
+    <h1 class="p-4 text-xl">Super Admin</h1>
+    <h1 class="p-4 text-xl">Member</h1>
     {#if roles.length > 0}
       {#each roles as role}
         <Disclosure let:open>

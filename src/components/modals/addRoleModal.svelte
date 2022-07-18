@@ -82,6 +82,7 @@
       checkboxes={roleMapping}
       bind:checked={checkedRole}
       {isHasWriteRolePermission}
+      bg="bg-neutral-800"
     />
     <button
       disabled={roleName === '' ? true : false}

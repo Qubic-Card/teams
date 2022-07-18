@@ -36,7 +36,7 @@
       <p>Subscription valid hingga: 12 Feb 2023</p>
       <p>Saldo tersisa: 0</p>
       <div
-        class="flex justify-between items-center p-3 rounded-full mt-4 bg-neutral-800"
+        class="flex justify-between items-center p-3 rounded-full mt-4 bg-neutral-900"
       >
         <p>Aktifkan auto renew</p>
         <Switch

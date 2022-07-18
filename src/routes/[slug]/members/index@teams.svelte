@@ -1,19 +1,17 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
-  import MemberCard from '@comp/cards/memberCard.svelte';
+  import { onMount } from 'svelte';
+  import Cookies from 'js-cookie';
   import supabase from '@lib/db';
   import { memberSearchMenu } from '@lib/constants.js';
   import { user, userData } from '@lib/stores/userStore';
-  import Cookies from 'js-cookie';
-  import { onMount } from 'svelte';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
+  import { getMemberId } from '@lib/query/getId';
+  import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
+  import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
+  import MemberCard from '@comp/cards/memberCard.svelte';
   import Search from '@comp/search.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
-
-  let members = [];
-  let ownProfile;
   let permissions = {
     readMembers: false,
     writeRoles: false,
@@ -23,24 +21,29 @@
   let searchNotFoundMsg = '';
   let loading = false;
   let innerWidth = 0;
-  let cards = null;
+  let cards = [];
   let selectedSearchMenu = null;
   let roles = [];
+  let userCardId = null;
+  let teamCardCon = [];
+  let inactiveCards = [];
+  let activeMembers = [];
+  let state = 'all';
 
+  const setState = (newState) => (state = newState);
   const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
 
-  const getTeamMembers = async () => {
-    // let teamId = await getTeamId($user?.id);
+  const getUserCardId = async () => {
+    let memberId = await getMemberId($user?.id, teamId);
     const { data, error } = await supabase
-      .from('team_members')
-      .select('member_from, team_profile, uid, id')
-      .eq('team_id', teamId)
-      .order('member_from', { ascending: true });
+      .from('team_cardcon')
+      .select('card_id')
+      .eq('team_member_id', memberId);
 
     if (error) console.log(error);
 
     if (data) {
-      members = data;
+      userCardId = data[0].card_id;
     }
   };
 
@@ -54,29 +57,41 @@
     if (error) console.log(error);
     if (data) {
       cards = data;
-      console.log(data);
+    }
+  };
+
+  const getTeamCardCon = async () => {
+    const { data, error } = await supabase
+      .from('team_cardcon')
+      .select('card_id(id, type, color), status, team_member_id(*)');
+    // .eq('card_id', cardId);
+
+    if (error) console.log(error);
+    if (data) {
+      if (data.length > 0) {
+        teamCardCon = data;
+        // console.log(teamCardCon);
+      }
     }
   };
 
   const searchMemberHandler = async () => {
-    // let teamId = await getTeamId($user?.id);
     loading = true;
     const { data, error } = await supabase
-      .from('team_members')
-      .select('*')
-      .eq('team_id', teamId)
+      .from('team_cardcon')
+      .select('team_member_id(*)')
+      .eq('team_member_id->>team_id', teamId)
       .ilike(
         selectedSearchMenu
           ? selectedSearchMenu.col
-          : 'team_profile->>firstname',
+          : 'team_member_id.team_profile->>firstname',
         `%${searchQuery}%`
       );
 
     loading = false;
     if (error) console.log(error);
     if (data) {
-      members = data;
-
+      console.log(data);
       data.length === 0
         ? (searchNotFoundMsg = 'No member found.')
         : (searchNotFoundMsg = '');
@@ -85,8 +100,23 @@
     }
   };
 
-  const deleteMemberFromUI = (id) =>
-    (members = members.filter((member) => member.id !== id));
+  const seperatingMembers = (arr1, arr2) => {
+    let active = arr2.filter((item) => !arr1.includes(item));
+
+    inactiveCards = [];
+    for (let index in cards) {
+      if (active[index]?.card_id?.id !== cards[index]?.id) {
+        inactiveCards = [...inactiveCards, cards[index]];
+      }
+
+      if (teamCardCon[index]?.card_id?.id === active[index]?.card_id?.id) {
+        activeMembers = [...activeMembers, teamCardCon[index]];
+        activeMembers = activeMembers.filter((member) => member !== undefined);
+      }
+    }
+  };
+
+  $: if (cards && teamCardCon) seperatingMembers(cards, teamCardCon);
 
   $: {
     $userData?.filter((item) => {
@@ -94,34 +124,58 @@
       if (item === 'allow_write_roles') permissions.writeRoles = true;
       if (item === 'allow_read_roles') permissions.readRoles = true;
     });
-    // TODO: get own profile
     // TODO: search
-    members.map((member) => {
-      if (member.uid === $user?.id) ownProfile = member;
-    });
-  }
-  $: searchQuery, selectedSearchMenu, searchMemberHandler();
 
-  onMount(async () => (roles = await getAllRoleByTeam(teamId)));
+    if (activeMembers) {
+      getUserCardId();
+      activeMembers = moveArrItemToFront(activeMembers, userCardId);
+    }
+  }
+
+  // $: searchQuery, selectedSearchMenu, searchMemberHandler();
+
+  onMount(async () => {
+    roles = await getAllRoleByTeam(teamId);
+  });
 </script>
 
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-4 pl-24 pr-4">
-  {#await getTeamCard()}
+  {#await (getTeamCard(), getTeamCardCon())}
     <MemberSkeleton searchSkeletonVisible />
   {:then}
     <div
-      class={`items-center w-full rounded-md justify-end gap-2 mt-4 bg-neutral-900 p-4 ${
+      class={`items-center w-full rounded-md gap-4 mt-4 bg-neutral-900 p-4 ${
         permissions.readMembers ? 'flex' : 'hidden'
       }`}
     >
-      <Search
+      <button
+        class={`p-3 w-28 rounded-md ${
+          state === 'active' ? 'bg-neutral-200 text-black' : 'bg-black '
+        }`}
+        on:click={() => {
+          if (state !== 'active') {
+            setState('active');
+          } else setState('all');
+        }}>Active</button
+      >
+      <button
+        class={`p-3 w-28 rounded-md ${
+          state === 'inactive' ? 'bg-neutral-200 text-black' : 'bg-black '
+        }`}
+        on:click={() => {
+          if (state !== 'inactive') {
+            setState('inactive');
+          } else setState('all');
+        }}>Inactive</button
+      >
+      <!-- <Search
         class="top-24 mt-2 right-10"
         searchMenu={memberSearchMenu}
         bind:value={searchQuery}
         on:select={selectMenu}
         label={selectedSearchMenu?.name}
-      />
+      /> -->
     </div>
     {#if loading}
       <MemberSkeleton />
@@ -131,41 +185,22 @@
           innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
         }`}
       >
-        {#each cards as card, i}
-          <MemberCard
-            {card}
-            {cards}
-            index={i}
-            {roles}
-            {permissions}
-            {deleteMemberFromUI}
-          />
-        {/each}
-        <!-- {#each members as member, i}
-          {#if isHasPermission === false && member.uid === ownProfile.uid}
-            <MemberCard
-              member={ownProfile}
-              {isHasPermission}
-              id={member.id}
-              index={i}
-              {members}
-              memberUid={member.uid}
-              {roles}
-              {deleteMemberFromUI}
-            />
-          {:else if isHasPermission === true}
-            <MemberCard
-              {member}
-              {isHasPermission}
-              id={member.id}
-              index={i}
-              {members}
-              memberUid={member.uid}
-              {roles}
-              {deleteMemberFromUI}
-            />
-          {/if}
-        {/each} -->
+        {#if state === 'all'}
+          {#each activeMembers as member, i}
+            <MemberCard {member} {roles} {permissions} active />
+          {/each}
+          {#each inactiveCards as card, i}
+            <MemberCard {card} {permissions} />
+          {/each}
+        {:else if state === 'active'}
+          {#each activeMembers as member, i}
+            <MemberCard {member} {roles} {permissions} active />
+          {/each}
+        {:else if state === 'inactive'}
+          {#each inactiveCards as card, i}
+            <MemberCard {card} {permissions} />
+          {/each}
+        {/if}
       </div>
     {/if}
     {#if searchNotFoundMsg !== ''}

@@ -1,99 +1,50 @@
 <script>
-  import Cookies from 'js-cookie';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { onMount } from 'svelte';
   import { slide, fly } from 'svelte/transition';
   import supabase from '@lib/db';
-  import {
-    getAllRoleByTeam,
-    getMemberRole,
-    getRoleMapsByProfile,
-  } from '@lib/query/getRoleMaps';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import roleId from '@lib/roleConfig';
+  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
+  import SwitchButton from '@comp/buttons/switchButton.svelte';
   import {
-    Switch,
     Menu,
     MenuButton,
     MenuItems,
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
-  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
-  import { cardImage } from '@lib/constants';
 
-  export let member,
-    permissions,
-    id,
-    index,
-    members,
-    cards,
-    memberUid,
-    roles,
-    deleteMemberFromUI;
-  export let card;
-  $: console.log(card);
-  let statusMember = false;
-  let cardId = null;
-  // let card = null;
+  export let permissions;
+  export let card = null;
+  export let roles = [];
+  export let member = null;
+  export let active = false;
+  // $: console.log(cards);
+  // $: console.log(permissions);
+
   let selectedRole = '';
   let memberRole = null;
-  let teamId = Cookies.get('qubicTeamId');
-  let roleName;
-  let isActivated = false;
-  let memberData;
-  const checkIsCardHasBeenActivated = async () => {
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .select('card_id, status, team_member_id(*)')
-      .eq('card_id', card.id);
-
-    if (error) console.log(error);
-    if (data) {
-      if (data.length > 0) {
-        // console.log('true');
-        isActivated = true;
-        memberData = data[0].team_member_id;
-        statusMember = data[0].status;
-      } else {
-        isActivated = false;
-      }
-      console.log(data);
-    }
-  };
-
-  const getMemberRoleName = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('role(role_name)')
-      .eq('uid', $user?.id)
-      .eq('team_id', memberData?.team_id);
-
-    if (error) console.log(error);
-    if (data) {
-      roleName = data[0].role.role_name;
-    }
-  };
 
   const toProfileEditor = (slug) =>
     goto(`/${$page.params.slug}/members/${slug}`);
 
   const selectRole = (role) => (selectedRole = role);
 
-  const setStatus = async (id, stat, index) => {
+  const setStatus = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .update({ status: stat }, { returning: 'minimal' })
-      .eq('card_id', id);
+      .update({ status: !member.status }, { returning: 'minimal' })
+      .eq('card_id', member.card_id.id);
 
-    cards[index].status = !cards[index].status;
+    member.status = !member.status;
 
     if (error) {
       toastFailed();
       return;
     }
 
-    if (stat) {
+    if (member.status) {
       toastSuccess('Card has been activated');
     } else {
       toastSuccess('Card has been deactivated');
@@ -104,8 +55,8 @@
     const { data, error } = await supabase
       .from('team_members')
       .update({ role: id }, { returning: 'minimal' })
-      .eq('uid', memberData?.uid)
-      .eq('team_id', memberData?.team_id);
+      .eq('uid', member?.team_member_id?.uid)
+      .eq('team_id', member?.team_member_id?.team_id);
 
     if (error) {
       console.log(error);
@@ -115,35 +66,43 @@
       toastSuccess('Role has been updated');
     }
   };
-  // c8580595-2a92-487a-8756-2ab437c29759
+  // eac9c236-da25-4d9c-a058-632bd92bc951
+  // cf682da6-c300-4078-8088-f85993eda24d
   const deleteMemberHandler = async () => {
     const { error } = await supabase
       .from('team_cardcon')
       .delete()
-      .eq('team_member_id', id);
+      .eq('team_member_id', member?.team_member_id?.id);
 
     const { error: error_member } = await supabase
       .from('team_members')
-      .delete()
-      .eq('id', id);
+      .update({ uid: null }, { returning: 'minimal' })
+      .eq('id', member?.team_member_id?.id);
 
     if (error) {
+      console.log(error);
       toastFailed();
       return;
     } else if (error_member) {
+      console.log(error_member);
       toastFailed();
       return;
     } else {
-      deleteMemberFromUI(id);
+      // if (memberData?.id === id) {
+      //   memberData = null;
+      //   // active = false;
+      // }
+      active = false;
       toastSuccess('Member has been deleted');
     }
   };
-  const getMembersRole = async (uid, teamId) => {
+
+  const getMembersRole = async () => {
     const { data, error } = await supabase
       .from('team_members')
       .select('role(role_name, id)')
-      .eq('uid', memberData?.uid)
-      .eq('team_id', memberData?.team_id);
+      .eq('uid', member?.team_member_id?.uid)
+      .eq('team_id', member?.team_member_id?.team_id);
 
     if (error) console.log(error);
 
@@ -152,211 +111,328 @@
     }
   };
 
-  $: statusMember, checkIsCardHasBeenActivated();
-  $: if (isActivated) {
-    getMemberRoleName(), getMembersRole();
-  }
+  $: if (member) getMembersRole();
+
+  // $: console.log(userCard);
+  // $: console.log(memberData);
+  // $: console.log(member);
 </script>
 
-{#if isActivated}
-  <div class="flex flex-col justify-between">
-    <div
-      class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
-    >
-      <div
-        class="flex cursor-pointer h-full gap-4 p-4"
-        on:click={() => toProfileEditor(memberData?.uid)}
-      >
-        {#if memberData?.team_profile?.avatar === ''}
+{#if active}
+  {#if !permissions.readMembers}
+    {#if $user.id === member.team_member_id.uid}
+      <div class="flex flex-col justify-between">
+        <div
+          class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
+        >
           <div
-            class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
+            class="flex cursor-pointer h-full gap-4 p-4"
+            on:click={() => toProfileEditor(member?.team_member_id.uid)}
           >
-            Q
-          </div>
-        {:else}
-          <img
-            src={memberData?.team_profile?.avatar}
-            alt="Profile"
-            class="w-32 lg:w-36 h-32 lg:h-36 rounded-md"
-          />
-        {/if}
-        <div class="flex flex-col justify-between">
-          <div class="flex flex-col flex-wrap">
-            <h1 class="md:text-lg lg:text-xl text-left w-56">
-              {memberData?.team_profile?.firstname === ''
-                ? 'No name'
-                : memberData?.team_profile?.firstname}
-              {memberData?.team_profile?.lastname === ''
-                ? ''
-                : ' ' + memberData?.team_profile?.lastname}
-            </h1>
-            <h2 class="text-neutral-300 text-md">
-              {memberData?.team_profile?.job}
-            </h2>
-            <h2 class="text-neutral-300 text-md">
-              Joined since {new Date(memberData?.member_from)
-                .toDateString()
-                .slice(4)}
-            </h2>
-          </div>
-          <div>
-            <h2 class="text-neutral-300 mt-3">Card:</h2>
-            <p class="text-neutral-300">
-              {#if card}
-                {card?.type?.charAt(0).toUpperCase() + card?.type?.slice(1)}
-                {card?.color?.charAt(0).toUpperCase() + card?.color?.slice(1)}
+            <div class="flex flex-row-reverse relative">
+              {#if member?.team_member_id.team_profile.avatar === ''}
+                <div
+                  class={`flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl ${
+                    $user.id === member?.team_member_id?.uid
+                      ? 'border-2 border-blue-600'
+                      : ''
+                  }`}
+                >
+                  Q
+                </div>
               {:else}
-                <span>No card found</span>
+                <img
+                  src={member?.team_member_id.team_profile.avatar}
+                  alt="Profile"
+                  class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
+                    $user.id === member?.team_member_id?.uid
+                      ? 'border-2 border-blue-600'
+                      : ''
+                  }`}
+                />
               {/if}
+              {#if $user.id === member?.team_member_id?.uid}
+                <h1
+                  class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
+                >
+                  You
+                </h1>
+              {/if}
+            </div>
+            <div class="flex flex-col justify-between">
+              <div class="flex flex-col flex-wrap">
+                <h1 class="md:text-lg lg:text-xl text-left w-56">
+                  {member?.team_member_id.team_profile.firstname === ''
+                    ? 'No name'
+                    : member?.team_member_id.team_profile.firstname}
+                  {member?.team_member_id.team_profile.lastname === ''
+                    ? ''
+                    : ' ' + member?.team_member_id.team_profile.lastname}
+                </h1>
+                <h2 class="text-neutral-300 text-md">
+                  {member?.team_member_id.team_profile.job}
+                </h2>
+                <h2 class="text-neutral-300 text-md">
+                  Joined since {new Date(member?.member_from)
+                    .toDateString()
+                    .slice(4)}
+                </h2>
+              </div>
+              <div>
+                <h2 class="text-neutral-300 mt-3">Card:</h2>
+                <p class="text-neutral-300">
+                  {member?.card_id?.type?.charAt(0).toUpperCase() +
+                    member?.card_id?.type?.slice(1)}
+                  {member?.card_id?.color?.charAt(0).toUpperCase() +
+                    member?.card_id?.color?.slice(1)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex relative w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
+          >
+            <p
+              class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+            >
+              {selectedRole !== ''
+                ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
+                : memberRole?.role_name
+                ? memberRole.role_name.charAt(0).toUpperCase() +
+                  memberRole.role_name.slice(1)
+                : 'No role'}
             </p>
+
+            <!-- <SwitchButton
+              on:change={async () => await setStatus()}
+              checked={member.status}
+            /> -->
           </div>
         </div>
       </div>
-
-      <Menu class="absolute flex flex-row-reverse self-end" let:open>
-        <MenuButton
-          class={`text-white flex justify-between items-center h-12 p-2 gap-2 rounded-md relative ${$$props.class}`}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="white"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-            />
-          </svg>
-        </MenuButton>
-
-        {#if open}
-          <div transition:fly|local={{ x: -20 }}>
-            <MenuItems
-              class="top-0 right-0 z-50 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
-            >
-              <MenuItem
-                class="flex hover:bg-neutral-800 text-red-600 px-2 py-2 rounded-md cursor-pointer"
-                on:click={deleteMemberHandler}
-              >
-                Remove user
-              </MenuItem>
-            </MenuItems>
-          </div>
-        {/if}
-      </Menu>
-
+    {/if}
+  {:else}
+    <div class="flex flex-col justify-between">
       <div
-        class="flex relative w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
+        class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
       >
-        <Menu let:open>
-          {#if permissions.readRoles}
-            {#if permissions.writeRoles}
-              <DropdownButton
-                class="w-auto"
-                label={selectedRole !== ''
-                  ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
-                  : memberRole?.role_name
-                  ? memberRole.role_name.charAt(0).toUpperCase() +
-                    memberRole.role_name.slice(1)
-                  : 'No role'}
-              />
-            {:else}
-              <p
-                class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+        <div
+          class="flex cursor-pointer h-full gap-4 p-4"
+          on:click={() => toProfileEditor(member?.team_member_id.uid)}
+        >
+          <div class="flex flex-row-reverse relative">
+            {#if member?.team_member_id.team_profile.avatar === ''}
+              <div
+                class={`flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl ${
+                  $user.id === member?.team_member_id?.uid
+                    ? 'border-2 border-blue-600'
+                    : ''
+                }`}
               >
-                {selectedRole !== ''
-                  ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
-                  : memberRole?.role_name
-                  ? memberRole.role_name.charAt(0).toUpperCase() +
-                    memberRole.role_name.slice(1)
-                  : 'No role'}
-              </p>
+                Q
+              </div>
+            {:else}
+              <img
+                src={member?.team_member_id.team_profile.avatar}
+                alt="Profile"
+                class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
+                  $user.id === member?.team_member_id?.uid
+                    ? 'border-2 border-blue-600'
+                    : ''
+                }`}
+              />
             {/if}
-          {/if}
+            {#if $user.id === member?.team_member_id?.uid}
+              <h1
+                class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
+              >
+                You
+              </h1>
+            {/if}
+          </div>
+          <div class="flex flex-col justify-between">
+            <div class="flex flex-col flex-wrap">
+              <h1 class="md:text-lg lg:text-xl text-left w-56">
+                {member?.team_member_id.team_profile.firstname === ''
+                  ? 'No name'
+                  : member?.team_member_id.team_profile.firstname}
+                {member?.team_member_id.team_profile.lastname === ''
+                  ? ''
+                  : ' ' + member?.team_member_id.team_profile.lastname}
+              </h1>
+              <h2 class="text-neutral-300 text-md">
+                {member?.team_member_id.team_profile.job}
+              </h2>
+              <h2 class="text-neutral-300 text-md">
+                Joined since {new Date(member?.member_from)
+                  .toDateString()
+                  .slice(4)}
+              </h2>
+            </div>
+            <div>
+              <h2 class="text-neutral-300 mt-3">Card:</h2>
+              <p class="text-neutral-300">
+                {member?.card_id?.type?.charAt(0).toUpperCase() +
+                  member?.card_id?.type?.slice(1)}
+                {member?.card_id?.color?.charAt(0).toUpperCase() +
+                  member?.card_id?.color?.slice(1)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <Menu class="absolute flex flex-row-reverse self-end" let:open>
+          <MenuButton
+            class={`text-white flex justify-between items-center h-12 p-2 gap-2 rounded-md relative ${$$props.class}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="white"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+              />
+            </svg>
+          </MenuButton>
 
           {#if open}
-            <div transition:slide|local>
+            <div transition:fly|local={{ x: -20 }}>
               <MenuItems
-                class="top-20 z-40 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
+                class="top-0 right-0 z-50 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
               >
-                {#each roles as item}
-                  <MenuItem
-                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
-                    on:click={async () => {
-                      await setMemberRole(item.id);
-                      selectRole(item.role_name);
-                    }}
-                  >
-                    {item.role_name}
-                  </MenuItem>
-                {/each}
+                <MenuItem
+                  on:click={async () => await deleteMemberHandler()}
+                  class="flex hover:bg-neutral-800 text-red-600 px-2 py-2 rounded-md cursor-pointer"
+                >
+                  Remove user
+                </MenuItem>
               </MenuItems>
             </div>
           {/if}
         </Menu>
 
-        <Switch
-          checked={statusMember}
-          on:change={async (e) => {
-            await setStatus(card.id, e.detail, index);
-            statusMember = e.detail;
-          }}
-          class={`justify-center items-center relative rounded-lg w-16 h-10 z-50 ${
-            statusMember ? 'bg-green-300' : 'bg-neutral-600'
-          } flex`}
-        >
-          <span
-            class={`inline-block w-7 h-7 bg-white rounded-full transition-transform duration-300 ease-in-out ${
-              statusMember ? 'translate-x-3' : '-translate-x-3'
-            }`}
-            class:toggle-on={statusMember}
-            class:toggle-off={!statusMember}
-          />
-        </Switch>
-      </div>
-    </div>
-  </div>
-{:else}
-  <div class="flex flex-col justify-between">
-    <div
-      class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
-    >
-      <div
-        class="flex cursor-pointer h-full gap-4 p-4"
-        on:click={() => toProfileEditor(memberData?.uid)}
-      >
         <div
-          class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
+          class="flex relative w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
         >
-          Q
-        </div>
-        <div class="flex flex-col justify-between">
-          <div class="flex flex-col flex-wrap">
-            <h1 class="md:text-lg lg:text-xl text-left w-56">
-              This card not activated yet
-            </h1>
-          </div>
-          <div>
-            <h2 class="text-neutral-300 mt-3">Card:</h2>
-            <p class="text-neutral-300">
-              {#if card}
-                {card?.type?.charAt(0).toUpperCase() + card?.type?.slice(1)}
-                {card?.color?.charAt(0).toUpperCase() + card?.color?.slice(1)}
+          <Menu let:open>
+            {#if permissions.readRoles}
+              {#if permissions.writeRoles}
+                <DropdownButton
+                  class="w-auto"
+                  label={selectedRole !== ''
+                    ? selectedRole.charAt(0).toUpperCase() +
+                      selectedRole.slice(1)
+                    : memberRole?.role_name
+                    ? memberRole.role_name.charAt(0).toUpperCase() +
+                      memberRole.role_name.slice(1)
+                    : 'No role'}
+                />
               {:else}
-                <span>No card found</span>
+                <p
+                  class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+                >
+                  {selectedRole !== ''
+                    ? selectedRole.charAt(0).toUpperCase() +
+                      selectedRole.slice(1)
+                    : memberRole?.role_name
+                    ? memberRole.role_name.charAt(0).toUpperCase() +
+                      memberRole.role_name.slice(1)
+                    : 'No role'}
+                </p>
               {/if}
-            </p>
-          </div>
+            {/if}
+
+            {#if open}
+              <div transition:slide|local>
+                <MenuItems
+                  class="top-20 z-40 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
+                >
+                  {#each roles as item}
+                    <MenuItem
+                      class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                      on:click={async () => {
+                        await setMemberRole(item.id);
+                        selectRole(item.role_name);
+                      }}
+                    >
+                      {item.role_name.charAt(0).toUpperCase() +
+                        item.role_name.slice(1)}
+                    </MenuItem>
+                  {/each}
+                  <MenuItem
+                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                    on:click={async () => {
+                      await setMemberRole(roleId[0].id);
+                      selectRole(roleId[0].name);
+                    }}
+                  >
+                    Super Admin
+                  </MenuItem>
+                  <MenuItem
+                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                    on:click={async () => {
+                      await setMemberRole(roleId[1].id);
+                      selectRole(roleId[1].name);
+                    }}
+                  >
+                    Member
+                  </MenuItem>
+                </MenuItems>
+              </div>
+            {/if}
+          </Menu>
+
+          <SwitchButton
+            on:change={async () => await setStatus()}
+            checked={member.status}
+          />
         </div>
       </div>
-
-      <div
-        class="flex relative w-full h-24 justify-between items-center bg-neutral-900 rounded-b-md p-4"
-      />
     </div>
-  </div>
+  {/if}
+{:else if permissions.readMembers}
+  {#if card}
+    <div class="flex flex-col justify-between">
+      <div
+        class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
+      >
+        <div class="flex h-full gap-4 p-4">
+          <div
+            class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
+          >
+            Q
+          </div>
+          <div class="flex flex-col justify-between">
+            <div class="flex flex-col flex-wrap">
+              <h1 class="md:text-lg lg:text-xl text-left w-56">
+                This card not activated yet
+              </h1>
+            </div>
+            <div>
+              <h2 class="text-neutral-300 mt-3">Card:</h2>
+              <p class="text-neutral-300">
+                {#if card}
+                  {card?.type?.charAt(0).toUpperCase() + card?.type?.slice(1)}
+                  {card?.color?.charAt(0).toUpperCase() + card?.color?.slice(1)}
+                {:else}
+                  <span>No card found</span>
+                {/if}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex relative w-full h-24 justify-between items-center bg-neutral-900 rounded-b-md p-4"
+        />
+      </div>
+    </div>
+  {/if}
 {/if}

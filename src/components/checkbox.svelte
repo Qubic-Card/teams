@@ -1,7 +1,16 @@
 <script>
   import { setNewRole } from '@lib/stores/roleStore';
+  import { createEventDispatcher } from 'svelte';
 
   export let checkboxes, checked, isHasWriteRolePermission;
+  export let bg = 'bg-neutral-900';
+  let isSuperAdmin = false;
+  const superAdminCheckbox = checkboxes.slice(0, 1);
+  const readCheckbox = checkboxes.slice(1, 7);
+  const writeCheckbox = checkboxes.slice(7);
+
+  const dispatch = createEventDispatcher();
+  const clicked = () => dispatch('clicked', false);
 
   $: {
     setNewRole(checked);
@@ -10,6 +19,7 @@
         checked.push('allow_write_profile');
     }
     if (checked.includes('super_admin')) {
+      isSuperAdmin = true;
       checked = [
         'super_admin',
         'allow_read_roles',
@@ -30,25 +40,25 @@
       ];
     }
   }
-  const superAdminCheckbox = checkboxes.slice(0, 1);
-  const readCheckbox = checkboxes.slice(1, 7);
-  const writeCheckbox = checkboxes.slice(7);
 </script>
 
 <h1 class="font-bold text-xl my-4 ml-2 self-start">Super Admin</h1>
 {#each superAdminCheckbox as checkbox}
   <div
-    class="flex w-full justify-between items-center bg-neutral-800 p-4 rounded-lg mb-2 first:mt-2"
+    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
   >
     <div class="block">
       <div class="mt-2">
-        <label class="flex cursor-pointer">
+        <label
+          class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
+        >
           <input
             type="checkbox"
             class="w-7 h-7 cursor-pointer disabled:cursor-default"
             bind:group={checked}
             value={checkbox.name}
-            disabled={!isHasWriteRolePermission}
+            on:change={clicked}
+            disabled={!isHasWriteRolePermission || isSuperAdmin}
           />
 
           <p class="ml-4 w-72">
@@ -66,17 +76,20 @@
 <h1 class="font-bold text-xl my-4 ml-2 self-start">Read</h1>
 {#each readCheckbox as checkbox}
   <div
-    class="flex w-full justify-between items-center bg-neutral-800 p-4 rounded-lg mb-2 first:mt-2"
+    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
   >
     <div class="block">
       <div class="mt-2">
-        <label class="flex cursor-pointer">
+        <label
+          class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
+        >
           <input
             type="checkbox"
             class="w-7 h-7 cursor-pointer disabled:cursor-default"
             bind:group={checked}
             value={checkbox.name}
-            disabled={!isHasWriteRolePermission}
+            on:change={clicked}
+            disabled={!isHasWriteRolePermission || isSuperAdmin}
           />
 
           <p class="ml-4 w-72">
@@ -94,17 +107,21 @@
 <h1 class="font-bold text-xl my-4 ml-2 self-start">Write</h1>
 {#each writeCheckbox as checkbox}
   <div
-    class="flex w-full justify-between items-center bg-neutral-800 p-4 rounded-lg mb-2 first:mt-2"
+    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
   >
     <div class="block">
       <div class="mt-2">
-        <label class="flex cursor-pointer">
+        <label
+          on:click={clicked}
+          class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
+        >
           <input
             type="checkbox"
             class="w-7 h-7 cursor-pointer disabled:cursor-default"
             bind:group={checked}
             value={checkbox.name}
-            disabled={!isHasWriteRolePermission}
+            on:change={clicked}
+            disabled={!isHasWriteRolePermission || isSuperAdmin}
           />
 
           <p class="ml-4 w-72">

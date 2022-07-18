@@ -39,12 +39,13 @@
         .from('team_roles')
         .select('*')
         .eq('team_id', teamId)
+        // .or(`team_id.eq.${teamId}, id.eq.31, id.eq.32`)
+        // .or(`id.eq.31`)
         .order('role_name', { ascending: true });
 
       if (error) throw error;
 
       if (data) {
-        console.log(data);
         roles = data;
       }
     } catch (error) {
