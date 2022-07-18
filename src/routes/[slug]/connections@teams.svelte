@@ -36,12 +36,10 @@
   const setTabs = (tab) => (tabs = tab);
 
   const getTeamConnectionsList = async () => {
-    let id = teamId;
-
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(*)')
-      .eq('team_id', id)
+      .select('*, by(*), team_id(*)')
+      .eq('team_id', teamId)
       .order('dateConnected', { ascending: false });
 
     if (error) console.log(error);

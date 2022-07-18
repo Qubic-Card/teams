@@ -29,7 +29,7 @@
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
       const dateLimiter = new Date(
-        new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 30)
+        new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 29)
       );
       toDateOptions.minDate = new Date(selectedDates[0]);
       toDateOptions.maxDate = new Date(dateLimiter);
@@ -71,7 +71,7 @@
     const { data, error } = await supabase.storage
       .from('records')
       .upload(
-        `${teamId}/${$user?.id}/${fileName}-${
+        `${teamId}/${$user?.id}/${fileName === '' ? 'qubic' : fileName}-${
           selectedType === 'Activities' ? 'activities' : 'connections'
         }`,
         selectedType === 'Activities' ? logsCsv : connectionsCsv,
@@ -218,23 +218,14 @@
           {#each personalCsv as record, i}
             <RecordsTableBody {record} {teamId} {deleteFromTable} />
           {/each}
+        {:else}
+          <tr>
+            <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
+              No records found
+            </td>
+          </tr>
         {/if}
-      {:else}
-        <tr>
-          <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
-            No records found
-          </td>
-        </tr>
       {/if}
     </tbody>
   </table>
-  <!-- {#if searchNotFoundMsg !== ''}
-              <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-                {searchNotFoundMsg}
-              </h1>
-            {:else if userConnections.length === 0}
-              <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-                No connection found.
-              </h1>
-            {/if} -->
 </div>

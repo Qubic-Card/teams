@@ -16,7 +16,7 @@
         <div class="flex flex-col pl-7">
           {#each log.logs as item}
             <div
-              class="text-sm flex justify-between hover:border hover:border-neutral-700 hover:p-1"
+              class="text-sm flex justify-between p-1 hover:bg-neutral-800 hover:p-1"
             >
               <h1 class="text-white">
                 {`${item.team_member.firstname}'s` + item.message.slice(4)}

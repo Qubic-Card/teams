@@ -10,7 +10,7 @@
   import Checkboxes from '@comp/checkbox.svelte';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
-  export let roles;
+  export let roles, isHasWriteRolePermission;
 
   let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
@@ -66,10 +66,10 @@
   title="Add role"
   {showModal}
   on:showModal={toggleModal}
-  class="w-1/2"
+  class="w-1/2 h-1/2"
 >
   <div
-    class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
+    class="flex flex-col h-82 justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
   >
     <Input
       placeholder="Role Name"
@@ -78,7 +78,12 @@
       class="w-full"
       isEmptyChecking={true}
     />
-    <Checkboxes checkboxes={roleMapping} bind:checked={checkedRole} />
+    <Checkboxes
+      checkboxes={roleMapping}
+      bind:checked={checkedRole}
+      {isHasWriteRolePermission}
+      bg="bg-neutral-800"
+    />
     <button
       disabled={roleName === '' ? true : false}
       class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500"
@@ -92,16 +97,3 @@
     </button>
   </div>
 </ModalWrapper>
-
-<style>
-  .snap-container::-webkit-scrollbar {
-    height: 10px;
-    width: 5px;
-  }
-  .snap-container::-webkit-scrollbar-track {
-    background-color: #e4e4e4;
-  }
-  .snap-container::-webkit-scrollbar-thumb {
-    background-color: #71717a;
-  }
-</style>
