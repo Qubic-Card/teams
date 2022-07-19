@@ -6,51 +6,50 @@
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
+import { Dialog } from '@rgossiaux/svelte-headlessui';
 
   export let showModal;
   export let connection;
   export let modalHandler;
 </script>
-
-<ModalWrapper
-  on:showModal={modalHandler}
-  {showModal}
-  class="w-1/2"
-  title="Connection profile"
+<Dialog
+  open={showModal}
+  on:close={() => (showModal = false)}
+  class="flex flex-col h-screen min-w-[360px] p-4 gap-4 bottom-0 right-0 z-50 absolute bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory"
 >
   <div class="flex w-full justify-between items-center text-white">
     <div class="flex flex-col w-full">
-      <div class="flex flex-col lg:flex-row items-center lg:pl-24 pb-4">
+      <div class="flex flex-col items-center mb-2">
         {#if connection.profileData.avatar}
           {#if connection.profileData.avatar === ''}
             <div
-              class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600 mr-2 lg:mr-10"
+              class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600"
             >
               {connection.profileData.firstname.charAt(0).toUpperCase()}
             </div>
           {:else}
             <AvatarCard
               background={connection.profileData.avatar}
-              class="mr-2 lg:mr-10 w-24 md:w-32 lg:w-36"
+              class="w-24 md:w-32 lg:w-36"
             />
           {/if}
         {:else}
           <div
-            class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600 mr-2 lg:mr-10"
+            class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600 "
           >
             Q
           </div>
         {/if}
-        <div class="flex flex-col w-72 mt-4 lg:mt-0 text-center lg:text-left">
+        <div class="flex flex-col  mt-3 text-center ">
           <p class="font-bold">
             {connection.profileData.firstname ?? ''}
             {connection.profileData.lastname ?? ''}
           </p>
-          <p class={`${connection.profileData.firstname ? '' : 'hidden'}`}>
-            {connection.profileData.job ?? ''}
-            at {connection.profileData.company ?? ''}
+          <p class={`${connection.profileData.firstname ? 'text-neutral-300 text-sm text-center' : 'hidden'}`}>
+            {connection.profileData.job ? connection.profileData.job + 'at' : ''}
+            {connection.profileData.company ?? ''}
           </p>
-          <p>
+          <p class="text-xs text-neutral-300">
             Connected at {new Date(connection.dateConnected)
               .toDateString()
               .slice(4)}
@@ -60,7 +59,7 @@
             class={`my-2 ${
               connection.link === '' || connection.link === null
                 ? 'hidden'
-                : 'flex justify-center lg:justify-start'
+                : 'flex justify-center'
             }`}
           >
             <img
@@ -85,7 +84,7 @@
               class={`${
                 connection.message === null
                   ? 'hidden'
-                  : 'flex justify-center lg:justify-start'
+                  : 'flex justify-center'
               }`}
             >
               <img
@@ -108,19 +107,19 @@
   </div>
   <div class="flex flex-col w-full">
     <div
-      class="flex flex-col items-center px-4 md:px-12 py-4 bg-neutral-900 rounded-b-lg"
+      class="flex flex-col items-center"
     >
       <button
         on:click={async () =>
           download(await genvcard(connection.profileData), 'contact')}
-        class="w-full bg-blue-600 rounded-md hover:font-bold text-white mx-auto p-4 mb-4"
+        class="w-full bg-blue-600 rounded-md hover:font-bold text-white mx-auto p-3 mb-4"
       >
-        Add to Contacts
+        Save to Contacts
       </button>
       <div
-        class={`w-full p-4 mb-4 flex-wrap justify-center items-center gap-3 bg-neutral-800 rounded-md ${
-          connection.profileData.socials > 0
-            ? 'grid grid-cols-3 grid-flow-row 12 md:20 lg:px-32'
+        class={`w-full mb-4 flex-wrap justify-center items-center gap-2 bg-neutral-800 rounded-md ${
+          connection.profileData.socials.length > 0
+            ? 'grid grid-cols-3'
             : 'flex'
         }`}
       >
@@ -128,13 +127,14 @@
           {#if connection.profileData.socials.length > 0}
             {#each connection.profileData.socials as item}
               {#if item.isActive}
-                <BorderButton
+                <button
+                 class="col-span-1  rounded"
                   on:click={async () => await go(item.type, item.data)}
                   ><img
                     src={socialIcons[item.type]}
-                    class="w-10 md:12 lg:w-16 h-10 md:h-12 lg:h-16 mx-auto p-2"
+                    class="w-14 h-14 rounded  mx-auto p-3"
                     alt=""
-                  /></BorderButton
+                  /></button
                 >
               {/if}
             {/each}
@@ -148,14 +148,14 @@
         {/if}
       </div>
       <div
-        class="grid grid-cols-1 grid-flow-row gap-3 bg-neutral-800 rounded-md p-4 w-full text-center text-white"
+        class="grid grid-cols-1 grid-flow-row gap-2 rounded-md w-full text-center text-white"
       >
         {#if connection.profileData.links}
           {#if connection.profileData.links.length > 0}
             {#each connection.profileData.links as item}
               {#if item.isActive}
                 <p
-                  class="cursor-pointer hover:font-bold"
+                  class="cursor-pointer border border-neutral-600 rounded p-3 hover:font-bold"
                   on:click={() => window.open(item.link, '_blank').focus()}
                 >
                   {item.title}
@@ -171,4 +171,4 @@
       </div>
     </div>
   </div>
-</ModalWrapper>
+</Dialog>
