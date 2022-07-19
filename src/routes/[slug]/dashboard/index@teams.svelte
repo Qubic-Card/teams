@@ -48,7 +48,7 @@
 
   let y = 0;
   $: y;
-  $: console.log(y);
+  // $: console.log(y);
 </script>
 
 <svelte:window bind:scrollY={y} />

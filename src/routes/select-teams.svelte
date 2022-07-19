@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import supabase from '@lib/db';
   import { slide } from 'svelte/transition';
-  import { user, userData } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import SelectTeamsSkeleton from '@comp/skeleton/selectTeamsSkeleton.svelte';
   import AddTeamModal from '@comp/modals/addTeamModal.svelte';
 

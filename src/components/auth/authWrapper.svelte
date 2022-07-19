@@ -1,20 +1,35 @@
 <script>
-  import Cookies from 'js-cookie';
-  import { setUserData, user, userData } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
   import { browser } from '$app/env';
-  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
-  import { onMount } from 'svelte';
 
   $user = supabase.auth.user();
+  const checkIsActiveMember = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('uid')
+      .eq('uid', $user.id);
 
-  const redirect = () => {
-    if ($user && $page.url.pathname === '/') goto('/select-teams');
+    if (error) console.log(error);
+    if (data) {
+      if (data.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+  const redirect = async () => {
+    if (await checkIsActiveMember()) {
+      if ($user && $page.url.pathname === '/') goto('/select-teams');
+    } else {
+      $user = null;
+    }
+
     if (!$user) goto('/');
   };
-
   $: if (browser) redirect();
 
   supabase.auth.onAuthStateChange(async (event, session) => {

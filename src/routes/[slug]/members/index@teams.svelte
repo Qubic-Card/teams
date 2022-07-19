@@ -74,8 +74,9 @@
   const seperatingMembers = (arr1, arr2) => {
     let active = arr2.filter((item) => !arr1.includes(item));
 
-    inactiveCards = [];
+    // inactiveCards = [];
     for (let index in cards) {
+      inactiveCards = [];
       if (active[index]?.card_id?.id !== cards[index]?.id) {
         inactiveCards = [...inactiveCards, cards[index]];
       }
@@ -124,23 +125,21 @@
     >
       <button
         class={`p-3 w-28 rounded-md ${
+          state === 'all' ? 'bg-neutral-200 text-black' : 'bg-black '
+        }`}
+        on:click={() => setState('all')}>All</button
+      >
+      <button
+        class={`p-3 w-28 rounded-md ${
           state === 'active' ? 'bg-neutral-200 text-black' : 'bg-black '
         }`}
-        on:click={() => {
-          if (state !== 'active') {
-            setState('active');
-          } else setState('all');
-        }}>Active</button
+        on:click={() => setState('active')}>Active</button
       >
       <button
         class={`p-3 w-28 rounded-md ${
           state === 'inactive' ? 'bg-neutral-200 text-black' : 'bg-black '
         }`}
-        on:click={() => {
-          if (state !== 'inactive') {
-            setState('inactive');
-          } else setState('all');
-        }}>Inactive</button
+        on:click={() => setState('inactive')}>Inactive</button
       >
     </div>
     <div
