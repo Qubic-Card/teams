@@ -29,6 +29,12 @@ export const numberRegex = (number) => {
   return re.test(String(number).toLowerCase());
 };
 
+export const linkRegex = (link) => {
+  const re =
+    /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+  return re.test(String(link).toLowerCase());
+};
+
 export const socialValidator = (value) => {
   const social = value.trim();
   social.startsWith('http://') ||
@@ -40,11 +46,8 @@ export const socialValidator = (value) => {
 
 export const linkValidator = (value) => {
   const link = value.trim();
-  link.startsWith('http://') ||
-  link.startsWith('https://') ||
-  link.startsWith('www')
-    ? (isLinkInvalid = false)
-    : (isLinkInvalid = true);
+
+  linkRegex(link) ? (isLinkInvalid = false) : (isLinkInvalid = true);
 };
 
 export const emailValidator = (value) => {

@@ -17,6 +17,7 @@
   import Cookies from 'js-cookie';
   import TeamEditor from '@pages/teamEditor.svelte';
   import PersonalEditor from '@pages/personalEditor.svelte';
+  import { profileData } from '@lib/stores/profileData';
 
   let teamIdCookies = Cookies.get('qubicTeamId');
   let isHasWriteProfilePermission = false;
@@ -48,26 +49,11 @@
   });
 
   let teamId = Cookies.get('qubicTeamId');
-  let profileData = {
-    firstname: '',
-    lastname: '',
-    job: '',
-    company: '',
-    avatar: '',
-    socials: $socials,
-    links: $links,
-    design: {
-      theme: 'dark',
-      background: '',
-    },
-  };
+
   let profileId = null;
 
   let message = '';
   let isTeamTab = false;
-
-  const handlerPick = (item) => (profileData.design.background = item?.detail);
-  const handleAddPhoto = (item) => (profileData.avatar = item?.detail);
 
   const getProfile = async () => {
     let { data, error } = await supabase
@@ -78,7 +64,7 @@
 
     if (data) {
       const profile = data[0]['team_profile'];
-      profileData = { ...profile };
+      $profileData = { ...profile };
       $socials = profile['socials'];
       $links = profile['links'];
       profileId = data[0]['id'];
@@ -149,8 +135,6 @@
                   <PersonalEditor
                     {isHasWriteMembersPermission}
                     {isHasWriteProfilePermission}
-                    on:unsplashPicker={handlerPick}
-                    on:photoProfilePicker={handleAddPhoto}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -162,7 +146,6 @@
             <PersonalEditor
               {isHasWriteMembersPermission}
               {isHasWriteProfilePermission}
-              on:unsplashPicker={handlerPick}
             />
           {/if}
         </div>
@@ -172,7 +155,7 @@
           <Profile
             class="min-h-screen"
             isEditorMode={true}
-            data={profileData}
+            data={$profileData}
             id={profileId}
             {teamId}
           />

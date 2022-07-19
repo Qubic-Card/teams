@@ -175,7 +175,7 @@
                   {member?.team_member_id.team_profile.job}
                 </h2>
                 <h2 class="text-neutral-300 text-md">
-                  Joined since {new Date(member?.member_from)
+                  Joined since {new Date(member?.team_member_id.member_from)
                     .toDateString()
                     .slice(4)}
                 </h2>
@@ -267,7 +267,7 @@
                 {member?.team_member_id.team_profile.job}
               </h2>
               <h2 class="text-neutral-300 text-md">
-                Joined since {new Date(member?.member_from)
+                Joined since {new Date(member?.team_member_id.member_from)
                   .toDateString()
                   .slice(4)}
               </h2>

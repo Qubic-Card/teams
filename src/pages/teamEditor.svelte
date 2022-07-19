@@ -12,7 +12,7 @@
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
-  import { socials, links } from '@lib/stores/editorStore';
+  import { teamSocials, teamLinks } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -28,13 +28,10 @@
     MenuItem,
     Transition,
   } from '@rgossiaux/svelte-headlessui';
-  import { getTeamId } from '@lib/query/getId';
   import toNewTab from '@lib/utils/newTab';
-  import { page } from '$app/stores';
   import Cookies from 'js-cookie';
-  import BorderButton from '@comp/buttons/borderButton.svelte';
-  import { socialIcons } from '@lib/constants';
   import { theme } from '@lib/profileTheme';
+  import { teamData } from '@lib/stores/profileData';
 
   // Register the plugins
   registerPlugin(
@@ -52,23 +49,8 @@
   let pond;
   let name = 'filepond';
   let teamNickname = null;
-  let teamData = {
-    company: '',
-    description: '',
-    address: '',
-    logo: '',
-    email: '',
-    phone: '',
-    avatar: '',
-    socials: $socials,
-    links: $links,
-    design: {
-      theme: 'dark',
-      background: '',
-    },
-  };
 
-  let currentTheme = theme[teamData.design?.theme?.toString() ?? 'dark'];
+  let currentTheme = theme[$teamData.design?.theme?.toString() ?? 'dark'];
 
   // handle filepond events
   function handleInit() {
@@ -86,14 +68,14 @@
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${file.filename}`);
 
-    teamData.avatar = publicURL;
+    $teamData.avatar = publicURL;
     await handleSave();
   };
 
   const addLink = () => {
-    $links.length < 5
-      ? links.set([
-          ...$links,
+    $teamLinks.length < 5
+      ? teamLinks.set([
+          ...$teamLinks,
           { title: 'My Website', link: 'https://qubic.id', isActive: true },
         ])
       : toastFailed('Only 5 link allowed for free members');
@@ -101,12 +83,12 @@
 
   const handleSave = async () => {
     // let teamId = await getTeamId($user?.id);
-    teamData.socials = $socials;
-    teamData.links = $links;
+    $teamData.socials = $teamSocials;
+    $teamData.links = $teamLinks;
     const { error } = await supabase
       .from('teams')
       .update(
-        { metadata: teamData, nickname: teamNickname },
+        { metadata: $teamData, nickname: teamNickname },
         { returning: 'minimal' }
       )
       .eq('id', teamId);
@@ -120,28 +102,28 @@
   };
 
   const handleUpSocial = async (item, i) => {
-    $socials.splice(i, 1);
-    $socials.splice(i - 1, 0, item);
-    socials.set($socials);
+    $teamSocials.splice(i, 1);
+    $teamSocials.splice(i - 1, 0, item);
+    teamSocials.set($teamSocials);
     await handleSave();
   };
   const handleUpLink = async (item, i) => {
-    $links.splice(i, 1);
-    $links.splice(i - 1, 0, item);
-    links.set($links);
+    $teamLinks.splice(i, 1);
+    $teamLinks.splice(i - 1, 0, item);
+    teamLinks.set($teamLinks);
     await handleSave();
   };
 
   const handleDeleteSocial = async (item) => {
-    let arr = $socials.filter((oldItem) => oldItem !== item);
-    socials.set(arr);
+    let arr = $teamSocials.filter((oldItem) => oldItem !== item);
+    teamSocials.set(arr);
     toastSuccess('Deleted successfully');
     await handleSave();
   };
 
   const handleDeleteLink = async (item) => {
-    let arr = $links.filter((oldItem) => oldItem !== item);
-    links.set(arr);
+    let arr = $teamLinks.filter((oldItem) => oldItem !== item);
+    teamLinks.set(arr);
     toastSuccess('Deleted successfully');
     await handleSave();
   };
@@ -157,14 +139,14 @@
 
     if (data) {
       const team = data[0].metadata;
-      teamData = { ...team };
+      $teamData = { ...team };
       teamNickname = data[0].nickname;
-      $socials = team['socials'];
-      $links = team['links'];
+      $teamSocials = team['socials'];
+      $teamLinks = team['links'];
       // teamId = team['id'];
-      $socials.map((social) => {
-        if (social.type === 'phone') teamData.phone = social.data;
-        if (social.type === 'email') teamData.email = social.data;
+      $teamSocials.map((social) => {
+        if (social.type === 'phone') $teamData.phone = social.data;
+        if (social.type === 'email') $teamData.email = social.data;
       });
     }
     return data;
@@ -209,7 +191,7 @@
                       on:change={handleSave}
                       placeholder="Company Name"
                       title="Name"
-                      bind:value={teamData.company}
+                      bind:value={$teamData.company}
                       disabled={isHasWriteTeamPermission ? false : true}
                     />
                     <Input
@@ -225,14 +207,14 @@
                       on:change={handleSave}
                       placeholder="Address"
                       title="Address"
-                      bind:value={teamData.address}
+                      bind:value={$teamData.address}
                       disabled={isHasWriteTeamPermission ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Description"
                       title="Description"
-                      bind:value={teamData.description}
+                      bind:value={$teamData.description}
                       disabled={isHasWriteTeamPermission ? false : true}
                     />
                   </div>
@@ -241,14 +223,14 @@
                       on:change={handleSave}
                       placeholder="Email"
                       title="Email"
-                      bind:value={teamData.email}
+                      bind:value={$teamData.email}
                       disabled={isHasWriteTeamPermission ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Phone Number"
                       title="Phone Number"
-                      bind:value={teamData.phone}
+                      bind:value={$teamData.phone}
                       disabled={isHasWriteTeamPermission ? false : true}
                     />
                   </div>
@@ -289,11 +271,12 @@
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
+                      isTeam
                       class={`${isHasWriteTeamPermission ? '' : 'hidden'}`}
                     />
                   </div>
-                  {#if $socials.length > 0}
-                    {#each $socials as item, i}
+                  {#if $teamSocials.length > 0}
+                    {#each $teamSocials as item, i}
                       <div class="p-3 flex items-end">
                         <Input
                           class="flex-grow"
@@ -326,7 +309,7 @@
                             : item.type === 'line'
                             ? 'Line ID'
                             : item.type}
-                          bind:value={$socials[i].data}
+                          bind:value={$teamSocials[i].data}
                           on:change={handleSave}
                           isSocialInput={true}
                           isTiktokInput={item.type === 'tiktok' ? true : false}
@@ -465,8 +448,8 @@
                     />
                   </div>
 
-                  {#if $links.length > 0}
-                    {#each $links as item, i}
+                  {#if $teamLinks.length > 0}
+                    {#each $teamLinks as item, i}
                       <div class="p-3 flex">
                         <div class="flex flex-col flex-grow">
                           <Input
@@ -494,24 +477,36 @@
                             on:change={handleSave}
                           />
                           {#if i != 0}
-                            <img
+                            <svg
                               on:click={() => handleDeleteLink(item)}
-                              draggable="false"
-                              class="cursor-pointer"
-                              width="24"
-                              height="24"
-                              src="/icons/trash.svg"
-                              alt=""
-                            />
-                            <img
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="h-6 w-6 cursor-pointer"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="white"
+                              stroke-width="2"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                            <svg
                               on:click={() => handleUpLink(item, i)}
-                              draggable="false"
-                              class="cursor-pointer"
-                              width="24"
-                              height="24"
-                              src="/icons/arrow_up.png"
-                              alt=""
-                            />
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="h-6 w-6 cursor-pointer"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="white"
+                              stroke-width="2"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M7 11l5-5m0 0l5 5m-5-5v12"
+                              />
+                            </svg>
                           {/if}
                         </div>
                       </div>
