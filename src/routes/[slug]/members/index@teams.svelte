@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Pagination from '@comp/pagination.svelte';
   import { onMount } from 'svelte';
   import Cookies from 'js-cookie';
   import supabase from '@lib/db';
@@ -26,6 +27,31 @@
   let inactiveCards = [];
   let activeMembers = [];
   let state = 'all';
+  let allMember = [];
+  let itemsPerPage = 9;
+  let page = 0;
+  let totalPages = [];
+  let active = 0;
+  let currentPageRows = [];
+
+  const paginate = (items) => {
+    const pages = Math.ceil(items.length / itemsPerPage);
+    const paginatedItems = Array.from({ length: pages }, (_, index) => {
+      const start = index * itemsPerPage;
+      return items.slice(start, start + itemsPerPage);
+    });
+    totalPages = [...paginatedItems];
+    currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
+  };
+
+  const setPage = (p) => {
+    if (p >= 0 && p < totalPages?.length) {
+      page = p;
+      active = p;
+    }
+
+    console.log(page, active, p);
+  };
 
   const setState = (newState) => (state = newState);
 
@@ -71,31 +97,17 @@
     }
   };
 
-  const seperatingMembers = (arr1, arr2) => {
-    let active = arr2.filter((item) => !arr1.includes(item));
+  // eac9c236-da25-4d9c-a058-632bd92bc951
+  // cf682da6-c300-4078-8088-f85993eda24d
 
-    // inactiveCards = [];
-    for (let index in cards) {
+  $: cards.map((item, i) => {
+    if (teamCardCon[i] !== undefined) {
+      activeMembers = [...activeMembers, teamCardCon[i]];
       inactiveCards = [];
-      if (active[index]?.card_id?.id !== cards[index]?.id) {
-        inactiveCards = [...inactiveCards, cards[index]];
-      }
-
-      if (teamCardCon[index]?.card_id?.id === active[index]?.card_id?.id) {
-        activeMembers = [...activeMembers, teamCardCon[index]];
-        activeMembers = activeMembers.filter((member) => member !== undefined);
-      }
+    } else {
+      inactiveCards = [...inactiveCards, cards[i]];
     }
-  };
-
-  const recieveDeletedMemberData = (e) => {
-    inactiveCards = [...inactiveCards, e.detail];
-    activeMembers = activeMembers.filter(
-      (member) => member?.card_id?.id !== e.detail?.card_id?.id
-    );
-  };
-
-  $: if (cards && teamCardCon) seperatingMembers(cards, teamCardCon);
+  });
 
   $: {
     $userData?.filter((item) => {
@@ -109,6 +121,9 @@
       activeMembers = moveArrItemToFront(activeMembers, userCardId);
     }
   }
+  $: currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
+  $: allMember = [...activeMembers, ...inactiveCards];
+  $: paginate(allMember);
 
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
@@ -148,31 +163,22 @@
       }`}
     >
       {#if state === 'all'}
-        {#each activeMembers as member, i}
-          <MemberCard
-            {member}
-            {roles}
-            {permissions}
-            active
-            on:deletedMemberData={recieveDeletedMemberData}
-          />
+        {#each currentPageRows as member, i}
+          <MemberCard {member} {roles} {permissions} />
         {/each}
-        {#each inactiveCards as card, i}
-          <MemberCard {card} {permissions} />
+      {/if}
+      {#if state === 'active'}
+        {#each currentPageRows as member, i}
+          {#if member.team_member_id}
+            <MemberCard {member} {roles} {permissions} />
+          {/if}
         {/each}
-      {:else if state === 'active'}
-        {#each activeMembers as member, i}
-          <MemberCard
-            {member}
-            {roles}
-            {permissions}
-            active
-            on:deletedMemberData={recieveDeletedMemberData}
-          />
-        {/each}
-      {:else if state === 'inactive'}
-        {#each inactiveCards as card, i}
-          <MemberCard {card} {permissions} />
+      {/if}
+      {#if state === 'inactive'}
+        {#each currentPageRows as member, i}
+          {#if member.id}
+            <MemberCard {member} {roles} {permissions} />
+          {/if}
         {/each}
       {/if}
     </div>
@@ -180,6 +186,9 @@
       <div class="text-2xl font-bold text-white text-center w-full mt-8">
         {searchNotFoundMsg}
       </div>
+    {/if}
+    {#if permissions.readMembers && currentPageRows.length > 26}
+      <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
     {/if}
   {:catch}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">

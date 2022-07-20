@@ -246,7 +246,6 @@
                     <ConnectionTableBody
                       {innerWidth}
                       {connection}
-                      {i}
                       tab="team"
                       deleteHandler={deleteConnectionHandler}
                     />
@@ -256,7 +255,6 @@
                     <ConnectionTableBody
                       {innerWidth}
                       {connection}
-                      {i}
                       tab="user"
                       deleteHandler={deleteConnectionHandler}
                     />
@@ -334,7 +332,6 @@
                 <ConnectionTableBody
                   {innerWidth}
                   {connection}
-                  {i}
                   tab="user"
                   deleteHandler={deleteConnectionHandler}
                 />

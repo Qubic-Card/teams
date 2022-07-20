@@ -5,18 +5,24 @@
   import { links, socials } from '@lib/stores/editorStore';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import { Dialog, DialogTitle } from '@rgossiaux/svelte-headlessui';
+  import { fade } from 'svelte/transition';
+  import Spinner from '@comp/loading/spinner.svelte';
+  import { profileData } from '@lib/stores/profileData';
+  import { createEventDispatcher } from 'svelte';
 
-  let open = false;
   export let data;
-
+  let open = false;
+  let loading = false;
+  let activeSocialMedia = [];
+  let activeLinks = [];
+  const dispatch = createEventDispatcher();
+  const sendUpdatedData = (data) => dispatch('sendUpdatedData', data);
   const toggleModal = () => {
     open = !open;
     $socials = activeSocialMedia;
     $links = activeLinks;
+    if (open) $profileData = null;
   };
-
-  let activeSocialMedia = [];
-  let activeLinks = [];
 
   $: activeSocialMedia = data.profileData.socials.filter(
     (social) => social.isActive
@@ -29,6 +35,8 @@
     data.profileData = Object.assign(data.profileData, {
       edited: new Date(),
     });
+
+    loading = true;
     const { error } = await supabase
       .from('team_connection_acc')
       .update({ profileData: data.profileData }, { returning: 'minimal' })
@@ -36,10 +44,14 @@
 
     if (error) {
       toastFailed('Failed to update connection data');
+      loading = false;
     } else {
       toastSuccess('Connection data updated successfully');
       toggleModal();
+      sendUpdatedData(data);
+      loading = false;
     }
+    loading = false;
   };
 
   const addLink = () => {
@@ -52,6 +64,15 @@
   };
 </script>
 
+{#if open}
+  <div
+    transition:fade|local={{ duration: 200 }}
+    class="fixed inset-0 bg-black/50 z-50"
+    aria-hidden="true"
+    on:click={() => (open = false)}
+  />
+{/if}
+
 <img
   src="/edit-icon.svg"
   alt=""
@@ -59,15 +80,13 @@
   on:click={toggleModal}
 />
 <Dialog
+  static
   {open}
   on:close={() => (open = false)}
-  class="flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 absolute bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory"
+  class={`${
+    open ? 'translate-x-0' : 'translate-x-[900px]'
+  } transition-all duration-300 ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
 >
-  <div
-    class="fixed inset-0 bg-black/50 z-10"
-    aria-hidden="true"
-    on:click={() => (open = false)}
-  />
   <DialogTitle class="text-xl pb-2 border-b-2 border-neutral-700 z-30"
     >Edit Connection</DialogTitle
   >
@@ -78,8 +97,12 @@
       on:click={toggleModal}>Cancel</button
     >
     <button
-      class="p-2 bg-blue-600 w-full"
-      on:click={async () => await updateConnectionsData()}>Save</button
+      class="flex justify-center p-2 bg-blue-600 w-full"
+      on:click={async () => await updateConnectionsData()}
+      >{#if loading}
+        <Spinner class="w-6 h-6" />
+      {:else}Save
+      {/if}</button
     >
   </div>
 

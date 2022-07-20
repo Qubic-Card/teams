@@ -1,16 +1,12 @@
 <script>
   import DeleteModal from '@comp/modals/deleteModal.svelte';
   import ConnectionsModal from '@comp/modals/connectionsModal.svelte';
-  import { createEventDispatcher } from 'svelte';
-  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
-  import { socials } from '@lib/stores/editorStore';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
 
   export let innerWidth;
   export let connection;
-  export let i;
   export let tab;
   export let deleteHandler;
 
@@ -49,7 +45,10 @@
     {connection?.by?.team_profile?.lastname ?? '-'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
-    <EditConnectionsModal data={connection} />
+    <EditConnectionsModal
+      data={connection}
+      on:sendUpdatedData={(e) => (connection = e.detail)}
+    />
     <DeleteModal
       on:click={() => {
         deleteHandler(connection.id, tab);

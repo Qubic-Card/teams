@@ -12,12 +12,18 @@
   import PersonalRecords from '@pages/personalRecords.svelte';
   import supabase from '@lib/db';
   import RecordsSkeleton from '@comp/skeleton/recordsSkeleton.svelte';
+  import { get } from 'svelte/store';
 
   let teamId = Cookies.get('qubicTeamId');
-  let isHasPermission = false;
+  let permissions = {
+    writeRecords: true,
+  };
   let isTeamTab = false;
   let personalCsv;
   let teamCsv;
+  let isUpdated = false;
+
+  const updatedData = (e) => (isUpdated = e.detail);
 
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
@@ -32,10 +38,6 @@
       personalCsv = data;
       // console.log(data);
     }
-
-    // $userData?.filter((item) => {
-    //   if (item === 'allow_write_records') isHasPermission = true;
-    // });
   };
 
   const getTeamStorage = async () => {
@@ -53,8 +55,12 @@
   };
 
   $: $userData?.filter((item) => {
-    if (item === 'allow_write_records') isHasPermission = true;
+    if (item === 'allow_write_records') {
+      permissions.writeRecords = true;
+    } else permissions.writeRecords = false;
   });
+
+  $: if (isUpdated) getPersonalStorage(), getTeamStorage();
 </script>
 
 {#await (getPersonalStorage(), getTeamStorage())}
@@ -62,10 +68,10 @@
 {:then name}
   <div
     class={`flex flex-col w-full pl-216 ${
-      isHasPermission ? 'h-[95%] pt-4' : 'h-full pt-0'
+      permissions.writeRecords ? 'h-[95%] pt-4' : 'h-full pt-0'
     }`}
   >
-    {#if isHasPermission}
+    {#if permissions.writeRecords}
       <TabGroup class="h-full">
         <TabList
           class="w-full flex justify-between pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
@@ -94,16 +100,16 @@
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">
-            <PersonalRecords {personalCsv} />
+            <PersonalRecords {personalCsv} on:updated={updatedData} />
           </TabPanel>
           <TabPanel class="flex h-full">
-            <TeamRecords {teamCsv} />
+            <TeamRecords {teamCsv} on:updated={updatedData} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords {personalCsv} />
+        <PersonalRecords {personalCsv} on:updated={updatedData} />
       </div>
     {/if}
   </div>

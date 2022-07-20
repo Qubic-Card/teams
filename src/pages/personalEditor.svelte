@@ -35,6 +35,7 @@
   import toNewTab from '@lib/utils/newTab';
   import Cookies from 'js-cookie';
   import { profileData } from '@lib/stores/profileData';
+  import CropModal from '@comp/modals/cropModal.svelte';
 
   // Register the plugins
   registerPlugin(
@@ -51,11 +52,9 @@
   let teamIdCookies = Cookies.get('qubicTeamId');
 
   export let isHasWriteMembersPermission, isHasWriteProfilePermission;
-
-  // handle filepond events
-  function handleInit() {
-    console.log('FilePond has initialised');
-  }
+  let isOpen = false;
+  let fileName = '';
+  let image;
 
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
@@ -68,8 +67,11 @@
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${file.filename}`);
 
-    $profileData.avatar = publicURL;
-    await handleSave();
+    isOpen = true;
+    fileName = file.filename;
+    image = publicURL;
+    // $profileData.avatar = publicURL;
+    // await handleSave();
   };
 
   const addLink = () => {
@@ -287,7 +289,6 @@
                       imageCropAspectRatio={1 / 1}
                       labelIdle="Add Profile Picture"
                       allowMultiple={false}
-                      oninit={handleInit}
                       onpreparefile={handleAddFile}
                       imageTransformVariants={{
                         thumb_small_: (transforms) => {
@@ -301,6 +302,7 @@
                         },
                       }}
                     />
+                    <CropModal {handleSave} {isOpen} {fileName} {image} />
                     <button
                       on:click={modalHandler}
                       class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"

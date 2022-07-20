@@ -12,19 +12,22 @@
   import { getMemberId } from '@lib/query/getId';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
-  import getDates, { last30Days, today } from '@lib/utils/getDates';
+  import { last30Days, today } from '@lib/utils/getDates';
   import Spinner from '@comp/loading/spinner.svelte';
+  import { createEventDispatcher } from 'svelte';
 
   export let personalCsv;
-  // $: console.log(personalCsv);
+
   let teamId = Cookies.get('qubicTeamId');
-  let fileName = '';
+  let fileName = `${new Date().toDateString().slice(4)}`;
   let selectedType = 'Choose Type';
-  let isCreateRecord = false;
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
   let asc = false;
+
+  const dispatch = createEventDispatcher();
+  const updated = () => dispatch('updated', true);
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
@@ -47,10 +50,9 @@
   };
 
   const createRecordHandler = async () => {
-    isLoading = true;
     let id = await getMemberId($user?.id, teamId);
-    let logsCsv = null;
-    let connectionsCsv = null;
+    let logsCsv = [];
+    let connectionsCsv = [];
 
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
@@ -68,62 +70,52 @@
       );
     }
 
-    const { data, error } = await supabase.storage
-      .from('records')
-      .upload(
-        `${teamId}/${$user?.id}/${fileName === '' ? 'qubic' : fileName}-${
-          selectedType === 'Activities' ? 'activities' : 'connections'
-        }`,
-        selectedType === 'Activities' ? logsCsv : connectionsCsv,
-        {
-          contentType: 'text/csv',
-        }
-      );
-
-    if (error) {
-      if (
-        (error.message =
-          'duplicate key value violates unique constraint "bucketid_objname')
-      ) {
-        toastFailed(
-          'File already exists. Please rename the file and try again.'
+    if (logsCsv.length !== 0 || connectionsCsv.length !== 0) {
+      isLoading = true;
+      const { data, error } = await supabase.storage
+        .from('records')
+        .upload(
+          `${teamId}/${$user?.id}/${fileName}-${
+            selectedType === 'Activities' ? 'activities' : 'connections'
+          }`,
+          selectedType === 'Activities' ? logsCsv : connectionsCsv,
+          {
+            contentType: 'text/csv',
+          }
         );
-      } else {
-        toastFailed(error.message);
+
+      if (error) {
+        if (
+          (error.message =
+            'duplicate key value violates unique constraint "bucketid_objname')
+        ) {
+          toastFailed(
+            'File already exists. Please rename the file and try again.'
+          );
+        } else {
+          toastFailed(error.message);
+        }
+        isLoading = false;
       }
+
+      if (data) {
+        toastSuccess(
+          `${fileName}-${
+            selectedType === 'Activities' ? 'activities' : 'connections'
+          } created successfully`
+        );
+        isLoading = false;
+      }
+
+      updated();
+      fileName = `${new Date().toDateString().slice(4)}`;
+      selectedType = 'Choose Type';
+      toDateValue = new Date(today);
+      fromDateValue = new Date(today);
+      toDateOptions.maxDate = new Date(today);
       isLoading = false;
-    }
-
-    if (data) {
-      toastSuccess(
-        `${fileName}-${
-          selectedType === 'Activities' ? 'activities' : 'connections'
-        } created successfully`
-      );
-      isLoading = false;
-    }
-
-    isCreateRecord = true;
-    fileName = '';
-    selectedType = 'Choose Type';
-    toDateValue = new Date(today);
-    fromDateValue = new Date(today);
-    toDateOptions.maxDate = new Date(today);
-    isLoading = false;
-  };
-
-  const getPersonalStorage = async () => {
-    const { data, error } = await supabase.storage
-      .from('records')
-      .list(`${teamId}/${$user?.id}`, {
-        sortBy: { column: 'created_at', order: 'desc' },
-      });
-
-    if (error) {
-      console.log(error);
     } else {
-      // console.log(data);
-      personalCsv = data;
+      console.log('No records found');
     }
   };
 
@@ -142,12 +134,12 @@
     }
   };
 
-  const deleteFromTable = (id) =>
-    (personalCsv = personalCsv.filter((item) => item.id !== id));
+  const deleteFromTable = (id) => {
+    personalCsv = personalCsv.filter((item) => item.id !== id);
+    updated();
+  };
 
   const selectTypeHandler = (e) => (selectedType = e.detail);
-
-  $: if (isCreateRecord) isCreateRecord, getPersonalStorage();
 </script>
 
 <div
@@ -181,6 +173,11 @@
       isFilenameInput={true}
       isEmptyChecking={true}
     />
+    {#if fileName.length < 4}
+      <small class="text-red-500">
+        You must enter a filename with at least 4 characters.
+      </small>
+    {/if}
   </div>
   <button
     class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"

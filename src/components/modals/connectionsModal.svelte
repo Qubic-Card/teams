@@ -7,8 +7,8 @@
   import { Dialog } from '@rgossiaux/svelte-headlessui';
   import { fade } from 'svelte/transition';
 
-  export let showModal;
   export let connection;
+  export let showModal;
   export let modalHandler;
 </script>
 
@@ -22,9 +22,12 @@
 {/if}
 
 <Dialog
+  static
   open={showModal}
   on:close={modalHandler}
-  class="transition-all duration-300 ease-in-out min-w-[360px] flex flex-col h-screen p-4 gap-4 bottom-0 right-0 z-50 absolute bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto"
+  class={`${
+    showModal ? 'translate-x-0' : 'translate-x-96'
+  } transition-all duration-300 ease-in-out min-w-[360px] flex flex-col h-screen p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto`}
 >
   <div class="flex w-full justify-between items-center text-white">
     <div class="flex flex-col w-full">
