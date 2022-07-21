@@ -17,10 +17,9 @@
   import { createEventDispatcher } from 'svelte';
 
   export let permissions;
-  export let card = null;
   export let roles = [];
   export let member = null;
-  export let active = false;
+
   // export let deleteMemberHandler;
 
   let selectedRole = '';
@@ -73,7 +72,7 @@
   // eac9c236-da25-4d9c-a058-632bd92bc951
   // cf682da6-c300-4078-8088-f85993eda24d
   const deleteMemberHandler = async (id, memberData) => {
-    console.log(id, memberData);
+    // console.log(id, memberData);
 
     const { error } = await supabase
       .from('team_cardcon')
@@ -94,8 +93,9 @@
       toastFailed();
       return;
     } else {
-      passDeletedMemberData(memberData);
+      // passDeletedMemberData(memberData.card_id);
       toastSuccess('Member has been deleted');
+      location.reload();
     }
   };
 
@@ -113,14 +113,10 @@
     }
   };
 
-  $: if (member) getMembersRole();
-
-  // $: console.log(userCard);
-  // $: console.log(memberData);
-  // $: console.log(member);
+  $: if (member.team_member_id) getMembersRole();
 </script>
 
-{#if active}
+{#if member.team_member_id}
   {#if !permissions.readMembers}
     {#if $user.id === member.team_member_id.uid}
       <div class="flex flex-col justify-between">
@@ -175,7 +171,7 @@
                   {member?.team_member_id.team_profile.job}
                 </h2>
                 <h2 class="text-neutral-300 text-md">
-                  Joined since {new Date(member?.member_from)
+                  Joined since {new Date(member?.team_member_id.member_from)
                     .toDateString()
                     .slice(4)}
                 </h2>
@@ -267,7 +263,7 @@
                 {member?.team_member_id.team_profile.job}
               </h2>
               <h2 class="text-neutral-300 text-md">
-                Joined since {new Date(member?.member_from)
+                Joined since {new Date(member?.team_member_id.member_from)
                   .toDateString()
                   .slice(4)}
               </h2>
@@ -403,42 +399,41 @@
       </div>
     </div>
   {/if}
-{:else if permissions.readMembers}
-  {#if card}
-    <div class="flex flex-col justify-between">
-      <div
-        class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
-      >
-        <div class="flex h-full gap-4 p-4">
-          <div
-            class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
-          >
-            Q
+{:else}
+  <div class="flex flex-col justify-between">
+    <div
+      class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
+    >
+      <div class="flex h-full gap-4 p-4">
+        <div
+          class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
+        >
+          Q
+        </div>
+        <div class="flex flex-col justify-between">
+          <div class="flex flex-col flex-wrap">
+            <h1 class="md:text-lg lg:text-xl text-left w-56">
+              This card not activated yet
+            </h1>
           </div>
-          <div class="flex flex-col justify-between">
-            <div class="flex flex-col flex-wrap">
-              <h1 class="md:text-lg lg:text-xl text-left w-56">
-                This card not activated yet
-              </h1>
-            </div>
-            <div>
-              <h2 class="text-neutral-300 mt-3">Card:</h2>
-              <p class="text-neutral-300">
-                {#if card}
-                  {card?.type?.charAt(0).toUpperCase() + card?.type?.slice(1)}
-                  {card?.color?.charAt(0).toUpperCase() + card?.color?.slice(1)}
-                {:else}
-                  <span>No card found</span>
-                {/if}
-              </p>
-            </div>
+          <div>
+            <h2 class="text-neutral-300 mt-3">Card:</h2>
+            <p class="text-neutral-300">
+              {#if !member.status}
+                {member?.type?.charAt(0).toUpperCase() + member?.type?.slice(1)}
+                {member?.color?.charAt(0).toUpperCase() +
+                  member?.color?.slice(1)}
+              {:else}
+                <span>No card found</span>
+              {/if}
+            </p>
           </div>
         </div>
-
-        <div
-          class="flex relative w-full h-24 justify-between items-center bg-neutral-900 rounded-b-md p-4"
-        />
       </div>
+
+      <div
+        class="flex relative w-full h-24 justify-between items-center bg-neutral-900 rounded-b-md p-4"
+      />
     </div>
-  {/if}
+  </div>
 {/if}

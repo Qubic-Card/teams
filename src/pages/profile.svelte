@@ -3,7 +3,12 @@
   import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';
   import LinkPreview from '@comp/cards/linkPreview/linkPreview.svelte';
-  import { socials, links } from '@lib/stores/editorStore';
+  import {
+    socials,
+    teamSocials,
+    teamLinks,
+    links,
+  } from '@lib/stores/editorStore';
   import { theme } from '@lib/profileTheme';
   import Dummy from '@lib/dummy.json';
   import { page } from '$app/stores';
@@ -118,13 +123,15 @@
       <TabPanel>
         <div class="gap-2 flex flex-col px-16 justify-center items-center mt-4">
           <div
-            class="flex gap-2 flex-col w-full border-2 border-neutral-700 rounded-lg p-4"
+            class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"
           >
             <div class="flex">
               <img src={companyLogo} alt="" class="rounded-lg w-16 h-16 mr-2" />
-              <h1>{companyName ?? '-'}</h1>
+              <div>
+                <h1>{companyName ?? '-'}</h1>
+                <p>{companyAddress ?? '-'}</p>
+              </div>
             </div>
-            <p>{companyAddress ?? '-'}</p>
             <p class="text-neutral-400">
               {companyDesc ?? '-'}
             </p>
@@ -135,6 +142,49 @@
           >
             <h1>Know more about us</h1>
             <p class="text-neutral-400">Download brosur starbucks</p>
+          </div>
+          <div class="flex justify-between flex-wrap items-start gap-1 my-1">
+            {#each isEditorMode ? $teamSocials : data.socials as item}
+              {#if item.isActive}
+                <BorderButton
+                  on:click={() => {
+                    go(
+                      item.type,
+                      item.data,
+                      $page.url.searchParams.get('type'),
+                      cardId,
+                      profileUid
+                    );
+                  }}
+                  class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+                  ><img
+                    src={socialIcons[item.type]}
+                    width="34"
+                    height="34"
+                    alt=""
+                  /></BorderButton
+                >
+              {/if}
+            {/each}
+          </div>
+
+          <div class="gap-2 flex flex-col justify-center items-center pb-5">
+            {#each isEditorMode ? $teamLinks : data.links as item}
+              {#if item.isActive}
+                <BorderButton
+                  class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+                  ><div class="p-2">
+                    <LinkPreview
+                      title={item.title}
+                      url={item.link}
+                      className={currentTheme.secondary}
+                      {profileUid}
+                      {cardId}
+                    />
+                  </div></BorderButton
+                >
+              {/if}
+            {/each}
           </div>
         </div>
       </TabPanel>

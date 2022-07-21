@@ -1,21 +1,33 @@
 <script>
   import AvatarCard from '@comp/cards/avatarCard.svelte';
-  import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';
   import go from '@lib/utils/go';
-  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
-import { Dialog } from '@rgossiaux/svelte-headlessui';
+  import { Dialog } from '@rgossiaux/svelte-headlessui';
+  import { fade } from 'svelte/transition';
 
-  export let showModal;
   export let connection;
+  export let showModal;
   export let modalHandler;
 </script>
+
+{#if showModal}
+  <div
+    transition:fade|local={{ duration: 200 }}
+    class="fixed inset-0 bg-black/50 z-50"
+    aria-hidden="true"
+    on:click={modalHandler}
+  />
+{/if}
+
 <Dialog
+  static
   open={showModal}
-  on:close={() => (showModal = false)}
-  class="flex flex-col h-screen min-w-[360px] p-4 gap-4 bottom-0 right-0 z-50 absolute bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory"
+  on:close={modalHandler}
+  class={`${
+    showModal ? 'translate-x-0' : 'translate-x-96'
+  } transition-all duration-300 ease-in-out min-w-[360px] flex flex-col h-screen p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto`}
 >
   <div class="flex w-full justify-between items-center text-white">
     <div class="flex flex-col w-full">
@@ -45,8 +57,16 @@ import { Dialog } from '@rgossiaux/svelte-headlessui';
             {connection.profileData.firstname ?? ''}
             {connection.profileData.lastname ?? ''}
           </p>
-          <p class={`${connection.profileData.firstname ? 'text-neutral-300 text-sm text-center' : 'hidden'}`}>
-            {connection.profileData.job ? connection.profileData.job + 'at' : ''}
+          <p
+            class={`${
+              connection.profileData.firstname
+                ? 'text-neutral-300 text-sm text-center'
+                : 'hidden'
+            }`}
+          >
+            {connection.profileData.job
+              ? connection.profileData.job + 'at'
+              : ''}
             {connection.profileData.company ?? ''}
           </p>
           <p class="text-xs text-neutral-300">
@@ -82,9 +102,7 @@ import { Dialog } from '@rgossiaux/svelte-headlessui';
           <div>
             <div
               class={`${
-                connection.message === null
-                  ? 'hidden'
-                  : 'flex justify-center'
+                connection.message === null ? 'hidden' : 'flex justify-center'
               }`}
             >
               <img
@@ -106,9 +124,7 @@ import { Dialog } from '@rgossiaux/svelte-headlessui';
     </div>
   </div>
   <div class="flex flex-col w-full">
-    <div
-      class="flex flex-col items-center"
-    >
+    <div class="flex flex-col items-center">
       <button
         on:click={async () =>
           download(await genvcard(connection.profileData), 'contact')}
@@ -128,7 +144,7 @@ import { Dialog } from '@rgossiaux/svelte-headlessui';
             {#each connection.profileData.socials as item}
               {#if item.isActive}
                 <button
-                 class="col-span-1  rounded"
+                  class="col-span-1  rounded"
                   on:click={async () => await go(item.type, item.data)}
                   ><img
                     src={socialIcons[item.type]}

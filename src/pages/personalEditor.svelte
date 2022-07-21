@@ -33,9 +33,9 @@
   } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
   import toNewTab from '@lib/utils/newTab';
-  import { getTeamId } from '@lib/query/getId';
   import Cookies from 'js-cookie';
-  import { createEventDispatcher } from 'svelte';
+  import { profileData } from '@lib/stores/profileData';
+  import CropModal from '@comp/modals/cropModal.svelte';
 
   // Register the plugins
   registerPlugin(
@@ -52,17 +52,9 @@
   let teamIdCookies = Cookies.get('qubicTeamId');
 
   export let isHasWriteMembersPermission, isHasWriteProfilePermission;
-
-  // handle filepond events
-  function handleInit() {
-    console.log('FilePond has initialised');
-  }
-
-  const dispatch = createEventDispatcher();
-  const unsplashPicker = () =>
-    dispatch('unsplashPicker', profileData.design.background);
-  const photoProfilePicker = () =>
-    dispatch('photoProfilePicker', profileData.avatar);
+  let isOpen = false;
+  let fileName = '';
+  let image;
 
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
@@ -75,9 +67,11 @@
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${file.filename}`);
 
-    profileData.avatar = publicURL;
-    photoProfilePicker();
-    await handleSave();
+    isOpen = true;
+    fileName = file.filename;
+    image = publicURL;
+    // $profileData.avatar = publicURL;
+    // await handleSave();
   };
 
   const addLink = () => {
@@ -96,20 +90,6 @@
   let unsplashDatas;
   let showModal = false;
   let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
-  let profileData = {
-    firstname: '',
-    lastname: '',
-    job: '',
-    company: '',
-    avatar: '',
-    address: '',
-    socials: $socials,
-    links: $links,
-    design: {
-      theme: 'dark',
-      background: '',
-    },
-  };
 
   const getProfile = async () => {
     let { data, error } = await supabase
@@ -119,7 +99,7 @@
 
     if (data) {
       const profile = data[0]['team_profile'];
-      profileData = { ...profile };
+      $profileData = { ...profile };
       $socials = profile['socials'];
       $links = profile['links'];
       profileId = data[0]['id'];
@@ -132,8 +112,7 @@
 
   const modalHandler = () => (showModal = !showModal);
   const handlePick = async (item) => {
-    profileData.design.background = item.detail.urls.regular;
-    unsplashPicker();
+    $profileData.design.background = item.detail.urls.regular;
     modalHandler();
     await handleSave();
   };
@@ -157,11 +136,11 @@
 
   const handleSave = async () => {
     // let teamId = await getTeamId($user?.id);
-    profileData.socials = $socials;
-    profileData.links = $links;
+    $profileData.socials = $socials;
+    $profileData.links = $links;
     const { error } = await supabase
       .from('team_members')
-      .update({ team_profile: profileData }, { returning: 'minimal' })
+      .update({ team_profile: $profileData }, { returning: 'minimal' })
       .eq('uid', $page.params.slug);
     if (error) {
       toastFailed();
@@ -238,7 +217,7 @@
                       on:change={handleSave}
                       placeholder="Hello"
                       title="First Name"
-                      bind:value={profileData.firstname}
+                      bind:value={$profileData.firstname}
                       disabled={isHasWriteProfilePermission
                         ? false
                         : isHasWriteMembersPermission
@@ -249,7 +228,7 @@
                       on:change={handleSave}
                       placeholder="World"
                       title="Last Name"
-                      bind:value={profileData.lastname}
+                      bind:value={$profileData.lastname}
                       disabled={isHasWriteProfilePermission
                         ? false
                         : isHasWriteMembersPermission
@@ -262,7 +241,7 @@
                       on:change={handleSave}
                       placeholder="example company"
                       title="Company"
-                      bind:value={profileData.company}
+                      bind:value={$profileData.company}
                       disabled={isHasWriteProfilePermission
                         ? false
                         : isHasWriteMembersPermission
@@ -273,7 +252,7 @@
                       on:change={handleSave}
                       placeholder="Hiring Manager"
                       title="Job"
-                      bind:value={profileData.job}
+                      bind:value={$profileData.job}
                       disabled={isHasWriteProfilePermission
                         ? false
                         : isHasWriteMembersPermission
@@ -284,7 +263,7 @@
                       on:change={handleSave}
                       placeholder="Address"
                       title="Address"
-                      bind:value={profileData.address}
+                      bind:value={$profileData.address}
                       disabled={isHasWriteProfilePermission
                         ? false
                         : isHasWriteMembersPermission
@@ -310,7 +289,6 @@
                       imageCropAspectRatio={1 / 1}
                       labelIdle="Add Profile Picture"
                       allowMultiple={false}
-                      oninit={handleInit}
                       onpreparefile={handleAddFile}
                       imageTransformVariants={{
                         thumb_small_: (transforms) => {
@@ -324,6 +302,7 @@
                         },
                       }}
                     />
+                    <CropModal {handleSave} {isOpen} {fileName} {image} />
                     <button
                       on:click={modalHandler}
                       class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"
@@ -501,7 +480,10 @@
                             </MenuItems>
                           </Transition>
                         </Menu>
-                        <SwitchButton bind:checked={item.isActive} />
+                        <SwitchButton
+                          bind:checked={item.isActive}
+                          on:change={handleSave}
+                        />
                       </div>
                     </div>
                   {/each}
@@ -563,24 +545,36 @@
                       >
                         <SwitchButton bind:checked={item.isActive} />
                         {#if i != 0}
-                          <img
+                          <svg
                             on:click={() => handleDeleteLink(item)}
-                            draggable="false"
-                            class="cursor-pointer"
-                            width="24"
-                            height="24"
-                            src="/icons/trash.svg"
-                            alt=""
-                          />
-                          <img
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6 cursor-pointer"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="white"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                          <svg
                             on:click={() => handleUpLink(item, i)}
-                            draggable="false"
-                            class="cursor-pointer"
-                            width="24"
-                            height="24"
-                            src="/icons/arrow_up.png"
-                            alt=""
-                          />
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6 cursor-pointer"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="white"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M7 11l5-5m0 0l5 5m-5-5v12"
+                            />
+                          </svg>
                         {/if}
                       </div>
                     </div>

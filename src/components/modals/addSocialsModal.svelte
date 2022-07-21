@@ -1,18 +1,30 @@
 <script>
   import { socialIcons } from '@lib/constants';
-  import { socials } from '@lib/stores/editorStore';
+  import { socials, teamSocials } from '@lib/stores/editorStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
+
   let showModal = false;
+  export let isTeam = false;
 
   const toggleModal = () => {
     showModal = !showModal;
   };
   const addSocial = (item) => {
-    let socialType = $socials.map((item) => item.type);
-    socialType.includes(item)
-      ? toastFailed('You can only add one of each social media')
-      : socials.set([...$socials, { type: item, data: '', isActive: true }]);
+    if (isTeam) {
+      let socialType = $teamSocials.map((item) => item.type);
+      socialType.includes(item)
+        ? toastFailed('You can only add one of each social media')
+        : teamSocials.set([
+            ...$teamSocials,
+            { type: item, data: '', isActive: true },
+          ]);
+    } else {
+      let socialType = $socials.map((item) => item.type);
+      socialType.includes(item)
+        ? toastFailed('You can only add one of each social media')
+        : socials.set([...$socials, { type: item, data: '', isActive: true }]);
+    }
 
     showModal = !showModal;
   };
