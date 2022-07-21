@@ -1,4 +1,8 @@
 <script>
+  import {
+    teamData as teamDataStore,
+    profileData,
+  } from '@lib/stores/profileData';
   import AvatarCard from '@comp/cards/avatarCard.svelte';
   import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';
@@ -38,9 +42,9 @@
   let companyDesc = null;
   let companyAddress = null;
   let companyLogo = null;
-  let currentTheme = theme[data.design?.theme?.toString() ?? 'dark'];
+  let currentTheme = theme[$profileData.design?.theme?.toString() ?? 'dark'];
   let teamData = null;
-
+  // TODO: ERROR MENAMPILKAN SOCIALS DAN LINKS TEAM
   const getTeams = async () => {
     const { data, error } = await supabase
       .from('teams')
@@ -56,11 +60,11 @@
       companyAddress = data[0].metadata.address;
       companyDesc = data[0].metadata.description;
       companyLogo = data[0].metadata.logo;
-      return data;
     }
   };
   $: getTeams();
 
+  // $: console.log('PROFILE DATA PROPD', data);
   const popup = () => toastFailed(`You can't connect to your profile`);
   const downloadHandler = () => console.log('Brosur has been downloaded');
 </script>
@@ -80,7 +84,7 @@
         class="pt-8"
         height="125px"
         width="125px"
-        background={data?.avatar == '' ? Dummy.avatar : data?.avatar}
+        background={data.avatar == '' ? Dummy.avatar : data.avatar}
       />
     </div>
   </div>
@@ -91,7 +95,7 @@
     <h1 class="text-lg font-bold">
       {data.firstname == ''
         ? Dummy.firstname
-        : data.firstname + ' ' + data?.lastname}
+        : data.firstname + ' ' + data.lastname}
     </h1>
     <h1 class="text-sm opacity-80">
       {data.job == '' ? Dummy.job : data.job}
@@ -99,6 +103,20 @@
     <h1 class="text-md opacity-90">
       {data.company == '' ? Dummy.company : data.company}
     </h1>
+  </div>
+  <div class="flex flex-col gap-2 px-20 text-white my-4">
+    <BorderButton
+      class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
+      on:click={popup}
+    >
+      Connect with Me
+    </BorderButton>
+    <BorderButton
+      class="w-full h-12  {currentTheme.border} {currentTheme.secondary} rounded-md"
+      on:click={async () => download(await genvcard(data, teamData), 'contact')}
+    >
+      Add to Contacts
+    </BorderButton>
   </div>
   <TabGroup class="flex flex-col items-center w-full text-white mt-4">
     <TabList
@@ -121,12 +139,18 @@
     </TabList>
     <TabPanels class="w-full">
       <TabPanel>
-        <div class="gap-2 flex flex-col px-16 justify-center items-center mt-4">
+        <div class="gap-2 flex flex-col px-20 justify-center items-center mt-4">
           <div
             class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"
           >
             <div class="flex">
-              <img src={companyLogo} alt="" class="rounded-lg w-16 h-16 mr-2" />
+              <img
+                src={$teamDataStore.logo !== ''
+                  ? $teamDataStore.logo
+                  : companyLogo}
+                alt=""
+                class="rounded-lg w-16 h-16 mr-2"
+              />
               <div>
                 <h1>{companyName ?? '-'}</h1>
                 <p>{companyAddress ?? '-'}</p>
@@ -144,7 +168,7 @@
             <p class="text-neutral-400">Download brosur starbucks</p>
           </div>
           <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-            {#each isEditorMode ? $teamSocials : data.socials as item}
+            {#each isEditorMode ? teamData?.socials : data.socials as item}
               {#if item.isActive}
                 <BorderButton
                   on:click={() => {
@@ -159,8 +183,8 @@
                   class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
                   ><img
                     src={socialIcons[item.type]}
-                    width="34"
-                    height="34"
+                    width="32"
+                    height="32"
                     alt=""
                   /></BorderButton
                 >
@@ -169,7 +193,7 @@
           </div>
 
           <div class="gap-2 flex flex-col justify-center items-center pb-5">
-            {#each isEditorMode ? $teamLinks : data.links as item}
+            {#each isEditorMode ? teamData?.links : data.links as item}
               {#if item.isActive}
                 <BorderButton
                   class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
@@ -191,12 +215,6 @@
       <TabPanel>
         <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
           <!-- UTILITIES -->
-          <BorderButton
-            class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
-            on:click={popup}
-          >
-            Connect with Me
-          </BorderButton>
           <div class="flex justify-between flex-wrap items-start gap-1 my-1">
             {#each isEditorMode ? $socials : data.socials as item}
               {#if item.isActive}
@@ -221,13 +239,6 @@
               {/if}
             {/each}
           </div>
-          <BorderButton
-            class="w-full h-12 mb-10 {currentTheme.border} {currentTheme.secondary} rounded-md"
-            on:click={async () =>
-              download(await genvcard(data, teamData), 'contact')}
-          >
-            Add to Contacts
-          </BorderButton>
 
           <!-- LINKS -->
           <div class="gap-2 flex flex-col justify-center items-center pb-5">

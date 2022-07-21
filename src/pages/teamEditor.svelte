@@ -32,6 +32,7 @@
   import Cookies from 'js-cookie';
   import { theme } from '@lib/profileTheme';
   import { teamData } from '@lib/stores/profileData';
+  import CropModal from '@comp/modals/cropModal.svelte';
 
   // Register the plugins
   registerPlugin(
@@ -43,12 +44,15 @@
     FilePondPluginFileValidateType
   );
 
-  export let isHasWriteTeamPermission;
+  export let permissions;
 
   let teamId = Cookies.get('qubicTeamId');
   let pond;
   let name = 'filepond';
   let teamNickname = null;
+  let isOpen = false;
+  let fileName = '';
+  let image;
 
   let currentTheme = theme[$teamData.design?.theme?.toString() ?? 'dark'];
 
@@ -68,7 +72,10 @@
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${file.filename}`);
 
-    $teamData.avatar = publicURL;
+    $teamData.logo = publicURL;
+    // isOpen = true;
+    // fileName = file.filename;
+    // image = publicURL;
     await handleSave();
   };
 
@@ -192,14 +199,14 @@
                       placeholder="Company Name"
                       title="Name"
                       bind:value={$teamData.company}
-                      disabled={isHasWriteTeamPermission ? false : true}
+                      disabled={permissions.writeTeam ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Nickname"
                       title="Nickname"
                       bind:value={teamNickname}
-                      disabled={isHasWriteTeamPermission ? false : true}
+                      disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
                   <div class="px-3">
@@ -208,14 +215,14 @@
                       placeholder="Address"
                       title="Address"
                       bind:value={$teamData.address}
-                      disabled={isHasWriteTeamPermission ? false : true}
+                      disabled={permissions.writeTeam ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Description"
                       title="Description"
                       bind:value={$teamData.description}
-                      disabled={isHasWriteTeamPermission ? false : true}
+                      disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
                   <div class="px-3 grid grid-cols-2 space-x-5">
@@ -224,19 +231,18 @@
                       placeholder="Email"
                       title="Email"
                       bind:value={$teamData.email}
-                      disabled={isHasWriteTeamPermission ? false : true}
+                      disabled={permissions.writeTeam ? false : true}
                     />
                     <Input
                       on:change={handleSave}
                       placeholder="Phone Number"
                       title="Phone Number"
                       bind:value={$teamData.phone}
-                      disabled={isHasWriteTeamPermission ? false : true}
+                      disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
-                  <div
-                    class={`p-3 ${isHasWriteTeamPermission ? '' : 'hidden'}`}
-                  >
+                  <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
+                  <div class={`p-3 ${permissions.writeTeam ? '' : 'hidden'}`}>
                     <FilePond
                       bind:this={pond}
                       {name}
@@ -272,7 +278,7 @@
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
                       isTeam
-                      class={`${isHasWriteTeamPermission ? '' : 'hidden'}`}
+                      class={`${permissions.writeTeam ? '' : 'hidden'}`}
                     />
                   </div>
                   {#if $teamSocials.length > 0}
@@ -322,12 +328,12 @@
                             : false}
                           isPhoneInput={item.type === 'phone' ? true : false}
                           isEmptyChecking={true}
-                          disabled={isHasWriteTeamPermission ? false : true}
+                          disabled={permissions.writeTeam ? false : true}
                         />
 
                         <div
                           class={`flex items-center mb-3 ${
-                            isHasWriteTeamPermission ? 'flex' : 'hidden'
+                            permissions.writeTeam ? 'flex' : 'hidden'
                           }`}
                         >
                           <Menu
@@ -440,23 +446,38 @@
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
                       class={`h-10 w-10 cursor-pointer ${
-                        isHasWriteTeamPermission ? '' : 'hidden'
+                        permissions.writeTeam ? '' : 'hidden'
                       }`}
                       on:click={addLink}
                       src="/add-icon.svg"
                       alt="add"
                     />
                   </div>
+                  <label
+                    for="links"
+                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100"
+                  >
+                    <input
+                      bind:checked={$teamData.isShowMetaImage}
+                      id="links"
+                      type="checkbox"
+                      class="w-5 h-5 cursor-pointer disabled:cursor-default"
+                      value={$teamData?.isShowMetaImage}
+                      on:change={handleSave}
+                    />
 
+                    <p>Show meta image for links (if available).</p>
+                  </label>
                   {#if $teamLinks.length > 0}
                     {#each $teamLinks as item, i}
                       <div class="p-3 flex">
-                        <div class="flex flex-col flex-grow">
+                        <div class="flex flex-2 flex-col flex-grow">
                           <Input
                             on:change={handleSave}
                             title="Title"
                             placeholder="Title"
                             bind:value={item.title}
+                            disabled={permissions.writeTeam ? false : true}
                           />
                           <Input
                             title="Link"
@@ -465,11 +486,12 @@
                             isLinkInput={true}
                             placeholder="Link"
                             isEmptyChecking={true}
+                            disabled={permissions.writeTeam ? false : true}
                           />
                         </div>
                         <div
-                          class={`mx-3 grid-cols-3 gap-3 place-items-center ${
-                            isHasWriteTeamPermission ? 'grid' : 'hidden'
+                          class={`mx-3 flex-1 gap-3 place-items-center ${
+                            permissions.writeTeam ? 'flex' : 'hidden'
                           }`}
                         >
                           <SwitchButton

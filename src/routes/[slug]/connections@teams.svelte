@@ -22,7 +22,9 @@
 
   // let currentPageRows = [2, 2, 2, 2, 2];
   let loading = false;
-  let isHasPermission = false;
+  let permissions = {
+    readConnection: false,
+  };
   let teamConnections = [];
   let userConnections = [];
   let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
@@ -30,7 +32,7 @@
   let tabs = 'all';
 
   $: $userData?.filter((item) => {
-    if (item === 'allow_read_connections') isHasPermission = true;
+    if (item === 'allow_read_connections') permissions.readConnection = true;
   });
 
   const setTabs = (tab) => (tabs = tab);
@@ -66,11 +68,13 @@
     let column;
 
     tabs === 'all'
-      ? (id = isHasPermission ? teamId : await getMemberId($user?.id, teamId))
+      ? (id = permissions.readConnection
+          ? teamId
+          : await getMemberId($user?.id, teamId))
       : (id = await getMemberId($user?.id, teamId));
 
     tabs === 'all'
-      ? (column = isHasPermission ? 'team_id' : 'by')
+      ? (column = permissions.readConnection ? 'team_id' : 'by')
       : (column = 'by');
 
     const { data, error } = await supabase
@@ -82,7 +86,7 @@
     if (error) console.log(error);
     if (data) {
       tabs === 'all'
-        ? isHasPermission
+        ? permissions.readConnection
           ? (teamConnections = data)
           : (userConnections = data)
         : (userConnections = data);
@@ -154,9 +158,9 @@
     }
   };
 
-  $: if (isHasPermission && tabs === 'all') {
+  $: if (permissions.readConnection && tabs === 'all') {
     searchQuery, selectedSearchMenu, searchTeamHandler();
-  } else if (isHasPermission && tabs === 'user') {
+  } else if (permissions.readConnection && tabs === 'user') {
     searchQuery, selectedSearchMenu, searchPersonalHandler();
   } else {
     searchQuery, selectedSearchMenu, searchPersonalHandler();
@@ -167,7 +171,7 @@
 
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pt-4 pl-24 pr-4">
-  {#if isHasPermission === true}
+  {#if permissions.readConnection === true}
     {#await getTeamConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}

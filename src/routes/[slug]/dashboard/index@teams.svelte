@@ -5,30 +5,32 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  let isHasPermissionToMemberPage = false;
-  let isHasPermissionToEditProfilePage = false;
+  let permissions = {
+    writeMembers: false,
+    writeProfile: false,
+  };
   let showModal = false;
 
   $: $userData?.filter((item) => {
     if (item === 'allow_write_members') {
-      isHasPermissionToMemberPage = true;
+      permissions.writeMembers = true;
     }
     if (item === 'allow_write_profile') {
-      isHasPermissionToEditProfilePage = true;
+      permissions.writeProfile = true;
     }
   });
 
   const quickActions = [
     {
       handler: () =>
-        isHasPermissionToMemberPage === false
+        permissions.writeMembers === false
           ? (showModal = true)
           : goto(`/${$page.params.slug}/members`),
       name: 'Manage Members',
     },
     {
       handler: () =>
-        isHasPermissionToEditProfilePage === false
+        permissions.writeProfile === false
           ? (showModal = true)
           : goto(`/${$page.params.slug}/members/${$user.id}`),
       name: 'Edit profile',
@@ -73,7 +75,7 @@
   </div>
 
   <Analytics />
-  <p>{y}</p>
+
   <div class="flex flex-col mt-2">
     <h1 class="text-2xl font-bold">Learn More</h1>
     <div

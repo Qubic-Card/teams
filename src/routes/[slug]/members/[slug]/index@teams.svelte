@@ -20,30 +20,33 @@
   import { profileData } from '@lib/stores/profileData';
 
   let teamIdCookies = Cookies.get('qubicTeamId');
-  let isHasWriteProfilePermission = false;
-  let isHasWriteMembersPermission = false;
-  let isHasReadTeamPermission = false;
-  let isHasWriteTeamPermission = false;
+  let permissions = {
+    writeProfile: false,
+    writeTeam: false,
+    writeMembers: false,
+    ReadTeam: false,
+  };
+
   let isCheckRoleDone = false;
 
   $: $userData?.filter((item) => {
     if ($page.params.slug === $user?.id) {
       if (item === 'allow_write_profile') {
-        isHasWriteProfilePermission = true;
+        permissions.writeProfile = true;
       } else if (item === 'allow_write_team') {
-        isHasWriteTeamPermission = true;
+        permissions.writeTeam = true;
       }
       isCheckRoleDone = true;
     } else if (item === 'allow_write_members') {
-      isHasWriteMembersPermission = true;
+      permissions.writeMembers = true;
       isCheckRoleDone = true;
     } else if (item === 'allow_write_team') {
-      isHasWriteTeamPermission = true;
+      permissions.writeTeam = true;
       isCheckRoleDone = true;
     }
 
     if (item === 'allow_read_team') {
-      isHasReadTeamPermission = true;
+      permissions.readTeam = true;
       isCheckRoleDone = true;
     }
   });
@@ -64,7 +67,9 @@
 
     if (data) {
       const profile = data[0]['team_profile'];
+      // console.log('INDEX PROFILE', { ...profile });
       $profileData = { ...profile };
+      // console.log('INDEX PROFILEDATA', $profileData);
       $socials = profile['socials'];
       $links = profile['links'];
       profileId = data[0]['id'];
@@ -80,20 +85,20 @@
 {:then}
   {#if isCheckRoleDone}
     {#if $page.params.slug === $user?.id}
-      {#if !isHasWriteProfilePermission && !isTeamTab}
+      {#if !permissions.writeProfile && !isTeamTab}
         <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
           You don't have permission to edit your profile
         </div>
-      {:else if !isHasWriteTeamPermission && isTeamTab}
+      {:else if !permissions.writeTeam && isTeamTab}
         <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
           You dont have permission to edit this team's profile
         </div>
       {/if}
-    {:else if !isHasWriteMembersPermission && !isTeamTab}
+    {:else if !permissions.writeMembers && !isTeamTab}
       <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
         You don't have permission to edit this member's profile
       </div>
-    {:else if !isHasWriteTeamPermission && isTeamTab}
+    {:else if !permissions.writeTeam && isTeamTab}
       <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
         You dont have permission to edit this team's profile
       </div>
@@ -104,7 +109,7 @@
     <div class="md:px-20 px-4 w-full bg-black">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
-          {#if isHasReadTeamPermission}
+          {#if permissions.readTeam}
             <TabGroup>
               <TabList
                 class="w-full grid grid-cols-2 border-b-2 border-neutral-700 mb-4"
@@ -132,21 +137,15 @@
               </TabList>
               <TabPanels>
                 <TabPanel>
-                  <PersonalEditor
-                    {isHasWriteMembersPermission}
-                    {isHasWriteProfilePermission}
-                  />
+                  <PersonalEditor {permissions} />
                 </TabPanel>
                 <TabPanel>
-                  <TeamEditor {isHasWriteTeamPermission} />
+                  <TeamEditor {permissions} />
                 </TabPanel>
               </TabPanels>
             </TabGroup>
-          {:else if !isHasReadTeamPermission}
-            <PersonalEditor
-              {isHasWriteMembersPermission}
-              {isHasWriteProfilePermission}
-            />
+          {:else if !permissions.readTeam}
+            <PersonalEditor {permissions} />
           {/if}
         </div>
         <div
