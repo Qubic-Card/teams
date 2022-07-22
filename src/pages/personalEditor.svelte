@@ -7,6 +7,8 @@
   import SwitchButton from '@comp/buttons/switchButton.svelte';
   import ProfileEditorSkeleton from '@comp/skeleton/profileEditorSkeleton.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
+  import Cropper from 'svelte-easy-crop';
+  import getCroppedImg from '@lib/utils/canvas';
 
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
@@ -29,12 +31,14 @@
     MenuItems,
     MenuItem,
     Transition,
+Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
   import toNewTab from '@lib/utils/newTab';
   import Cookies from 'js-cookie';
   import { profileData } from '@lib/stores/profileData';
   import CropModal from '@comp/modals/cropModal.svelte';
+import ModalOverlay from '@comp/modals/modalOverlay.svelte';
 
   // Register the plugins
   registerPlugin(
@@ -51,9 +55,49 @@
   let teamIdCookies = Cookies.get('qubicTeamId');
 
   let isOpen = false;
+  let croppedImage = '';
   let fileName = '';
+  let pixelCrop;
   let image;
+  let fileImage;
   export let permissions;
+
+  const getFileFromBase64 = (string64, fileName) => {
+    const trimmedString = string64?.replace('data:image/jpeg;base64,', '');
+    const imageContent = atob(trimmedString);
+    const buffer = new ArrayBuffer(imageContent.length);
+    const view = new Uint8Array(buffer);
+
+    for (let n = 0; n < imageContent.length; n++) {
+      view[n] = imageContent.charCodeAt(n);
+    }
+    const type = 'image/jpeg';
+    const blob = new Blob([buffer], { type });
+    return new File([blob], fileName, {
+      lastModified: new Date().getTime(),
+      type,
+    });
+  };
+
+  const cropImage = async () => {
+    croppedImage = await getCroppedImg(image, pixelCrop);
+    fileImage = getFileFromBase64(croppedImage, fileName);
+  };
+
+  const previewCrop = (e) => {
+    pixelCrop = e.detail.pixels;
+    const { x, y, width } = e.detail.pixels;
+    const scale = 200 / width;
+  };
+
+  const handleCrop = async (item) => {
+    console.log("item", item)
+    image = URL.createObjectURL(item.file);
+    console.log("object url", image)
+    fileName = item.file.filename;
+    isOpen = true;
+    return true;
+  }
 
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
@@ -65,10 +109,7 @@
     const { publicURL, error } = supabase.storage
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${file.filename}`);
-
-    // isOpen = true;
-    // fileName = file.filename;
-    // image = publicURL;
+    
     $profileData.avatar = publicURL;
     await handleSave();
   };
@@ -177,6 +218,60 @@
   };
 </script>
 
+<ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
+
+  <Dialog
+    static
+    class={`${
+      isOpen ? 'translate-x-0' : 'translate-x-[900px]'
+    } transition-all duration-300 ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+    open={isOpen}
+    on:close={() => (isOpen = false)}
+  >
+    <div class="flex w-full gap-2">
+      <button
+        type="button"
+        class="bg-neutral-600 p-2 w-1/2"
+        on:click={() => {
+          croppedImage = null;
+        }}>Reset</button
+      >
+      {#if croppedImage}
+        <button
+          type="button"
+          class="bg-blue-600 p-2 w-1/2"
+          on:click={() => {
+            $profileData.avatar = URL.createObjectURL(image);
+          }}>Save</button
+        >
+      {:else}
+        <button
+          type="button"
+          class="bg-blue-600 p-2 w-1/2"
+          on:click={async () => await cropImage()}>Crop</button
+        >
+      {/if}
+    </div>
+    <h2>Crop image</h2>
+    <div class="relative h-1/2">
+      <Cropper
+        {image}
+        aspect={1}
+        zoom="1"
+        crop={{ x: 0, y: 0 }}
+        on:cropcomplete={previewCrop}
+      />
+    </div>
+    {#if croppedImage}
+      <h2>Cropped Image</h2>
+      <img
+        src={croppedImage}
+        alt="Cropped profile"
+        class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+      /><br />
+    {/if}
+  </Dialog>
+
 {#await getProfile()}
   <ProfileEditorSkeleton />
 {:then}
@@ -281,14 +376,13 @@
                       bind:this={pond}
                       {name}
                       credits=""
-                      allowProcess={false}
+                      allowProcess={true}
                       class="cursor-pointer"
                       acceptedFileTypes={['image/png', 'image/jpeg']}
                       instantUpload={false}
-                      imageCropAspectRatio={1 / 1}
                       labelIdle="Add Profile Picture"
                       allowMultiple={false}
-                      onpreparefile={handleAddFile}
+                      beforeAddFile={handleCrop}
                       imageTransformVariants={{
                         thumb_small_: (transforms) => {
                           transforms.resize = {
@@ -301,7 +395,7 @@
                         },
                       }}
                     />
-                    <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
+                    <CropModal {handleSave} {isOpen} {fileName} {image} />
                     <button
                       on:click={modalHandler}
                       class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"
