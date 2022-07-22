@@ -5,3 +5,9 @@ export const links = writable([]);
 
 export const teamSocials = writable([]);
 export const teamLinks = writable([]);
+
+export const setSocials = (updatedSocials) => socials.set(updatedSocials);
+export const setLinks = (updatedLinks) => links.set(updatedLinks);
+export const setTeamSocials = (updatedSocials) =>
+  teamSocials.set(updatedSocials);
+export const setTeamLinks = (updatedLinks) => teamLinks.set(updatedLinks);

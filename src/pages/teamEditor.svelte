@@ -27,12 +27,22 @@
     MenuItems,
     MenuItem,
     Transition,
+    Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import toNewTab from '@lib/utils/newTab';
   import Cookies from 'js-cookie';
   import { theme } from '@lib/profileTheme';
   import { teamData } from '@lib/stores/profileData';
-  import CropModal from '@comp/modals/cropModal.svelte';
+  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
+  import {
+    handleDeleteLink,
+    handleDeleteSocial,
+    handleUpLink,
+    handleUpSocial,
+  } from '@lib/utils/editors';
+  import getFileFromBase64 from '@lib/utils/getFileFromBase64';
+  import getCroppedImg from '@lib/utils/canvas';
+  import Cropper from 'svelte-easy-crop';
 
   // Register the plugins
   registerPlugin(
@@ -51,31 +61,48 @@
   let name = 'filepond';
   let teamNickname = null;
   let isOpen = false;
+  let croppedImage = '';
   let fileName = '';
+  let pixelCrop;
   let image;
-
+  let fileImage;
   let currentTheme = theme[$teamData.design?.theme?.toString() ?? 'dark'];
 
-  // handle filepond events
-  function handleInit() {
-    console.log('FilePond has initialised');
-  }
+  const cropImage = async () => {
+    croppedImage = await getCroppedImg(image, pixelCrop);
+    fileImage = getFileFromBase64(croppedImage, fileName);
+  };
 
-  const handleAddFile = async (file, output) => {
+  const previewCrop = (e) => {
+    pixelCrop = e.detail.pixels;
+    const { x, y, width } = e.detail.pixels;
+    const scale = 200 / width;
+  };
+
+  const handleCrop = async (item) => {
+    image = URL.createObjectURL(item.file);
+    fileName = item.filename;
+    isOpen = true;
+    return true;
+  };
+
+  const handleAddFile = async () => {
+    let timestamp = new Date().getTime();
+
     const { data } = await supabase.storage
       .from('avatars')
-      .upload(`${$user?.id}/${file.filename}`, output[1].file, {
+      .upload(`${$user?.id}/${timestamp}${fileName}`, fileImage, {
         contentType: 'image/jpeg',
       });
 
     const { publicURL, error } = supabase.storage
       .from('avatars')
-      .getPublicUrl(`${$user?.id}/${file.filename}`);
+      .getPublicUrl(`${$user?.id}/${timestamp}${fileName}`);
 
+    pond.removeFile();
+    croppedImage = '';
+    isOpen = false;
     $teamData.logo = publicURL;
-    // isOpen = true;
-    // fileName = file.filename;
-    // image = publicURL;
     await handleSave();
   };
 
@@ -108,33 +135,6 @@
     }
   };
 
-  const handleUpSocial = async (item, i) => {
-    $teamSocials.splice(i, 1);
-    $teamSocials.splice(i - 1, 0, item);
-    teamSocials.set($teamSocials);
-    await handleSave();
-  };
-  const handleUpLink = async (item, i) => {
-    $teamLinks.splice(i, 1);
-    $teamLinks.splice(i - 1, 0, item);
-    teamLinks.set($teamLinks);
-    await handleSave();
-  };
-
-  const handleDeleteSocial = async (item) => {
-    let arr = $teamSocials.filter((oldItem) => oldItem !== item);
-    teamSocials.set(arr);
-    toastSuccess('Deleted successfully');
-    await handleSave();
-  };
-
-  const handleDeleteLink = async (item) => {
-    let arr = $teamLinks.filter((oldItem) => oldItem !== item);
-    teamLinks.set(arr);
-    toastSuccess('Deleted successfully');
-    await handleSave();
-  };
-
   const getTeamsDetail = async () => {
     // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
@@ -159,6 +159,61 @@
     return data;
   };
 </script>
+
+<ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
+
+<Dialog
+  static
+  class={`${
+    isOpen ? 'translate-x-0' : 'translate-x-[900px]'
+  } transition-all duration-300 ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+  open={isOpen}
+  on:close={() => (isOpen = false)}
+>
+  <div class="flex w-full gap-2">
+    <button
+      type="button"
+      class="bg-neutral-600 p-2 w-1/2"
+      on:click={() => {
+        croppedImage = null;
+      }}>Reset</button
+    >
+    {#if croppedImage}
+      <button
+        type="button"
+        class="bg-blue-600 p-2 w-1/2"
+        on:click={async () => {
+          await handleAddFile();
+          // $profileData.avatar = URL.createObjectURL(image);
+        }}>Save</button
+      >
+    {:else}
+      <button
+        type="button"
+        class="bg-blue-600 p-2 w-1/2"
+        on:click={async () => await cropImage()}>Crop</button
+      >
+    {/if}
+  </div>
+  <h2>Crop image</h2>
+  <div class="relative h-1/2">
+    <Cropper
+      {image}
+      aspect={1}
+      zoom="1"
+      crop={{ x: 0, y: 0 }}
+      on:cropcomplete={previewCrop}
+    />
+  </div>
+  {#if croppedImage}
+    <h2>Cropped Image</h2>
+    <img
+      src={croppedImage}
+      alt="Cropped profile"
+      class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+    /><br />
+  {/if}
+</Dialog>
 
 <div class="flex justify-center">
   {#await getTeamsDetail()}
@@ -251,11 +306,9 @@
                       class="cursor-pointer"
                       acceptedFileTypes={['image/png', 'image/jpeg']}
                       instantUpload={false}
-                      imageCropAspectRatio={1 / 1}
                       labelIdle="Add Team Logo"
                       allowMultiple={false}
-                      oninit={handleInit}
-                      onpreparefile={handleAddFile}
+                      onpreparefile={handleCrop}
                       imageTransformVariants={{
                         thumb_small_: (transforms) => {
                           transforms.resize = {
@@ -369,7 +422,7 @@
                                 class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
                               >
                                 <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                  class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
                                   on:click={() =>
                                     // go(item.type, item.data, 'Preview')
                                     toNewTab(item.type, item.data)}
@@ -385,8 +438,15 @@
                                   <p>Test</p>
                                 </MenuItem>
                                 <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                  on:click={() => handleDeleteSocial(item)}
+                                  class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                  on:click={async () => {
+                                    handleDeleteSocial(
+                                      item,
+                                      $teamSocials,
+                                      true
+                                    );
+                                    await handleSave();
+                                  }}
                                 >
                                   <img
                                     class="cursor-pointer mr-2"
@@ -400,8 +460,16 @@
                                 </MenuItem>
                                 {#if i != 0}
                                   <MenuItem
-                                    class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                    on:click={() => handleUpSocial(item, i)}
+                                    class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                    on:click={async () => {
+                                      handleUpSocial(
+                                        item,
+                                        i,
+                                        $teamSocials,
+                                        true
+                                      );
+                                      await handleSave();
+                                    }}
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
@@ -500,7 +568,10 @@
                           />
                           {#if i != 0}
                             <svg
-                              on:click={() => handleDeleteLink(item)}
+                              on:click={async () => {
+                                handleDeleteLink(item, $teamLinks, true);
+                                await handleSave();
+                              }}
                               xmlns="http://www.w3.org/2000/svg"
                               class="h-6 w-6 cursor-pointer"
                               fill="none"
@@ -515,7 +586,10 @@
                               />
                             </svg>
                             <svg
-                              on:click={() => handleUpLink(item, i)}
+                              on:click={async () => {
+                                handleUpLink(item, i, $teamLinks, true);
+                                await handleSave();
+                              }}
                               xmlns="http://www.w3.org/2000/svg"
                               class="h-6 w-6 cursor-pointer"
                               fill="none"

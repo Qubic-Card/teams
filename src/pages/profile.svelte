@@ -29,7 +29,7 @@
   export let isEditorMode = false;
   export let profileUid;
   export let cardId;
-  export let companyNickname = null;
+
   // INFO: buka social media masih di tab browser yang sama
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
@@ -95,8 +95,7 @@
         class={({ selected }) =>
           selected
             ? 'bg-white text-black p-2 rounded-l-lg w-1/2'
-            : 'bg-neutral-800 text-white p-2 rounded-l-lg w-1/2'}
-        >{companyNickname ?? '-'}</Tab
+            : 'bg-neutral-800 text-white p-2 rounded-l-lg w-1/2'}>Team</Tab
       >
       <Tab
         class={({ selected }) =>
