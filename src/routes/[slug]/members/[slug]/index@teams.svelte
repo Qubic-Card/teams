@@ -1,7 +1,11 @@
 <script>
   import Profile from '@pages/profile.svelte';
-  import { socials, links } from '@lib/stores/editorStore';
-  import { go } from '@lib/utils/forwarder';
+  import {
+    socials,
+    links,
+    teamSocials,
+    teamLinks,
+  } from '@lib/stores/editorStore';
   import EditorSkeleton from '@comp/skeleton/editorSkeleton.svelte';
 
   import supabase from '@lib/db';
@@ -17,9 +21,8 @@
   import Cookies from 'js-cookie';
   import TeamEditor from '@pages/teamEditor.svelte';
   import PersonalEditor from '@pages/personalEditor.svelte';
-  import { profileData } from '@lib/stores/profileData';
+  import { profileData, teamData } from '@lib/stores/profileData';
 
-  let teamIdCookies = Cookies.get('qubicTeamId');
   let permissions = {
     writeProfile: false,
     writeTeam: false,
@@ -57,6 +60,24 @@
 
   let message = '';
   let isTeamTab = false;
+  let companyNickname;
+
+  const getTeams = async () => {
+    const { data, error } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('id', teamId);
+
+    if (error) console.log(error);
+    if (data) {
+      const teamProfile = data[0]['metadata'];
+      $teamData = { ...teamProfile };
+      $teamSocials = teamProfile['socials'];
+      $teamLinks = teamProfile['links'];
+      companyNickname = data[0]['nickname'];
+      return data;
+    }
+  };
 
   const getProfile = async () => {
     let { data, error } = await supabase
@@ -80,7 +101,7 @@
   };
 </script>
 
-{#await getProfile()}
+{#await (getProfile(), getTeams())}
   <EditorSkeleton />
 {:then}
   {#if isCheckRoleDone}
@@ -157,6 +178,7 @@
             data={$profileData}
             id={profileId}
             {teamId}
+            {companyNickname}
           />
         </div>
       </div>

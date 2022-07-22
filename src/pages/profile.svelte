@@ -1,8 +1,5 @@
 <script>
-  import {
-    teamData as teamDataStore,
-    profileData,
-  } from '@lib/stores/profileData';
+  import { profileData, teamData } from '@lib/stores/profileData';
   import AvatarCard from '@comp/cards/avatarCard.svelte';
   import BorderButton from '@comp/buttons/borderButton.svelte';
   import { socialIcons } from '@lib/constants';
@@ -24,47 +21,18 @@
     TabPanel,
     TabPanels,
   } from '@rgossiaux/svelte-headlessui';
-  import supabase from '@lib/db';
-  import addToContactHandler from '@lib/utils/addToContact';
   import { genvcard } from '@lib/vcard/vcardgen';
   import download from '@lib/utils/download';
-  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { toastFailed } from '@lib/utils/toast';
 
   export let data;
   export let isEditorMode = false;
   export let profileUid;
   export let cardId;
-  export let teamId;
+  export let companyNickname = null;
+  // INFO: buka social media masih di tab browser yang sama
+  let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
-  let showModal = false;
-  let companyName = null;
-  let companyNickname = null;
-  let companyDesc = null;
-  let companyAddress = null;
-  let companyLogo = null;
-  let currentTheme = theme[$profileData.design?.theme?.toString() ?? 'dark'];
-  let teamData = null;
-  // TODO: ERROR MENAMPILKAN SOCIALS DAN LINKS TEAM
-  const getTeams = async () => {
-    const { data, error } = await supabase
-      .from('teams')
-      .select('*')
-      .eq('id', teamId);
-
-    if (error) console.log(error);
-    if (data) {
-      // console.log(data);
-      teamData = data[0].metadata;
-      companyName = data[0].metadata.company;
-      companyNickname = data[0].nickname;
-      companyAddress = data[0].metadata.address;
-      companyDesc = data[0].metadata.description;
-      companyLogo = data[0].metadata.logo;
-    }
-  };
-  $: getTeams();
-
-  // $: console.log('PROFILE DATA PROPD', data);
   const popup = () => toastFailed(`You can't connect to your profile`);
   const downloadHandler = () => console.log('Brosur has been downloaded');
 </script>
@@ -75,16 +43,16 @@
     <div
       class="rounded-2xl h-32 relative bg-center object-cover"
       style={`background: url(${
-        data.design?.background == ''
-          ? Dummy.design?.background
-          : data.design?.background
+        data?.design?.background == ''
+          ? Dummy?.design?.background
+          : data?.design?.background
       });`}
     >
       <AvatarCard
         class="pt-8"
         height="125px"
         width="125px"
-        background={data.avatar == '' ? Dummy.avatar : data.avatar}
+        background={data?.avatar == '' ? Dummy.avatar : data?.avatar}
       />
     </div>
   </div>
@@ -93,18 +61,18 @@
     class=" justify-center items-center flex flex-col pt-6 {currentTheme.text}"
   >
     <h1 class="text-lg font-bold">
-      {data.firstname == ''
+      {data?.firstname == ''
         ? Dummy.firstname
-        : data.firstname + ' ' + data.lastname}
+        : data?.firstname + ' ' + data?.lastname}
     </h1>
     <h1 class="text-sm opacity-80">
-      {data.job == '' ? Dummy.job : data.job}
+      {data?.job == '' ? Dummy.job : data?.job}
     </h1>
     <h1 class="text-md opacity-90">
-      {data.company == '' ? Dummy.company : data.company}
+      {data?.company == '' ? Dummy.company : data?.company}
     </h1>
   </div>
-  <div class="flex flex-col gap-2 px-20 text-white my-4">
+  <div class="flex gap-2 px-20 text-white my-4">
     <BorderButton
       class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
       on:click={popup}
@@ -113,7 +81,8 @@
     </BorderButton>
     <BorderButton
       class="w-full h-12  {currentTheme.border} {currentTheme.secondary} rounded-md"
-      on:click={async () => download(await genvcard(data, teamData), 'contact')}
+      on:click={async () =>
+        download(await genvcard(data, $teamData), 'contact')}
     >
       Add to Contacts
     </BorderButton>
@@ -145,19 +114,17 @@
           >
             <div class="flex">
               <img
-                src={$teamDataStore.logo !== ''
-                  ? $teamDataStore.logo
-                  : companyLogo}
+                src={$teamData.logo !== '' ? $teamData.logo : Dummy.avatar}
                 alt=""
                 class="rounded-lg w-16 h-16 mr-2"
               />
               <div>
-                <h1>{companyName ?? '-'}</h1>
-                <p>{companyAddress ?? '-'}</p>
+                <h1>{$teamData.company ?? '-'}</h1>
+                <p>{$teamData.address ?? '-'}</p>
               </div>
             </div>
             <p class="text-neutral-400">
-              {companyDesc ?? '-'}
+              {$teamData.description ?? '-'}
             </p>
           </div>
           <div
@@ -168,7 +135,7 @@
             <p class="text-neutral-400">Download brosur starbucks</p>
           </div>
           <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-            {#each isEditorMode ? teamData?.socials : data.socials as item}
+            {#each isEditorMode ? $teamSocials : data.socials as item}
               {#if item.isActive}
                 <BorderButton
                   on:click={() => {
@@ -193,7 +160,7 @@
           </div>
 
           <div class="gap-2 flex flex-col justify-center items-center pb-5">
-            {#each isEditorMode ? teamData?.links : data.links as item}
+            {#each isEditorMode ? $teamLinks : data.links as item}
               {#if item.isActive}
                 <BorderButton
                   class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
