@@ -5,10 +5,10 @@
   import { links, socials } from '@lib/stores/editorStore';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import { Dialog, DialogTitle } from '@rgossiaux/svelte-headlessui';
-  import { fade } from 'svelte/transition';
   import Spinner from '@comp/loading/spinner.svelte';
   import { profileData } from '@lib/stores/profileData';
   import { createEventDispatcher } from 'svelte';
+  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
 
   export let data;
   let open = false;
@@ -64,14 +64,7 @@
   };
 </script>
 
-{#if open}
-  <div
-    transition:fade|local={{ duration: 200 }}
-    class="fixed inset-0 bg-black/50 z-50"
-    aria-hidden="true"
-    on:click={() => (open = false)}
-  />
-{/if}
+<ModalOverlay isOpen={open} on:click={() => (open = false)} />
 
 <img
   src="/edit-icon.svg"

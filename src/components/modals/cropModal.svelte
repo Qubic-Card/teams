@@ -1,9 +1,8 @@
 <script>
+  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import supabase from '@lib/db';
-
   import { profileData } from '@lib/stores/profileData';
   import { user } from '@lib/stores/userStore';
-
   import getCroppedImg from '@lib/utils/canvas';
   import { Dialog } from '@rgossiaux/svelte-headlessui';
   import Cropper from 'svelte-easy-crop';
@@ -14,10 +13,9 @@
   export let fileName;
   export let image;
   $: console.log(image, fileName);
-  let fileinput, pixelCrop;
+  let pixelCrop;
   let croppedImage = '';
   let fileImage;
-  let profilePicture, style;
 
   const previewCrop = (e) => {
     pixelCrop = e.detail.pixels;
@@ -47,33 +45,31 @@
     fileImage = getFileFromBase64(croppedImage, fileName);
   };
 
-  const handleAddFile = async () => {
+  const handleSaveCroppedImage = async () => {
+    // const { data: remove_data, error: remove_err } = await supabase.storage
+    //   .from('avatars')
+    //   .remove([`${$user?.id}/${fileName}`]);
+
     const { data, error: err } = await supabase.storage
       .from('avatars')
       .update(`${$user?.id}/${fileName}`, fileImage, {
         contentType: 'image/jpeg',
       });
 
-    console.log(data, err);
+    // console.log(data, remove_data, err, remove_err);
 
     const { publicURL, error } = supabase.storage
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${fileName}`);
 
     $profileData.avatar = publicURL;
+    // console.log($profileData.avatar);
     await handleSave();
     isOpen = false;
   };
 </script>
 
-{#if isOpen}
-  <div
-    transition:fade|local={{ duration: 200 }}
-    class="fixed inset-0 bg-black/50 z-50"
-    aria-hidden="true"
-    on:click={() => (isOpen = false)}
-  />
-{/if}
+<ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
 
 <Dialog
   static
@@ -96,7 +92,7 @@
       <button
         type="button"
         class="bg-blue-600 p-2 w-1/2"
-        on:click={async () => await handleAddFile()}>Save</button
+        on:click={async () => await handleSaveCroppedImage()}>Save</button
       >
     {:else}
       <button
@@ -118,6 +114,10 @@
   </div>
   {#if croppedImage}
     <h2>Cropped Image</h2>
-    <img src={croppedImage} alt="Cropped profile" /><br />
+    <img
+      src={croppedImage}
+      alt="Cropped profile"
+      class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+    /><br />
   {/if}
 </Dialog>

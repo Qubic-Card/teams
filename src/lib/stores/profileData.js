@@ -12,6 +12,7 @@ export const teamData = writable({
   avatar: '',
   socials: '',
   links: '',
+  isShowMetaImage: false,
   design: {
     theme: 'dark',
     background: '',

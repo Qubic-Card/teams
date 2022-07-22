@@ -5,21 +5,14 @@
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
   import { Dialog } from '@rgossiaux/svelte-headlessui';
-  import { fade } from 'svelte/transition';
+  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
 
   export let connection;
   export let showModal;
   export let modalHandler;
 </script>
 
-{#if showModal}
-  <div
-    transition:fade|local={{ duration: 200 }}
-    class="fixed inset-0 bg-black/50 z-50"
-    aria-hidden="true"
-    on:click={modalHandler}
-  />
-{/if}
+<ModalOverlay isOpen={showModal} on:click={modalHandler} />
 
 <Dialog
   static

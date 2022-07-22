@@ -68,7 +68,7 @@
   </h1>
   <div class={'relative'}>
     <input
-      transition:fade|local={{ duration: 500 }}
+      transition:fade|local={{ duration: 300 }}
       on:change
       on:focus={() => (focus = true)}
       on:blur={() => (focus = false)}
@@ -76,6 +76,7 @@
       bind:value
       maxlength={$$props.maxlength}
       class={`w-full rounded-md my-2 h-10 px-2 ${inputbg} ${inputText}`}
+      disabled={$$props.disabled}
     />
   </div>
   {#if focus && isLinkInput && isLinkInvalid}

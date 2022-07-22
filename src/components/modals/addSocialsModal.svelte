@@ -46,7 +46,7 @@
       <img
         width="64"
         height="64"
-        class="m-1 p-2 border border-neutral-200 bg-neutral-800"
+        class="m-1 p-2 border border-neutral-200 bg-neutral-800 cursor-pointer"
         on:click={() => addSocial(item)}
         src={socialIcons[item]}
         alt={item}

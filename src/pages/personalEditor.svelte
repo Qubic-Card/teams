@@ -3,7 +3,6 @@
   import Profile from '@pages/profile.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import { socials, links } from '@lib/stores/editorStore';
-  import { go } from '@lib/utils/forwarder';
   import SelectBackgroundModal from '@comp/modals/selectBackgroundModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
   import ProfileEditorSkeleton from '@comp/skeleton/profileEditorSkeleton.svelte';
@@ -51,10 +50,10 @@
   let name = 'filepond';
   let teamIdCookies = Cookies.get('qubicTeamId');
 
-  export let isHasWriteMembersPermission, isHasWriteProfilePermission;
   let isOpen = false;
   let fileName = '';
   let image;
+  export let permissions;
 
   const handleAddFile = async (file, output) => {
     const { data } = await supabase.storage
@@ -67,11 +66,11 @@
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${file.filename}`);
 
-    isOpen = true;
-    fileName = file.filename;
-    image = publicURL;
-    // $profileData.avatar = publicURL;
-    // await handleSave();
+    // isOpen = true;
+    // fileName = file.filename;
+    // image = publicURL;
+    $profileData.avatar = publicURL;
+    await handleSave();
   };
 
   const addLink = () => {
@@ -218,9 +217,9 @@
                       placeholder="Hello"
                       title="First Name"
                       bind:value={$profileData.firstname}
-                      disabled={isHasWriteProfilePermission
+                      disabled={permissions.writeProfile
                         ? false
-                        : isHasWriteMembersPermission
+                        : permissions.writeMembers
                         ? false
                         : true}
                     />
@@ -229,9 +228,9 @@
                       placeholder="World"
                       title="Last Name"
                       bind:value={$profileData.lastname}
-                      disabled={isHasWriteProfilePermission
+                      disabled={permissions.writeProfile
                         ? false
-                        : isHasWriteMembersPermission
+                        : permissions.writeMembers
                         ? false
                         : true}
                     />
@@ -242,9 +241,9 @@
                       placeholder="example company"
                       title="Company"
                       bind:value={$profileData.company}
-                      disabled={isHasWriteProfilePermission
+                      disabled={permissions.writeProfile
                         ? false
-                        : isHasWriteMembersPermission
+                        : permissions.writeMembers
                         ? false
                         : true}
                     />
@@ -253,9 +252,9 @@
                       placeholder="Hiring Manager"
                       title="Job"
                       bind:value={$profileData.job}
-                      disabled={isHasWriteProfilePermission
+                      disabled={permissions.writeProfile
                         ? false
-                        : isHasWriteMembersPermission
+                        : permissions.writeMembers
                         ? false
                         : true}
                     />
@@ -264,16 +263,16 @@
                       placeholder="Address"
                       title="Address"
                       bind:value={$profileData.address}
-                      disabled={isHasWriteProfilePermission
+                      disabled={permissions.writeProfile
                         ? false
-                        : isHasWriteMembersPermission
+                        : permissions.writeMembers
                         ? false
                         : true}
                     />
                   </div>
                   <div
                     class={`p-3 ${
-                      isHasWriteProfilePermission || isHasWriteMembersPermission
+                      permissions.writeProfile || permissions.writeMembers
                         ? ''
                         : 'hidden'
                     }`}
@@ -302,7 +301,7 @@
                         },
                       }}
                     />
-                    <CropModal {handleSave} {isOpen} {fileName} {image} />
+                    <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
                     <button
                       on:click={modalHandler}
                       class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"
@@ -325,8 +324,7 @@
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
                       class={`${
-                        isHasWriteProfilePermission ||
-                        isHasWriteMembersPermission
+                        permissions.writeProfile || permissions.writeMembers
                           ? 'flex'
                           : 'hidden'
                       }`}
@@ -378,17 +376,16 @@
                           : false}
                         isPhoneInput={item.type === 'phone' ? true : false}
                         isEmptyChecking={true}
-                        disabled={isHasWriteProfilePermission
+                        disabled={permissions.writeProfile
                           ? false
-                          : isHasWriteMembersPermission
+                          : permissions.writeMembers
                           ? false
                           : true}
                       />
 
                       <div
                         class={`items-center mb-3 ${
-                          isHasWriteProfilePermission ||
-                          isHasWriteMembersPermission
+                          permissions.writeProfile || permissions.writeMembers
                             ? 'flex'
                             : 'hidden'
                         }`}
@@ -491,13 +488,13 @@
               </TabPanel>
               <TabPanel>
                 <!-- Link Editor -->
+
                 <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-20">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
                       class={`h-10 w-10 cursor-pointer ${
-                        isHasWriteProfilePermission ||
-                        isHasWriteMembersPermission
+                        permissions.writeProfile || permissions.writeMembers
                           ? ''
                           : 'hidden'
                       }`}
@@ -506,18 +503,32 @@
                       alt="add"
                     />
                   </div>
+                  <label
+                    for="links"
+                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100"
+                  >
+                    <input
+                      bind:checked={$profileData.isShowMetaImage}
+                      id="links"
+                      type="checkbox"
+                      class="w-5 h-5 cursor-pointer disabled:cursor-default"
+                      value={$profileData?.isShowMetaImage}
+                      on:change={handleSave}
+                    />
 
+                    <p>Show meta image for links (if available).</p>
+                  </label>
                   {#each $links as item, i}
                     <div class="p-3 flex">
-                      <div class="flex flex-col flex-grow">
+                      <div class="flex flex-2 flex-col flex-grow">
                         <Input
                           on:change={handleSave}
                           title="Title"
                           placeholder="Title"
                           bind:value={item.title}
-                          disabled={isHasWriteProfilePermission
+                          disabled={permissions.writeProfile
                             ? false
-                            : isHasWriteMembersPermission
+                            : permissions.writeMembers
                             ? false
                             : true}
                         />
@@ -528,18 +539,17 @@
                           isLinkInput={true}
                           placeholder="Link"
                           isEmptyChecking={true}
-                          disabled={isHasWriteProfilePermission
+                          disabled={permissions.writeProfile
                             ? false
-                            : isHasWriteMembersPermission
+                            : permissions.writeMembers
                             ? false
                             : true}
                         />
                       </div>
                       <div
-                        class={`mx-3 grid-cols-3 gap-3 place-items-center ${
-                          isHasWriteProfilePermission ||
-                          isHasWriteMembersPermission
-                            ? 'grid'
+                        class={`mx-3 flex-1 gap-3 place-items-center ${
+                          permissions.writeProfile || permissions.writeMembers
+                            ? 'flex'
                             : 'hidden'
                         }`}
                       >
