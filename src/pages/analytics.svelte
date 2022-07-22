@@ -1,7 +1,7 @@
 <script>
   import supabase from '@lib/db.js';
   import AnalyticTable from '@comp/tables/analyticTable.svelte';
-  import { user, userData } from '@lib/stores/userStore.js';
+  import { user, userChangeTimestamp } from '@lib/stores/userStore.js';
   import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getMemberId } from '@lib/query/getId';
   import {
@@ -29,7 +29,7 @@
   let activity = [];
   let dateConnected = [];
   let userLogs = [];
-
+  $: console.log("change", $userChangeTimestamp)
   let loading = false;
 
   let itemsPerPage = 10;
@@ -117,6 +117,17 @@
     let id = await getMemberId($user?.id, teamId);
 
     loading = true;
+
+    let minTime = new Date(
+          selectedDays === '7 Days'
+            ? last7Days[0]
+            : selectedDays === '14 Days'
+            ? last14Days[0]
+            : selectedDays === '30 Days'
+            ? last30Days[0]
+            : last3Days[0]
+        ).toUTCString();
+
     let {
       data: connection_profile,
       error: error_profile,
@@ -130,15 +141,7 @@
       .eq('by', id)
       .gte(
         'dateConnected',
-        new Date(
-          selectedDays === '7 Days'
-            ? last7Days[0]
-            : selectedDays === '14 Days'
-            ? last14Days[0]
-            : selectedDays === '30 Days'
-            ? last30Days[0]
-            : last3Days[0]
-        ).toUTCString()
+        $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
       )
       .order('dateConnected', { ascending: false });
 
@@ -155,6 +158,17 @@
   const getWeeklyLogsActivity = async () => {
     let id = await getMemberId($user?.id, teamId);
     loading = true;
+
+    let minTime = new Date(
+          selectedDays === '7 Days'
+            ? last7Days[0]
+            : selectedDays === '14 Days'
+            ? last14Days[0]
+            : selectedDays === '30 Days'
+            ? last30Days[0]
+            : last3Days[0]
+        ).toISOString();
+
     let {
       data: logs,
       error,
@@ -170,15 +184,7 @@
       .eq('team_member', id)
       .gte(
         'created_at',
-        new Date(
-          selectedDays === '7 Days'
-            ? last7Days[0]
-            : selectedDays === '14 Days'
-            ? last14Days[0]
-            : selectedDays === '30 Days'
-            ? last30Days[0]
-            : last3Days[0]
-        ).toISOString()
+        $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
       )
       .order('created_at', {
         ascending: false,

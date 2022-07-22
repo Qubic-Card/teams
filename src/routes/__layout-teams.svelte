@@ -5,13 +5,13 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { setUserData, user, userData } from '@lib/stores/userStore';
+  import { setUserData, user, userChangeTimestamp, userData } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
-  import supabase from '@lib/db';
+import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -27,6 +27,7 @@
 
   onMount(async () => {
     roleMapping = await getRoleMapsByProfile($user?.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
     team = await getTeamData(teamId);
   });
 
