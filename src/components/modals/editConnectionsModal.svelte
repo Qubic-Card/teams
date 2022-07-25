@@ -47,7 +47,6 @@
       loading = false;
     } else {
       toastSuccess('Connection data updated successfully');
-      toggleModal();
       sendUpdatedData(data);
       loading = false;
     }
@@ -84,38 +83,26 @@
     >Edit Connection</DialogTitle
   >
 
-  <div class="bottom flex gap-4 mb-4 z-30">
-    <button
-      class="p-2 border-2 border-neutral-700 w-full"
-      on:click={toggleModal}>Cancel</button
-    >
-    <button
-      class="flex justify-center p-2 bg-blue-600 w-full"
-      on:click={async () => await updateConnectionsData()}
-      >{#if loading}
-        <Spinner class="w-6 h-6" />
-      {:else}Save
-      {/if}</button
-    >
-  </div>
-
   <div class="flex flex-col mb-2 z-30">
     <h1 class="font-bold text-xl text-white mb-2">Identity</h1>
     <Input
       placeholder="Firstname"
       title="Firstname"
       bind:value={data.profileData.firstname}
+      on:change={updateConnectionsData}
     />
     <Input
       placeholder="Lastname"
       title="Lastname"
       bind:value={data.profileData.lastname}
+      on:change={updateConnectionsData}
     />
     <Input placeholder="Job" title="Job" bind:value={data.profileData.job} />
     <Input
       placeholder="Company"
       title="Company"
       bind:value={data.profileData.company}
+      on:change={updateConnectionsData}
     />
   </div>
   <div class="flex flex-col mb-2 z-30">
@@ -155,6 +142,7 @@
           ? 'Line ID'
           : social.type}
         bind:value={social.data}
+        on:change={updateConnectionsData}
       />
     {/each}
   </div>
@@ -176,6 +164,7 @@
           title={link.title}
           placeholder="Website"
           bind:value={link.link}
+          on:change={updateConnectionsData}
         />
       {/each}
     {:else}

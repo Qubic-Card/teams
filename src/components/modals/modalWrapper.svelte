@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  export let title, showModal;
+  export let title, showModal, isUnsplash;
 
   const dispatch = createEventDispatcher();
 
@@ -22,7 +22,18 @@
           class="p-5 border-b-2 border-neutral-700 mb-4 border-solid rounded-t"
         >
           <div class="flex w-full text-white justify-between items-center">
-            <h3 class="text-xl font-semibold">{title ?? ''}</h3>
+            {#if isUnsplash}
+              <div class="flex items-center">
+                <p class="text-center translate-y-1">Powered By</p>
+                <img
+                  src="/unsplash.svg"
+                  alt=""
+                  class="w-32 ml-2 bg-white p-2 rounded-md"
+                />
+              </div>
+            {:else}
+              <h3 class="text-xl font-semibold">{title ?? ''}</h3>
+            {/if}
             <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
               x
             </p>
