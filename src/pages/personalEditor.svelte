@@ -46,6 +46,7 @@
     handleUpSocial,
   } from '@lib/utils/editors';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
+
   export let permissions;
 
   // Register the plugins
@@ -121,7 +122,6 @@
   let query = 'background';
   let url;
   let unsplashDatas;
-  let showModal = false;
   let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
   const getProfile = async () => {
@@ -141,13 +141,6 @@
     if (error) console.log(error);
 
     return data;
-  };
-
-  const modalHandler = () => (showModal = !showModal);
-  const handlePick = async (item) => {
-    $profileData.design.background = item.detail.urls.regular;
-    modalHandler();
-    await handleSave();
   };
 
   const searchQuery = (val) => (query = val.detail);
@@ -363,17 +356,10 @@
                       }}
                     />
                     <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
-                    <button
-                      on:click={modalHandler}
-                      class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"
-                      >Select Background</button
-                    >
                     <SelectBackgroundModal
-                      {modalHandler}
-                      on:pickImage={handlePick}
                       on:searchQuery={searchQuery}
-                      {showModal}
                       {unsplashDatas}
+                      {handleSave}
                     />
                   </div>
                 </div>

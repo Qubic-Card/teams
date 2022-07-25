@@ -29,7 +29,6 @@
   export let isEditorMode = false;
   export let profileUid;
   export let cardId;
-
   // INFO: buka social media masih di tab browser yang sama
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
@@ -39,22 +38,20 @@
 
 <div class={`${currentTheme.pageBackground} ${$$props.class}`}>
   <!-- HEAD -->
-  <div class="w-full p-4">
-    <div
-      class="rounded-2xl h-32 relative bg-center object-cover"
-      style={`background: url(${
-        data?.design?.background == ''
-          ? Dummy?.design?.background
-          : data?.design?.background
-      });`}
-    >
-      <AvatarCard
-        class="pt-8"
-        height="125px"
-        width="125px"
-        background={data?.avatar == '' ? Dummy.avatar : data?.avatar}
-      />
-    </div>
+  <div class="w-full h-40 p-4">
+    <img
+      class="w-full h-32 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+      src={data?.design?.background == ''
+        ? Dummy?.design?.background
+        : data?.design?.background}
+      alt=""
+    />
+    <AvatarCard
+      class="pt-8 relative -translate-y-32"
+      height="125px"
+      width="125px"
+      background={data?.avatar == '' ? Dummy.avatar : data?.avatar}
+    />
   </div>
   <!-- BIO -->
   <div

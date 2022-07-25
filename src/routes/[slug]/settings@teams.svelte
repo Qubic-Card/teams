@@ -1,23 +1,9 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
-  import roleMapping from '@lib/role';
   import supabase from '@lib/db';
-  import { role, roleName, setRoleName } from '@lib/stores/roleStore';
-  import {
-    Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
-    Switch,
-  } from '@rgossiaux/svelte-headlessui';
-  import AddRoleModal from '@comp/modals/addRoleModal.svelte';
-  import RenameModal from '@comp/modals/renameModal.svelte';
-  import Checkboxes from '@comp/checkbox.svelte';
+  import { teamRoles } from '@lib/stores/roleStore';
   import SettingsSkeleton from '@comp/skeleton/settingsSkeleton.svelte';
-  import { setUserData, user, userData } from '@lib/stores/userStore';
-  import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
+  import { userData } from '@lib/stores/userStore';
   import Cookies from 'js-cookie';
-  import Spinner from '@comp/loading/spinner.svelte';
   import Billing from '@pages/settings/billing.svelte';
   import Role from '@pages/settings/role.svelte';
 
@@ -39,21 +25,18 @@
         .from('team_roles')
         .select('*')
         .eq('team_id', teamId)
-        // .or(`team_id.eq.${teamId}, id.eq.31, id.eq.32`)
-        // .or(`id.eq.31`)
-        .order('role_name', { ascending: true });
+        .order('id', { ascending: true });
 
       if (error) throw error;
 
       if (data) {
         roles = data;
+        $teamRoles = data;
       }
     } catch (error) {
       console.log(error);
     }
   };
-
-  // $: getMemberRole();
 
   const clicked = (e) => (isClicked = e.detail);
 

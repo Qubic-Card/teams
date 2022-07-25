@@ -3,14 +3,13 @@
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
-  import { getTeamId } from '@lib/query/getId';
-  import { user } from '@lib/stores/userStore';
   import Input from '@comp/input.svelte';
   import Cookies from 'js-cookie';
   import Checkboxes from '@comp/checkbox.svelte';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
+  import { teamRoles } from '@lib/stores/roleStore';
 
-  export let roles, isHasWriteRolePermission;
+  export let isHasWriteRolePermission;
 
   let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
@@ -19,7 +18,7 @@
   let checkedRole = [];
 
   const toggleModal = () => {
-    if (roles.length < 5) {
+    if ($teamRoles.length < 5) {
       showModal = !showModal;
     } else {
       toastFailed('You can only add 5 roles');
@@ -29,7 +28,6 @@
   const addRoleHandler = async () => {
     loading = true;
     try {
-      // let teamId = await getTeamId($user?.id);
       const { data, error } = await supabase
         .from('team_roles')
         .insert({
@@ -45,9 +43,13 @@
         loading = false;
         toastSuccess('Role added successfully');
         toggleModal();
-        setTimeout(() => {
-          location.reload();
-        }, 500);
+        $teamRoles = [
+          ...$teamRoles,
+          {
+            role_name: roleName,
+            role_maps: checkedRole,
+          },
+        ];
       }
     } catch (error) {
       loading = false;

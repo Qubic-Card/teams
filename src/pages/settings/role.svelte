@@ -2,7 +2,7 @@
   import { fade, slide } from 'svelte/transition';
   import roleMapping from '@lib/role';
   import supabase from '@lib/db';
-  import { role } from '@lib/stores/roleStore';
+  import { role, teamRoles } from '@lib/stores/roleStore';
   import {
     Disclosure,
     DisclosureButton,
@@ -16,7 +16,7 @@
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import Cookies from 'js-cookie';
 
-  export let permissions, roles;
+  export let permissions;
   let roleMaps = [];
   let isClicked = true;
   let loading = false;
@@ -53,23 +53,21 @@
     >
       <h1 class="font-bold text-xl md:text-3xl">Role Settings</h1>
       {#if permissions.writeRoles}
-        <AddRoleModal
-          {roles}
-          isHasWriteRolePermission={permissions.writeRoles}
-        />
+        <AddRoleModal isHasWriteRolePermission={permissions.writeRoles} />
       {/if}
     </div>
     <h1 class="p-4 text-xl">Super Admin</h1>
     <h1 class="p-4 text-xl">Member</h1>
-    {#if roles.length > 0}
-      {#each roles as role}
+    {#if $teamRoles.length > 0}
+      {#each $teamRoles as role}
         <Disclosure let:open>
           <div class="flex justify-between items-center">
             <DisclosureButton
               on:click={() => (isClicked = true)}
               class="text-xl w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2"
             >
-              {role.role_name.charAt(0).toUpperCase() + role.role_name.slice(1)}
+              {role?.role_name?.charAt(0).toUpperCase() +
+                role?.role_name?.slice(1)}
             </DisclosureButton>
             {#if permissions.writeRoles}
               <RenameModal id={role.id} />
