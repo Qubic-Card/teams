@@ -13,7 +13,7 @@
       <div
         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4"
       >
-        <h1 class="font-bold text-xl md:text-3xl">Billing</h1>
+        <h1 class="font-bold text-xl">Billing</h1>
         <div
           class={`gap-2 ${
             permissions.writeBilling && permissions.readBilling
@@ -22,12 +22,12 @@
           }`}
         >
           <button
-            class="p-4 w-auto bg-blue-600 text-white rounded-lg"
+            class="p-2 w-auto bg-blue-600 text-white rounded-lg"
             on:click={async () => await console.log('billing')}
             >Change subscription</button
           >
           <button
-            class="p-4 w-auto bg-blue-600 text-white rounded-lg"
+            class="p-2 w-auto bg-blue-600 text-white rounded-lg"
             on:click={async () => await console.log('billing')}
             >Tambah saldo</button
           >
@@ -36,13 +36,13 @@
       <p>Subscription valid hingga: 12 Feb 2023</p>
       <p>Saldo tersisa: 0</p>
       <div
-        class="flex justify-between items-center p-3 rounded-full mt-4 bg-neutral-900"
+        class="flex justify-between items-center p-3 rounded mt-4 bg-neutral-900"
       >
         <p>Aktifkan auto renew</p>
         <Switch
           checked={isAutoRenew}
           on:change={(e) => (isAutoRenew = e.detail)}
-          class={`flex justify-center items-center self-end rounded-full w-12 h-8 ${
+          class={`flex justify-center items-center self-end rounded w-12 h-8 ${
             isAutoRenew ? 'bg-green-600' : 'bg-neutral-600'
           }`}
         >

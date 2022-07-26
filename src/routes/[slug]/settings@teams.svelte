@@ -54,7 +54,7 @@
   </div>
 {:then}
   <div class="flex justify-center pt-4 pl-24 pr-4">
-    <div class="flex flex-col w-full gap-4">
+    <div class="flex flex-col w-full gap-4 text-sm pb-10">
       <Billing {permissions} />
       <Role {permissions} {roles} />
       <div class="flex flex-col p-4 bg-neutral-800 rounded-lg">

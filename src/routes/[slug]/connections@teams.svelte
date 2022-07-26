@@ -170,13 +170,13 @@
 </script>
 
 <svelte:window bind:innerWidth />
-<div class="flex flex-col pt-4 pl-24 pr-4">
+<div class="flex flex-col pt-4 pl-16">
   {#if permissions.readConnection === true}
     {#await getTeamConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
-        class="flex md:flex-row flex-col justify-between items-center mt-2 gap-4 border-b-2 border-neutral-700"
+        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 border-neutral-700"
       >
         <div class="flex w-full md:w-48 text-white gap-1">
           <button
@@ -219,7 +219,7 @@
         <div
           class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
         >
-          <table class="snap-center text-black w-full mt-6">
+          <table class="snap-center text-black w-full">
             <thead class="text-left text-neutral-400 bg-black/60">
               <tr>
                 {#if innerWidth > 640}

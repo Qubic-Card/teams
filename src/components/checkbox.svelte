@@ -42,7 +42,8 @@
   }
 </script>
 
-<h1 class="font-bold text-xl my-4 ml-2 self-start">Super Admin</h1>
+<div class="border border-neutral-600 mt-3 p-2 rounded">
+<h1 class="font-bold text-sm my-4 ml-2 self-start">Super Admin</h1>
 {#each superAdminCheckbox as checkbox}
   <div
     class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
@@ -73,7 +74,7 @@
   </div>
 {/each}
 
-<h1 class="font-bold text-xl my-4 ml-2 self-start">Read</h1>
+<h1 class="font-bold text-sm my-4 ml-2 self-start">Read</h1>
 {#each readCheckbox as checkbox}
   <div
     class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
@@ -104,7 +105,7 @@
   </div>
 {/each}
 
-<h1 class="font-bold text-xl my-4 ml-2 self-start">Write</h1>
+<h1 class="font-bold text-sm my-4 ml-2 self-start">Write</h1>
 {#each writeCheckbox as checkbox}
   <div
     class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
@@ -135,3 +136,4 @@
     </p>
   </div>
 {/each}
+</div>

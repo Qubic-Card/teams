@@ -51,20 +51,20 @@
     <div
       class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
     >
-      <h1 class="font-bold text-xl md:text-3xl">Role Settings</h1>
+      <h1 class="font-bold text-xl">Role Settings</h1>
       {#if permissions.writeRoles}
         <AddRoleModal isHasWriteRolePermission={permissions.writeRoles} />
       {/if}
     </div>
-    <h1 class="p-4 text-xl">Super Admin</h1>
-    <h1 class="p-4 text-xl">Member</h1>
+    <h1 class="p-4 text-sm">Superadmin</h1>
+    <h1 class="p-4 text-sm">Default</h1>
     {#if $teamRoles.length > 0}
       {#each $teamRoles as role}
         <Disclosure let:open>
           <div class="flex justify-between items-center">
             <DisclosureButton
               on:click={() => (isClicked = true)}
-              class="text-xl w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2"
+              class="text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2"
             >
               {role?.role_name?.charAt(0).toUpperCase() +
                 role?.role_name?.slice(1)}

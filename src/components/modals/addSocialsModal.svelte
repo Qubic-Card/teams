@@ -2,7 +2,8 @@
   import { socialIcons } from '@lib/constants';
   import { socials, teamSocials } from '@lib/stores/editorStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
+import { Dialog, DialogTitle } from '@rgossiaux/svelte-headlessui';
+import ModalOverlay from './modalOverlay.svelte';
 
   let showModal = false;
   export let isTeam = false;
@@ -33,24 +34,32 @@
 <button type="button" on:click={toggleModal} class={$$props.class}>
   <img class="h-10 w-10" src="/add-icon.svg" alt="add" />
 </button>
-<ModalWrapper
-  title="Add social media"
-  on:showModal={toggleModal}
-  {showModal}
-  class="w-auto"
+<ModalOverlay isOpen={showModal} on:click={() => (showModal = false)} />
+<Dialog
+  static
+  open={showModal}
+  on:close={() => (showModal = false)}
+  class={`${
+    showModal ? 'translate-x-0' : 'translate-x-[900px]'
+  } transition-all duration-300 ease-in-out flex flex-col h-screen w-[320px] p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
 >
+  <DialogTitle class="text-xl pb-2 border-b-2 border-neutral-700 z-30"
+    >Add Social Media</DialogTitle
+  >
   <div
-    class="grid grid-cols-4 justify-center bg-neutral-800 items-center p-4 rounded-lg"
+    class="flex flex-col justify-center bg-neutral-800 items-center p- rounded-lg"
   >
     {#each Object.keys(socialIcons) as item}
-      <img
-        width="64"
-        height="64"
-        class="m-1 p-2 border border-neutral-200 bg-neutral-800 cursor-pointer"
-        on:click={() => addSocial(item)}
+      <div on:click={() => addSocial(item)} class="cursor-pointer flex rounded m-1 flex-row w-full border border-neutral-600">
+        <img
+        width="48"
+        height="48"
+        class="p-2"
         src={socialIcons[item]}
         alt={item}
       />
+        <p class="flex justify-center items-center">{item}</p>
+      </div>
     {/each}
   </div>
-</ModalWrapper>
+</Dialog>

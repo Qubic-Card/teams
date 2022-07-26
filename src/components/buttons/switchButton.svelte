@@ -12,7 +12,7 @@
     position: relative;
     display: inline-block;
     width: 65px;
-    height: 42px;
+    height: 30px;
   }
 
   .switch input {
@@ -37,9 +37,9 @@
   .slider:before {
     position: absolute;
     content: '';
-    height: 30px;
-    width: 30px;
-    left: 8px;
+    height: 20px;
+    width: 20px;
+    left: 15px;
     bottom: 5px;
     background-color: white;
     -webkit-transition: 0.4s;

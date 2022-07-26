@@ -129,36 +129,36 @@
 </script>
 
 <svelte:window bind:innerWidth />
-<div class="flex flex-col pb-20 bg-black min-h-screen pt-4 pl-24 pr-4">
+<div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-24 pr-4">
   {#await (getTeamCard(), getTeamCardCon())}
     <MemberSkeleton searchSkeletonVisible />
   {:then}
     <div
-      class={`items-center w-full rounded-md gap-4 mt-4 bg-neutral-900 p-4 ${
+      class={`items-center w-full rounded-md gap-2 mt-2 bg-neutral-900 p-3 ${
         permissions.readMembers ? 'flex' : 'hidden'
       }`}
     >
       <button
-        class={`p-3 w-28 rounded-md ${
-          state === 'all' ? 'bg-neutral-200 text-black' : 'bg-black '
+        class={`p-2 w-20 rounded-md ${
+          state === 'all' ? 'bg-neutral-200 text-black' : 'border border-neutral-600 text-neutral-400 text-sm'
         }`}
         on:click={() => setState('all')}>All</button
       >
       <button
-        class={`p-3 w-28 rounded-md ${
-          state === 'active' ? 'bg-neutral-200 text-black' : 'bg-black '
+        class={`p-2 w-20 rounded-md ${
+          state === 'active' ? 'bg-neutral-200 text-black' : 'border border-neutral-600 text-neutral-400 text-sm'
         }`}
         on:click={() => setState('active')}>Active</button
       >
       <button
-        class={`p-3 w-28 rounded-md ${
-          state === 'inactive' ? 'bg-neutral-200 text-black' : 'bg-black '
+        class={`p-2 w-20 rounded-md ${
+          state === 'inactive' ? 'bg-neutral-200 text-black' : 'border border-neutral-600 text-neutral-400 text-sm'
         }`}
         on:click={() => setState('inactive')}>Inactive</button
       >
     </div>
     <div
-      class={`grid grid-flow-row my-8 gap-4 ${
+      class={`grid grid-flow-row my-4 h-64 gap-2 ${
         innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
       }`}
     >

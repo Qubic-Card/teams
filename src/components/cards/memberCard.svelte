@@ -121,7 +121,7 @@
     {#if $user.id === member.team_member_id.uid}
       <div class="flex flex-col justify-between">
         <div
-          class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
+          class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
         >
           <div
             class="flex cursor-pointer h-full gap-4 p-4"
@@ -159,7 +159,7 @@
             </div>
             <div class="flex flex-col justify-between">
               <div class="flex flex-col flex-wrap">
-                <h1 class="md:text-lg lg:text-xl text-left w-56">
+                <h1 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis">
                   {member?.team_member_id.team_profile.firstname === ''
                     ? 'No name'
                     : member?.team_member_id.team_profile.firstname}
@@ -167,18 +167,18 @@
                     ? ''
                     : ' ' + member?.team_member_id.team_profile.lastname}
                 </h1>
-                <h2 class="text-neutral-300 text-md">
+                <h2 class="text-neutral-300">
                   {member?.team_member_id.team_profile.job}
                 </h2>
-                <h2 class="text-neutral-300 text-md">
+                <h2 class="text-neutral-300 text-xs">
                   Joined since {new Date(member?.team_member_id.member_from)
                     .toDateString()
                     .slice(4)}
                 </h2>
               </div>
               <div>
-                <h2 class="text-neutral-300 mt-3">Card:</h2>
-                <p class="text-neutral-300">
+                <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
+                <p class="text-neutral-300 text-sm">
                   {member?.card_id?.type?.charAt(0).toUpperCase() +
                     member?.card_id?.type?.slice(1)}
                   {member?.card_id?.color?.charAt(0).toUpperCase() +
@@ -192,7 +192,7 @@
             class="flex relative w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
           >
             <p
-              class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+              class="text-white border-2 border-neutral-700 flex justify-between items-center h-8 text-sm p-2 gap-2 rounded-md relative"
             >
               {selectedRole !== ''
                 ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
@@ -213,7 +213,7 @@
   {:else}
     <div class="flex flex-col justify-between">
       <div
-        class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
+        class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
       >
         <div
           class="flex cursor-pointer h-full gap-4 p-4"
@@ -251,7 +251,7 @@
           </div>
           <div class="flex flex-col justify-between">
             <div class="flex flex-col flex-wrap">
-              <h1 class="md:text-lg lg:text-xl text-left w-56">
+              <h1 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis">
                 {member?.team_member_id.team_profile.firstname === ''
                   ? 'No name'
                   : member?.team_member_id.team_profile.firstname}
@@ -259,18 +259,18 @@
                   ? ''
                   : ' ' + member?.team_member_id.team_profile.lastname}
               </h1>
-              <h2 class="text-neutral-300 text-md">
+              <h2 class="text-neutral-300">
                 {member?.team_member_id.team_profile.job}
               </h2>
-              <h2 class="text-neutral-300 text-md">
+              <h2 class="text-neutral-300 text-xs">
                 Joined since {new Date(member?.team_member_id.member_from)
                   .toDateString()
                   .slice(4)}
               </h2>
             </div>
             <div>
-              <h2 class="text-neutral-300 mt-3">Card:</h2>
-              <p class="text-neutral-300">
+              <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
+              <p class="text-neutral-300 text-sm">
                 {member?.card_id?.type?.charAt(0).toUpperCase() +
                   member?.card_id?.type?.slice(1)}
                 {member?.card_id?.color?.charAt(0).toUpperCase() +
@@ -327,7 +327,7 @@
             {#if permissions.readRoles}
               {#if permissions.writeRoles}
                 <DropdownButton
-                  class="w-auto"
+                  class="w-60 text-sm"
                   label={selectedRole !== ''
                     ? selectedRole.charAt(0).toUpperCase() +
                       selectedRole.slice(1)
@@ -338,7 +338,7 @@
                 />
               {:else}
                 <p
-                  class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative"
+                  class="text-white border-2 border-neutral-700 flex justify-between items-center h-8 text-sm p-2 gap-2 rounded-md relative"
                 >
                   {selectedRole !== ''
                     ? selectedRole.charAt(0).toUpperCase() +
@@ -354,7 +354,7 @@
             {#if open}
               <div transition:slide|local>
                 <MenuItems
-                  class="top-20 z-40 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
+                  class="top-20 z-40 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md text-sm border border-neutral-700 p-2 w-64"
                 >
                   {#each roles as item}
                     <MenuItem
@@ -402,7 +402,7 @@
 {:else}
   <div class="flex flex-col justify-between">
     <div
-      class="flex flex-col justify-between w-full h-56 md:h-80 bg-neutral-800 rounded-md"
+      class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
     >
       <div class="flex h-full gap-4 p-4">
         <div
@@ -412,13 +412,13 @@
         </div>
         <div class="flex flex-col justify-between">
           <div class="flex flex-col flex-wrap">
-            <h1 class="md:text-lg lg:text-xl text-left w-56">
-              This card not activated yet
+            <h1 class="md:text-md lg:text-lg text-left w-56">
+              This card is inactive
             </h1>
           </div>
           <div>
-            <h2 class="text-neutral-300 mt-3">Card:</h2>
-            <p class="text-neutral-300">
+            <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
+            <p class="text-neutral-300 text-sm">
               {#if !member.status}
                 {member?.type?.charAt(0).toUpperCase() + member?.type?.slice(1)}
                 {member?.color?.charAt(0).toUpperCase() +
@@ -432,7 +432,7 @@
       </div>
 
       <div
-        class="flex relative w-full h-24 justify-between items-center bg-neutral-900 rounded-b-md p-4"
+        class="flex relative w-full h-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
       />
     </div>
   </div>
