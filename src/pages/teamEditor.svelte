@@ -106,6 +106,24 @@
     await handleSave();
   };
 
+  const handleAddBrosur = async (output, file) => {
+    let timestamp = new Date().getTime();
+    const { data } = await supabase.storage
+      .from('pdf')
+      .upload(`${$user?.id}/${timestamp}${file?.filename}`, file.file, {
+        contentType: 'application/pdf',
+      });
+
+    const { publicURL, error } = supabase.storage
+      .from('pdf')
+      .getPublicUrl(`${$user?.id}/${timestamp}${file?.filename}`);
+
+    toastSuccess('Successfully uploaded brosur');
+    pond.removeFile();
+    $teamData.brosur = publicURL;
+    await handleSave();
+  };
+
   const addLink = () => {
     $teamLinks.length < 5
       ? teamLinks.set([
@@ -309,17 +327,18 @@
                       labelIdle="Add Team Logo"
                       allowMultiple={false}
                       onpreparefile={handleCrop}
-                      imageTransformVariants={{
-                        thumb_small_: (transforms) => {
-                          transforms.resize = {
-                            size: {
-                              width: 312,
-                              height: 312,
-                            },
-                          };
-                          return transforms;
-                        },
-                      }}
+                    />
+                    <FilePond
+                      bind:this={pond}
+                      {name}
+                      credits=""
+                      allowProcess={false}
+                      class="cursor-pointer"
+                      acceptedFileTypes={['application/pdf']}
+                      instantUpload={false}
+                      labelIdle="Add Brosur"
+                      allowMultiple={false}
+                      onaddfile={handleAddBrosur}
                     />
                   </div>
                 </div>

@@ -9,7 +9,7 @@
    * The url for which the preview is to be rendered.
    */
   export let url;
-
+  export let isShowMetaImage;
   export let title;
   /**
    * The class you want to apply to the preview card container.
@@ -56,20 +56,27 @@
         {:else if !isLoading && !data} -->
 
     <!-- <img class="image" src={data.image} alt="Barca Universal" /> -->
-    <div class="LowerContainer">
-      <h3 class=" font-bold my-2">{title}</h3>
+    <div class="animate-pulse w-64 flex flex-col justify-center gap-2 pt-4">
+      {#if isShowMetaImage}
+        <div class="bg-neutral-700 h-40 w-full rounded-md" />
+      {/if}
+      <div class="bg-neutral-700 h-8 w-1/2 rounded-md" />
+      <div class="bg-neutral-700 h-8 w-1/3 rounded-md" />
+      <div class="bg-neutral-700 h-8 w-1/3 rounded-md" />
     </div>
   {:else}
-    {#if data.image}
-      <div
-        transition:fly|local={{ y: 100, duration: 2000 }}
-        class="Image"
-        style={`background-image:url(${
-          data.image != 'https://qubicrlp.herokuapp.com//img-placeholder.jpg'
-            ? data.image
-            : placeholderImg
-        })`}
-      />
+    {#if isShowMetaImage}
+      {#if data.image}
+        <div
+          transition:fly|local={{ y: 100, duration: 2000 }}
+          class="Image"
+          style={`background-image:url(${
+            data.image != 'https://qubicrlp.herokuapp.com//img-placeholder.jpg'
+              ? data.image
+              : placeholderImg
+          })`}
+        />
+      {/if}
     {/if}
     <!-- <img class="image" src={data.image} alt="Barca Universal" /> -->
     <div class="LowerContainer">

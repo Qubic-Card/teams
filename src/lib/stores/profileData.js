@@ -9,6 +9,7 @@ export const teamData = writable({
   logo: '',
   email: '',
   phone: '',
+  brosur: '',
   avatar: '',
   socials: '',
   links: '',
