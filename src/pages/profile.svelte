@@ -12,8 +12,6 @@
   } from '@lib/stores/editorStore';
   import { theme } from '@lib/profileTheme';
   import Dummy from '@lib/dummy.json';
-  import { page } from '$app/stores';
-  import { go } from '@lib/utils/forwarder';
   import {
     Tab,
     TabGroup,
@@ -24,16 +22,31 @@
   import { genvcard } from '@lib/vcard/vcardgen';
   import download from '@lib/utils/download';
   import { toastFailed } from '@lib/utils/toast';
+  import toNewTab from '@lib/utils/newTab';
 
   export let data;
   export let isEditorMode = false;
   export let profileUid;
   export let cardId;
-  // INFO: buka social media masih di tab browser yang sama
+
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
   const popup = () => toastFailed(`You can't connect to your profile`);
-  const downloadHandler = () => console.log('Brosur has been downloaded');
+
+  const downloadHandler = async () => {
+    window.open($teamData.brosur, '_blank').focus();
+
+    // fetch($teamData.brosur).then(function (t) {
+    //   return t.blob().then((b) => {
+    //     var a = document.createElement('a');
+    //     a.href = URL.createObjectURL(b);
+    //     a.setAttribute('download', $teamData.company);
+    //     a.click();
+    //   });
+    // });
+  };
+
+  $: console.log($teamData);
 </script>
 
 <div class={`${currentTheme.pageBackground} ${$$props.class}`}>
@@ -128,50 +141,47 @@
             class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
           >
             <h1>Know more about us</h1>
-            <p class="text-neutral-400">Download brosur starbucks</p>
+            <p class="text-neutral-400">Download brosur {$teamData.company}</p>
           </div>
-          <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-            {#each isEditorMode ? $teamSocials : data.socials as item}
-              {#if item.isActive}
-                <BorderButton
-                  on:click={() => {
-                    go(
-                      item.type,
-                      item.data,
-                      $page.url.searchParams.get('type'),
-                      cardId,
-                      profileUid
-                    );
-                  }}
-                  class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
-                  ><img
-                    src={socialIcons[item.type]}
-                    width="32"
-                    height="32"
-                    alt=""
-                  /></BorderButton
-                >
-              {/if}
-            {/each}
-          </div>
+          <div class={currentTheme.text}>
+            <div class="flex justify-between flex-wrap items-start gap-1 my-1">
+              {#each isEditorMode ? $teamSocials : data.socials as item}
+                {#if item.isActive}
+                  <BorderButton
+                    on:click={() => {
+                      toNewTab(item.type, item.data);
+                    }}
+                    class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+                    ><img
+                      src={socialIcons[item.type]}
+                      width="32"
+                      height="32"
+                      alt=""
+                    /></BorderButton
+                  >
+                {/if}
+              {/each}
+            </div>
 
-          <div class="gap-2 flex flex-col justify-center items-center pb-5">
-            {#each isEditorMode ? $teamLinks : data.links as item}
-              {#if item.isActive}
-                <BorderButton
-                  class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-                  ><div class="p-2">
-                    <LinkPreview
-                      title={item.title}
-                      url={item.link}
-                      className={currentTheme.secondary}
-                      {profileUid}
-                      {cardId}
-                    />
-                  </div></BorderButton
-                >
-              {/if}
-            {/each}
+            <div class="gap-2 flex flex-col justify-center items-center pb-5">
+              {#each isEditorMode ? $teamLinks : data.links as item}
+                {#if item.isActive}
+                  <BorderButton
+                    class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+                    ><div class="p-2">
+                      <LinkPreview
+                        isShowMetaImage={$teamData.isShowMetaImage}
+                        title={item.title}
+                        url={item.link}
+                        className={currentTheme.secondary}
+                        {profileUid}
+                        {cardId}
+                      />
+                    </div></BorderButton
+                  >
+                {/if}
+              {/each}
+            </div>
           </div>
         </div>
       </TabPanel>
@@ -183,13 +193,7 @@
               {#if item.isActive}
                 <BorderButton
                   on:click={() => {
-                    go(
-                      item.type,
-                      item.data,
-                      $page.url.searchParams.get('type'),
-                      cardId,
-                      profileUid
-                    );
+                    toNewTab(item.type, item.data);
                   }}
                   class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
                   ><img
@@ -211,6 +215,7 @@
                   class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
                   ><div class="p-2">
                     <LinkPreview
+                      isShowMetaImage={data.isShowMetaImage}
                       title={item.title}
                       url={item.link}
                       className={currentTheme.secondary}

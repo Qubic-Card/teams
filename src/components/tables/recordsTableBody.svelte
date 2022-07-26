@@ -23,15 +23,15 @@
   };
 
   const downloadCsv = async (filename) => {
-    const { publicURL, error } = await supabase.storage
+    const { signedURL, error } = await supabase.storage
       .from('records')
-      .getPublicUrl(`${teamId}/${$user?.id}/${filename}`);
+      .createSignedUrl(`${teamId}/${$user?.id}/${filename}`, 60);
 
     if (error) {
       console.log(error);
       toastFailed();
     } else {
-      fetch(publicURL)
+      fetch(signedURL)
         .then((resp) => resp.blob())
         .then((blob) => {
           const url = window.URL.createObjectURL(blob);
