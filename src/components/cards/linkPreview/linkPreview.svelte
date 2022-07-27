@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
   import './LinkPreview.css';
   import { fly } from 'svelte/transition';
-  import { log } from '@lib/logger/logger';
   import { user } from '@lib/stores/userStore';
 
   /**
@@ -15,8 +14,6 @@
    * The class you want to apply to the preview card container.
    */
   export let className = '';
-  export let profileUid;
-  export let cardId;
 
   let data;
   let isLoading = false;
@@ -40,7 +37,6 @@
     isLoading = false;
   }
   async function clickHandler(e) {
-    await log(`Your link ${url} was opened`, 'INFO', url, cardId, profileUid);
     await goto(url);
   }
   const proxyUrl = 'https://qubicrlp.herokuapp.com/v2';
@@ -51,7 +47,7 @@
 </script>
 
 <div class={`Container ${className}`} on:click={clickHandler}>
-  {#if isLoading || !data}
+  {#if isLoading}
     <!-- <div class="Image flex justify-center items-center"><Spinner class="h-20 w-20"/></div>
         {:else if !isLoading && !data} -->
 
@@ -64,6 +60,8 @@
       <div class="bg-neutral-700 h-8 w-1/3 rounded-md" />
       <div class="bg-neutral-700 h-8 w-1/3 rounded-md" />
     </div>
+  {:else if !data}
+    <h3 class=" font-bold my-2">{title ?? data.title}</h3>
   {:else}
     {#if isShowMetaImage}
       {#if data.image}
