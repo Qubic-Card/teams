@@ -159,7 +159,9 @@
             </div>
             <div class="flex flex-col justify-between">
               <div class="flex flex-col flex-wrap">
-                <h1 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis">
+                <h1
+                  class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
+                >
                   {member?.team_member_id.team_profile.firstname === ''
                     ? 'No name'
                     : member?.team_member_id.team_profile.firstname}
@@ -251,7 +253,9 @@
           </div>
           <div class="flex flex-col justify-between">
             <div class="flex flex-col flex-wrap">
-              <h1 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis">
+              <h1
+                class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
+              >
                 {member?.team_member_id.team_profile.firstname === ''
                   ? 'No name'
                   : member?.team_member_id.team_profile.firstname}
@@ -384,7 +388,7 @@
                       selectRole(roleId[1].name);
                     }}
                   >
-                    Member
+                    Default
                   </MenuItem>
                 </MenuItems>
               </div>

@@ -26,27 +26,13 @@
 
   export let data;
   export let isEditorMode = false;
-  export let profileUid;
-  export let cardId;
 
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
   const popup = () => toastFailed(`You can't connect to your profile`);
 
-  const downloadHandler = async () => {
+  const downloadHandler = async () =>
     window.open($teamData.brosur, '_blank').focus();
-
-    // fetch($teamData.brosur).then(function (t) {
-    //   return t.blob().then((b) => {
-    //     var a = document.createElement('a');
-    //     a.href = URL.createObjectURL(b);
-    //     a.setAttribute('download', $teamData.company);
-    //     a.click();
-    //   });
-    // });
-  };
-
-  $: console.log($teamData);
 </script>
 
 <div class={`text-sm ${currentTheme.pageBackground} ${$$props.class}`}>

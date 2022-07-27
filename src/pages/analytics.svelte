@@ -2,7 +2,6 @@
   import supabase from '@lib/db.js';
   import AnalyticTable from '@comp/tables/analyticTable.svelte';
   import { user, userChangeTimestamp } from '@lib/stores/userStore.js';
-  import AnalyticsSkeleton from '@comp/skeleton/analyticsSkeleton.svelte';
   import { getMemberId } from '@lib/query/getId';
   import {
     last3Days,
@@ -16,9 +15,7 @@
   import { onMount } from 'svelte';
   import ChartEl from '@comp/chart.svelte';
   import Chart from 'chart.js/auto/auto.js';
-  import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
   import { analyticsChartConfig } from '@lib/constants';
-  import { getConnectionsCsv } from '@lib/utils/getCsvData';
   import PersonalAnalyticsCard from '@comp/cards/personalAnalyticsCard.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
@@ -29,7 +26,6 @@
   let activity = [];
   let dateConnected = [];
   let userLogs = [];
-  $: console.log("change", $userChangeTimestamp)
   let loading = false;
 
   let itemsPerPage = 10;
@@ -119,14 +115,14 @@
     loading = true;
 
     let minTime = new Date(
-          selectedDays === '7 Days'
-            ? last7Days[0]
-            : selectedDays === '14 Days'
-            ? last14Days[0]
-            : selectedDays === '30 Days'
-            ? last30Days[0]
-            : last3Days[0]
-        ).toUTCString();
+      selectedDays === '7 Days'
+        ? last7Days[0]
+        : selectedDays === '14 Days'
+        ? last14Days[0]
+        : selectedDays === '30 Days'
+        ? last30Days[0]
+        : last3Days[0]
+    ).toUTCString();
 
     let {
       data: connection_profile,
@@ -160,14 +156,14 @@
     loading = true;
 
     let minTime = new Date(
-          selectedDays === '7 Days'
-            ? last7Days[0]
-            : selectedDays === '14 Days'
-            ? last14Days[0]
-            : selectedDays === '30 Days'
-            ? last30Days[0]
-            : last3Days[0]
-        ).toISOString();
+      selectedDays === '7 Days'
+        ? last7Days[0]
+        : selectedDays === '14 Days'
+        ? last14Days[0]
+        : selectedDays === '30 Days'
+        ? last30Days[0]
+        : last3Days[0]
+    ).toISOString();
 
     let {
       data: logs,

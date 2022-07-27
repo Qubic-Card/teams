@@ -2,7 +2,6 @@
   import { goto } from '$app/navigation';
   import './LinkPreview.css';
   import { fly } from 'svelte/transition';
-  import { user } from '@lib/stores/userStore';
 
   /**
    * The url for which the preview is to be rendered.
@@ -48,10 +47,6 @@
 
 <div class={`Container ${className}`} on:click={clickHandler}>
   {#if isLoading}
-    <!-- <div class="Image flex justify-center items-center"><Spinner class="h-20 w-20"/></div>
-        {:else if !isLoading && !data} -->
-
-    <!-- <img class="image" src={data.image} alt="Barca Universal" /> -->
     <div class="animate-pulse w-64 flex flex-col justify-center gap-2 pt-4">
       {#if isShowMetaImage}
         <div class="bg-neutral-700 h-40 w-full rounded-md" />
@@ -76,7 +71,6 @@
         />
       {/if}
     {/if}
-    <!-- <img class="image" src={data.image} alt="Barca Universal" /> -->
     <div class="LowerContainer">
       <h3 class=" font-bold my-2">{title ?? data.title}</h3>
       {#if data.description}
