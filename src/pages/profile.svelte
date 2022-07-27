@@ -26,30 +26,16 @@
 
   export let data;
   export let isEditorMode = false;
-  export let profileUid;
-  export let cardId;
 
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
   const popup = () => toastFailed(`You can't connect to your profile`);
 
-  const downloadHandler = async () => {
+  const downloadHandler = async () =>
     window.open($teamData.brosur, '_blank').focus();
-
-    // fetch($teamData.brosur).then(function (t) {
-    //   return t.blob().then((b) => {
-    //     var a = document.createElement('a');
-    //     a.href = URL.createObjectURL(b);
-    //     a.setAttribute('download', $teamData.company);
-    //     a.click();
-    //   });
-    // });
-  };
-
-  $: console.log($teamData);
 </script>
 
-<div class={`${currentTheme.pageBackground} ${$$props.class}`}>
+<div class={`text-sm ${currentTheme.pageBackground} ${$$props.class}`}>
   <!-- HEAD -->
   <div class="w-full h-40 p-4">
     <img
@@ -98,21 +84,18 @@
     </BorderButton>
   </div>
   <TabGroup class="flex flex-col items-center w-full text-white mt-4">
-    <TabList
-      class="flex w-2/3 bg-black border-2 border-neutral-700 rounded-lg p-2"
-    >
+    <TabList class="flex w-2/3 h-16 rounded-lg p-2">
       <Tab
         class={({ selected }) =>
           selected
-            ? 'bg-white text-black p-2 rounded-l-lg w-1/2'
-            : 'bg-neutral-800 text-white p-2 rounded-l-lg w-1/2'}>Team</Tab
+            ? 'border-b-2 border-neutral-300 w-1/2'
+            : 'border-b-2 border-neutral-700 w-1/2'}>Team</Tab
       >
       <Tab
         class={({ selected }) =>
           selected
-            ? 'bg-white text-black p-2 rounded-r-lg w-1/2'
-            : 'bg-neutral-800 text-white p-2 rounded-r-lg w-1/2'}
-        >My Contact</Tab
+            ? 'border-b-2 border-neutral-300 w-1/2'
+            : 'border-b-2 border-neutral-700 w-1/2'}>My Contact</Tab
       >
     </TabList>
     <TabPanels class="w-full">
@@ -174,8 +157,6 @@
                         title={item.title}
                         url={item.link}
                         className={currentTheme.secondary}
-                        {profileUid}
-                        {cardId}
                       />
                     </div></BorderButton
                   >
@@ -219,8 +200,6 @@
                       title={item.title}
                       url={item.link}
                       className={currentTheme.secondary}
-                      {profileUid}
-                      {cardId}
                     />
                   </div></BorderButton
                 >

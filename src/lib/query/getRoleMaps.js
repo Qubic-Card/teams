@@ -18,7 +18,8 @@ export const getAllRoleByTeam = async (teamId) => {
   const { data, error } = await supabase
     .from('team_roles')
     .select('role_name, id')
-    .eq('team_id', teamId);
+    .eq('team_id', teamId)
+    .order('created_at', { ascending: true });
 
   if (error) console.log(error);
 

@@ -59,7 +59,7 @@
 
 <div class={`flex flex-col md:text-base text-sm ${$$props.class}`}>
   <h1
-    transition:fade|local={{ duration: 500 }}
+    in:fade|local={{ duration: 500 }}
     class={`text-gray-400 after:content-['*'] after:ml-0.5 ${
       value === '' && isEmptyChecking ? 'after:text-red-500' : 'after:hidden'
     }`}
@@ -68,7 +68,7 @@
   </h1>
   <div class={'relative'}>
     <input
-      transition:fade|local={{ duration: 300 }}
+      in:fade|local={{ duration: 300 }}
       on:change
       on:focus={() => (focus = true)}
       on:blur={() => (focus = false)}

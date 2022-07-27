@@ -159,7 +159,9 @@
             </div>
             <div class="flex flex-col justify-between">
               <div class="flex flex-col flex-wrap">
-                <h1 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis">
+                <h1
+                  class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
+                >
                   {member?.team_member_id.team_profile.firstname === ''
                     ? 'No name'
                     : member?.team_member_id.team_profile.firstname}
@@ -179,8 +181,12 @@
               <div>
                 <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
                 <p class="text-neutral-300 text-sm">
-                  {member?.card_id?.type?.charAt(0).toUpperCase() +
-                    member?.card_id?.type?.slice(1)}
+                  {#if member?.type === 'pvc'}
+                    PVC
+                  {:else}
+                    {member?.card_id?.type?.charAt(0).toUpperCase() +
+                      member?.card_id?.type?.slice(1)}
+                  {/if}
                   {member?.card_id?.color?.charAt(0).toUpperCase() +
                     member?.card_id?.color?.slice(1)}
                 </p>
@@ -251,7 +257,9 @@
           </div>
           <div class="flex flex-col justify-between">
             <div class="flex flex-col flex-wrap">
-              <h1 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis">
+              <h1
+                class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
+              >
                 {member?.team_member_id.team_profile.firstname === ''
                   ? 'No name'
                   : member?.team_member_id.team_profile.firstname}
@@ -271,8 +279,12 @@
             <div>
               <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
               <p class="text-neutral-300 text-sm">
-                {member?.card_id?.type?.charAt(0).toUpperCase() +
-                  member?.card_id?.type?.slice(1)}
+                {#if member?.type === 'pvc'}
+                  PVC
+                {:else}
+                  {member?.card_id?.type?.charAt(0).toUpperCase() +
+                    member?.card_id?.type?.slice(1)}
+                {/if}
                 {member?.card_id?.color?.charAt(0).toUpperCase() +
                   member?.card_id?.color?.slice(1)}
               </p>
@@ -420,7 +432,12 @@
             <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
             <p class="text-neutral-300 text-sm">
               {#if !member.status}
-                {member?.type?.charAt(0).toUpperCase() + member?.type?.slice(1)}
+                {#if member?.type === 'pvc'}
+                  PVC
+                {:else}
+                  {member?.type?.charAt(0).toUpperCase() +
+                    member?.type?.slice(1)}
+                {/if}
                 {member?.color?.charAt(0).toUpperCase() +
                   member?.color?.slice(1)}
               {:else}

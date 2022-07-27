@@ -5,13 +5,18 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import { setUserData, user, userChangeTimestamp, userData } from '@lib/stores/userStore';
+  import {
+    setUserData,
+    user,
+    userChangeTimestamp,
+    userData,
+  } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
-import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
+  import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -40,15 +45,12 @@ import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
-  let y;
-  $: console.log(y);
 </script>
 
 <svelte:head>
   <title>Qubic Card | Teams</title>
 </svelte:head>
 
-<svelte:window bind:scrollY={y} />
 <AuthWrapper>
   <div class="relative min-h-screen">
     <div

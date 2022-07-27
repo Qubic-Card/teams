@@ -25,7 +25,7 @@
         .from('team_roles')
         .select('*')
         .eq('team_id', teamId)
-        .order('id', { ascending: true });
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
 

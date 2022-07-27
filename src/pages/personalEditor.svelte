@@ -355,7 +355,6 @@
                         },
                       }}
                     />
-                    <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
                     <SelectBackgroundModal
                       on:searchQuery={searchQuery}
                       {unsplashDatas}
@@ -569,7 +568,7 @@
                       on:change={handleSave}
                     />
 
-                    <p>Show meta image for links (if available).</p>
+                    <p>Show URL image if available.</p>
                   </label>
                   {#each $links as item, i}
                     <div class="p-3 flex">

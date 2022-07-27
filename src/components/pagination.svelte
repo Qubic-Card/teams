@@ -26,7 +26,7 @@
   {#each totalPages as page, i}
     {#if i === active - 2 && i !== totalPages[0]}
       <div
-        class="text-center rounded-md cursor-pointer w-auto p-2 m-1 text-black hover:bg-black/70 hover:text-white border-2 border-neutral-700"
+        class="text-center rounded-md cursor-pointer w-auto p-2 m-1 text-white hover:bg-black/70 hover:text-white border-2 border-neutral-700"
         on:click={() => setPage(0)}
       >
         1
@@ -68,7 +68,7 @@
     {/if}
     {#if i === active + 1 && i !== totalPages.length - 1}
       <div
-        class="text-center cursor-pointer w-auto p-2 m-1 text-black hover:bg-black/70 hover:text-white border-2 border-neutral-700"
+        class="text-center cursor-pointer w-auto p-2 m-1 text-white hover:bg-black/70 hover:text-white border-2 border-neutral-700"
         on:click={() => setPage(totalPages.length - 1)}
       >
         {totalPages.length}

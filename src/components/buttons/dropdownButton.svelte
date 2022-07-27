@@ -1,6 +1,8 @@
 <script>
   import { MenuButton } from '@rgossiaux/svelte-headlessui';
   export let label = 'Dropdown Button';
+
+  $: if (label === 'Superadmin') label = 'Super Admin';
 </script>
 
 <MenuButton
