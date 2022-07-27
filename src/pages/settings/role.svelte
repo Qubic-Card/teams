@@ -56,8 +56,8 @@
         <AddRoleModal isHasWriteRolePermission={permissions.writeRoles} />
       {/if}
     </div>
-    <h1 class="p-4 text-sm">Superadmin</h1>
-    <h1 class="p-4 text-sm">Default</h1>
+    <h1 class="p-4 text-sm">Super Admin</h1>
+    <h1 class="p-4 text-sm">Member</h1>
     {#if $teamRoles.length > 0}
       {#each $teamRoles as role}
         <Disclosure let:open>
@@ -105,10 +105,6 @@
           {/if}
         </Disclosure>
       {/each}
-    {:else}
-      <div class="flex justify-center items-center">
-        <p class="text-xl text-center">No roles found</p>
-      </div>
     {/if}
   </div>
   <div class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-xl">

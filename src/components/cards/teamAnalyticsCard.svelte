@@ -1,6 +1,8 @@
 <script>
   export let item = null;
   export let selectedDays = '';
+
+  $: isNaN(item.percentage) ? (item.percentage = 0) : item.percentage;
 </script>
 
 <div

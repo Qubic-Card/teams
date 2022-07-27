@@ -518,7 +518,7 @@
                       </div>
                     {/each}
                   {:else}
-                    <div class="flex flex-col items-center justify-center">
+                    <div class="flex flex-col mt-2 items-center justify-center">
                       <p class="text-lg text-neutral-500">
                         No social media yet
                       </p>
@@ -553,7 +553,7 @@
                       on:change={handleSave}
                     />
 
-                    <p>Show meta image for links (if available).</p>
+                    <p>Show URL image if available.</p>
                   </label>
                   {#if $teamLinks.length > 0}
                     {#each $teamLinks as item, i}
@@ -627,10 +627,8 @@
                       </div>
                     {/each}
                   {:else}
-                    <div class="flex flex-col items-center justify-center">
-                      <p class="text-lg text-neutral-500">
-                        No social media yet
-                      </p>
+                    <div class="flex flex-col items-center mt-2 justify-center">
+                      <p class="text-lg text-neutral-500">No links yet</p>
                     </div>
                   {/if}
                 </div>

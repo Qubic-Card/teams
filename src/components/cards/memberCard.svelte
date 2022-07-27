@@ -181,8 +181,12 @@
               <div>
                 <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
                 <p class="text-neutral-300 text-sm">
-                  {member?.card_id?.type?.charAt(0).toUpperCase() +
-                    member?.card_id?.type?.slice(1)}
+                  {#if member?.type === 'pvc'}
+                    PVC
+                  {:else}
+                    {member?.card_id?.type?.charAt(0).toUpperCase() +
+                      member?.card_id?.type?.slice(1)}
+                  {/if}
                   {member?.card_id?.color?.charAt(0).toUpperCase() +
                     member?.card_id?.color?.slice(1)}
                 </p>
@@ -275,8 +279,12 @@
             <div>
               <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
               <p class="text-neutral-300 text-sm">
-                {member?.card_id?.type?.charAt(0).toUpperCase() +
-                  member?.card_id?.type?.slice(1)}
+                {#if member?.type === 'pvc'}
+                  PVC
+                {:else}
+                  {member?.card_id?.type?.charAt(0).toUpperCase() +
+                    member?.card_id?.type?.slice(1)}
+                {/if}
                 {member?.card_id?.color?.charAt(0).toUpperCase() +
                   member?.card_id?.color?.slice(1)}
               </p>
@@ -388,7 +396,7 @@
                       selectRole(roleId[1].name);
                     }}
                   >
-                    Default
+                    Member
                   </MenuItem>
                 </MenuItems>
               </div>
@@ -424,7 +432,12 @@
             <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
             <p class="text-neutral-300 text-sm">
               {#if !member.status}
-                {member?.type?.charAt(0).toUpperCase() + member?.type?.slice(1)}
+                {#if member?.type === 'pvc'}
+                  PVC
+                {:else}
+                  {member?.type?.charAt(0).toUpperCase() +
+                    member?.type?.slice(1)}
+                {/if}
                 {member?.color?.charAt(0).toUpperCase() +
                   member?.color?.slice(1)}
               {:else}
