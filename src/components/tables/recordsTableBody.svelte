@@ -67,6 +67,7 @@
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
     <ConfirmationModal
       isDelete
+      isIconVisible
       heading="Are you sure you want to delete"
       text={`${record.profileData?.firstname ?? record?.name}
       ${record.profileData?.lastname ?? ''} ?`}

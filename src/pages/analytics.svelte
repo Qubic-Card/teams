@@ -172,7 +172,7 @@
     } = await supabase
       .from('team_logs')
       .select(
-        'created_at, data->card, data->message, type, team, team_member(*)',
+        'created_at, data->card, data->message, type, team, team_member(*), platform',
         {
           count: 'estimated',
         }

@@ -1,10 +1,18 @@
 <script>
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
 
-  export let text, heading, buttonLabel, showModal, toggleModal, isDelete;
+  export let text,
+    heading,
+    buttonLabel,
+    showModal,
+    toggleModal,
+    isDelete,
+    isIconVisible;
+
+  // Button Cancel
 </script>
 
-{#if isDelete}
+{#if isIconVisible}
   <img
     src="/delete-icon.svg"
     alt=""
@@ -30,14 +38,21 @@
         This action cannot be undone.
       </p>
     {/if}
-    <button
-      on:click
-      class={`text-lg font-semibold ${
-        isDelete
-          ? 'text-red-600'
-          : 'text-white bg-blue-600 border-0 hover:bg-blue-600/80'
-      } p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800`}
-      >{buttonLabel ?? 'Action'}
-    </button>
+    <div class="flex gap-2 w-full">
+      <button
+        on:click={toggleModal}
+        class="text-lg font-semibold text-white p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800"
+        >Cancel</button
+      >
+      <button
+        on:click
+        class={`text-lg font-semibold ${
+          isDelete
+            ? 'text-red-600'
+            : 'text-white bg-blue-600 hover:bg-blue-600/80'
+        } p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800`}
+        >{buttonLabel ?? 'Action'}
+      </button>
+    </div>
   </div>
 </ModalWrapper>

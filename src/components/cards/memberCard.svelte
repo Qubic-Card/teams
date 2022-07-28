@@ -118,9 +118,11 @@
     }
   };
 
-  $: if (member.team_member_id) getMembersRole();
+  let showDeleteMemberModal = false;
+  const toggleDeleteMemberModal = () =>
+    (showDeleteMemberModal = !showDeleteMemberModal);
 
-  $: console.log(member.team_member_id);
+  $: if (member.team_member_id) getMembersRole();
 </script>
 
 <ConfirmationModal
@@ -132,6 +134,19 @@
     await setMemberRole(roleID);
     selectRole(roleName);
     showModal = false;
+  }}
+/>
+
+<ConfirmationModal
+  isDelete
+  heading="Are you sure you want to delete"
+  text="yourself from team?"
+  buttonLabel="Delete"
+  showModal={showDeleteMemberModal}
+  toggleModal={toggleDeleteMemberModal}
+  on:click={async () => {
+    await deleteMemberHandler(member?.team_member_id?.id, member);
+    showDeleteMemberModal = false;
   }}
 />
 
@@ -200,7 +215,7 @@
               <div>
                 <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
                 <p class="text-neutral-300 text-sm">
-                  {#if member?.type === 'pvc'}
+                  {#if member?.card_id?.type === 'pvc'}
                     PVC
                   {:else}
                     {member?.card_id?.type?.charAt(0).toUpperCase() +
@@ -298,7 +313,7 @@
             <div>
               <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
               <p class="text-neutral-300 text-sm">
-                {#if member?.type === 'pvc'}
+                {#if member?.card_id?.type === 'pvc'}
                   PVC
                 {:else}
                   {member?.card_id?.type?.charAt(0).toUpperCase() +
@@ -337,11 +352,16 @@
                 class="top-0 right-0 z-50 relative mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-700 p-2 w-64"
               >
                 <MenuItem
-                  on:click={async () =>
-                    await deleteMemberHandler(
-                      member?.team_member_id?.id,
-                      member
-                    )}
+                  on:click={async () => {
+                    if ($user?.id === member.team_member_id.uid) {
+                      toggleDeleteMemberModal();
+                    } else {
+                      await deleteMemberHandler(
+                        member?.team_member_id?.id,
+                        member
+                      );
+                    }
+                  }}
                   class="flex hover:bg-neutral-800 text-red-600 px-2 py-2 rounded-md cursor-pointer"
                 >
                   Remove user

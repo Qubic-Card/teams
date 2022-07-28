@@ -308,7 +308,11 @@
                     />
                   </div>
                   <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
-                  <div class={`p-3 ${permissions.writeTeam ? '' : 'hidden'}`}>
+                  <div
+                    class={`grid grid-cols-2 gap-2 px-3 pt-3 ${
+                      permissions.writeTeam ? '' : 'hidden'
+                    }`}
+                  >
                     <FilePond
                       bind:this={pond}
                       {name}

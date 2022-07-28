@@ -116,7 +116,7 @@
               />
               <h1>{$teamData.company ?? '-'}</h1>
             </div>
-            <p>{$teamData.address ?? '-'}</p>
+            <p class="text-xs">{$teamData.address ?? '-'}</p>
             <p class="text-xs text-neutral-400">
               {$teamData.description ?? '-'}
             </p>

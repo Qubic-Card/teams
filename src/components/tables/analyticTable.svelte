@@ -38,7 +38,7 @@
               </td>
               <td class="pl-4 w-auto">{row.message}</td>
               <td class="flex flex-col h-[40px] justify-center">
-                {row.platform ?? 'Unknown'}
+                {row?.platform ?? 'Unknown'}
               </td>
             </tr>
           {/each}

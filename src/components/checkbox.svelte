@@ -43,97 +43,97 @@
 </script>
 
 <div class="border border-neutral-600 mt-3 p-2 rounded">
-<h1 class="font-bold text-sm my-4 ml-2 self-start">Super Admin</h1>
-{#each superAdminCheckbox as checkbox}
-  <div
-    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
-  >
-    <div class="block">
-      <div class="mt-2">
-        <label
-          class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
-        >
-          <input
-            type="checkbox"
-            class="w-7 h-7 cursor-pointer disabled:cursor-default"
-            bind:group={checked}
-            value={checkbox.name}
-            on:change={clicked}
-            disabled={!isHasWriteRolePermission || isSuperAdmin}
-          />
+  <h1 class="font-bold text-sm my-4 ml-2 self-start">Super Admin</h1>
+  {#each superAdminCheckbox as checkbox}
+    <div
+      class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+    >
+      <div class="block">
+        <div class="mt-2">
+          <label
+            class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
+          >
+            <input
+              type="checkbox"
+              class="w-5 h-5 cursor-pointer disabled:cursor-default"
+              bind:group={checked}
+              value={checkbox.name}
+              on:change={clicked}
+              disabled={!isHasWriteRolePermission}
+            />
 
-          <p class="ml-4 w-72">
-            {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
-          </p>
-        </label>
+            <p class="ml-4 w-72">
+              {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
+            </p>
+          </label>
+        </div>
       </div>
+      <p class="w-1/2">
+        {checkbox.desc}
+      </p>
     </div>
-    <p class="w-1/2">
-      {checkbox.desc}
-    </p>
-  </div>
-{/each}
+  {/each}
 
-<h1 class="font-bold text-sm my-4 ml-2 self-start">Read</h1>
-{#each readCheckbox as checkbox}
-  <div
-    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
-  >
-    <div class="block">
-      <div class="mt-2">
-        <label
-          class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
-        >
-          <input
-            type="checkbox"
-            class="w-7 h-7 cursor-pointer disabled:cursor-default"
-            bind:group={checked}
-            value={checkbox.name}
-            on:change={clicked}
-            disabled={!isHasWriteRolePermission || isSuperAdmin}
-          />
+  <h1 class="font-bold text-sm my-4 ml-2 self-start">Read</h1>
+  {#each readCheckbox as checkbox}
+    <div
+      class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+    >
+      <div class="block">
+        <div class="mt-2">
+          <label
+            class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
+          >
+            <input
+              type="checkbox"
+              class="w-5 h-5 cursor-pointer disabled:cursor-default"
+              bind:group={checked}
+              value={checkbox.name}
+              on:change={clicked}
+              disabled={!isHasWriteRolePermission || isSuperAdmin}
+            />
 
-          <p class="ml-4 w-72">
-            {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
-          </p>
-        </label>
+            <p class="ml-4 w-72">
+              {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
+            </p>
+          </label>
+        </div>
       </div>
+      <p class="w-1/2">
+        {checkbox.desc}
+      </p>
     </div>
-    <p class="w-1/2">
-      {checkbox.desc}
-    </p>
-  </div>
-{/each}
+  {/each}
 
-<h1 class="font-bold text-sm my-4 ml-2 self-start">Write</h1>
-{#each writeCheckbox as checkbox}
-  <div
-    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
-  >
-    <div class="block">
-      <div class="mt-2">
-        <label
-          on:click={clicked}
-          class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
-        >
-          <input
-            type="checkbox"
-            class="w-7 h-7 cursor-pointer disabled:cursor-default"
-            bind:group={checked}
-            value={checkbox.name}
-            on:change={clicked}
-            disabled={!isHasWriteRolePermission || isSuperAdmin}
-          />
+  <h1 class="font-bold text-sm my-4 ml-2 self-start">Write</h1>
+  {#each writeCheckbox as checkbox}
+    <div
+      class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+    >
+      <div class="block">
+        <div class="mt-2">
+          <label
+            on:click={clicked}
+            class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
+          >
+            <input
+              type="checkbox"
+              class="w-5 h-5 cursor-pointer disabled:cursor-default"
+              bind:group={checked}
+              value={checkbox.name}
+              on:change={clicked}
+              disabled={!isHasWriteRolePermission || isSuperAdmin}
+            />
 
-          <p class="ml-4 w-72">
-            {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
-          </p>
-        </label>
+            <p class="ml-4 w-72">
+              {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
+            </p>
+          </label>
+        </div>
       </div>
+      <p class="w-1/2">
+        {checkbox.desc}
+      </p>
     </div>
-    <p class="w-1/2">
-      {checkbox.desc}
-    </p>
-  </div>
-{/each}
+  {/each}
 </div>

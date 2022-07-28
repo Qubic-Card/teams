@@ -49,7 +49,7 @@
         // location.reload();
       }
     } catch (error) {
-      toastFailed();
+      toastFailed(error.message);
       loading = false;
     }
   };

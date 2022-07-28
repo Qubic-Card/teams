@@ -51,6 +51,7 @@
     />
     <ConfirmationModal
       isDelete
+      isIconVisible
       heading="Are you sure you want to delete"
       text={`${connection.profileData?.firstname ?? connection?.name}
       ${connection.profileData?.lastname ?? ''} ?`}

@@ -96,17 +96,24 @@
     }
   };
 
-  // eac9c236-da25-4d9c-a058-632bd92bc951
-  // cf682da6-c300-4078-8088-f85993eda24d
+  const getAllData = async () => {
+    await getTeamCard();
+    await getTeamCardCon();
 
-  $: cards.map((item, i) => {
-    if (teamCardCon[i] !== undefined) {
-      activeMembers = [...activeMembers, teamCardCon[i]];
-      inactiveCards = [];
-    } else {
-      inactiveCards = [...inactiveCards, cards[i]];
+    if (cards.length > 0 && teamCardCon.length > 0) {
+      cards.map((item, i) => {
+        if (teamCardCon[i] !== undefined) {
+          activeMembers = [...activeMembers, teamCardCon[i]];
+          inactiveCards = [];
+        } else {
+          inactiveCards = [...inactiveCards, cards[i]];
+        }
+      });
+
+      await getUserCardId();
+      activeMembers = moveArrItemToFront(activeMembers, userCardId);
     }
-  });
+  };
 
   $: {
     $userData?.filter((item) => {
@@ -114,12 +121,8 @@
       if (item === 'allow_write_roles') permissions.writeRoles = true;
       if (item === 'allow_read_roles') permissions.readRoles = true;
     });
-
-    if (activeMembers) {
-      getUserCardId();
-      activeMembers = moveArrItemToFront(activeMembers, userCardId);
-    }
   }
+
   $: currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
   $: allMember = [...activeMembers, ...inactiveCards];
   $: paginate(allMember);
@@ -129,7 +132,7 @@
 
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-24 pr-4">
-  {#await (getTeamCard(), getTeamCardCon())}
+  {#await getAllData()}
     <MemberSkeleton searchSkeletonVisible />
   {:then}
     <div

@@ -40,7 +40,7 @@
       value = value.replace(value, '62' + value);
     }
 
-    if (whatsapp.charAt(0) !== '+' && !numberRegex(value)) {
+    if (!numberRegex(value)) {
       isWhatsappInvalid = true;
     } else {
       isWhatsappInvalid = false;
@@ -93,6 +93,7 @@
       >Please use a valid country code and phone number</small
     >
   {/if}
+
   {#if isInstagramInput && isInstagramInvalid}
     <small class="text-red-500 absolute mt-20"
       >Instagram doesn't require "@"</small
