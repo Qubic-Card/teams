@@ -26,7 +26,11 @@
 
   export let data;
   export let isEditorMode = false;
+  // 09fb5818-c8ce-4b12-bfbb-f939d7da7321 card
+  // 402ef83e-5627-4273-8086-48d88000d200 team
+  // 3c5c060b-3066-4da0-9e7b-fe557186b27a uid
 
+  // 639ea8b6-9aef-4138-80c1-0c67ab0b25f7 izmi card
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
   const popup = () => toastFailed(`You can't connect to your profile`);
@@ -104,18 +108,16 @@
           <div
             class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"
           >
-            <div class="flex">
+            <div class="flex items-center">
               <img
                 src={$teamData.logo !== '' ? $teamData.logo : Dummy.avatar}
                 alt=""
                 class="rounded-lg w-16 h-16 mr-2"
               />
-              <div>
-                <h1>{$teamData.company ?? '-'}</h1>
-                <p>{$teamData.address ?? '-'}</p>
-              </div>
+              <h1>{$teamData.company ?? '-'}</h1>
             </div>
-            <p class="text-neutral-400">
+            <p>{$teamData.address ?? '-'}</p>
+            <p class="text-xs text-neutral-400">
               {$teamData.description ?? '-'}
             </p>
           </div>
@@ -124,7 +126,9 @@
             class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
           >
             <h1>Know more about us</h1>
-            <p class="text-neutral-400">Download brosur {$teamData.company}</p>
+            <p class="text-xs text-neutral-400">
+              Download brochure {$teamData.company}
+            </p>
           </div>
           <div class={currentTheme.text}>
             <div class="flex justify-between flex-wrap items-start gap-1 my-1">

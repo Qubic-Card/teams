@@ -9,7 +9,6 @@
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
-  import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
   let teamId = Cookies.get('qubicTeamId');
   let permissions = {
@@ -140,19 +139,25 @@
     >
       <button
         class={`p-2 w-20 rounded-md ${
-          state === 'all' ? 'bg-neutral-200 text-black' : 'border border-neutral-600 text-neutral-400 text-sm'
+          state === 'all'
+            ? 'bg-neutral-200 text-black'
+            : 'border border-neutral-600 text-neutral-400 text-sm'
         }`}
         on:click={() => setState('all')}>All</button
       >
       <button
         class={`p-2 w-20 rounded-md ${
-          state === 'active' ? 'bg-neutral-200 text-black' : 'border border-neutral-600 text-neutral-400 text-sm'
+          state === 'active'
+            ? 'bg-neutral-200 text-black'
+            : 'border border-neutral-600 text-neutral-400 text-sm'
         }`}
         on:click={() => setState('active')}>Active</button
       >
       <button
         class={`p-2 w-20 rounded-md ${
-          state === 'inactive' ? 'bg-neutral-200 text-black' : 'border border-neutral-600 text-neutral-400 text-sm'
+          state === 'inactive'
+            ? 'bg-neutral-200 text-black'
+            : 'border border-neutral-600 text-neutral-400 text-sm'
         }`}
         on:click={() => setState('inactive')}>Inactive</button
       >
@@ -187,7 +192,7 @@
         {searchNotFoundMsg}
       </div>
     {/if}
-    {#if permissions.readMembers && currentPageRows.length > 26}
+    {#if permissions.readMembers && currentPageRows.length > 9}
       <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
     {/if}
   {:catch}

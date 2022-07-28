@@ -217,21 +217,29 @@
   {#if state === 'idle'}
     <button
       on:click={() => setState('unsplash')}
-      class="bg-blue-600 text-white mx-8 h-12 rounded-md mb-2 mt-6"
+      class="bg-blue-600 text-white mx-8 h-20 rounded-md mb-2"
       >Upload from Unsplash</button
     >
-    <button
-      on:click={() => setState('local')}
-      class="bg-neutral-300 text-neutral-900 mx-8 h-12 rounded-md mb-10"
-    >
-      Upload from your computer
-    </button>
+    <div class="mx-8 h-24" in:fade|local>
+      <FilePond
+        bind:this={pond}
+        {name}
+        credits=""
+        allowProcess={true}
+        class="cursor-pointer"
+        acceptedFileTypes={['image/png', 'image/jpeg']}
+        instantUpload={false}
+        labelIdle="Add background image"
+        beforeAddFile={handleCrop}
+        allowMultiple={false}
+      />
+    </div>
   {:else if state === 'unsplash'}
-    <div class="flex flex-col" transition:fade|local>
-      <div class="px-12 mt-4 pb-4 w-full flex flex-row-reverse shadow-md">
+    <div class="flex flex-col" in:fade|local>
+      <div class="p-2 w-full flex flex-row-reverse shadow-md">
         <button
           on:click={searchHandler}
-          class="bg-neutral-700 text-white w-32 mx-4 hover:font-bold hover:bg-neutral-800 transition-colors duration-400"
+          class="bg-neutral-700 text-white w-32 mx-4 hover:font-bold hover:bg-neutral-800 transition-colors duration-400 rounded-md"
           >Search</button
         >
         <input
@@ -244,7 +252,7 @@
       <div
         class={`${
           unsplashDatas.length > 0 ? 'grid' : 'flex'
-        } grid-cols-2 grid-flow-row p-8 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto`}
+        } grid-cols-2 grid-flow-row p-2 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto`}
       >
         {#if unsplashDatas}
           {#if unsplashDatas.length > 0}
@@ -286,21 +294,6 @@
           {/if}
         {/if}
       </div>
-    </div>
-  {:else if state === 'local'}
-    <div class="mx-8 h-24" transition:fade|local>
-      <FilePond
-        bind:this={pond}
-        {name}
-        credits=""
-        allowProcess={true}
-        class="cursor-pointer"
-        acceptedFileTypes={['image/png', 'image/jpeg']}
-        instantUpload={false}
-        labelIdle="Add background image"
-        beforeAddFile={handleCrop}
-        allowMultiple={false}
-      />
     </div>
   {/if}
 </ModalWrapper>

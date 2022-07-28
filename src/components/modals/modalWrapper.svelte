@@ -44,7 +44,7 @@
       </div>
     </div>
   </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
+  <div class="fixed inset-0 z-40 bg-black/50" />
 {/if}
 
 <style>

@@ -1,5 +1,5 @@
 <script>
-  import DeleteModal from '@comp/modals/deleteModal.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import ConnectionsModal from '@comp/modals/connectionsModal.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
   import download from '@lib/utils/download';
@@ -49,13 +49,16 @@
       data={connection}
       on:sendUpdatedData={(e) => (connection = e.detail)}
     />
-    <DeleteModal
+    <ConfirmationModal
+      isDelete
+      heading="Are you sure you want to delete"
+      text={`${connection.profileData?.firstname ?? connection?.name}
+      ${connection.profileData?.lastname ?? ''} ?`}
       on:click={() => {
         deleteHandler(connection.id, tab);
         deletModalHandler();
       }}
-      data={connection}
-      id={connection.id}
+      buttonLabel="Delete"
       showModal={showDeleteModal}
       toggleModal={deletModalHandler}
     />

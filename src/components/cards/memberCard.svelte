@@ -15,6 +15,7 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import { createEventDispatcher } from 'svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let permissions;
   export let roles = [];
@@ -25,6 +26,10 @@
   let selectedRole = '';
   let memberRole = null;
   const dispatch = createEventDispatcher();
+  let showModal = false;
+  let roleID = null;
+  let roleName = null;
+  const toggleModal = () => (showModal = !showModal);
 
   const passDeletedMemberData = (member) =>
     dispatch('deletedMemberData', member);
@@ -114,11 +119,25 @@
   };
 
   $: if (member.team_member_id) getMembersRole();
+
+  $: console.log(member.team_member_id);
 </script>
+
+<ConfirmationModal
+  heading="Are you sure to change your role?"
+  buttonLabel="Yes, i am sure."
+  {showModal}
+  {toggleModal}
+  on:click={async () => {
+    await setMemberRole(roleID);
+    selectRole(roleName);
+    showModal = false;
+  }}
+/>
 
 {#if member.team_member_id}
   {#if !permissions.readMembers}
-    {#if $user.id === member.team_member_id.uid}
+    {#if $user?.id === member.team_member_id.uid}
       <div class="flex flex-col justify-between">
         <div
           class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
@@ -195,18 +214,18 @@
           </div>
 
           <div
-            class="flex relative w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
+            class="flex relative h-20 w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
           >
-            <p
-              class="text-white border-2 border-neutral-700 flex justify-between items-center h-8 text-sm p-2 gap-2 rounded-md relative"
-            >
-              {selectedRole !== ''
-                ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)
-                : memberRole?.role_name
-                ? memberRole.role_name.charAt(0).toUpperCase() +
-                  memberRole.role_name.slice(1)
-                : 'No role'}
-            </p>
+            {#if permissions.readRoles}
+              <p
+                class="text-white border-2 border-neutral-700 flex justify-between items-center h-8 text-sm p-2 gap-2 rounded-md relative"
+              >
+                {memberRole?.role_name === 'superadmin'
+                  ? 'Super Admin'
+                  : memberRole?.role_name?.charAt(0).toUpperCase() +
+                    memberRole?.role_name?.slice(1)}
+              </p>
+            {/if}
 
             <!-- <SwitchButton
               on:change={async () => await setStatus()}
@@ -372,8 +391,14 @@
                     <MenuItem
                       class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
                       on:click={async () => {
-                        await setMemberRole(item.id);
-                        selectRole(item.role_name);
+                        if ($user?.id === member.team_member_id.uid) {
+                          roleID = item.id;
+                          roleName = item.role_name;
+                          toggleModal();
+                        } else {
+                          await setMemberRole(item.id);
+                          selectRole(item.role_name);
+                        }
                       }}
                     >
                       {item.role_name.charAt(0).toUpperCase() +
@@ -383,8 +408,14 @@
                   <MenuItem
                     class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
                     on:click={async () => {
-                      await setMemberRole(roleId[0].id);
-                      selectRole(roleId[0].name);
+                      if ($user?.id === member.team_member_id.uid) {
+                        roleID = roleId[0].id;
+                        roleName = roleId[0].name;
+                        toggleModal();
+                      } else {
+                        await setMemberRole(roleId[0].id);
+                        selectRole(roleId[0].name);
+                      }
                     }}
                   >
                     Super Admin
@@ -392,8 +423,14 @@
                   <MenuItem
                     class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
                     on:click={async () => {
-                      await setMemberRole(roleId[1].id);
-                      selectRole(roleId[1].name);
+                      if ($user?.id === member.team_member_id.uid) {
+                        roleID = roleId[1].id;
+                        roleName = roleId[1].name;
+                        toggleModal();
+                      } else {
+                        await setMemberRole(roleId[1].id);
+                        selectRole(roleId[1].name);
+                      }
                     }}
                   >
                     Member
@@ -411,7 +448,7 @@
       </div>
     </div>
   {/if}
-{:else}
+{:else if permissions.readMembers}
   <div class="flex flex-col justify-between">
     <div
       class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
@@ -449,7 +486,7 @@
       </div>
 
       <div
-        class="flex relative w-full h-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
+        class="flex relative w-full h-20 justify-between items-center bg-neutral-900 rounded-b-md p-4"
       />
     </div>
   </div>
