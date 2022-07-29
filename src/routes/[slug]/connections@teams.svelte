@@ -227,8 +227,13 @@
                     class="w-1/6"
                     data={connectionsTable}
                     on:sort={async (e) => {
-                      asc = !asc;
-                      await sortHandler(e.detail);
+                      if (
+                        teamConnections.length > 1 ||
+                        userConnections.length > 1
+                      ) {
+                        asc = !asc;
+                        await sortHandler(e.detail);
+                      }
                     }}
                   />
                 {:else}
@@ -236,8 +241,13 @@
                     class="w-1/4"
                     data={connectionsTableMobile}
                     on:sort={async (e) => {
-                      asc = !asc;
-                      await sortHandler(e.detail);
+                      if (
+                        teamConnections.length > 1 ||
+                        userConnections.length > 1
+                      ) {
+                        asc = !asc;
+                        await sortHandler(e.detail);
+                      }
                     }}
                   />
                 {/if}
@@ -315,8 +325,10 @@
                     class="w-1/6"
                     data={connectionsTable}
                     on:sort={async (e) => {
-                      asc = !asc;
-                      await sortHandler(e.detail);
+                      if (userConnections.length > 1) {
+                        asc = !asc;
+                        await sortHandler(e.detail);
+                      }
                     }}
                   />
                 {:else}
@@ -324,8 +336,10 @@
                     class="w-1/4"
                     data={connectionsTable}
                     on:sort={async (e) => {
-                      asc = !asc;
-                      await sortHandler(e.detail);
+                      if (userConnections.length > 1) {
+                        asc = !asc;
+                        await sortHandler(e.detail);
+                      }
                     }}
                   />
                 {/if}

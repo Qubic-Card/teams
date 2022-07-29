@@ -40,7 +40,7 @@
       value = value.replace(value, '62' + value);
     }
 
-    if (whatsapp.charAt(0) !== '+' && !numberRegex(value)) {
+    if (!numberRegex(value)) {
       isWhatsappInvalid = true;
     } else {
       isWhatsappInvalid = false;
@@ -66,7 +66,7 @@
   >
     {title}
   </h1>
-  <div class={'relative'}>
+  <div>
     <input
       in:fade|local={{ duration: 300 }}
       on:change
@@ -80,32 +80,39 @@
     />
   </div>
   {#if focus && isLinkInput && isLinkInvalid}
-    <small class="text-red-500">Invalid link input</small>
+    <small class="text-red-500 absolute mt-20">Invalid link input</small>
   {/if}
   {#if focus && isSocialInput && isSocialValid}
-    <small class="text-red-500">Invalid social input</small>
+    <small class="text-red-500 absolute mt-20">Invalid social input</small>
   {/if}
   {#if isEmailInput && isEmailValid}
-    <small class="text-red-500">Invalid email input</small>
+    <small class="text-red-500 absolute mt-20">Invalid email input</small>
   {/if}
   {#if isWhatsappInput && isWhatsappInvalid}
-    <small class="text-red-500"
+    <small class="text-red-500 absolute mt-20"
       >Please use a valid country code and phone number</small
     >
   {/if}
+
   {#if isInstagramInput && isInstagramInvalid}
-    <small class="text-red-500">Instagram doesn't require "@"</small>
+    <small class="text-red-500 absolute mt-20"
+      >Instagram doesn't require "@"</small
+    >
   {/if}
   {#if isTiktokInput && isTiktokValid}
-    <small class="text-red-500">TikTok require "@"</small>
+    <small class="text-red-500 absolute mt-20">TikTok require "@"</small>
   {/if}
   {#if isTwitterInput && isTwitterValid}
-    <small class="text-red-500">Twitter doesn't require "@"</small>
+    <small class="text-red-500 absolute mt-20"
+      >Twitter doesn't require "@"</small
+    >
   {/if}
   {#if isPhoneInput && isPhoneValid}
-    <small class="text-red-500">Invalid phone number</small>
+    <small class="text-red-500 absolute mt-20">Invalid phone number</small>
   {/if}
   {#if isNumber}
-    <small class="text-red-500">Invalid input. Please enter a number.</small>
+    <small class="text-red-500 absolute mt-20"
+      >Invalid input. Please enter a number.</small
+    >
   {/if}
 </div>

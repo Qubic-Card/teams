@@ -106,16 +106,16 @@
     await handleSave();
   };
 
-  const handleAddBrosur = async (output, file) => {
+  const handleAddBrochure = async (output, file) => {
     let timestamp = new Date().getTime();
     const { data } = await supabase.storage
-      .from('pdf')
+      .from('brochure')
       .upload(`${$user?.id}/${timestamp}${file?.filename}`, file.file, {
         contentType: 'application/pdf',
       });
 
     const { publicURL, error } = supabase.storage
-      .from('pdf')
+      .from('brochure')
       .getPublicUrl(`${$user?.id}/${timestamp}${file?.filename}`);
 
     toastSuccess('Successfully uploaded brosur');
@@ -266,19 +266,12 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div class="border-2 border-neutral-700 mb-4 pt-2">
-                  <div class="px-3 grid grid-cols-2 space-x-5">
+                  <div class="px-3 grid grid-cols-1 space-x-5">
                     <Input
                       on:change={handleSave}
                       placeholder="Company Name"
                       title="Name"
                       bind:value={$teamData.company}
-                      disabled={permissions.writeTeam ? false : true}
-                    />
-                    <Input
-                      on:change={handleSave}
-                      placeholder="Nickname"
-                      title="Nickname"
-                      bind:value={teamNickname}
                       disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
@@ -315,7 +308,11 @@
                     />
                   </div>
                   <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
-                  <div class={`p-3 ${permissions.writeTeam ? '' : 'hidden'}`}>
+                  <div
+                    class={`grid grid-cols-2 gap-2 px-3 pt-3 ${
+                      permissions.writeTeam ? '' : 'hidden'
+                    }`}
+                  >
                     <FilePond
                       bind:this={pond}
                       {name}
@@ -336,9 +333,9 @@
                       class="cursor-pointer"
                       acceptedFileTypes={['application/pdf']}
                       instantUpload={false}
-                      labelIdle="Add Brosur"
+                      labelIdle="Add Brochure"
                       allowMultiple={false}
-                      onaddfile={handleAddBrosur}
+                      onaddfile={handleAddBrochure}
                     />
                   </div>
                 </div>
@@ -404,7 +401,7 @@
                         />
 
                         <div
-                          class={`flex items-center mb-3 ${
+                          class={`items-center mb-3 ${
                             permissions.writeTeam ? 'flex' : 'hidden'
                           }`}
                         >

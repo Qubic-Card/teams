@@ -1,5 +1,5 @@
 <script>
-  import DeleteModal from '@comp/modals/deleteModal.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -65,8 +65,13 @@
     {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
-    <DeleteModal
-      data={record}
+    <ConfirmationModal
+      isDelete
+      isIconVisible
+      heading="Are you sure you want to delete"
+      text={`${record.profileData?.firstname ?? record?.name}
+      ${record.profileData?.lastname ?? ''} ?`}
+      buttonLabel="Delete"
       showModal={showDeleteModal}
       toggleModal={deleteModalHandler}
       on:click={async () => {

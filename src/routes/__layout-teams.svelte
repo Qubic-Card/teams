@@ -160,7 +160,7 @@
           <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
             <button
               on:click={() => goto(`/${team?.id}/dashboard`)}
-              class={`pb-2 text-md ${
+              class={`pb-2 w-1/5 text-md ${
                 $page.routeId === '[slug]/dashboard@teams'
                   ? 'border-b-2 border-neutral-200 font-bold'
                   : 'text-neutral-300'
@@ -168,7 +168,7 @@
             >
             <button
               on:click={() => goto(`/${team?.id}/dashboard/team`)}
-              class={`pb-2 text-md ${
+              class={`pb-2 w-1/5 text-md ${
                 $page.routeId === '[slug]/dashboard/team@teams'
                   ? 'border-b-2 border-neutral-200 font-bold'
                   : 'text-neutral-300'

@@ -22,9 +22,11 @@
                 {`${item.team_member.firstname}'s` + item.message.slice(4)}
               </h1>
               <p class="text-neutral-500">
-                {new Date(item.created_at).getHours() +
+                {new Date(new Date(item.created_at).setUTCHours(7)).getHours() +
                   ':' +
-                  new Date(item.created_at).getMinutes()}
+                  new Date(
+                    new Date(item.created_at).setUTCHours(7)
+                  ).getMinutes()}
               </p>
             </div>
           {/each}
