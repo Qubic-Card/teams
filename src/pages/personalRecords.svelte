@@ -12,7 +12,7 @@
   import { getMemberId } from '@lib/query/getId';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
-  import { last30Days, today } from '@lib/utils/getDates';
+  import getDates, { last30Days, today } from '@lib/utils/getDates';
   import Spinner from '@comp/loading/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
 
@@ -53,7 +53,12 @@
     let id = await getMemberId($user?.id, teamId);
     let logsCsv = [];
     let connectionsCsv = [];
-
+    // let from = getDates(
+    //   new Date(new Date().setDate(new Date().getDate() - 1)),
+    //   fromDateValue
+    // );
+    // from = new Date(from[0]);
+    // console.log(from);
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
         'team_member',
@@ -181,12 +186,14 @@
   </div>
   <button
     class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
-    disabled={fileName.includes('.') ||
-    fileName.length < 4 ||
-    selectedType === ''
-      ? true
-      : false}
-    on:click={async () => await createRecordHandler()}
+    disabled={fileName.includes('.') || fileName.length < 4 ? true : false}
+    on:click={async () => {
+      if (selectedType === 'Choose Type') {
+        toastFailed('Please select a type');
+      } else {
+        await createRecordHandler();
+      }
+    }}
   >
     {#if isLoading}
       <Spinner class="w-8 h-8" />

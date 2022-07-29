@@ -13,6 +13,7 @@
   let teamId = Cookies.get('qubicTeamId');
   let permissions = {
     readMembers: false,
+    writeMembers: false,
     writeRoles: false,
     readRoles: false,
   };
@@ -84,14 +85,14 @@
   const getTeamCardCon = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .select('card_id(id, type, color), status, team_member_id(*)');
-    // .eq('card_id', cardId);
+      .select(
+        'card_id(id, type, color), status, team_member_id(*, role(id, role_name))'
+      );
 
     if (error) console.log(error);
     if (data) {
       if (data.length > 0) {
         teamCardCon = data;
-        // console.log(teamCardCon);
       }
     }
   };
@@ -118,6 +119,7 @@
   $: {
     $userData?.filter((item) => {
       if (item === 'allow_read_members') permissions.readMembers = true;
+      if (item === 'allow_write_members') permissions.writeMembers = true;
       if (item === 'allow_write_roles') permissions.writeRoles = true;
       if (item === 'allow_read_roles') permissions.readRoles = true;
     });

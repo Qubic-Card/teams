@@ -47,7 +47,7 @@
 
 <div class={`Container ${className}`} on:click={clickHandler}>
   {#if isLoading}
-    <div class="animate-pulse w-64 flex flex-col justify-center gap-2 pt-4">
+    <div class="animate-pulse w-68 flex flex-col justify-center gap-2 pt-4">
       {#if isShowMetaImage}
         <div class="bg-neutral-700 h-40 w-full rounded-md" />
       {/if}

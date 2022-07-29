@@ -6,7 +6,7 @@
 </script>
 
 <MenuButton
-  class={`text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md relative ${$$props.class}`}
+  class={`text-white border-2 border-neutral-700 flex justify-between text-sm items-center h-12 p-2 gap-2 rounded-md relative ${$$props.class}`}
 >
   {label}
   <svg

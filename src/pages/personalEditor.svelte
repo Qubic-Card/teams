@@ -377,7 +377,7 @@
                     />
                   </div>
                   {#each $socials as item, i}
-                    <div class="p-3 flex items-end">
+                    <div class="p-3 flex items-center">
                       <Input
                         class="flex-grow"
                         title={item.type === 'tiktok'
@@ -428,14 +428,7 @@
                           ? false
                           : true}
                       />
-
-                      <div
-                        class={`items-center mb-3 ${
-                          permissions.writeProfile || permissions.writeMembers
-                            ? 'flex'
-                            : 'hidden'
-                        }`}
-                      >
+                      {#if permissions.writeProfile || permissions.writeMembers}
                         <Menu
                           as="div"
                           class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
@@ -533,7 +526,7 @@
                           bind:checked={item.isActive}
                           on:change={handleSave}
                         />
-                      </div>
+                      {/if}
                     </div>
                   {/each}
                 </div>

@@ -72,7 +72,7 @@
       {data?.company == '' ? Dummy.company : data?.company}
     </h1>
   </div>
-  <div class="flex gap-2 px-20 text-white my-4">
+  <div class="flex gap-2 px-16 text-white my-4">
     <BorderButton
       class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
       on:click={popup}
@@ -104,7 +104,7 @@
     </TabList>
     <TabPanels class="w-full">
       <TabPanel>
-        <div class="gap-2 flex flex-col px-20 justify-center items-center mt-4">
+        <div class="gap-2 flex flex-col px-16 justify-center items-center mt-4">
           <div
             class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"
           >
@@ -141,8 +141,8 @@
                     class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
                     ><img
                       src={socialIcons[item.type]}
-                      width="32"
-                      height="32"
+                      width="34"
+                      height="34"
                       alt=""
                     /></BorderButton
                   >
@@ -183,8 +183,8 @@
                   class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
                   ><img
                     src={socialIcons[item.type]}
-                    width="32"
-                    height="32"
+                    width="34"
+                    height="34"
                     alt=""
                   /></BorderButton
                 >

@@ -80,7 +80,8 @@ export const genvcard = async (prop, team) => {
 
     if (team.links) {
       team.links.map((e) => {
-        if (e.isActive) return (vCard.socialUrls[e.title + 'company'] = e.link);
+        if (e.isActive)
+          return (vCard.socialUrls[e.title + ' Company'] = e.link);
       });
     }
   }
