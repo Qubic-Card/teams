@@ -20,7 +20,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     new Date(toDate).setDate(new Date(toDate).getDate() + 1)
   ).toUTCString();
   
-  
+
   const { data, error } = await supabase
     .from('team_connection_acc')
     // .select('*')
@@ -29,7 +29,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     )
     .eq(col, id)
     .gte('dateConnected', fromDate)
-    .lte('dateConnected', toDate);
+    .lt('dateConnected', toDate);
   // .csv();
 
   if (error) {
@@ -92,7 +92,7 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
     )
     .eq(col, id)
     .gte('created_at', fromDate)
-    .lte('created_at', toDate);
+    .lt('created_at', toDate);
   // .csv();
 
   if (error) {
