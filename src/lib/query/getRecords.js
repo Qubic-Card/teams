@@ -13,18 +13,14 @@ const convertToCSV = (arr) => {
 };
 
 export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
-  // let from = new Date(
-  //   new Date(fromDate).setUTCDate(new Date(fromDate).getUTCDate() - 1)
-  // );
-  // console.log(new Date(new Date(from).setUTCHours(7)).toUTCString());
   fromDate = new Date(
-    new Date(fromDate).setHours(new Date(fromDate).getHours() - 7)
+    new Date(fromDate)
   ).toUTCString();
-  console.log(
-    new Date(
-      new Date(fromDate).setHours(new Date(fromDate).getHours() - 7)
-    ).toUTCString()
-  );
+  toDate = new Date(
+    new Date(toDate).setDate(new Date(toDate).getDate() + 1)
+  ).toUTCString();
+  
+  
   const { data, error } = await supabase
     .from('team_connection_acc')
     // .select('*')
@@ -33,7 +29,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     )
     .eq(col, id)
     .gte('dateConnected', fromDate)
-    .lte('dateConnected', new Date(toDate).toUTCString());
+    .lte('dateConnected', toDate);
   // .csv();
 
   if (error) {
@@ -80,38 +76,54 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
 };
 
 export const getLogsRecords = async (col, id, fromDate, toDate) => {
+  
+  fromDate = new Date(
+    new Date(fromDate)
+  ).toUTCString();
+  toDate = new Date(
+    new Date(toDate).setDate(new Date(toDate).getDate() + 1)
+  ).toUTCString();
+
+  
   const { data, error } = await supabase
     .from('team_logs')
     .select(
       '*, team_member(team_profile->firstname, team_profile->lastname), team(metadata->company, name)'
     )
     .eq(col, id)
-    .gte('created_at', new Date(fromDate).toUTCString())
-    .lte('created_at', new Date(toDate).toUTCString());
+    .gte('created_at', fromDate)
+    .lte('created_at', toDate);
   // .csv();
 
   if (error) {
     console.log(error);
+    return [];
   } else {
-    if (data.length === 0) {
-      toastFailed('No data found for this period');
-    } else {
-      let logs = data.map((log) => {
-        return {
-          Created_at: new Date(new Date(log?.created_at).setUTCHours(7)),
-          Type: log?.type,
-          Team: log?.team?.name,
-          Company: log?.team?.company,
-          Message: log?.data?.message,
-          Link: log?.data?.link,
-          TeamMember:
-            log?.team_member?.firstname + ' ' + log.team_member?.lastname,
-          Holder: log.card_holder ?? '-',
-        };
-      });
-
-      const csv = convertToCSV(logs);
-      return csv;
+    if (data) {
+      console.log("data", data)
+      if (data.length === 0) {
+        toastFailed('No data found for this period');
+      } else {
+        let logs = data.map((log) => {
+          return {
+            Created_at: new Date(
+              new Date(toDate).setHours(new Date(log?.created_at).getHours() + 7)
+            ).toUTCString(),
+            Type: log?.type,
+            Team: log?.team?.name,
+            Company: log?.team?.company,
+            Message: log?.data?.message,
+            Link: log?.data?.link,
+            TeamMember:
+              log?.team_member?.firstname + ' ' + log.team_member?.lastname,
+            Holder: log.card_holder ?? '-',
+          };
+        });
+        console.log("logsAfterConverted", logs)
+        const csv = convertToCSV(logs);
+        return csv;
+      }
     }
+
   }
 };

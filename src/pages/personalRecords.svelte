@@ -20,7 +20,7 @@
 
   let teamId = Cookies.get('qubicTeamId');
   let fileName = `${new Date().toDateString().slice(4)}`;
-  let selectedType = 'Choose Type';
+  let selectedType = 'Activities';
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
@@ -75,6 +75,7 @@
       );
     }
 
+    console.log("logCSV", logsCsv)
     if (logsCsv.length !== 0 || connectionsCsv.length !== 0) {
       isLoading = true;
       const { data, error } = await supabase.storage
