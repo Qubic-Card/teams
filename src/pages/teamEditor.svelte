@@ -81,23 +81,21 @@
 
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
-    fileName = item.filename;
+    fileName = item.id;
     isOpen = true;
     return true;
   };
 
   const handleAddFile = async () => {
-    let timestamp = new Date().getTime();
-
     const { data } = await supabase.storage
       .from('avatars')
-      .upload(`${$user?.id}/${timestamp}${fileName}`, fileImage, {
+      .upload(`${$user?.id}/${fileName}`, fileImage, {
         contentType: 'image/jpeg',
       });
 
     const { publicURL, error } = supabase.storage
       .from('avatars')
-      .getPublicUrl(`${$user?.id}/${timestamp}${fileName}`);
+      .getPublicUrl(`${$user?.id}/${fileName}`);
 
     pond.removeFile();
     croppedImage = '';
