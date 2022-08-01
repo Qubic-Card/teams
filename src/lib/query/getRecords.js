@@ -13,6 +13,18 @@ const convertToCSV = (arr) => {
 };
 
 export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
+  // let from = new Date(
+  //   new Date(fromDate).setUTCDate(new Date(fromDate).getUTCDate() - 1)
+  // );
+  // console.log(new Date(new Date(from).setUTCHours(7)).toUTCString());
+  fromDate = new Date(
+    new Date(fromDate).setHours(new Date(fromDate).getHours() - 7)
+  ).toUTCString();
+  console.log(
+    new Date(
+      new Date(fromDate).setHours(new Date(fromDate).getHours() - 7)
+    ).toUTCString()
+  );
   const { data, error } = await supabase
     .from('team_connection_acc')
     // .select('*')
@@ -20,24 +32,24 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
       'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)'
     )
     .eq(col, id)
-    .gte('dateConnected', new Date(fromDate).toUTCString())
+    .gte('dateConnected', fromDate)
     .lte('dateConnected', new Date(toDate).toUTCString());
   // .csv();
 
   if (error) {
     console.log(error);
   } else {
+    console.log(data);
     if (data.length === 0) {
       toastFailed('No data found for this period');
     } else {
       let items = data.map((item) => {
         return {
-          DateConnected: item?.dateConnected,
+          DateConnected: new Date(new Date(item?.dateConnected).setUTCHours(7)),
           Firstname: item?.firstname,
           Lastname: item?.lastname,
           Company: item?.company,
           Job: item?.job,
-          Avatar: item?.avatar,
           // Links: item?.links,
           Links1: item?.links[0]?.link,
           Links2: item?.links[1]?.link,
@@ -86,8 +98,7 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
     } else {
       let logs = data.map((log) => {
         return {
-          Created_at: log?.created_at,
-          Id: log?.id,
+          Created_at: new Date(new Date(log?.created_at).setUTCHours(7)),
           Type: log?.type,
           Team: log?.team?.name,
           Company: log?.team?.company,

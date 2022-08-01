@@ -29,7 +29,7 @@
   let userConnections = [];
   let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
 
-  let tabs = 'all';
+  let tabs = 'user';
 
   $: $userData?.filter((item) => {
     if (item === 'allow_read_connections') permissions.readConnection = true;
@@ -172,25 +172,13 @@
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pt-4 pl-16">
   {#if permissions.readConnection === true}
-    {#await getTeamConnectionsList()}
+    {#await getUserConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
         class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 border-neutral-700"
       >
         <div class="flex w-full md:w-48 text-white gap-1">
-          <button
-            class={`${
-              tabs === 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-16`}
-            on:click={async () => {
-              setTabs('all');
-              searchQuery = '';
-              await getTeamConnectionsList();
-            }}
-          >
-            Team
-          </button>
           <button
             class={`${
               tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
@@ -202,6 +190,18 @@
             }}
           >
             Personal
+          </button>
+          <button
+            class={`${
+              tabs === 'all' ? 'font-bold border-b-2 border-white' : ''
+            } w-full md:w-1/2 h-16`}
+            on:click={async () => {
+              setTabs('all');
+              searchQuery = '';
+              await getTeamConnectionsList();
+            }}
+          >
+            Team
           </button>
         </div>
         <Search

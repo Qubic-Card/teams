@@ -21,7 +21,9 @@ const formatter = (vcard) => {
       if (isIOS()) {
         let username = line.split(':')[1];
         let http = line.split(':')[1];
-        let url = line.split(':')[2];
+        let title = line?.split('=')[1].split(':')[0];
+        let link = line?.split(':')[1];
+        let domain = line.split(':')[2];
         let isCompany = line.includes('company');
 
         if (line.includes('facebook')) {
@@ -72,20 +74,21 @@ const formatter = (vcard) => {
           }:https://line.me/R/ti/p/~${username} ${nl()}item${
             i - 17
           }.X-ABLabel:${isCompany ? 'Line Company' : 'Line'}`;
-        } else if (!line.includes('email')) {
-          line = `item${i - 17}.URL;LABEL=${
-            isCompany ? 'URL Company' : 'URL'
-          }:${http + ':' + url} ${nl()}item${i - 17}.X-ABLabel:${
-            isCompany ? 'Website Company' : 'Website'
-          }`;
-        } else {
+        } else if (line.includes('email')) {
           line = '';
+        } else {
+          line = `item${i - 17}.URL;LABEL=${title}:${
+            link.includes('http') ? http + ':' + domain : link
+          } ${nl()}item${i - 17}.X-ABLabel:${title}`;
         }
       } else {
         let username = line.split(':')[1];
         let http = line.split(':')[1];
         let url = line.split(':')[2];
+        let title = line?.split('=')[1].split(':')[0];
+        let link = line?.split(':')[1];
         let isCompany = line.includes('company');
+        let domain = line.split(':')[2];
 
         if (line.includes('facebook')) {
           line = `URL;LABEL=${
@@ -119,12 +122,12 @@ const formatter = (vcard) => {
           line = `URL;LABEL=${
             isCompany ? 'Line Company' : 'Line'
           }:https://line.me/R/ti/p/~${username}`;
-        } else if (!line.includes('email')) {
-          line = `URL;LABEL=${isCompany ? 'URL Company' : 'URL'}:${
-            http + ':' + url
-          }`;
-        } else {
+        } else if (line.includes('email')) {
           line = '';
+        } else {
+          line = `URL;LABEL=${title}:${
+            link.includes('http') ? http + ':' + domain : link
+          }`;
         }
       }
 

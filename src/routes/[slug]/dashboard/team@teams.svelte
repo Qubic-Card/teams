@@ -99,8 +99,14 @@
     active = 0;
   };
 
-  const getPercentage = (current, previous) =>
-    Math.floor(((current - previous) / previous) * 100);
+  const getPercentage = (current, previous) => {
+    const calc = current - previous;
+    if (calc !== 0) {
+      return Math.floor((calc / previous) * 100);
+    } else {
+      return 0;
+    }
+  };
 
   const paginate = (items) => {
     const pages = Math.ceil(items.length / itemsPerPage);
@@ -125,7 +131,11 @@
 
   const getTeamConnectionsPreviousList = async () => {
     // loading = true;
-    let { error: team_error, count } = await supabase
+    let {
+      data,
+      error: team_error,
+      count,
+    } = await supabase
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
       .eq('team_id', teamId)
@@ -143,7 +153,7 @@
       )
       .order('dateConnected', { ascending: false });
 
-    if (count) previousConnectionCount = count;
+    if (data) previousConnectionCount = count;
 
     if (team_error) console.log(team_error);
     loading = false;

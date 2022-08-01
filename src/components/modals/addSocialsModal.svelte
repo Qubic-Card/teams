@@ -8,26 +8,31 @@
   let showModal = false;
   export let isTeam = false;
 
-  const toggleModal = () => {
-    showModal = !showModal;
-  };
+  const toggleModal = () => (showModal = !showModal);
+
   const addSocial = (item) => {
     if (isTeam) {
-      let socialType = $teamSocials.map((item) => item.type);
-      socialType.includes(item)
-        ? toastFailed('You can only add one of each social media')
+      let socialType = $teamSocials
+        .map((item) => item.type)
+        .filter((type) => type === item);
+
+      socialType.length >= 2
+        ? toastFailed('You can only add two of each social media')
         : teamSocials.set([
             ...$teamSocials,
             { type: item, data: '', isActive: true },
           ]);
+      if (socialType.length < 2) toastSuccess(`${item} successfully added`);
     } else {
-      let socialType = $socials.map((item) => item.type);
-      socialType.includes(item)
-        ? toastFailed('You can only add one of each social media')
-        : socials.set([...$socials, { type: item, data: '', isActive: true }]);
-    }
+      let socialType = $socials
+        .map((item) => item.type)
+        .filter((type) => type === item);
 
-    showModal = !showModal;
+      socialType.length >= 2
+        ? toastFailed('You can only add two of each social media')
+        : socials.set([...$socials, { type: item, data: '', isActive: true }]);
+      if (socialType.length < 2) toastSuccess(`${item} successfully added`);
+    }
   };
 </script>
 
@@ -45,9 +50,11 @@
       showModal ? 'translate-x-0' : 'translate-x-[900px]'
     } transition-all duration-300 ease-in-out flex flex-col h-screen w-[320px] z-50 p-4 gap-4 bottom-0 right-0 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   >
-    <DialogTitle class="text-xl pb-2 border-b-2 border-neutral-700 z-30"
-      >Add Social Media</DialogTitle
-    >
+    <div class="flex w-full justify-between border-b-2 border-neutral-700">
+      <DialogTitle class="text-xl pb-2 z-30">Add Social Media</DialogTitle>
+      <p on:click={toggleModal} class="cursor-pointer">x</p>
+    </div>
+
     <div
       class="flex flex-col justify-center bg-neutral-800 items-center p- rounded-lg"
     >
