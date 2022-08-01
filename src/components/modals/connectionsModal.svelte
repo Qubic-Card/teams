@@ -6,6 +6,7 @@
   import { genvcard } from '@lib/vcard/vcardgen';
   import { Dialog } from '@rgossiaux/svelte-headlessui';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
+  import toNewTab from '@lib/utils/newTab';
 
   export let connection;
   export let showModal;
@@ -138,7 +139,7 @@
               {#if item.isActive}
                 <button
                   class="col-span-1  rounded"
-                  on:click={async () => await go(item.type, item.data)}
+                  on:click={async () => await toNewTab(item.type, item.data)}
                   ><img
                     src={socialIcons[item.type]}
                     class="w-14 h-14 rounded  mx-auto p-3"

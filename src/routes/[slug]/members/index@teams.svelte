@@ -33,6 +33,7 @@
   let totalPages = [];
   let active = 0;
   let currentPageRows = [];
+  let updatedRole = '';
 
   const paginate = (items) => {
     const pages = Math.ceil(items.length / itemsPerPage);
@@ -174,20 +175,34 @@
     >
       {#if state === 'all'}
         {#each currentPageRows as member, i}
-          <MemberCard {member} {roles} {permissions} />
+          <MemberCard
+            {member}
+            {roles}
+            {permissions}
+            {i}
+            {updatedRole}
+            on:setRole={(e) => (updatedRole = e.detail)}
+          />
         {/each}
       {/if}
       {#if state === 'active'}
         {#each currentPageRows as member, i}
           {#if member.team_member_id}
-            <MemberCard {member} {roles} {permissions} />
+            <MemberCard
+              {member}
+              {roles}
+              {permissions}
+              {i}
+              {updatedRole}
+              on:setRole={(e) => (updatedRole = e.detail)}
+            />
           {/if}
         {/each}
       {/if}
       {#if state === 'inactive'}
         {#each currentPageRows as member, i}
           {#if member.id}
-            <MemberCard {member} {roles} {permissions} />
+            <MemberCard {member} {roles} {permissions} {updatedRole} />
           {/if}
         {/each}
       {/if}

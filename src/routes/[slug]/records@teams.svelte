@@ -36,7 +36,6 @@
       console.log(error);
     } else {
       personalCsv = data;
-      // console.log(data);
     }
   };
 

@@ -53,12 +53,7 @@
     let id = await getMemberId($user?.id, teamId);
     let logsCsv = [];
     let connectionsCsv = [];
-    // let from = getDates(
-    //   new Date(new Date().setDate(new Date().getDate() - 1)),
-    //   fromDateValue
-    // );
-    // from = new Date(from[0]);
-    // console.log(from);
+
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
         'team_member',
@@ -75,7 +70,6 @@
       );
     }
 
-    console.log("logCSV", logsCsv)
     if (logsCsv.length !== 0 || connectionsCsv.length !== 0) {
       isLoading = true;
       const { data, error } = await supabase.storage
@@ -115,7 +109,7 @@
 
       updated();
       fileName = `${new Date().toDateString().slice(4)}`;
-      selectedType = 'Choose Type';
+      selectedType = 'Activities';
       toDateValue = new Date(today);
       fromDateValue = new Date(today);
       toDateOptions.maxDate = new Date(today);

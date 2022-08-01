@@ -24,14 +24,11 @@
         'allow_read_roles',
         'allow_read_team',
         'allow_read_members',
-        'allow_read_records',
         'allow_read_analytics',
         'allow_read_connections',
         'allow_read_billing',
         'allow_write_profile',
-        'allow_write_connections',
         'allow_write_billing',
-        'allow_write_analytics',
         'allow_write_team',
         'allow_write_members',
         'allow_write_roles',
@@ -44,29 +41,16 @@
 </script>
 
 <div class="border border-neutral-600 mt-3 p-2 rounded">
-  <h1 class="font-bold text-sm my-4 ml-2 self-start">Select all</h1>
-  <div
-    class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+  <!-- <h1 class="font-bold text-sm my-4 ml-2 self-start">Select all</h1> -->
+  <button
+    on:click={() => {
+      clicked();
+      selectAll = true;
+    }}
+    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-blue-600"
   >
-    <div class="block">
-      <div class="mt-2">
-        <label class="flex cursor-pointer" on:click={clicked}>
-          <input
-            type="checkbox"
-            class="w-5 h-5 cursor-pointer disabled:cursor-default"
-            bind:value={selectAll}
-            on:click={() => {
-              clicked();
-              selectAll = true;
-            }}
-            disabled={!isHasWriteRolePermission}
-          />
-
-          <p class="ml-4 w-72">Select all</p>
-        </label>
-      </div>
-    </div>
-  </div>
+    Select all
+  </button>
 
   <h1 class="font-bold text-sm my-4 ml-2 self-start">Read</h1>
   {#each readCheckbox as checkbox}

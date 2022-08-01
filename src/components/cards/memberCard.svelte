@@ -15,11 +15,13 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
+  import { createEventDispatcher } from 'svelte';
 
   export let permissions;
   export let roles = [];
-  export let member;
+  export let member, i, updatedRole;
 
+  const dispatch = createEventDispatcher();
   let selectedRole = '';
   let showModal = false;
   let roleID = null;
@@ -28,6 +30,7 @@
   let card = member?.card_id;
   let role = member?.team_member_id?.role;
 
+  const setRole = (role) => dispatch('setRole', { role: role, index: i });
   const toggleModal = () => (showModal = !showModal);
 
   const toProfileEditor = (slug) =>
@@ -99,6 +102,8 @@
   let showDeleteMemberModal = false;
   const toggleDeleteMemberModal = () =>
     (showDeleteMemberModal = !showDeleteMemberModal);
+
+  $: if (i === updatedRole.index) selectedRole = updatedRole.role;
 </script>
 
 <ConfirmationModal
@@ -383,7 +388,8 @@
                         toggleModal();
                       } else {
                         await setMemberRole(item.id);
-                        selectRole(item.role_name);
+                        // selectRole(item.role_name);
+                        setRole(item.role_name);
                       }
                     }}
                   >

@@ -289,22 +289,7 @@
                       disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
-                  <div class="px-3 grid grid-cols-2 space-x-5">
-                    <Input
-                      on:change={handleSave}
-                      placeholder="Email"
-                      title="Email"
-                      bind:value={$teamData.email}
-                      disabled={permissions.writeTeam ? false : true}
-                    />
-                    <Input
-                      on:change={handleSave}
-                      placeholder="Phone Number"
-                      title="Phone Number"
-                      bind:value={$teamData.phone}
-                      disabled={permissions.writeTeam ? false : true}
-                    />
-                  </div>
+
                   <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
                   <div
                     class={`grid grid-cols-2 gap-2 px-3 pt-3 ${

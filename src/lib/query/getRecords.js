@@ -13,13 +13,10 @@ const convertToCSV = (arr) => {
 };
 
 export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
-  fromDate = new Date(
-    new Date(fromDate)
-  ).toUTCString();
+  fromDate = new Date(new Date(fromDate)).toUTCString();
   toDate = new Date(
     new Date(toDate).setDate(new Date(toDate).getDate() + 1)
   ).toUTCString();
-  
 
   const { data, error } = await supabase
     .from('team_connection_acc')
@@ -31,7 +28,13 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     .gte('dateConnected', fromDate)
     .lt('dateConnected', toDate);
   // .csv();
+  // {
+  //   "card": "b9069595-2a92-487a-8756-2ab437c29758",
+  //   "link": "https://qubic.id",
+  //   "message": "Your link https://qubic.id was opened"
+  //   }
 
+  //   76900f13-9d11-424a-b111-71b1f2cd6def
   if (error) {
     console.log(error);
   } else {
@@ -41,7 +44,11 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     } else {
       let items = data.map((item) => {
         return {
-          DateConnected: new Date(new Date(item?.dateConnected).setUTCHours(7)),
+          DateConnected: new Date(
+            new Date(item?.dateConnected).setHours(
+              new Date(item?.dateConnected).getHours() + 7
+            )
+          ),
           Firstname: item?.firstname,
           Lastname: item?.lastname,
           Company: item?.company,
@@ -76,15 +83,14 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
 };
 
 export const getLogsRecords = async (col, id, fromDate, toDate) => {
-  
-  fromDate = new Date(
-    new Date(fromDate)
-  ).toUTCString();
+  fromDate = new Date(new Date(fromDate)).toUTCString();
+  // fromDate = new Date(
+  //   new Date(fromDate).setDate(new Date(fromDate).getDate() - 1)
+  // ).toUTCString();
   toDate = new Date(
     new Date(toDate).setDate(new Date(toDate).getDate() + 1)
   ).toUTCString();
 
-  
   const { data, error } = await supabase
     .from('team_logs')
     .select(
@@ -100,15 +106,16 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
     return [];
   } else {
     if (data) {
-      console.log("data", data)
       if (data.length === 0) {
         toastFailed('No data found for this period');
       } else {
         let logs = data.map((log) => {
           return {
             Created_at: new Date(
-              new Date(toDate).setHours(new Date(log?.created_at).getHours() + 7)
-            ).toUTCString(),
+              new Date(log?.created_at).setHours(
+                new Date(log?.created_at).getHours() + 7
+              )
+            ),
             Type: log?.type,
             Team: log?.team?.name,
             Company: log?.team?.company,
@@ -119,11 +126,11 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
             Holder: log.card_holder ?? '-',
           };
         });
-        console.log("logsAfterConverted", logs)
+
         const csv = convertToCSV(logs);
+
         return csv;
       }
     }
-
   }
 };
