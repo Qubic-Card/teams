@@ -52,10 +52,11 @@
     <ConfirmationModal
       isDelete
       isIconVisible
+      isDispatch
       heading="Are you sure you want to delete"
       text={`${connection.profileData?.firstname ?? connection?.name}
       ${connection.profileData?.lastname ?? ''} ?`}
-      on:click={() => {
+      on:action={() => {
         deleteHandler(connection.id, tab);
         deletModalHandler();
       }}

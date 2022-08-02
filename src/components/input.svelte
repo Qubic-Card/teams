@@ -80,7 +80,9 @@
     />
   </div>
   {#if focus && isLinkInput && isLinkInvalid}
-    <small class="text-red-500">Invalid link input</small>
+    <small class="text-red-500">
+      Link require "https://" or "http://" or "www"
+    </small>
   {/if}
   {#if focus && isSocialInput && isSocialValid}
     <small class="text-red-500">Invalid social input</small>

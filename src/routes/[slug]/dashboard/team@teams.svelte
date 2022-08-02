@@ -88,7 +88,6 @@
   let selectedDays = '3 Days';
   let itemsPerPage = 20;
   let totalPages = [];
-  let page = 0;
   let active = 0;
   let paginatedLogs = [];
   let currentPageRows = [];
@@ -118,15 +117,25 @@
   };
 
   const setPage = (p) => {
-    if (p >= 0 && p < totalPages?.length) {
-      page = p;
-      active = p;
-    }
+    page = p;
+    console.log(p);
   };
 
   const renderChart = async () => {
     const ctx = chart.getContext('2d');
     if (chart !== null) chartctx = new Chart(ctx, config);
+  };
+
+  let maxPage = 0;
+  let page = 0;
+  let toItem = 20;
+
+  const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const from = page ? page * limit : 0;
+    const to = page ? from + size - 1 : size - 1;
+
+    return { from, to };
   };
 
   const getTeamConnectionsPreviousList = async () => {
@@ -259,16 +268,87 @@
 
       if (logs) {
         let newArr = [];
+        let groupedLogs = [];
+        let tap = logs.filter((log) =>
+          log.message.includes('QRScan' || 'QRShare' || 'NFC')
+        );
         logs.map((log) => {
           if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
         });
 
-        // console.log('logs', logs);
-        analyticsData[0].data = count;
-        analyticsData[2].data = logs.length;
+        groupedLogs = logs.filter(
+          (log) => !log.message.includes('QRScan' || 'QRShare' || 'NFC')
+        );
 
+        // Grouping by date
+        groupedLogs = groupedLogs.reduce((acc, log) => {
+          const date = new Date(log.created_at).toDateString().slice(4);
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push(log);
+          return acc;
+        }, {});
+
+        groupedLogs = Object.keys(groupedLogs).map((date) => {
+          return {
+            date,
+            logs: groupedLogs[date],
+          };
+        });
+
+        analyticsData[0].data = count;
+        analyticsData[2].data = tap.length;
+        data.datasets[0].data = tapCount(Object.keys(socialIcons), groupedLogs);
+        if (chartctx) chartctx.update();
+
+        currentTeamLogsCount = count;
+        loading = false;
+      }
+    } catch (error) {
+      console.log(error);
+      loading = false;
+    }
+  };
+
+  const getTeamWeeklyLogsActivityList = async () => {
+    const { from, to } = getPagination(page, toItem);
+    // loading = true;
+    try {
+      let {
+        data: logs,
+        error,
+        count,
+      } = await supabase
+        .from('team_logs')
+        .select(
+          'created_at, data->card, data->message, data->link, type, team, team_member(team_profile->firstname, team_profile->lastname)',
+          { count: 'estimated' }
+        )
+        .eq('team', teamId)
+        .gte(
+          'created_at',
+          new Date(
+            new Date(
+              selectedDays === '7 Days'
+                ? last7Days[0]
+                : selectedDays === '14 Days'
+                ? last14Days[0]
+                : selectedDays === '30 Days'
+                ? last30Days[0]
+                : last3Days[0]
+            )
+          ).toISOString()
+        )
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+      if (logs) {
+        // teamLogs = logs.filter(
+        //   (log) => !log.message.includes('QRScan' || 'QRShare' || 'NFC')
+        // );
         teamLogs = logs;
-        paginatedLogs = logs;
+        // console.log(logs.length);
         // Grouping by date
         teamLogs = teamLogs.reduce((acc, log) => {
           const date = new Date(log.created_at).toDateString().slice(4);
@@ -286,10 +366,8 @@
           };
         });
 
-        data.datasets[0].data = tapCount(Object.keys(socialIcons), teamLogs);
-        if (chartctx) chartctx.update();
+        maxPage = Math.floor(count / 20);
 
-        currentTeamLogsCount = count;
         loading = false;
       }
     } catch (error) {
@@ -301,11 +379,14 @@
   onMount(async () => await renderChart());
 
   $: {
-    selectedDays,
+    page,
+      toItem,
+      selectedDays,
       getTeamWeeklyLogsActivity(),
       getTeamConnectionsList(),
       getTeamConnectionsPreviousList(),
-      getTeamWeeklyLogsPreviousActivity();
+      getTeamWeeklyLogsPreviousActivity(),
+      getTeamWeeklyLogsActivityList();
 
     analyticsData[0].percentage = getPercentage(
       currentTeamLogsCount,
@@ -321,24 +402,7 @@
     );
   }
 
-  $: {
-    paginate(paginatedLogs);
-    currentPageRows = totalPages.length > 0 ? totalPages[page] : [];
-    currentPageRows = currentPageRows.reduce((acc, log) => {
-      const date = new Date(log.created_at).toDateString().slice(4);
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(log);
-      return acc;
-    }, {});
-    currentPageRows = Object.keys(currentPageRows).map((date) => {
-      return {
-        date,
-        logs: currentPageRows[date],
-      };
-    });
-  }
+  // $: page, toItem, getTeamWeeklyLogsActivity();
 </script>
 
 <div class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-24 pr-4">
@@ -365,12 +429,11 @@
         </div>
 
         <TeamAnalytics
-          {currentPageRows}
-          {totalPages}
+          currentPageRows={teamLogs}
           {page}
-          {active}
           {setPage}
           {loading}
+          {maxPage}
         />
       </div>
       {#if data.datasets[0].data.every((item) => item === 0)}

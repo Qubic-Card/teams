@@ -4,6 +4,7 @@
   import QuickActionsModal from '@comp/modals/quickActionsModal.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import LinkPreview from '@comp/cards/linkPreview/linkPreview.svelte';
 
   let permissions = {
     writeMembers: false,
@@ -36,24 +37,36 @@
       name: 'Edit profile',
     },
   ];
-  let learn = [
-    'How to use Qubic',
-    'How to use Qubic',
-    'How to use Qubic',
-    'How to use Qubic',
-    'How to use Qubic',
+  let faq = [
+    {
+      title: 'Perbedaan Qubic Teams & Basic',
+      link: 'https://qubicid.notion.site/Produk-Qubic-51424b37949c45e98ba256ad6a9d8ed2',
+    },
+    {
+      title: 'Produk Qubic',
+      link: 'https://qubicid.notion.site/Perbedaan-Qubic-Teams-Basic-916f8ff01ae54374b7a2c6a594534835',
+    },
+    {
+      title: 'Menambah User Saat Subscription Berjalan',
+      link: 'https://qubicid.notion.site/Menambah-User-Saat-Subscription-Berjalan-5bb318c30c3b4e3a99e2aebb5f3cbb08',
+    },
+    {
+      title: 'Minimal Pengguna Qubic Teams',
+      link: 'https://qubicid.notion.site/Minimal-Pengguna-Qubic-Teams-de4c3cf21b5144089fc78184ec856b62',
+    },
+    {
+      title: 'Penggunaan Product Qubic Teams',
+      link: 'https://qubicid.notion.site/Penggunaan-Product-Qubic-Teams-94876ae60adb4e9a9541e43df8e87a3c',
+    },
+    {
+      title: 'Cara Berpindah Qubic Basic → Teams ',
+      link: 'https://qubicid.notion.site/Cara-Berpindah-Qubic-Basic-Teams-2472d3cd8aa6479c80b36d607f509186',
+    },
   ];
-  let banner =
-    'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1632&q=80';
 
   const modalHandler = () => (showModal = !showModal);
-
-  let y = 0;
-  $: y;
-  // $: console.log(y);
 </script>
 
-<svelte:window bind:scrollY={y} />
 <div
   class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-24 pr-4"
 >
@@ -76,21 +89,19 @@
 
   <Analytics />
 
-  <div class="flex flex-col mt-2">
-    <h1 class="text-2xl font-bold">Learn More</h1>
+  <div class="flex flex-col">
+    <h1 class="text-lg font-bold">Learn More</h1>
     <div
-      class="snap-container snap-x mx-auto snap-mandatory h-52 md:h-56 lg:h-80 flex w-full overflow-x-auto mt-8 gap-2"
+      class="snap-container snap-x mx-auto snap-mandatory h-52 md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
     >
-      {#each learn as item}
-        <div
-          class="flex flex-col bg-neutral-800 p-4 rounded-lg snap-center w-[250px] md:w-[350px] lg:w-[450px] flex-shrink-0 cursor-pointer mb-3"
-        >
-          <img
-            src={banner}
-            alt=""
-            class="w-full h-28 md:h-32 lg:h-48 rounded-lg"
+      {#each faq as item}
+        <div class="w-[250px] md:w-[350px] lg:w-[450px] py-4">
+          <LinkPreview
+            isShowMetaImage={true}
+            title={item.title}
+            url={item.link}
+            className="w-[250px] md:w-[350px] lg:w-[450px]"
           />
-          <h1 class="text-xl lg:text-2xl mt-4">{item}</h1>
         </div>
       {/each}
     </div>
@@ -99,7 +110,7 @@
 
 <style>
   .snap-container::-webkit-scrollbar {
-    height: 10px;
+    height: 5px;
   }
   .snap-container::-webkit-scrollbar-track {
     background-color: #e4e4e4;

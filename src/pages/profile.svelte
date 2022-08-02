@@ -35,8 +35,11 @@
 
   const popup = () => toastFailed(`You can't connect to your profile`);
 
-  const downloadHandler = async () =>
-    window.open($teamData.brosur, '_blank').focus();
+  const downloadHandler = () => {
+    $teamData.brosur !== ''
+      ? window.open($teamData.brosur, '_blank').focus()
+      : toastFailed('No brochure uploaded yet');
+  };
 </script>
 
 <div class={`text-sm ${currentTheme.pageBackground} ${$$props.class}`}>

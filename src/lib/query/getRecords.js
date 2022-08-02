@@ -44,11 +44,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     } else {
       let items = data.map((item) => {
         return {
-          DateConnected: new Date(
-            new Date(item?.dateConnected).setHours(
-              new Date(item?.dateConnected).getHours() + 7
-            )
-          ),
+          DateConnected: new Date(new Date(item?.dateConnected)),
           Firstname: item?.firstname,
           Lastname: item?.lastname,
           Company: item?.company,
@@ -111,11 +107,7 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
       } else {
         let logs = data.map((log) => {
           return {
-            Created_at: new Date(
-              new Date(log?.created_at).setHours(
-                new Date(log?.created_at).getHours() + 7
-              )
-            ),
+            Created_at: new Date(new Date(log?.created_at)),
             Type: log?.type,
             Team: log?.team?.name,
             Company: log?.team?.company,

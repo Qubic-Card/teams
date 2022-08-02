@@ -36,6 +36,7 @@
           team_id: teamId,
         })
         .eq('id', teamId);
+
       if (error) {
         loading = false;
         throw new Error(error.message);
@@ -46,10 +47,13 @@
         $teamRoles = [
           ...$teamRoles,
           {
-            role_name: roleName,
-            role_maps: checkedRole,
+            role_name: data[0].role_name,
+            role_maps: data[0].role_maps,
+            id: data[0].id,
           },
         ];
+        roleName = '';
+        checkedRole = [];
       }
     } catch (error) {
       loading = false;
@@ -87,8 +91,8 @@
       bg="bg-neutral-800"
     />
     <button
-      disabled={roleName === '' ? true : false}
-      class="flex justify-center p-4 w-full bg-neutral-700 text-white rounded-lg disabled:bg-neutral-500"
+      disabled={roleName === ''}
+      class="flex justify-center p-4 w-full bg-blue-600 text-white rounded-lg disabled:bg-blue-600/60"
       on:click={async () => await addRoleHandler()}
     >
       {#if loading}

@@ -28,12 +28,7 @@
   let userLogs = [];
   let loading = false;
 
-  let itemsPerPage = 10;
-  let totalPages = [];
   let maxLimit = 5;
-  let page = 0;
-  let currentPageRows = [];
-  let active = 0;
   let isAlreadySeeMore = false;
 
   let connectionChartCtx;
@@ -78,30 +73,14 @@
   let logsChart;
   let connectionsChart;
 
-  let connectionsCsv = {};
-  let logsCsv = {};
   let selectedDays = '';
+  let maxPage = 0;
+  let page = 0;
+  let toItem = 5;
   let isSelectedDaysHasChanged = false;
 
-  const setLimit = (value) => {
-    maxLimit = value;
-    isAlreadySeeMore = !isAlreadySeeMore;
-  };
-
-  const paginate = (items) => {
-    const pages = Math.ceil(items.length / itemsPerPage);
-    const paginatedItems = Array.from({ length: pages }, (_, index) => {
-      const start = index * itemsPerPage;
-      return items.slice(start, start + itemsPerPage);
-    });
-    totalPages = [...paginatedItems];
-  };
-
   const setPage = (p) => {
-    if (p >= 0 && p < totalPages?.length) {
-      page = p;
-      active = p;
-    }
+    page = p;
   };
 
   const selectDaysHandler = (e) => {
@@ -152,7 +131,16 @@
     loading = false;
   };
 
+  const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const from = page ? page * limit : 0;
+    const to = page ? from + size - 1 : size - 1;
+
+    return { from, to };
+  };
+
   const getWeeklyLogsActivity = async () => {
+    const { from, to } = getPagination(page, toItem);
     let id = await getMemberId($user?.id, teamId);
     loading = true;
 
@@ -187,10 +175,13 @@
       )
       .order('created_at', {
         ascending: false,
-      });
+      })
+      .range(from, to);
     // .limit(maxLimit ?? 5);
 
     if (logs) {
+      // console.log(logs);
+      // console.log(count / 10);
       let newArr = [];
       logs.map((log) => {
         if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
@@ -202,6 +193,7 @@
       );
 
       userLogs = logs;
+      maxPage = Math.floor(count / 10);
       loading = false;
     }
     if (error) {
@@ -231,10 +223,13 @@
         : last3Days,
       activity
     );
-
+    // ac2cb004-b1ed-4d53-bec1-c97ffa5917dc
+    // https://qubic.id/qbc/613572e9-f471-4f0d-90d2-d8511d1ac462?type=QRScan
     if (logChartCtx) logChartCtx.update();
     isSelectedDaysHasChanged = false;
     isAlreadySeeMore = false;
+    page = 0;
+    toItem = 5;
   };
 
   const connection = async () => {
@@ -264,15 +259,8 @@
     isAlreadySeeMore = false;
   };
 
-  $: selectedDays, paginate(userLogs.slice(0, maxLimit));
   $: selectedDays, connection(), activityHandler();
-  $: if (isSelectedDaysHasChanged && maxLimit > 5) setLimit(5);
-  $: currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
-  $: if (selectedDays !== '') {
-    page = 0;
-    active = 0;
-  }
-
+  // $: console.log(page);
   onMount(async () => {
     const connectionsCtx = connectionsChart.getContext('2d');
     connectionChartCtx = new Chart(connectionsCtx, connectionsConfig);
@@ -280,6 +268,8 @@
     const logsCtx = logsChart.getContext('2d');
     logChartCtx = new Chart(logsCtx, logsConfig);
   });
+
+  $: page, toItem, getWeeklyLogsActivity();
 </script>
 
 <div class="h-auto flex justify-center mt-2">
@@ -314,15 +304,17 @@
     </div>
     <div class="hidden lg:flex lg:flex-col">
       <AnalyticTable
+        on:click={() => {
+          page = 0;
+          toItem = 10;
+          isAlreadySeeMore = true;
+        }}
+        {page}
+        {maxPage}
         {loading}
-        {totalPages}
-        on:click={() => setLimit(5000)}
-        on:hide={() => setLimit(5)}
         {isAlreadySeeMore}
         {setPage}
-        {page}
-        {currentPageRows}
-        {active}
+        currentPageRows={userLogs}
       />
     </div>
     <div class="flex lg:hidden w-full justify-center mt-8">

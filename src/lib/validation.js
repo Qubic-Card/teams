@@ -46,8 +46,12 @@ export const socialValidator = (value) => {
 
 export const linkValidator = (value) => {
   const link = value.trim();
-
-  linkRegex(link) ? (isLinkInvalid = false) : (isLinkInvalid = true);
+  console.log(link);
+  link.startsWith('http://') ||
+  link.startsWith('https://') ||
+  link.startsWith('www')
+    ? (isLinkInvalid = false)
+    : (isLinkInvalid = true);
 };
 
 export const emailValidator = (value) => {

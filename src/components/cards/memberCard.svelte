@@ -107,11 +107,12 @@
 </script>
 
 <ConfirmationModal
+  isDispatch
   heading="Are you sure to change your role?"
   buttonLabel="Yes, i am sure."
   {showModal}
   {toggleModal}
-  on:click={async () => {
+  on:action={async () => {
     await setMemberRole(roleID);
     selectRole(roleName);
     showModal = false;
@@ -120,12 +121,13 @@
 
 <ConfirmationModal
   isDelete
+  isDispatch
   heading="Are you sure you want to delete"
   text={`${teamProfile?.firstname} ${teamProfile?.lastname} from this team?`}
   buttonLabel="Delete"
   showModal={showDeleteMemberModal}
   toggleModal={toggleDeleteMemberModal}
-  on:click={async () => {
+  on:action={async () => {
     await deleteMemberHandler(member?.team_member_id?.id, member);
     showDeleteMemberModal = false;
   }}

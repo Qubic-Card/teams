@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Pagination from '@comp/pagination.svelte';
+  import PaginationButton from '@comp/buttons/paginationButton.svelte';
   import { onMount } from 'svelte';
   import Cookies from 'js-cookie';
   import supabase from '@lib/db';
@@ -29,29 +29,36 @@
   let state = 'all';
   let allMember = [];
   let itemsPerPage = 9;
-  let page = 0;
+
   let totalPages = [];
   let active = 0;
   let currentPageRows = [];
   let updatedRole = '';
+  let maxPage = 0;
+  let page = 0;
+  let toItem = 9;
 
-  const paginate = (items) => {
-    const pages = Math.ceil(items.length / itemsPerPage);
-    const paginatedItems = Array.from({ length: pages }, (_, index) => {
-      const start = index * itemsPerPage;
-      return items.slice(start, start + itemsPerPage);
-    });
-    totalPages = [...paginatedItems];
-    currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
-  };
+  // const paginate = (items) => {
+  //   const pages = Math.ceil(items.length / itemsPerPage);
+  //   const paginatedItems = Array.from({ length: pages }, (_, index) => {
+  //     const start = index * itemsPerPage;
+  //     return items.slice(start, start + itemsPerPage);
+  //   });
+  //   totalPages = [...paginatedItems];
+  //   currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
+  // };
 
   const setPage = (p) => {
-    if (p >= 0 && p < totalPages?.length) {
-      page = p;
-      active = p;
-    }
+    page = p;
+    console.log(p);
+  };
 
-    console.log(page, active, p);
+  const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const from = page ? page * limit : 0;
+    const to = page ? from + size - 1 : size - 1;
+
+    return { from, to };
   };
 
   const setState = (newState) => (state = newState);
@@ -71,15 +78,18 @@
   };
 
   const getTeamCard = async () => {
-    const { data, error } = await supabase
+    const { from, to } = getPagination(page, toItem);
+    const { data, error, count } = await supabase
       .from('business_cards')
       .select('id, type, color, team_id')
       .eq('team_id', teamId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .range(from, to);
 
     if (error) console.log(error);
     if (data) {
       cards = data;
+      maxPage = Math.floor(count / 9);
     }
   };
 
@@ -126,9 +136,7 @@
     });
   }
 
-  $: currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
   $: allMember = [...activeMembers, ...inactiveCards];
-  $: paginate(allMember);
 
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
@@ -174,7 +182,7 @@
       }`}
     >
       {#if state === 'all'}
-        {#each currentPageRows as member, i}
+        {#each allMember as member, i}
           <MemberCard
             {member}
             {roles}
@@ -186,7 +194,7 @@
         {/each}
       {/if}
       {#if state === 'active'}
-        {#each currentPageRows as member, i}
+        {#each allMember as member, i}
           {#if member.team_member_id}
             <MemberCard
               {member}
@@ -200,7 +208,7 @@
         {/each}
       {/if}
       {#if state === 'inactive'}
-        {#each currentPageRows as member, i}
+        {#each allMember as member, i}
           {#if member.id}
             <MemberCard {member} {roles} {permissions} {updatedRole} />
           {/if}
@@ -212,8 +220,13 @@
         {searchNotFoundMsg}
       </div>
     {/if}
-    {#if permissions.readMembers && currentPageRows.length > 9}
-      <Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
+    {#if permissions.readMembers && allMember.length < 9}
+      <PaginationButton
+        currentPageRows={allMember}
+        {setPage}
+        {page}
+        {maxPage}
+      />
     {/if}
   {:catch}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
