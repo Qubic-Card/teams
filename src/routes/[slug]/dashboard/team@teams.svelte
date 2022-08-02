@@ -142,13 +142,15 @@
       .gte(
         'dateConnected',
         new Date(
-          selectedDays === '7 Days'
-            ? sevenDays[0]
-            : selectedDays === '14 Days'
-            ? fourteenDays[0]
-            : selectedDays === '30 Days'
-            ? thirtyDays[0]
-            : threeDays[0]
+          new Date(
+            selectedDays === '7 Days'
+              ? sevenDays[0]
+              : selectedDays === '14 Days'
+              ? fourteenDays[0]
+              : selectedDays === '30 Days'
+              ? thirtyDays[0]
+              : threeDays[0]
+          )
         ).toUTCString()
       )
       .order('dateConnected', { ascending: false });
@@ -169,13 +171,15 @@
         .gte(
           'created_at',
           new Date(
-            selectedDays === '7 Days'
-              ? sevenDays[0]
-              : selectedDays === '14 Days'
-              ? fourteenDays[0]
-              : selectedDays === '30 Days'
-              ? thirtyDays[0]
-              : threeDays[0]
+            new Date(
+              selectedDays === '7 Days'
+                ? sevenDays[0]
+                : selectedDays === '14 Days'
+                ? fourteenDays[0]
+                : selectedDays === '30 Days'
+                ? thirtyDays[0]
+                : threeDays[0]
+            )
           ).toUTCString()
         )
         .order('created_at', { ascending: false });
@@ -200,13 +204,15 @@
       .gte(
         'dateConnected',
         new Date(
-          selectedDays === '7 Days'
-            ? last7Days[0]
-            : selectedDays === '14 Days'
-            ? last14Days[0]
-            : selectedDays === '30 Days'
-            ? last30Days[0]
-            : last3Days[0]
+          new Date(
+            selectedDays === '7 Days'
+              ? last7Days[0]
+              : selectedDays === '14 Days'
+              ? last14Days[0]
+              : selectedDays === '30 Days'
+              ? last30Days[0]
+              : last3Days[0]
+          )
         ).toUTCString()
       )
       // .rangeLt('dateConnected', [a, b])
@@ -238,13 +244,15 @@
         .gte(
           'created_at',
           new Date(
-            selectedDays === '7 Days'
-              ? last7Days[0]
-              : selectedDays === '14 Days'
-              ? last14Days[0]
-              : selectedDays === '30 Days'
-              ? last30Days[0]
-              : last3Days[0]
+            new Date(
+              selectedDays === '7 Days'
+                ? last7Days[0]
+                : selectedDays === '14 Days'
+                ? last14Days[0]
+                : selectedDays === '30 Days'
+                ? last30Days[0]
+                : last3Days[0]
+            )
           ).toISOString()
         )
         .order('created_at', { ascending: false });

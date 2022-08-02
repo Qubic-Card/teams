@@ -19,7 +19,7 @@
 
   let teamId = Cookies.get('qubicTeamId');
   let fileName = `${new Date().toDateString().slice(4)}`;
-  let selectedType = 'Choose Type';
+  let selectedType = 'Activities';
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
@@ -107,7 +107,7 @@
 
       updated();
       fileName = `${new Date().toDateString().slice(4)}`;
-      selectedType = 'Choose Type';
+      selectedType = 'Activities';
       toDateValue = new Date(today);
       fromDateValue = new Date(today);
       toDateOptions.maxDate = new Date(today);

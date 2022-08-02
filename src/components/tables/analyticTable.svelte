@@ -1,6 +1,9 @@
 <script>
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
   import Pagination from '@comp/pagination.svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher();
 
   export let loading,
     totalPages,
@@ -51,6 +54,11 @@
       <button
         class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
         on:click>See more</button
+      >
+    {:else if isAlreadySeeMore && active == 0}
+      <button
+        class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
+        on:click={() => dispatch('hide')}>Hide</button
       >
     {/if}
   {/if}

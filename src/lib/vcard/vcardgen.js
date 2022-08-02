@@ -93,7 +93,7 @@ export const genvcard = async (prop, team) => {
         if (e.type === 'email') personalEmail = e.data;
         if (e.type === 'phone') {
           phoneNumber = e.data;
-          if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
+          // if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
           if (phoneNumber.startsWith('08')) {
             phoneNumber = phoneNumber.slice(1);
             phoneNumber = '+62' + phoneNumber;

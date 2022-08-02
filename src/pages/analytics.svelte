@@ -85,7 +85,7 @@
 
   const setLimit = (value) => {
     maxLimit = value;
-    isAlreadySeeMore = true;
+    isAlreadySeeMore = !isAlreadySeeMore;
   };
 
   const paginate = (items) => {
@@ -113,15 +113,16 @@
     let id = await getMemberId($user?.id, teamId);
 
     loading = true;
-
     let minTime = new Date(
-      selectedDays === '7 Days'
-        ? last7Days[0]
-        : selectedDays === '14 Days'
-        ? last14Days[0]
-        : selectedDays === '30 Days'
-        ? last30Days[0]
-        : last3Days[0]
+      new Date(
+        selectedDays === '7 Days'
+          ? last7Days[0]
+          : selectedDays === '14 Days'
+          ? last14Days[0]
+          : selectedDays === '30 Days'
+          ? last30Days[0]
+          : last3Days[0]
+      )
     ).toUTCString();
 
     let {
@@ -156,14 +157,16 @@
     loading = true;
 
     let minTime = new Date(
-      selectedDays === '7 Days'
-        ? last7Days[0]
-        : selectedDays === '14 Days'
-        ? last14Days[0]
-        : selectedDays === '30 Days'
-        ? last30Days[0]
-        : last3Days[0]
-    ).toISOString();
+      new Date(
+        selectedDays === '7 Days'
+          ? last7Days[0]
+          : selectedDays === '14 Days'
+          ? last14Days[0]
+          : selectedDays === '30 Days'
+          ? last30Days[0]
+          : last3Days[0]
+      )
+    ).toUTCString();
 
     let {
       data: logs,
@@ -313,7 +316,8 @@
       <AnalyticTable
         {loading}
         {totalPages}
-        on:click={() => setLimit(500)}
+        on:click={() => setLimit(5000)}
+        on:hide={() => setLimit(5)}
         {isAlreadySeeMore}
         {setPage}
         {page}
