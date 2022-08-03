@@ -43,6 +43,7 @@
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import getCroppedImg from '@lib/utils/canvas';
   import Cropper from 'svelte-easy-crop';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   // Register the plugins
   registerPlugin(
@@ -105,7 +106,7 @@
     await handleSave();
   };
 
-  const handleAddBrochure = async (output, file) => {
+  const handleAddBrochure = async (err, file) => {
     let timestamp = new Date().getTime();
     const { data } = await supabase.storage
       .from('brochure')
@@ -117,9 +118,12 @@
       .from('brochure')
       .getPublicUrl(`${$user?.id}/${timestamp}${file?.filename}`);
 
-    toastSuccess('Successfully uploaded brosur');
+    toastSuccess('Successfully uploaded the brochure');
     brochurePond.removeFile();
-    $teamData.brosur = publicURL;
+    $teamData.brochure = {
+      url: publicURL,
+      title: file.filename,
+    };
     await handleSave();
   };
 
@@ -175,7 +179,31 @@
     }
     return data;
   };
+  let showDeleteBrochureModal = false;
+  const toggleBrochureModal = () =>
+    (showDeleteBrochureModal = !toggleBrochureModal);
 </script>
+
+<!-- text={`${teamProfile?.firstname} ${teamProfile?.lastname} from this team?`} -->
+
+{#if showDeleteBrochureModal}
+  <ConfirmationModal
+    isDelete
+    isDispatch
+    heading="Are you sure you want to delete"
+    text={`${$teamData?.brochure?.title}?`}
+    buttonLabel="Delete"
+    showModal={showDeleteBrochureModal}
+    toggleModal={toggleBrochureModal}
+    on:action={async () => {
+      showDeleteBrochureModal = false;
+      $teamData.brochure.url = '';
+      $teamData.brochure.title = '';
+      await handleSave();
+      toastFailed('Brochure deleted successfully');
+    }}
+  />
+{/if}
 
 <ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
 
@@ -289,6 +317,13 @@
                       bind:value={$teamData.description}
                       disabled={permissions.writeTeam ? false : true}
                     />
+                    <Input
+                      on:change={handleSave}
+                      placeholder="Brochure Title"
+                      title="Brochure Title"
+                      bind:value={$teamData.brochure.title}
+                      disabled={permissions.writeTeam ? false : true}
+                    />
                   </div>
 
                   <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
@@ -309,18 +344,48 @@
                       allowMultiple={false}
                       onpreparefile={handleCrop}
                     />
-                    <FilePond
-                      bind:this={brochurePond}
-                      {name}
-                      credits=""
-                      allowProcess={false}
-                      class="cursor-pointer"
-                      acceptedFileTypes={['application/pdf']}
-                      instantUpload={false}
-                      labelIdle="Add Brochure"
-                      allowMultiple={false}
-                      onaddfile={handleAddBrochure}
-                    />
+
+                    {#if $teamData?.brochure?.url === ''}
+                      <FilePond
+                        bind:this={brochurePond}
+                        {name}
+                        credits=""
+                        allowProcess={false}
+                        class="cursor-pointer"
+                        acceptedFileTypes={['application/pdf']}
+                        instantUpload={false}
+                        labelIdle="Add Brochure"
+                        allowMultiple={false}
+                        onaddfile={handleAddBrochure}
+                      />
+                    {:else}
+                      <div
+                        class="bg-neutral-100 rounded-md h-4/5 p-2 gap-2 flex items-center"
+                      >
+                        <p class="w-64 truncate text-neutral-700 text-sm">
+                          {$teamData?.brochure?.title}
+                        </p>
+                        <button
+                          class="p-2 bg-red-600 rounded-md self-start"
+                          on:click={() => (showDeleteBrochureModal = true)}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="white"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    {/if}
                   </div>
                 </div>
               </TabPanel>

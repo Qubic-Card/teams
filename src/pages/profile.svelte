@@ -26,6 +26,7 @@
 
   export let data;
   export let isEditorMode = false;
+
   // 09fb5818-c8ce-4b12-bfbb-f939d7da7321 card
   // 402ef83e-5627-4273-8086-48d88000d200 team
   // 3c5c060b-3066-4da0-9e7b-fe557186b27a uid
@@ -36,8 +37,8 @@
   const popup = () => toastFailed(`You can't connect to your profile`);
 
   const downloadHandler = () => {
-    $teamData.brosur !== ''
-      ? window.open($teamData.brosur, '_blank').focus()
+    $teamData?.brochure?.url !== ''
+      ? window.open($teamData?.brochure?.url, '_blank').focus()
       : toastFailed('No brochure uploaded yet');
   };
 </script>
@@ -124,15 +125,17 @@
               {$teamData.description ?? '-'}
             </p>
           </div>
-          <div
-            on:click={downloadHandler}
-            class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
-          >
-            <h1>Know more about us</h1>
-            <p class="text-xs text-neutral-400">
-              Download brochure {$teamData.company}
-            </p>
-          </div>
+          {#if $teamData?.brochure?.url !== ''}
+            <div
+              on:click={downloadHandler}
+              class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
+            >
+              <h1>{$teamData?.brochure?.title}</h1>
+              <p class="text-xs text-neutral-400">
+                Download brochure {$teamData.company}
+              </p>
+            </div>
+          {/if}
           <div class={currentTheme.text}>
             <div class="flex justify-between flex-wrap items-start gap-1 my-1">
               {#each isEditorMode ? $teamSocials : data.socials as item}

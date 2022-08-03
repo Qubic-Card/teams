@@ -5,15 +5,39 @@
     'bg-neutral-800/90',
     'bg-neutral-800/90',
   ];
-  let totalCol = [];
-
-  for (let i = 0; i < colLength; i++) {
-    totalCol = [...totalCol, i];
-  }
+  let width = ['w-72', 'w-full', 'w-72'];
 </script>
 
-<tr class="animate-pulse first:bg-black bg-neutral-700 my-2">
-  {#each totalCol as item, i}
-    <td class={`h-12 border-b border-neutral-700 ${bg[i]}`} />
+<tr class="animate-pulse my-2">
+  {#each Array(colLength) as item, i}
+    <td class={`h-12 border-b p-1 border-neutral-700 ${width[i]} ${bg[i]}`}>
+      <div class={`animate h-8 rounded-md ${width[i]}`} />
+    </td>
   {/each}
 </tr>
+
+<style>
+  tr > td > .animate {
+    background: linear-gradient(
+      to right,
+      #171717 20%,
+      #1f1f1f 50%,
+      #171717 80%
+    );
+    background-size: 500px 100px;
+    background-color: red;
+    animation-name: moving-gradient;
+    animation-duration: 0.8s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+  @keyframes moving-gradient {
+    0% {
+      background-position: -250px 0;
+    }
+    100% {
+      background-position: 250px 0;
+    }
+  }
+</style>

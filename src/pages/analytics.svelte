@@ -28,7 +28,6 @@
   let userLogs = [];
   let loading = false;
 
-  let maxLimit = 5;
   let isAlreadySeeMore = false;
 
   let connectionChartCtx;
@@ -77,16 +76,10 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 5;
-  let isSelectedDaysHasChanged = false;
 
-  const setPage = (p) => {
-    page = p;
-  };
+  const setPage = (p) => (page = p);
 
-  const selectDaysHandler = (e) => {
-    selectedDays = e.detail;
-    isSelectedDaysHasChanged = true;
-  };
+  const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getConnectionsList = async () => {
     let id = await getMemberId($user?.id, teamId);
@@ -177,11 +170,8 @@
         ascending: false,
       })
       .range(from, to);
-    // .limit(maxLimit ?? 5);
 
     if (logs) {
-      // console.log(logs);
-      // console.log(count / 10);
       let newArr = [];
       logs.map((log) => {
         if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
@@ -193,7 +183,7 @@
       );
 
       userLogs = logs;
-      maxPage = Math.floor(count / 10);
+      maxPage = Math.ceil(count / 10);
       loading = false;
     }
     if (error) {
@@ -223,10 +213,8 @@
         : last3Days,
       activity
     );
-    // ac2cb004-b1ed-4d53-bec1-c97ffa5917dc
-    // https://qubic.id/qbc/613572e9-f471-4f0d-90d2-d8511d1ac462?type=QRScan
+
     if (logChartCtx) logChartCtx.update();
-    isSelectedDaysHasChanged = false;
     isAlreadySeeMore = false;
     page = 0;
     toItem = 5;
@@ -255,12 +243,13 @@
     );
 
     if (connectionChartCtx) connectionChartCtx.update();
-    isSelectedDaysHasChanged = false;
+
     isAlreadySeeMore = false;
   };
 
   $: selectedDays, connection(), activityHandler();
-  // $: console.log(page);
+  $: page, toItem, getWeeklyLogsActivity();
+
   onMount(async () => {
     const connectionsCtx = connectionsChart.getContext('2d');
     connectionChartCtx = new Chart(connectionsCtx, connectionsConfig);
@@ -268,8 +257,6 @@
     const logsCtx = logsChart.getContext('2d');
     logChartCtx = new Chart(logsCtx, logsConfig);
   });
-
-  $: page, toItem, getWeeklyLogsActivity();
 </script>
 
 <div class="h-auto flex justify-center mt-2">
