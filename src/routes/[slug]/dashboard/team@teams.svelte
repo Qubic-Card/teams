@@ -86,16 +86,11 @@
   let currentTeamLogsCount = 0;
   let teamId = Cookies.get('qubicTeamId');
   let selectedDays = '3 Days';
-  let itemsPerPage = 20;
-  let totalPages = [];
-  let active = 0;
-  let paginatedLogs = [];
   let currentPageRows = [];
 
   const selectDaysHandler = (e) => {
     selectedDays = e.detail;
     page = 0;
-    active = 0;
   };
 
   const getPercentage = (current, previous) => {
@@ -105,15 +100,6 @@
     } else {
       return 0;
     }
-  };
-
-  const paginate = (items) => {
-    const pages = Math.ceil(items.length / itemsPerPage);
-    const paginatedItems = Array.from({ length: pages }, (_, index) => {
-      const start = index * itemsPerPage;
-      return items.slice(start, start + itemsPerPage);
-    });
-    totalPages = [...paginatedItems];
   };
 
   const setPage = (p) => {
@@ -366,7 +352,7 @@
           };
         });
 
-        maxPage = Math.floor(count / 20);
+        maxPage = Math.ceil(count / 20);
 
         loading = false;
       }

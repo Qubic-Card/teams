@@ -9,10 +9,13 @@ export const teamData = writable({
   logo: '',
   email: '',
   phone: '',
-  brosur: '',
+  brochure: {
+    url: '',
+    title: '',
+  },
   avatar: '',
-  socials: '',
-  links: '',
+  socials: [],
+  links: [],
   isShowMetaImage: false,
   design: {
     theme: 'dark',

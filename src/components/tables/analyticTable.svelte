@@ -1,19 +1,22 @@
 <script>
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
   import Pagination from '@comp/pagination.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
+  import { fade } from 'svelte/transition';
 
-  const dispatch = createEventDispatcher();
-  const skeleton = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   export let loading, isAlreadySeeMore, currentPageRows, setPage, page, maxPage;
+  const dispatch = createEventDispatcher();
 </script>
 
 <div class="bg-neutral-800 rounded-lg border border-neutral-700">
+  {#if loading}
+    <div class="bg-black/90 w-full rounded-md h-12" />
+  {/if}
   <table class="text-black w-full">
     {#if currentPageRows}
       {#if loading}
-        {#each skeleton as item}
+        {#each Array(isAlreadySeeMore ? 10 : 5) as item}
           <TableSkeleton colLength={3} />
         {/each}
       {:else}
@@ -25,8 +28,9 @@
           </tr>
         </thead>
         <tbody class="p-2">
-          {#each currentPageRows as row}
+          {#each currentPageRows as row, i}
             <tr
+              in:fade={{ duration: 200 }}
               class="bg-neutral-800 text-neutral-300 border-b border-neutral-700 hover:border"
             >
               <td class="pl-4 p-2 w-48">
