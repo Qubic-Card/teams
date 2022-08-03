@@ -58,6 +58,7 @@
 
   let teamId = Cookies.get('qubicTeamId');
   let pond;
+  let brochurePond;
   let name = 'filepond';
   let teamNickname = null;
   let isOpen = false;
@@ -117,7 +118,7 @@
       .getPublicUrl(`${$user?.id}/${timestamp}${file?.filename}`);
 
     toastSuccess('Successfully uploaded brosur');
-    pond.removeFile();
+    brochurePond.removeFile();
     $teamData.brosur = publicURL;
     await handleSave();
   };
@@ -309,7 +310,7 @@
                       onpreparefile={handleCrop}
                     />
                     <FilePond
-                      bind:this={pond}
+                      bind:this={brochurePond}
                       {name}
                       credits=""
                       allowProcess={false}

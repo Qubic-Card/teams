@@ -36,7 +36,7 @@
     isLoading = false;
   }
   async function clickHandler(e) {
-    await goto(url);
+    await window.open(url, '_blank').focus();
   }
   const proxyUrl = 'https://qubicrlp.herokuapp.com/v2';
   const placeholderImg =

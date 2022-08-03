@@ -16,7 +16,7 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let personalCsv;
+  export let personalCsv, getPersonalStorage;
 
   let teamId = Cookies.get('qubicTeamId');
   let fileName = `${new Date().toDateString().slice(4)}`;
@@ -27,7 +27,6 @@
   let asc = false;
 
   const dispatch = createEventDispatcher();
-  const updated = () => dispatch('updated', true);
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
@@ -104,10 +103,10 @@
             selectedType === 'Activities' ? 'activities' : 'connections'
           } created successfully`
         );
+        await getPersonalStorage();
         isLoading = false;
       }
 
-      updated();
       fileName = `${new Date().toDateString().slice(4)}`;
       selectedType = 'Activities';
       toDateValue = new Date(today);
@@ -134,9 +133,10 @@
     }
   };
 
-  const deleteFromTable = (id) => {
+  const deleteFromTable = async (id) => {
     personalCsv = personalCsv.filter((item) => item.id !== id);
-    updated();
+    dispatch('updated', personalCsv);
+    await getPersonalStorage();
   };
 
   const selectTypeHandler = (e) => (selectedType = e.detail);
@@ -196,13 +196,13 @@
   >
 </div>
 <div
-  class="w-3/4 snap-container snap-x mx-auto snap-mandatory flex flex-col overflow-x-auto mb-8"
+  class="w-3/4 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
 >
   <table class="snap-center text-black w-full">
     <thead class="text-left text-neutral-400 bg-black/70">
       <tr>
         <TableHead
-          class="w-1/4"
+          class="w-1/6"
           data={recordsTable}
           on:sort={async (e) => {
             asc = !asc;
@@ -228,3 +228,16 @@
     </tbody>
   </table>
 </div>
+
+<style>
+  .snap-container::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+  }
+  .snap-container::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+  }
+  .snap-container::-webkit-scrollbar-thumb {
+    background-color: #71717a;
+  }
+</style>

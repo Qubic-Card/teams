@@ -53,16 +53,21 @@
     }
   };
 
+  const getAllStorage = async () => {
+    await getPersonalStorage();
+    await getTeamStorage();
+  };
+
   $: $userData?.filter((item) => {
     if (item === 'allow_write_records') {
       permissions.writeRecords = true;
     } else permissions.writeRecords = false;
   });
 
-  $: if (isUpdated) getPersonalStorage(), getTeamStorage();
+  // $: if (isUpdated) getPersonalStorage(), getTeamStorage();
 </script>
 
-{#await (getPersonalStorage(), getTeamStorage())}
+{#await getAllStorage()}
   <RecordsSkeleton />
 {:then name}
   <div
@@ -99,16 +104,25 @@
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">
-            <PersonalRecords {personalCsv} on:updated={updatedData} />
+            <PersonalRecords
+              {personalCsv}
+              {teamCsv}
+              {getPersonalStorage}
+              on:updated={(e) => (teamCsv = e.detail)}
+            />
           </TabPanel>
           <TabPanel class="flex h-full">
-            <TeamRecords {teamCsv} on:updated={updatedData} />
+            <TeamRecords
+              {teamCsv}
+              {getTeamStorage}
+              on:updated={(e) => (teamCsv = e.detail)}
+            />
           </TabPanel>
         </TabPanels>
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords {personalCsv} on:updated={updatedData} />
+        <PersonalRecords {personalCsv} {teamCsv} {getPersonalStorage} />
       </div>
     {/if}
   </div>

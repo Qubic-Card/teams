@@ -2,27 +2,20 @@
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
   import Pagination from '@comp/pagination.svelte';
   import { createEventDispatcher } from 'svelte';
+  import PaginationButton from '@comp/buttons/paginationButton.svelte';
 
   const dispatch = createEventDispatcher();
-
-  export let loading,
-    totalPages,
-    isAlreadySeeMore,
-    page,
-    currentPageRows,
-    active,
-    setPage;
+  const skeleton = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  export let loading, isAlreadySeeMore, currentPageRows, setPage, page, maxPage;
 </script>
 
 <div class="bg-neutral-800 rounded-lg border border-neutral-700">
   <table class="text-black w-full">
     {#if currentPageRows}
       {#if loading}
-        <TableSkeleton colLength={3} />
-        <TableSkeleton colLength={3} />
-        <TableSkeleton colLength={3} />
-        <TableSkeleton colLength={3} />
-        <TableSkeleton colLength={3} />
+        {#each skeleton as item}
+          <TableSkeleton colLength={3} />
+        {/each}
       {:else}
         <thead class="text-neutral-200 bg-black/60">
           <tr>
@@ -55,20 +48,21 @@
         class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
         on:click>See more</button
       >
-    {:else if isAlreadySeeMore && active == 0}
+      <!-- {:else if isAlreadySeeMore && active == 0}
       <button
         class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
         on:click={() => dispatch('hide')}>Hide</button
-      >
+      > -->
     {/if}
   {/if}
-  {#if totalPages.length === 0}
-    {#if currentPageRows?.length === 0 && !loading}
-      <div class="text-center">
-        <h1 class="text-xl my-4">No activity found</h1>
-      </div>
-    {/if}
+
+  {#if currentPageRows?.length === 0 && !loading}
+    <div class="text-center">
+      <h1 class="text-xl my-4">No activity found</h1>
+    </div>
   {/if}
 </div>
 
-<Pagination {currentPageRows} {totalPages} {active} {setPage} {page} />
+{#if isAlreadySeeMore}
+  <PaginationButton {currentPageRows} {setPage} {page} {maxPage} />
+{/if}

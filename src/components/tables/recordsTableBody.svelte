@@ -53,28 +53,31 @@
 <tr
   class="h-12 text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
 >
-  <td class="font-bold text-ellipsis truncate pl-4 flex-1">
-    {record.name ?? '-'}
+  <td class="font-bold text-ellipsis pl-4">
+    <p class="w-96 truncate">
+      {record.name ?? '-'}
+    </p>
   </td>
 
-  <td class="flex-1 truncate pl-4">
+  <td class="pl-4">
     {new Date(record.created_at).toDateString().slice(4) ?? '-'}
   </td>
 
-  <td class="flex-1 truncate pl-4 pr-4">
+  <td class="pl-4 pr-4">
     {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
-  <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
+  <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
     <ConfirmationModal
       isDelete
       isIconVisible
+      isDispatch
       heading="Are you sure you want to delete"
       text={`${record.profileData?.firstname ?? record?.name}
       ${record.profileData?.lastname ?? ''} ?`}
       buttonLabel="Delete"
       showModal={showDeleteModal}
       toggleModal={deleteModalHandler}
-      on:click={async () => {
+      on:action={async () => {
         await deleteCsv();
         deleteFromTable(record.id);
         deleteModalHandler();

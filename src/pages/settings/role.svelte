@@ -15,12 +15,15 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import Cookies from 'js-cookie';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let permissions;
   let roleMaps = [];
   let isClicked = true;
   let loading = false;
   let teamId = Cookies.get('qubicTeamId');
+  let roleId = null;
+  let roleName = '';
 
   const updateTeamsRoleMapping = async (id) => {
     loading = true;
@@ -44,7 +47,53 @@
   };
 
   const clicked = (e) => (isClicked = e.detail);
+
+  let showDeleteModal = false;
+  const toggleDelete = () => (showDeleteModal = !showDeleteModal);
+  const checkIsRoleUsed = async (id) => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('role')
+      .eq('role', id);
+
+    if (error) {
+      toastFailed('Failed to check role');
+    }
+    console.log(data);
+    if (data.length > 0) {
+      toastFailed('Cannot delete role, it is used');
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const deleteRoleHandler = async (id) => {
+    if ((await checkIsRoleUsed(id)) === false) {
+      const { data, error } = await supabase
+        .from('team_roles')
+        .delete()
+        .eq('id', id);
+
+      if (!error) toastSuccess('Role deleted');
+
+      $teamRoles = $teamRoles.filter((role) => role.id !== id);
+    }
+
+    showDeleteModal = false;
+  };
 </script>
+
+<ConfirmationModal
+  isDelete
+  id={roleId}
+  heading="Are you sure you want to delete"
+  text={`${roleName}?`}
+  buttonLabel="Delete"
+  showModal={showDeleteModal}
+  toggleModal={toggleDelete}
+  {deleteRoleHandler}
+/>
 
 <div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-4`}>
   <div class="bg-neutral-800 rounded-lg w-3/4 p-4">
@@ -70,7 +119,20 @@
                 role?.role_name?.slice(1)}
             </DisclosureButton>
             {#if permissions.writeRoles}
+              <div class="bg-red-500 p-2 mr-2 rounded-md">
+                <img
+                  src="/delete-icon.svg"
+                  alt=""
+                  class="w-6 h-6 cursor-pointer"
+                  on:click={() => {
+                    toggleDelete();
+                    roleId = role?.id;
+                    roleName = role?.role_name;
+                  }}
+                />
+              </div>
               <RenameModal id={role.id} />
+
               {#if open}
                 <button
                   transition:fade|local={{ duration: 200 }}
