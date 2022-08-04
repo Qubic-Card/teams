@@ -13,32 +13,36 @@
   const toggleModal = () => (showModal = !showModal);
 
   const updateRoleName = async () => {
-    try {
-      loading = true;
-      const { error } = await supabase
-        .from('team_roles')
-        .update(
-          {
-            role_name: roleName,
-          },
-          { returning: 'minimal' }
-        )
-        .eq('id', id);
+    if (roleName === '') {
+      toastFailed('Empty field');
+    } else {
+      try {
+        loading = true;
+        const { error } = await supabase
+          .from('team_roles')
+          .update(
+            {
+              role_name: roleName,
+            },
+            { returning: 'minimal' }
+          )
+          .eq('id', id);
 
-      if (error) {
-        throw new Error(error.message);
-      } else {
+        if (error) {
+          throw new Error(error.message);
+        } else {
+          loading = false;
+          toastSuccess('Role name updated');
+          setTimeout(() => {
+            location.reload();
+          }, 500);
+        }
+
+        toggleModal();
+      } catch (error) {
         loading = false;
-        toastSuccess('Role name updated');
-        setTimeout(() => {
-          location.reload();
-        }, 500);
+        toastFailed("Couldn't update role name");
       }
-
-      toggleModal();
-    } catch (error) {
-      loading = false;
-      toastFailed("Couldn't update role name");
     }
   };
 </script>
@@ -47,7 +51,6 @@
   type="button"
   on:click={toggleModal}
   class="p-3 bg-white rounded-lg disabled:bg-white/60"
-  disabled={roleName === 'admin' ? true : false}
 >
   <img
     class="h-4 w-4"
@@ -75,7 +78,7 @@
     />
     <button
       on:click={async () => await updateRoleName()}
-      class="flex justify-center items-center p-3 w-full bg-neutral-700 hover:bg-neutral-800 hover:border hover:border-neutral-500"
+      class="flex justify-center items-center p-3 w-full bg-blue-600 hover:bg-blue-600/90 rounded-md"
     >
       {#if loading}
         <Spinner class="w-7 h-7" />

@@ -16,6 +16,7 @@
   } from '@rgossiaux/svelte-headlessui';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { createEventDispatcher } from 'svelte';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
 
   export let permissions;
   export let roles = [];
@@ -284,7 +285,7 @@
                 {teamProfile.job}
               </h2>
               <h2 class="text-neutral-300 text-xs">
-                Joined since {new Date(member?.team_member_id.member_from)
+                Joined since {convertToGMT7(member?.team_member_id.member_from)
                   .toDateString()
                   .slice(4)}
               </h2>

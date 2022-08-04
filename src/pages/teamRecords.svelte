@@ -126,7 +126,6 @@
     if (error) {
       console.log(error);
     } else {
-      // console.log(data);
       teamCsv = data;
     }
   };

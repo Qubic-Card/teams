@@ -59,7 +59,7 @@
     if (error) {
       toastFailed('Failed to check role');
     }
-    console.log(data);
+
     if (data.length > 0) {
       toastFailed('Cannot delete role, it is used');
       return true;
@@ -131,7 +131,7 @@
                   }}
                 />
               </div>
-              <RenameModal id={role.id} />
+              <RenameModal id={role.id} roleName={role?.role_name} />
 
               {#if open}
                 <button

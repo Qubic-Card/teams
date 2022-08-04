@@ -48,10 +48,7 @@
   //   currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
   // };
 
-  const setPage = (p) => {
-    page = p;
-    console.log(p);
-  };
+  const setPage = (p) => (page = p);
 
   const getPagination = (page, size) => {
     const limit = size ? +size : 3;
@@ -89,7 +86,7 @@
     if (error) console.log(error);
     if (data) {
       cards = data;
-      maxPage = Math.floor(count / 9);
+      maxPage = Math.ceil(count / 9);
     }
   };
 

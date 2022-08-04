@@ -2,6 +2,7 @@
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import ConnectionsModal from '@comp/modals/connectionsModal.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
 
@@ -37,7 +38,7 @@
   {/if}
 
   <td class="flex-1 truncate pl-4">
-    {new Date(connection.dateConnected).toDateString().slice(4) ?? '-'}
+    {convertToGMT7(connection.dateConnected).toDateString().slice(4) ?? '-'}
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">

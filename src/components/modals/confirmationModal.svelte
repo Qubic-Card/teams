@@ -57,9 +57,9 @@
             isDispatch ? action() : await deleteRoleHandler(id)}
           class={`text-lg font-semibold ${
             isDelete
-              ? 'text-red-600'
-              : 'text-white bg-blue-600 hover:bg-blue-600/80'
-          } p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800`}
+              ? 'bg-red-600 hover:bg-red-600/80'
+              : 'bg-blue-600 hover:bg-blue-600/80'
+          } p-2 rounded-md border-2 text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800`}
           >{buttonLabel ?? 'Action'}
         </button>
       </div>

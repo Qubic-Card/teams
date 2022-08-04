@@ -102,10 +102,7 @@
     }
   };
 
-  const setPage = (p) => {
-    page = p;
-    console.log(p);
-  };
+  const setPage = (p) => (page = p);
 
   const renderChart = async () => {
     const ctx = chart.getContext('2d');
@@ -330,11 +327,8 @@
         .range(from, to);
 
       if (logs) {
-        // teamLogs = logs.filter(
-        //   (log) => !log.message.includes('QRScan' || 'QRShare' || 'NFC')
-        // );
         teamLogs = logs;
-        // console.log(logs.length);
+
         // Grouping by date
         teamLogs = teamLogs.reduce((acc, log) => {
           const date = new Date(log.created_at).toDateString().slice(4);
@@ -387,8 +381,6 @@
       previousTeamLogsCount
     );
   }
-
-  // $: page, toItem, getTeamWeeklyLogsActivity();
 </script>
 
 <div class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-24 pr-4">

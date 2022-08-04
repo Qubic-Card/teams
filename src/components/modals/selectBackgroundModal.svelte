@@ -1,4 +1,5 @@
 <script>
+  import Spinner from '@comp/loading/spinner.svelte';
   import { fade } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
@@ -47,6 +48,7 @@
   let fileImage;
   let unsplashImageId = null;
   let showModal = false;
+  let isLoading = false;
 
   const toAuthorProfile = (url) => window.open(url, '_blank');
 
@@ -107,6 +109,7 @@
   };
 
   const handleAddFile = async () => {
+    isLoading = true;
     const { data } = await supabase.storage
       .from('banner')
       .upload(`${$user?.id}/${fileName}`, fileImage, {
@@ -131,6 +134,13 @@
     }
 
     await handleSave();
+    isLoading = false;
+  };
+
+  const onKeyPress = (e) => {
+    if (e.charCode === 13) {
+      searchHandler();
+    }
   };
 </script>
 
@@ -155,21 +165,31 @@
     }}
   >
     <div class="flex w-full gap-2">
-      <button
-        type="button"
-        class="bg-neutral-600 p-2 w-1/2"
-        on:click={() => (croppedImage = null)}>Reset</button
-      >
       {#if croppedImage}
         <button
+          in:fade|local={{ duration: 300 }}
           type="button"
-          class="bg-blue-600 p-2 w-1/2"
-          on:click={async () => await handleAddFile()}>Save</button
+          class="bg-black p-2 w-1/2 text-white rounded-md h-12 shadow-md"
+          on:click={() => {
+            croppedImage = null;
+          }}>Reset</button
         >
+        <button
+          in:fade|local={{ duration: 300 }}
+          type="button"
+          class="bg-blue-600 p-2 w-1/2 text-white rounded-md h-12 shadow-md flex justify-center items-center gap-2"
+          on:click={async () => await handleAddFile()}
+        >
+          {#if isLoading}
+            <Spinner class="w-6 h-6" />
+          {/if}
+          Save
+        </button>
       {:else}
         <button
+          in:fade|local={{ duration: 300 }}
           type="button"
-          class="bg-blue-600 p-2 w-1/2"
+          class="bg-blue-600 p-2 w-full text-white rounded-md h-12 shadow-md"
           on:click={async () => await cropImage()}>Crop</button
         >
       {/if}
@@ -187,9 +207,10 @@
     {#if croppedImage}
       <h2>Cropped Image</h2>
       <img
+        transition:fade|local={{ duration: 300 }}
         src={croppedImage}
         alt="Cropped profile"
-        class="w-full h-32 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+        class="w-full h-48 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
       /><br />
     {/if}
   </Dialog>
@@ -197,7 +218,7 @@
 
 <button
   on:click={() => (showModal = true)}
-  class="w-full text-white bg-neutral-500 rounded-md p-5 mt-2"
+  class="w-full text-neutral-700 bg-neutral-200 rounded-md p-5 h-16"
   >Select Background</button
 >
 
@@ -241,6 +262,7 @@
           >Search</button
         >
         <input
+          on:keypress={onKeyPress}
           bind:value={searchQuery}
           type="text"
           placeholder="Search for images..."

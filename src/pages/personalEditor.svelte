@@ -1,4 +1,6 @@
 <script>
+  import Spinner from '@comp/loading/spinner.svelte';
+  import { fade } from 'svelte/transition';
   import Input from '@comp/input.svelte';
   import Profile from '@pages/profile.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
@@ -69,6 +71,7 @@
   let pixelCrop;
   let image;
   let fileImage;
+  let isLoading = false;
 
   const cropImage = async () => {
     croppedImage = await getCroppedImg(image, pixelCrop);
@@ -89,6 +92,7 @@
   };
 
   const handleAddFile = async () => {
+    isLoading = true;
     const { data } = await supabase.storage
       .from('avatars')
       .upload(`${$user?.id}/${fileName}`, fileImage, {
@@ -104,6 +108,7 @@
     isOpen = false;
     $profileData.avatar = publicURL;
     await handleSave();
+    isLoading = false;
   };
 
   const addLink = () => {
@@ -170,6 +175,7 @@
       toastFailed();
       console.log(error);
     } else {
+      query = 'background';
       toastSuccess('Changes saved');
     }
   };
@@ -186,26 +192,31 @@
   on:close={() => (isOpen = false)}
 >
   <div class="flex w-full gap-2">
-    <button
-      type="button"
-      class="bg-neutral-600 p-2 w-1/2"
-      on:click={() => {
-        croppedImage = null;
-      }}>Reset</button
-    >
     {#if croppedImage}
       <button
+        in:fade|local={{ duration: 300 }}
         type="button"
-        class="bg-blue-600 p-2 w-1/2"
-        on:click={async () => {
-          await handleAddFile();
-          // $profileData.avatar = URL.createObjectURL(image);
-        }}>Save</button
+        class="bg-black p-2 w-1/2 text-white rounded-md h-12 shadow-md"
+        on:click={() => {
+          croppedImage = null;
+        }}>Reset</button
       >
+      <button
+        in:fade|local={{ duration: 300 }}
+        type="button"
+        class="bg-blue-600 p-2 w-1/2 text-white rounded-md h-12 shadow-md flex justify-center items-center gap-2"
+        on:click={async () => await handleAddFile()}
+      >
+        {#if isLoading}
+          <Spinner class="w-6 h-6" />
+        {/if}
+        Save
+      </button>
     {:else}
       <button
+        in:fade|local={{ duration: 300 }}
         type="button"
-        class="bg-blue-600 p-2 w-1/2"
+        class="bg-blue-600 p-2 w-full text-white rounded-md h-12 shadow-md"
         on:click={async () => await cropImage()}>Crop</button
       >
     {/if}
@@ -223,6 +234,7 @@
   {#if croppedImage}
     <h2>Cropped Image</h2>
     <img
+      transition:fade|local={{ duration: 300 }}
       src={croppedImage}
       alt="Cropped profile"
       class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"

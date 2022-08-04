@@ -10,21 +10,29 @@
 </script>
 
 <div class="bg-neutral-800 rounded-lg border border-neutral-700">
-  {#if loading}
+  <!-- {#if loading}
     <div class="bg-black/90 w-full rounded-md h-12" />
-  {/if}
+  {/if} -->
   <table class="text-black w-full">
     {#if currentPageRows}
       {#if loading}
-        {#each Array(isAlreadySeeMore ? 10 : 5) as item}
+        {#each currentPageRows as item}
           <TableSkeleton colLength={3} />
         {/each}
       {:else}
         <thead class="text-neutral-200 ">
           <tr>
-            <th class="text-left p-1 rounded-tl-lg"><div class="bg-black/60 pl-3 py-2 rounded-md">Date</div></th>
-            <th class="text-left p-1"><div class="bg-black/60 pl-3 py-2 rounded-md">Description</div></th>
-            <th class="text-left p-1"><div class="bg-black/60 pl-3 py-2 rounded-md">Device</div></th>
+            <th class="text-left p-1 rounded-tl-lg"
+              ><div class="bg-black/60 pl-3 py-2 rounded-md">Date</div></th
+            >
+            <th class="text-left p-1"
+              ><div class="bg-black/60 pl-3 py-2 rounded-md">
+                Description
+              </div></th
+            >
+            <th class="text-left p-1"
+              ><div class="bg-black/60 pl-3 py-2 rounded-md">Device</div></th
+            >
           </tr>
         </thead>
         <tbody class="p-2">

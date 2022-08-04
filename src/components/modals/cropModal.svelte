@@ -7,12 +7,12 @@
   import { Dialog } from '@rgossiaux/svelte-headlessui';
   import Cropper from 'svelte-easy-crop';
   import { fade } from 'svelte/transition';
-  // $: console.log($profileData.avatar);
+
   export let handleSave;
   export let isOpen = false;
   export let fileName;
   export let image;
-  $: console.log(image, fileName);
+
   let pixelCrop;
   let croppedImage = '';
   let fileImage;
@@ -46,24 +46,17 @@
   };
 
   const handleSaveCroppedImage = async () => {
-    // const { data: remove_data, error: remove_err } = await supabase.storage
-    //   .from('avatars')
-    //   .remove([`${$user?.id}/${fileName}`]);
-
     const { data, error: err } = await supabase.storage
       .from('avatars')
       .update(`${$user?.id}/${fileName}`, fileImage, {
         contentType: 'image/jpeg',
       });
 
-    // console.log(data, remove_data, err, remove_err);
-
     const { publicURL, error } = supabase.storage
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${fileName}`);
 
     $profileData.avatar = publicURL;
-    // console.log($profileData.avatar);
     await handleSave();
     isOpen = false;
   };
