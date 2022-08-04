@@ -20,24 +20,24 @@
           <TableSkeleton colLength={3} />
         {/each}
       {:else}
-        <thead class="text-neutral-200 bg-black/60">
+        <thead class="text-neutral-200 ">
           <tr>
-            <th class="text-left pl-4 p-2">Date</th>
-            <th class="text-left pl-4 p-2">Description</th>
-            <th class="text-left">Device</th>
+            <th class="text-left p-1 rounded-tl-lg"><div class="bg-black/60 pl-3 py-2 rounded-md">Date</div></th>
+            <th class="text-left p-1"><div class="bg-black/60 pl-3 py-2 rounded-md">Description</div></th>
+            <th class="text-left p-1"><div class="bg-black/60 pl-3 py-2 rounded-md">Device</div></th>
           </tr>
         </thead>
         <tbody class="p-2">
           {#each currentPageRows as row, i}
             <tr
               in:fade={{ duration: 200 }}
-              class="bg-neutral-800 text-neutral-300 border-b border-neutral-700 hover:border"
+              class=" text-neutral-300 border-b border-neutral-700 hover:border"
             >
               <td class="pl-4 p-2 w-48">
                 {new Date(row.created_at).toDateString().slice(4)}
               </td>
               <td class="pl-4 w-auto">{row.message}</td>
-              <td class="flex flex-col h-[40px] justify-center">
+              <td class="flex flex-col pl-4 h-[40px] justify-center">
                 {row?.platform ?? 'Unknown'}
               </td>
             </tr>
