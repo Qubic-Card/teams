@@ -141,7 +141,7 @@
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-24 pr-4">
   {#await getAllData()}
-    <MemberSkeleton searchSkeletonVisible />
+    <MemberSkeleton />
   {:then}
     <div
       class={`items-center w-full rounded-md gap-2 mt-2 bg-neutral-900 p-3 ${
@@ -173,9 +173,18 @@
         on:click={() => setState('inactive')}>Inactive</button
       >
     </div>
+    {#if state === 'inactive'}
+      {#if inactiveCards.length === 0}
+        <div>
+          <h1 class="text-xl text-neutral-400 text-center mt-4">
+            No inactive cards
+          </h1>
+        </div>
+      {/if}
+    {/if}
     <div
       class={`grid grid-flow-row my-4 h-64 gap-2 ${
-        innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
+        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-2'
       }`}
     >
       {#if state === 'all'}
@@ -205,11 +214,13 @@
         {/each}
       {/if}
       {#if state === 'inactive'}
-        {#each allMember as member, i}
-          {#if member.id}
-            <MemberCard {member} {roles} {permissions} {updatedRole} />
-          {/if}
-        {/each}
+        {#if inactiveCards.length !== 0}
+          {#each allMember as member, i}
+            {#if member.id}
+              <MemberCard {member} {roles} {permissions} {updatedRole} />
+            {/if}
+          {/each}
+        {/if}
       {/if}
     </div>
     {#if searchNotFoundMsg !== ''}

@@ -156,27 +156,17 @@
             on:click={() => toProfileEditor(member?.team_member_id.uid)}
           >
             <div class="flex flex-row-reverse relative">
-              {#if teamProfile.avatar === ''}
-                <div
-                  class={`flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl ${
-                    $user.id === member?.team_member_id?.uid
-                      ? 'border-2 border-blue-600'
-                      : ''
-                  }`}
-                >
-                  Q
-                </div>
-              {:else}
-                <img
-                  src={teamProfile.avatar}
-                  alt="Profile"
-                  class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
-                    $user.id === member?.team_member_id?.uid
-                      ? 'border-2 border-blue-600'
-                      : ''
-                  }`}
-                />
-              {/if}
+              <img
+                src={teamProfile.avatar === ''
+                  ? '/favicon.svg'
+                  : teamProfile.avatar}
+                alt="Profile"
+                class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
+                  $user.id === member?.team_member_id?.uid
+                    ? 'border-2 border-blue-600'
+                    : ''
+                }`}
+              />
               {#if $user.id === member?.team_member_id?.uid}
                 <h1
                   class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
@@ -252,27 +242,17 @@
           on:click={() => toProfileEditor(member?.team_member_id.uid)}
         >
           <div class="flex flex-row-reverse relative">
-            {#if teamProfile.avatar === ''}
-              <div
-                class={`flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl ${
-                  $user.id === member?.team_member_id?.uid
-                    ? 'border-2 border-blue-600'
-                    : ''
-                }`}
-              >
-                Q
-              </div>
-            {:else}
-              <img
-                src={teamProfile.avatar}
-                alt="Profile"
-                class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
-                  $user.id === member?.team_member_id?.uid
-                    ? 'border-2 border-blue-600'
-                    : ''
-                }`}
-              />
-            {/if}
+            <img
+              src={teamProfile.avatar === ''
+                ? '/favicon.svg'
+                : teamProfile.avatar}
+              alt="Profile"
+              class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
+                $user.id === member?.team_member_id?.uid
+                  ? 'border-2 border-blue-600'
+                  : ''
+              }`}
+            />
             {#if $user.id === member?.team_member_id?.uid}
               <h1
                 class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
@@ -389,7 +369,7 @@
 
             {#if open}
               <MenuItems
-                class="top-20 z-50 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md text-sm border border-neutral-700 p-2 w-64"
+                class="top-16 z-50 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md text-sm border border-neutral-700 p-2 w-64"
               >
                 {#each roles as item}
                   <MenuItem
@@ -460,11 +440,11 @@
       class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
     >
       <div class="flex h-full gap-4 p-4">
-        <div
-          class="flex justify-center items-center w-32 lg:w-36 h-32 lg:h-36 rounded-md bg-neutral-700 text-5xl"
-        >
-          Q
-        </div>
+        <img
+          src="/favicon.svg"
+          alt="Profile"
+          class="w-32 lg:w-36 h-32 lg:h-36 rounded-md"
+        />
         <div class="flex flex-col justify-between">
           <div class="flex flex-col flex-wrap">
             <h1 class="md:text-md lg:text-lg text-left w-56">

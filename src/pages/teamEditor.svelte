@@ -28,7 +28,6 @@
     MenuButton,
     MenuItems,
     MenuItem,
-    Transition,
     Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import toNewTab from '@lib/utils/newTab';
@@ -72,6 +71,7 @@
   let fileImage;
   let currentTheme = theme[$teamData.design?.theme?.toString() ?? 'dark'];
   let isLoading = false;
+  let brochureFilename = '';
 
   const cropImage = async () => {
     croppedImage = await getCroppedImg(image, pixelCrop);
@@ -125,9 +125,11 @@
 
     toastSuccess('Successfully uploaded the brochure');
     brochurePond.removeFile();
+    brochureFilename = file.filename;
     $teamData.brochure = {
       url: publicURL,
       title: file.filename,
+      filename: file.filename,
     };
     await handleSave();
   };
@@ -188,9 +190,9 @@
   let showDeleteBrochureModal = false;
   const toggleBrochureModal = () =>
     (showDeleteBrochureModal = !toggleBrochureModal);
-</script>
 
-<!-- text={`${teamProfile?.firstname} ${teamProfile?.lastname} from this team?`} -->
+  $: console.log(brochureFilename);
+</script>
 
 {#if showDeleteBrochureModal}
   <ConfirmationModal
@@ -276,10 +278,10 @@
   {#await getTeamsDetail()}
     <TeamEditorSkeleton />
   {:then}
-    <div class="w-full">
+    <div class="w-full" in:fade|local={{ duration: 200 }}>
       <div class="text-black">
         <div class="flex flex-col w-full">
-          <TabGroup defaultIndex={1}>
+          <TabGroup>
             <TabList
               class="w-full grid grid-cols-3 border-2 border-neutral-700 p-2"
             >
@@ -374,16 +376,31 @@
                       <div
                         class="bg-neutral-100 rounded-md h-4/5 p-2 gap-2 flex items-center justify-between"
                       >
-                        <p class="w-64 truncate text-neutral-700 text-sm">
-                          {$teamData?.brochure?.title}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-7 w-7"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+
+                        <p class="w-64 truncate text-neutral-700 text-md">
+                          {$teamData?.brochure?.filename}
                         </p>
                         <button
-                          class="p-2 bg-red-600 rounded-md self-start"
+                          class="p-2 h-full bg-red-600 rounded-md self-start"
                           on:click={() => (showDeleteBrochureModal = true)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4"
+                            class="h-5 w-5"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="white"
@@ -463,7 +480,9 @@
 
                         {#if permissions.writeProfile || permissions.writeMembers}
                           <div class="flex items-center h-[6.3rem]">
-                            <Menu class="bg-neutral-100 h-8 mx-2 rounded-md">
+                            <Menu
+                              class="bg-neutral-100 h-8 mx-2 relative rounded-md"
+                            >
                               <MenuButton
                                 class="w-8 h-auto flex justify-center items-center pt-1"
                                 ><svg
@@ -481,86 +500,84 @@
                                   />
                                 </svg></MenuButton
                               >
-                              <Transition
-                                enter="transition duration-100 ease-out"
-                                enterFrom="transform scale-95 opacity-0"
-                                enterTo="transform scale-100 opacity-100"
-                                leave="transition duration-75 ease-out"
-                                leaveFrom="transform scale-100 opacity-100"
-                                leaveTo="transform scale-95 opacity-0"
+
+                              <MenuItems
+                                class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
                               >
-                                <MenuItems
-                                  class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
+                                <MenuItem
+                                  class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                  on:click={() =>
+                                    // go(item.type, item.data, 'Preview')
+                                    toNewTab(item.type, item.data)}
                                 >
-                                  <MenuItem
-                                    class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                    on:click={() =>
-                                      // go(item.type, item.data, 'Preview')
-                                      toNewTab(item.type, item.data)}
+                                  <img
+                                    class="cursor-pointer mr-2"
+                                    draggable="false"
+                                    width="20"
+                                    height="20"
+                                    src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
+                                    alt=""
+                                  />
+                                  <p>Test</p>
+                                </MenuItem>
+                                <MenuItem
+                                  class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                  on:click={async () => {
+                                    handleDeleteSocial(
+                                      item,
+                                      $teamSocials,
+                                      true
+                                    );
+                                    await handleSave();
+                                  }}
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6 mr-2"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
                                   >
-                                    <img
-                                      class="cursor-pointer mr-2"
-                                      draggable="false"
-                                      width="20"
-                                      height="20"
-                                      src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
-                                      alt=""
+                                    <path
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                                     />
-                                    <p>Test</p>
-                                  </MenuItem>
+                                  </svg>
+                                  <p>Delete</p>
+                                </MenuItem>
+                                {#if i != 0}
                                   <MenuItem
                                     class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
                                     on:click={async () => {
-                                      handleDeleteSocial(
+                                      handleUpSocial(
                                         item,
+                                        i,
                                         $teamSocials,
                                         true
                                       );
                                       await handleSave();
                                     }}
                                   >
-                                    <img
-                                      class="cursor-pointer mr-2"
-                                      draggable="false"
-                                      width="20"
-                                      height="20"
-                                      src="https://img.icons8.com/material-outlined/96/000000/trash--v1.png"
-                                      alt=""
-                                    />
-                                    <p>Delete</p>
-                                  </MenuItem>
-                                  {#if i != 0}
-                                    <MenuItem
-                                      class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                      on:click={async () => {
-                                        handleUpSocial(
-                                          item,
-                                          i,
-                                          $teamSocials,
-                                          true
-                                        );
-                                        await handleSave();
-                                      }}
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      class="h-6 w-6 mr-2"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      stroke-width="2"
                                     >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-6 w-6"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                      >
-                                        <path
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          d="M7 11l5-5m0 0l5 5m-5-5v12"
-                                        />
-                                      </svg>
-                                      <p>Move up</p>
-                                    </MenuItem>
-                                  {/if}
-                                </MenuItems>
-                              </Transition>
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M7 11l5-5m0 0l5 5m-5-5v12"
+                                      />
+                                    </svg>
+                                    <p>Move up</p>
+                                  </MenuItem>
+                                {/if}
+                              </MenuItems>
                             </Menu>
                             <SwitchButton
                               bind:checked={item.isActive}
