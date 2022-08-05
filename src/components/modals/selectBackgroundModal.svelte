@@ -76,7 +76,7 @@
   const pickHandler = (img) => {
     selectedImage = img;
     image = img.urls.regular;
-    fileName = img.id;
+    fileName = img.id.trim();
     unsplashImageId = img.id;
     isOpen = true;
     showModal = false;
@@ -102,7 +102,7 @@
 
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
-    fileName = item.id;
+    fileName = item.id.trim();
     isOpen = true;
     showModal = !showModal;
     return true;

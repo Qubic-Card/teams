@@ -12,6 +12,7 @@ export const teamData = writable({
   brochure: {
     url: '',
     title: '',
+    filename: '',
   },
   avatar: '',
   socials: [],

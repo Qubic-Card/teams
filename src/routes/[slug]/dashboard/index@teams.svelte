@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import LinkPreview from '@comp/cards/linkPreview/linkPreview.svelte';
+  import { learnMoreContents } from '@lib/constants';
 
   let permissions = {
     writeMembers: false,
@@ -94,14 +95,18 @@
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-52 md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
     >
-      {#each faq as item}
-        <div class="w-[250px] md:w-[350px] lg:w-[450px] py-4">
-          <LinkPreview
-            isShowMetaImage={true}
-            title={item.title}
-            url={item.link}
-            className="w-[250px] md:w-[350px] lg:w-[450px]"
-          />
+      {#each learnMoreContents as content}
+        <div
+          class="w-[250px] md:w-[350px] lg:w-[450px] py-4 cursor-pointer"
+          on:click={() => window.open(content.url, '_blank').focus()}
+        >
+          <div
+            class="bg-neutral-800 w-[250px] md:w-[350px] lg:w-[450px] h-full p-3 rounded-md"
+          >
+            <div class="Image" style={`background-image:url(${content.bg})`} />
+            <h1 class="font-bold text-md my-2">{content.title}</h1>
+            <p class="text-neutral-400 text-sm">{content.desc}</p>
+          </div>
         </div>
       {/each}
     </div>

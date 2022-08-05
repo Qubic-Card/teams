@@ -2,7 +2,7 @@
   export let label = 'Qubic Chart';
 </script>
 
-<div class="flex flex-col w-full">
+<div class="flex flex-col lg:w-1/2 w-full">
   <div class="flex w-full justify-between">
     <h1 class="text-lg font-semibold">{label}</h1>
   </div>

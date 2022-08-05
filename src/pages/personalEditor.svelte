@@ -86,7 +86,7 @@
 
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
-    fileName = item.id;
+    fileName = item.id.trim();
     isOpen = true;
     return true;
   };
@@ -245,10 +245,11 @@
 {#await getProfile()}
   <ProfileEditorSkeleton />
 {:then}
-  <div class="flex justify-center">
+  <div class="flex justify-center" in:fade|local={{ duration: 200 }}>
     <div class="w-full bg-black">
       <div class="gap-2 text-black">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
+          <!-- <ProfileEditorSkeleton /> -->
           <TabGroup>
             <TabList
               class="w-full grid grid-cols-3 border-2 border-neutral-700 p-2"
@@ -364,7 +365,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="border rounded-lg mb-4 p-4">
+                <div class="border border-neutral-700 rounded-lg mb-4 p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
@@ -423,7 +424,9 @@
                         />
                         {#if permissions.writeProfile || permissions.writeMembers}
                           <div class="flex items-center h-[6.3rem]">
-                            <Menu class="bg-neutral-100 h-8 mx-2 rounded-md">
+                            <Menu
+                              class="bg-neutral-100 relative h-8 mx-2 rounded-md"
+                            >
                               <MenuButton
                                 class="w-8 h-auto flex justify-center items-center pt-1"
                                 ><svg
@@ -442,10 +445,10 @@
                                 </svg></MenuButton
                               >
                               <MenuItems
-                                class="top-10 z-40 absolute rounded-md flex flex-col bg-white shadow-md border border-neutral-300 p-2 w-40"
+                                class="top-10 z-40 rounded-md absolute flex flex-col bg-white shadow-md border border-neutral-300 p-2 w-40"
                               >
                                 <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
                                   on:click={async () =>
                                     await toNewTab(item.type, item.data)}
                                 >
@@ -460,32 +463,44 @@
                                   <p>Test</p>
                                 </MenuItem>
                                 <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
                                   on:click={() => handleDeleteSocial(item)}
                                 >
-                                  <img
-                                    class="cursor-pointer mr-2"
-                                    draggable="false"
-                                    width="20"
-                                    height="20"
-                                    src="/icons/trash.svg"
-                                    alt=""
-                                  />
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6 mr-2"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                  >
+                                    <path
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
                                   <p>Delete</p>
                                 </MenuItem>
                                 {#if i != 0}
                                   <MenuItem
-                                    class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                    class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
                                     on:click={() => handleUpSocial(item, i)}
                                   >
-                                    <img
-                                      draggable="false"
-                                      class="cursor-pointer mr-2"
-                                      width="20"
-                                      height="20"
-                                      src="/icons/arrow_up.png"
-                                      alt=""
-                                    />
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      class="h-6 w-6 mr-2"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M7 11l5-5m0 0l5 5m-5-5v12"
+                                      />
+                                    </svg>
                                     <p>Move up</p>
                                   </MenuItem>
                                 {/if}
