@@ -82,9 +82,8 @@
     >
       {#if loading}
         <Spinner class="w-7 h-7" />
-      {:else}
-        Apply changes
       {/if}
+      Apply changes
     </button>
   </div>
 </ModalWrapper>

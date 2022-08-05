@@ -1,19 +1,19 @@
 <script>
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
-  import supabase from '@lib/db';
+  import Spinner from '@comp/loading/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
 
   export let text,
+    isDelete,
+    isIconVisible,
+    isDispatch,
+    isLoading,
     heading,
     buttonLabel,
     showModal,
     toggleModal,
-    isDelete,
-    isIconVisible,
     id,
-    deleteRoleHandler,
-    isDispatch;
-
+    deleteRoleHandler;
   const dispatch = createEventDispatcher();
   const action = () => dispatch('action');
   // Button Cancel
@@ -59,8 +59,12 @@
             isDelete
               ? 'bg-red-600 hover:bg-red-600/80'
               : 'bg-blue-600 hover:bg-blue-600/80'
-          } p-2 rounded-md border-2 text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800`}
-          >{buttonLabel ?? 'Action'}
+          } p-2 rounded-md border-2 text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800 flex justify-center items-center gap-2`}
+        >
+          {#if isLoading}
+            <Spinner class="w-6 h-6" />
+          {/if}
+          {buttonLabel ?? 'Action'}
         </button>
       </div>
     </div>

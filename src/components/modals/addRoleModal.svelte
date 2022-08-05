@@ -97,9 +97,9 @@
     >
       {#if loading}
         <Spinner class="w-7 h-7" />
-      {:else}
-        Add role
       {/if}
+
+      Add role
     </button>
   </div>
 </ModalWrapper>

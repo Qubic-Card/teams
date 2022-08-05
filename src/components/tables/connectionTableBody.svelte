@@ -6,10 +6,7 @@
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
 
-  export let innerWidth;
-  export let connection;
-  export let tab;
-  export let deleteHandler;
+  export let innerWidth, connection, tab, deleteHandler, isLoading;
 
   let loading = false;
   let showDeleteModal = false;
@@ -51,6 +48,7 @@
       on:sendUpdatedData={(e) => (connection = e.detail)}
     />
     <ConfirmationModal
+      {isLoading}
       isDelete
       isIconVisible
       isDispatch

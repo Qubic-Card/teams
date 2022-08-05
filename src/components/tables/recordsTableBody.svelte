@@ -1,4 +1,5 @@
 <script>
+  import { fade } from 'svelte/transition';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
@@ -7,18 +8,22 @@
   export let record, teamId, deleteFromTable;
 
   let showDeleteModal = false;
+  let isLoading = false;
 
   const deleteModalHandler = () => (showDeleteModal = !showDeleteModal);
 
   const deleteCsv = async () => {
+    isLoading = true;
     const { error } = await supabase.storage
       .from('records')
       .remove([`${teamId}/${$user?.id}/${record.name}`]);
 
     if (error) {
       toastFailed('Failed to delete record');
+      isLoading = false;
     } else {
       toastSuccess(`${record.name} deleted successfully`);
+      isLoading = false;
     }
   };
 
@@ -51,6 +56,7 @@
 </script>
 
 <tr
+  out:fade|local={{ duration: 150 }}
   class="h-12 text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
 >
   <td class="font-bold text-ellipsis pl-4">
@@ -68,6 +74,7 @@
   </td>
   <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
     <ConfirmationModal
+      {isLoading}
       isDelete
       isIconVisible
       isDispatch

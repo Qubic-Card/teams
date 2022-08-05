@@ -86,7 +86,6 @@
   let currentTeamLogsCount = 0;
   let teamId = Cookies.get('qubicTeamId');
   let selectedDays = '3 Days';
-  let currentPageRows = [];
 
   const selectDaysHandler = (e) => {
     selectedDays = e.detail;
@@ -400,7 +399,7 @@
   </div>
 
   <div class="flex gap-4">
-    {#if currentPageRows}
+    {#if teamLogs}
       <div class="flex flex-col w-2/3 gap-4">
         <div class="flex justify-between">
           <h1 class="text-2xl font-bold">Team Activity</h1>

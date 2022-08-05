@@ -99,11 +99,11 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
         let logs = data.map((log) => {
           return {
             Created_at: convertToGMT7(log?.created_at),
-            Type: log?.type,
             Team: log?.team?.name,
             Company: log?.team?.company,
-            Message: log?.data?.message,
-            Link: log?.data?.link,
+            Message:
+              log?.data?.message.slice(5).charAt(0).toUpperCase() +
+              log?.data?.message.slice(6),
             TeamMember:
               log?.team_member?.firstname + ' ' + log.team_member?.lastname,
             Holder: log.card_holder ?? '-',

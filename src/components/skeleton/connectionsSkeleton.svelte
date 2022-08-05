@@ -1,5 +1,5 @@
 <script>
-  export let searchSkeletonVisible;
+  export let searchSkeletonVisible, items;
 </script>
 
 <div class="animate-pulse">
@@ -9,11 +9,14 @@
     {/if}
     <div class="flex flex-col">
       <div class="bg-black/70 w-full h-12" />
-      <div class="bg-neutral-800 w-full h-12" />
-      <div class="bg-neutral-800 w-full h-12" />
-      <div class="bg-neutral-800 w-full h-12" />
-      <div class="bg-neutral-800 w-full h-12" />
-      <div class="bg-neutral-800 w-full h-12" />
+      {#if items > 0}
+        {#each Array(items) as item}
+          <div class="bg-neutral-800 w-full h-12" />
+        {/each}
+      {:else}
+        <div class="bg-neutral-800 w-full h-12" />
+        <div class="bg-neutral-800 w-full h-12" />
+      {/if}
     </div>
   </div>
 </div>

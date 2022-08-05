@@ -19,7 +19,6 @@
   import PersonalAnalyticsCard from '@comp/cards/personalAnalyticsCard.svelte';
 
   let teamId = Cookies.get('qubicTeamId');
-
   let uniqueCount = 0;
   let activityCount = 0;
   let connectionCount = 0;
@@ -27,11 +26,15 @@
   let dateConnected = [];
   let userLogs = [];
   let loading = false;
-
   let isAlreadySeeMore = false;
-
   let connectionChartCtx;
   let logChartCtx;
+  let logsChart;
+  let connectionsChart;
+  let selectedDays = '';
+  let maxPage = 0;
+  let page = 0;
+  let toItem = 5;
 
   let logsChartData = {
     labels: [],
@@ -68,14 +71,6 @@
     data: logsChartData,
     options: analyticsChartConfig,
   };
-
-  let logsChart;
-  let connectionsChart;
-
-  let selectedDays = '';
-  let maxPage = 0;
-  let page = 0;
-  let toItem = 5;
 
   const setPage = (p) => (page = p);
 

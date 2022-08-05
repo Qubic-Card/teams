@@ -47,7 +47,7 @@
       clicked();
       selectAll = true;
     }}
-    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-blue-600"
+    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 transition-colors duration-300"
   >
     Select all
   </button>

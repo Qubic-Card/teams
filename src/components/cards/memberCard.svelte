@@ -30,6 +30,7 @@
   let teamProfile = member?.team_member_id?.team_profile;
   let card = member?.card_id;
   let role = member?.team_member_id?.role;
+  let isLoading = false;
 
   const setRole = (role) => dispatch('setRole', { role: role, index: i });
   const toggleModal = () => (showModal = !showModal);
@@ -60,6 +61,7 @@
   };
 
   const setMemberRole = async (id) => {
+    isLoading = true;
     const { data, error } = await supabase
       .from('team_members')
       .update({ role: id }, { returning: 'minimal' })
@@ -69,13 +71,16 @@
     if (error) {
       console.log(error);
       toastFailed();
+      isLoading = false;
       return;
     } else {
       toastSuccess('Role has been updated');
+      isLoading = false;
     }
   };
 
   const deleteMemberHandler = async (id, memberData) => {
+    isLoading = true;
     const { error } = await supabase
       .from('team_cardcon')
       .delete()
@@ -89,13 +94,16 @@
     if (error) {
       console.log(error);
       toastFailed();
+      isLoading = false;
       return;
     } else if (error_member) {
       console.log(error_member);
       toastFailed();
+      isLoading = false;
       return;
     } else {
       toastSuccess('Member has been deleted');
+      isLoading = false;
       location.reload();
     }
   };
@@ -108,6 +116,7 @@
 </script>
 
 <ConfirmationModal
+  {isLoading}
   isDispatch
   heading="Are you sure to change your role?"
   buttonLabel="Yes, i am sure."
@@ -121,6 +130,7 @@
 />
 
 <ConfirmationModal
+  {isLoading}
   isDelete
   isDispatch
   heading="Are you sure you want to delete"
