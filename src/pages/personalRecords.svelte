@@ -128,7 +128,6 @@
     if (error) {
       console.log(error);
     } else {
-      // console.log(data);
       personalCsv = data;
     }
   };

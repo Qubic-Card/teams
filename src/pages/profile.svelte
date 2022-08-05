@@ -27,11 +27,6 @@
   export let data;
   export let isEditorMode = false;
 
-  // 09fb5818-c8ce-4b12-bfbb-f939d7da7321 card
-  // 402ef83e-5627-4273-8086-48d88000d200 team
-  // 3c5c060b-3066-4da0-9e7b-fe557186b27a uid
-
-  // 639ea8b6-9aef-4138-80c1-0c67ab0b25f7 izmi card
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
   const popup = () => toastFailed(`You can't connect to your profile`);

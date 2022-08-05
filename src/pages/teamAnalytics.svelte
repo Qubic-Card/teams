@@ -3,6 +3,7 @@
   import TeamAnalyticsLogsSkeleton from '@comp/skeleton/teamAnalyticsLogsSkeleton.svelte';
   import { fade } from 'svelte/transition';
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
 
   export let page, currentPageRows, setPage, loading, maxPage;
 </script>
@@ -24,9 +25,9 @@
                   item?.message?.slice(4)}
               </h1>
               <p class="text-neutral-500">
-                {new Date(item.created_at).getHours() +
+                {convertToGMT7(item.created_at).getHours() +
                   ':' +
-                  new Date(item.created_at).getMinutes()}
+                  convertToGMT7(item.created_at).getMinutes()}
               </p>
             </div>
           {/each}

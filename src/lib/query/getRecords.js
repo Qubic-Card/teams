@@ -1,3 +1,4 @@
+import convertToGMT7 from '@lib/utils/convertToGMT7';
 import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
 import supabase from '@lib/db';
 import { toastFailed } from '@lib/utils/toast';
@@ -27,14 +28,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     .eq(col, id)
     .gte('dateConnected', fromDate)
     .lt('dateConnected', toDate);
-  // .csv();
-  // {
-  //   "card": "b9069595-2a92-487a-8756-2ab437c29758",
-  //   "link": "https://qubic.id",
-  //   "message": "Your link https://qubic.id was opened"
-  //   }
 
-  //   76900f13-9d11-424a-b111-71b1f2cd6def
   if (error) {
     console.log(error);
   } else {
@@ -44,7 +38,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     } else {
       let items = data.map((item) => {
         return {
-          DateConnected: new Date(new Date(item?.dateConnected)),
+          DateConnected: convertToGMT7(item?.dateConnected),
           Firstname: item?.firstname,
           Lastname: item?.lastname,
           Company: item?.company,
@@ -72,7 +66,6 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
       });
       const csv = convertToCSV(items);
 
-      // console.log(csv);
       return csv;
     }
   }
@@ -80,9 +73,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
 
 export const getLogsRecords = async (col, id, fromDate, toDate) => {
   fromDate = new Date(new Date(fromDate)).toUTCString();
-  // fromDate = new Date(
-  //   new Date(fromDate).setDate(new Date(fromDate).getDate() - 1)
-  // ).toUTCString();
+
   toDate = new Date(
     new Date(toDate).setDate(new Date(toDate).getDate() + 1)
   ).toUTCString();
@@ -107,12 +98,12 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
       } else {
         let logs = data.map((log) => {
           return {
-            Created_at: new Date(new Date(log?.created_at)),
-            Type: log?.type,
+            Created_at: convertToGMT7(log?.created_at),
             Team: log?.team?.name,
             Company: log?.team?.company,
-            Message: log?.data?.message,
-            Link: log?.data?.link,
+            Message:
+              log?.data?.message.slice(5).charAt(0).toUpperCase() +
+              log?.data?.message.slice(6),
             TeamMember:
               log?.team_member?.firstname + ' ' + log.team_member?.lastname,
             Holder: log.card_holder ?? '-',

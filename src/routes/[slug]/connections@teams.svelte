@@ -28,7 +28,7 @@
   let teamConnections = [];
   let userConnections = [];
   let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
-
+  let isLoading = false;
   let tabs = 'user';
 
   $: $userData?.filter((item) => {
@@ -141,20 +141,25 @@
   };
 
   const deleteConnectionHandler = async (id, tab) => {
+    isLoading = true;
     const { error } = await supabase
       .from('team_connection_acc')
       .delete()
       .match({ id: id });
     if (error) {
       toastFailed('Failed to delete connection');
+      isLoading = false;
     } else {
       toastSuccess('Connection deleted');
+      isLoading = false;
     }
 
     if (tab === 'team') {
       teamConnections = teamConnections.filter((item) => item.id !== id);
+      isLoading = false;
     } else {
       userConnections = userConnections.filter((item) => item.id !== id);
+      isLoading = false;
     }
   };
 
@@ -214,7 +219,11 @@
         />
       </div>
       {#if loading}
-        <ConnectionsSkeletion />
+        <ConnectionsSkeletion
+          items={tabs === 'all'
+            ? teamConnections.length
+            : userConnections.length}
+        />
       {:else}
         <div
           class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
@@ -301,7 +310,7 @@
     {#await getUserConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
-      <div class="flex justify-end items-center mt-6 gap-2">
+      <div class="flex justify-end items-center mt-1 gap-2">
         <Search
           searchMenu={connectionSearchMenu}
           {loading}
@@ -312,12 +321,12 @@
         />
       </div>
       {#if loading}
-        <ConnectionsSkeletion />
+        <ConnectionsSkeletion items={userConnections.length} />
       {:else}
         <div
           class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
         >
-          <table class="snap-center text-black w-full mt-6">
+          <table class="snap-center text-black w-full">
             <thead class="text-left text-neutral-400 bg-black/70">
               <tr>
                 {#if innerWidth > 640}

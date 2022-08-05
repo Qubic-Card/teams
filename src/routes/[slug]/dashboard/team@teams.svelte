@@ -86,7 +86,6 @@
   let currentTeamLogsCount = 0;
   let teamId = Cookies.get('qubicTeamId');
   let selectedDays = '3 Days';
-  let currentPageRows = [];
 
   const selectDaysHandler = (e) => {
     selectedDays = e.detail;
@@ -102,10 +101,7 @@
     }
   };
 
-  const setPage = (p) => {
-    page = p;
-    console.log(p);
-  };
+  const setPage = (p) => (page = p);
 
   const renderChart = async () => {
     const ctx = chart.getContext('2d');
@@ -330,11 +326,8 @@
         .range(from, to);
 
       if (logs) {
-        // teamLogs = logs.filter(
-        //   (log) => !log.message.includes('QRScan' || 'QRShare' || 'NFC')
-        // );
         teamLogs = logs;
-        // console.log(logs.length);
+
         // Grouping by date
         teamLogs = teamLogs.reduce((acc, log) => {
           const date = new Date(log.created_at).toDateString().slice(4);
@@ -387,8 +380,6 @@
       previousTeamLogsCount
     );
   }
-
-  // $: page, toItem, getTeamWeeklyLogsActivity();
 </script>
 
 <div class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-24 pr-4">
@@ -408,7 +399,7 @@
   </div>
 
   <div class="flex gap-4">
-    {#if currentPageRows}
+    {#if teamLogs}
       <div class="flex flex-col w-2/3 gap-4">
         <div class="flex justify-between">
           <h1 class="text-2xl font-bold">Team Activity</h1>

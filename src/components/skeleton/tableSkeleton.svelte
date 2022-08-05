@@ -8,9 +8,9 @@
   let width = ['w-72', 'w-full', 'w-72'];
 </script>
 
-<tr class="animate-pulse my-2">
+<tr class="animate-pulse">
   {#each Array(colLength) as item, i}
-    <td class={`h-12 border-b p-1 border-neutral-700 ${width[i]} ${bg[i]}`}>
+    <td class={`h-11 border-b p-1 border-neutral-700 ${width[i]} ${bg[i]}`}>
       <div class={`animate h-8 rounded-md ${width[i]}`} />
     </td>
   {/each}

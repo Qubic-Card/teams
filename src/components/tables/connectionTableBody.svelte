@@ -2,13 +2,11 @@
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import ConnectionsModal from '@comp/modals/connectionsModal.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
 
-  export let innerWidth;
-  export let connection;
-  export let tab;
-  export let deleteHandler;
+  export let innerWidth, connection, tab, deleteHandler, isLoading;
 
   let loading = false;
   let showDeleteModal = false;
@@ -37,7 +35,7 @@
   {/if}
 
   <td class="flex-1 truncate pl-4">
-    {new Date(connection.dateConnected).toDateString().slice(4) ?? '-'}
+    {convertToGMT7(connection.dateConnected).toDateString().slice(4) ?? '-'}
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">
@@ -50,6 +48,7 @@
       on:sendUpdatedData={(e) => (connection = e.detail)}
     />
     <ConfirmationModal
+      {isLoading}
       isDelete
       isIconVisible
       isDispatch

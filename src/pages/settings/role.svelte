@@ -24,6 +24,7 @@
   let teamId = Cookies.get('qubicTeamId');
   let roleId = null;
   let roleName = '';
+  let isLoading = false;
 
   const updateTeamsRoleMapping = async (id) => {
     loading = true;
@@ -59,7 +60,7 @@
     if (error) {
       toastFailed('Failed to check role');
     }
-    console.log(data);
+
     if (data.length > 0) {
       toastFailed('Cannot delete role, it is used');
       return true;
@@ -70,6 +71,7 @@
 
   const deleteRoleHandler = async (id) => {
     if ((await checkIsRoleUsed(id)) === false) {
+      isLoading = true;
       const { data, error } = await supabase
         .from('team_roles')
         .delete()
@@ -78,6 +80,7 @@
       if (!error) toastSuccess('Role deleted');
 
       $teamRoles = $teamRoles.filter((role) => role.id !== id);
+      isLoading = false;
     }
 
     showDeleteModal = false;
@@ -85,6 +88,7 @@
 </script>
 
 <ConfirmationModal
+  {isLoading}
   isDelete
   id={roleId}
   heading="Are you sure you want to delete"
@@ -113,7 +117,7 @@
           <div class="flex justify-between items-center">
             <DisclosureButton
               on:click={() => (isClicked = true)}
-              class="text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2"
+              class="text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
             >
               {role?.role_name?.charAt(0).toUpperCase() +
                 role?.role_name?.slice(1)}
@@ -131,7 +135,7 @@
                   }}
                 />
               </div>
-              <RenameModal id={role.id} />
+              <RenameModal id={role.id} roleName={role?.role_name} />
 
               {#if open}
                 <button

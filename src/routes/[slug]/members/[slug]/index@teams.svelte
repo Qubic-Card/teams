@@ -88,9 +88,7 @@
 
     if (data) {
       const profile = data[0]['team_profile'];
-      // console.log('INDEX PROFILE', { ...profile });
       $profileData = { ...profile };
-      // console.log('INDEX PROFILEDATA', $profileData);
       $socials = profile['socials'];
       $links = profile['links'];
       profileId = data[0]['id'];
@@ -99,8 +97,6 @@
 
     return data;
   };
-
-  let selectedTab = 0;
 </script>
 
 {#await (getProfile(), getTeams())}
@@ -133,13 +129,7 @@
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           {#if permissions.readTeam}
-            <TabGroup
-              on:change={(e) =>
-                console.log(
-                  'Changed selected tab to:',
-                  (selectedTab = e.detail)
-                )}
-            >
+            <TabGroup>
               <TabList
                 class="w-full grid grid-cols-2 border-b-2 border-neutral-700 mb-4"
               >
