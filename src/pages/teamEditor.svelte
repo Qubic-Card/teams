@@ -279,7 +279,7 @@
     <div class="w-full">
       <div class="text-black">
         <div class="flex flex-col w-full">
-          <TabGroup>
+          <TabGroup defaultIndex={1}>
             <TabList
               class="w-full grid grid-cols-3 border-2 border-neutral-700 p-2"
             >
@@ -413,7 +413,7 @@
                   </div>
                   {#if $teamSocials.length > 0}
                     {#each $teamSocials as item, i}
-                      <div class="p-3 flex items-center">
+                      <div class="p-1 flex">
                         <Input
                           class="flex-grow"
                           title={item.type === 'tiktok'
@@ -462,112 +462,111 @@
                         />
 
                         {#if permissions.writeProfile || permissions.writeMembers}
-                          <Menu
-                            as="div"
-                            class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
-                          >
-                            <MenuButton
-                              class="w-8 h-auto flex justify-center items-center pt-1"
-                              ><svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                                />
-                              </svg></MenuButton
-                            >
-                            <Transition
-                              enter="transition duration-100 ease-out"
-                              enterFrom="transform scale-95 opacity-0"
-                              enterTo="transform scale-100 opacity-100"
-                              leave="transition duration-75 ease-out"
-                              leaveFrom="transform scale-100 opacity-100"
-                              leaveTo="transform scale-95 opacity-0"
-                            >
-                              <MenuItems
-                                class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
-                              >
-                                <MenuItem
-                                  class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                  on:click={() =>
-                                    // go(item.type, item.data, 'Preview')
-                                    toNewTab(item.type, item.data)}
+                          <div class="flex items-center h-[6.3rem]">
+                            <Menu class="bg-neutral-100 h-8 mx-2 rounded-md">
+                              <MenuButton
+                                class="w-8 h-auto flex justify-center items-center pt-1"
+                                ><svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  class="h-6 w-6"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  stroke-width="2"
                                 >
-                                  <img
-                                    class="cursor-pointer mr-2"
-                                    draggable="false"
-                                    width="20"
-                                    height="20"
-                                    src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
-                                    alt=""
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
                                   />
-                                  <p>Test</p>
-                                </MenuItem>
-                                <MenuItem
-                                  class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
-                                  on:click={async () => {
-                                    handleDeleteSocial(
-                                      item,
-                                      $teamSocials,
-                                      true
-                                    );
-                                    await handleSave();
-                                  }}
+                                </svg></MenuButton
+                              >
+                              <Transition
+                                enter="transition duration-100 ease-out"
+                                enterFrom="transform scale-95 opacity-0"
+                                enterTo="transform scale-100 opacity-100"
+                                leave="transition duration-75 ease-out"
+                                leaveFrom="transform scale-100 opacity-100"
+                                leaveTo="transform scale-95 opacity-0"
+                              >
+                                <MenuItems
+                                  class="top-10 z-40 absolute rounded-md flex flex-col bg-neutral-100 text-black shadow-md border border-neutral-800 p-2 w-40"
                                 >
-                                  <img
-                                    class="cursor-pointer mr-2"
-                                    draggable="false"
-                                    width="20"
-                                    height="20"
-                                    src="https://img.icons8.com/material-outlined/96/000000/trash--v1.png"
-                                    alt=""
-                                  />
-                                  <p>Delete</p>
-                                </MenuItem>
-                                {#if i != 0}
+                                  <MenuItem
+                                    class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                    on:click={() =>
+                                      // go(item.type, item.data, 'Preview')
+                                      toNewTab(item.type, item.data)}
+                                  >
+                                    <img
+                                      class="cursor-pointer mr-2"
+                                      draggable="false"
+                                      width="20"
+                                      height="20"
+                                      src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
+                                      alt=""
+                                    />
+                                    <p>Test</p>
+                                  </MenuItem>
                                   <MenuItem
                                     class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
                                     on:click={async () => {
-                                      handleUpSocial(
+                                      handleDeleteSocial(
                                         item,
-                                        i,
                                         $teamSocials,
                                         true
                                       );
                                       await handleSave();
                                     }}
                                   >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      class="h-6 w-6"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      stroke="currentColor"
-                                      stroke-width="2"
-                                    >
-                                      <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M7 11l5-5m0 0l5 5m-5-5v12"
-                                      />
-                                    </svg>
-                                    <p>Move up</p>
+                                    <img
+                                      class="cursor-pointer mr-2"
+                                      draggable="false"
+                                      width="20"
+                                      height="20"
+                                      src="https://img.icons8.com/material-outlined/96/000000/trash--v1.png"
+                                      alt=""
+                                    />
+                                    <p>Delete</p>
                                   </MenuItem>
-                                {/if}
-                              </MenuItems>
-                            </Transition>
-                          </Menu>
-                          <SwitchButton
-                            bind:checked={item.isActive}
-                            on:change={handleSave}
-                          />
+                                  {#if i != 0}
+                                    <MenuItem
+                                      class="flex cursor-pointer hover:bg-neutral-300 px-2 py-1 rounded-md"
+                                      on:click={async () => {
+                                        handleUpSocial(
+                                          item,
+                                          i,
+                                          $teamSocials,
+                                          true
+                                        );
+                                        await handleSave();
+                                      }}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                      >
+                                        <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M7 11l5-5m0 0l5 5m-5-5v12"
+                                        />
+                                      </svg>
+                                      <p>Move up</p>
+                                    </MenuItem>
+                                  {/if}
+                                </MenuItems>
+                              </Transition>
+                            </Menu>
+                            <SwitchButton
+                              bind:checked={item.isActive}
+                              on:change={handleSave}
+                            />
+                          </div>
                         {/if}
                       </div>
                     {/each}
