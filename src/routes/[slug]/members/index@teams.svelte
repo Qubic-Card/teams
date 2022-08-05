@@ -173,6 +173,9 @@
         on:click={() => setState('inactive')}>Inactive</button
       >
     </div>
+    {#if inactiveCards.length === 0}
+      <div class="text-white text-6xl">No card found</div>
+    {/if}
     <div
       class={`grid grid-flow-row my-4 h-64 gap-2 ${
         innerWidth > 1257 ? 'grid-cols-3' : 'grid-cols-2'
