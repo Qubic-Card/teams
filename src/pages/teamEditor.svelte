@@ -376,24 +376,26 @@
                       <div
                         class="bg-neutral-100 rounded-md h-4/5 p-2 gap-2 flex items-center justify-between"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-7 w-7"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
+                        <div class="flex gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-7 w-7"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
 
-                        <p class="w-64 truncate text-neutral-700 text-md">
-                          {$teamData?.brochure?.filename}
-                        </p>
+                          <p class="w-72 truncate text-neutral-700 text-md">
+                            {$teamData?.brochure?.filename}
+                          </p>
+                        </div>
                         <button
                           class="p-2 h-full bg-red-600 rounded-md self-start"
                           on:click={() => (showDeleteBrochureModal = true)}

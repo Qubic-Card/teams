@@ -212,23 +212,7 @@
 
           <div
             class="flex relative h-20 w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
-          >
-            {#if permissions.readRoles}
-              <p
-                class="text-white border-2 border-neutral-700 flex justify-between items-center h-8 text-sm p-2 gap-2 rounded-md relative"
-              >
-                {role?.role_name === 'superadmin'
-                  ? 'Super Admin'
-                  : role?.role_name?.charAt(0).toUpperCase() +
-                    role?.role_name?.slice(1)}
-              </p>
-            {/if}
-
-            <!-- <SwitchButton
-              on:change={async () => await setStatus()}
-              checked={member.status}
-            /> -->
-          </div>
+          />
         </div>
       </div>
     {/if}

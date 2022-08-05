@@ -70,6 +70,12 @@
       loading = false;
     }
   };
+
+  const onKeyPress = async (e) => {
+    if (e.charCode === 13) {
+      await handleLogin();
+    }
+  };
 </script>
 
 <AuthWrapper>
@@ -109,6 +115,7 @@
                 Password
               </p>
               <input
+                on:keypress={onKeyPress}
                 bind:value={password}
                 type="password"
                 name=""
