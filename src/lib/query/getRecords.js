@@ -104,8 +104,6 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
             Message:
               log?.data?.message.slice(5).charAt(0).toUpperCase() +
               log?.data?.message.slice(6),
-            TeamMember:
-              log?.team_member?.firstname + ' ' + log.team_member?.lastname,
             Holder: log.card_holder ?? '-',
           };
         });

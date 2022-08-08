@@ -92,7 +92,7 @@
     />
     <button
       disabled={roleName === ''}
-      class="flex justify-center p-4 w-full bg-blue-600 text-white rounded-lg disabled:bg-blue-600/60"
+      class="flex gap-2 justify-center items-center p-4 w-full bg-blue-600 text-white rounded-lg disabled:bg-blue-600/60"
       on:click={async () => await addRoleHandler()}
     >
       {#if loading}

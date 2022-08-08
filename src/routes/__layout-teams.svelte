@@ -17,6 +17,8 @@
   import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
   import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
+  import { last3Days, last7Days } from '@lib/utils/getDates';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -45,6 +47,23 @@
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
+  let isActiveTeam = false;
+  let isGracePeriod = false;
+  let isInactiveTeam = false;
+  $: {
+    if (new Date(new Date().setDate(20)) > new Date()) {
+      isActiveTeam = true;
+    } else if (new Date(new Date().setDate(20)) > new Date(last7Days[0])) {
+      // if hari ini lebih besar daripada 7 hari setelah end date
+      isGracePeriod = true;
+    } else {
+      isInactiveTeam = true;
+    }
+    // console.log(new Date(last3Days[0]));
+    // console.log(new Date());
+
+    // console.log(isActiveTeam, isInactiveTeam, isGracePeriod);
+  }
 </script>
 
 <svelte:head>

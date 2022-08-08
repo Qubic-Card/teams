@@ -18,6 +18,11 @@
       if (!checked.includes('allow_write_profile'))
         checked.push('allow_write_profile');
     }
+
+    if (checked.includes('allow_write_roles')) {
+      if (!checked.includes('allow_read_roles'))
+        checked.push('allow_read_roles');
+    }
     if (selectAll) {
       // isSuperAdmin = true;
       checked = [
