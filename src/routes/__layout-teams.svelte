@@ -17,15 +17,14 @@
   import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
   import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
-  import convertToGMT7 from '@lib/utils/convertToGMT7';
-  import { last3Days, last7Days } from '@lib/utils/getDates';
+  import { endDate } from '@lib/stores/endDateStore';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
   let permissions = {
     readAnalytics: false,
   };
-  let roleMapping = [];
+  let roleMapping = { role_maps: [], role_name: '' };
   let team = null;
   let teamId = Cookies.get('qubicTeamId');
 
@@ -38,7 +37,7 @@
     team = await getTeamData(teamId);
   });
 
-  $: setUserData(roleMapping);
+  $: setUserData(roleMapping?.role_maps);
   $: $userData?.filter((item) => {
     if (item === 'allow_read_analytics') permissions.readAnalytics = true;
   });
@@ -47,22 +46,50 @@
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
-  let isActiveTeam = false;
-  let isGracePeriod = false;
-  let isInactiveTeam = false;
-  $: {
-    if (new Date(new Date().setDate(20)) > new Date()) {
-      isActiveTeam = true;
-    } else if (new Date(new Date().setDate(20)) > new Date(last7Days[0])) {
-      // if hari ini lebih besar daripada 7 hari setelah end date
-      isGracePeriod = true;
-    } else {
-      isInactiveTeam = true;
-    }
-    // console.log(new Date(last3Days[0]));
-    // console.log(new Date());
 
-    // console.log(isActiveTeam, isInactiveTeam, isGracePeriod);
+  // let endDate = new Date(today.setDate(today.getDate() + 30));
+  let sevenDaysAfterEndDate = new Date(
+    new Date().setDate(new Date().getDate() + 7)
+  );
+
+  $: {
+    if (new Date().getTime() > $endDate.getTime()) {
+      if (roleMapping.role_name !== 'superadmin') {
+        $userData = ['inactive'];
+      } else {
+        $userData = [
+          'allow_read_roles',
+          'allow_read_team',
+          'allow_read_members',
+          'allow_read_analytics',
+          'allow_read_connections',
+          'allow_read_billing',
+          'inactive',
+        ];
+      }
+    } else if (sevenDaysAfterEndDate.getTime() === new Date().getTime()) {
+      // if hari ini lebih besar daripada 7 hari setelah end date
+      if (roleMapping.role_name !== 'superadmin') {
+        $userData = ['will_expired'];
+      } else {
+        $userData = [
+          'allow_read_roles',
+          'allow_read_team',
+          'allow_read_members',
+          'allow_read_analytics',
+          'allow_read_connections',
+          'allow_read_billing',
+          'will_expired',
+        ];
+      }
+    } else {
+      console.log('active');
+    }
+
+    // console.log(sevenDaysAfterEndDate);
+    // console.log(roleMapping);
+    console.log($userData);
+    console.log($endDate);
   }
 </script>
 

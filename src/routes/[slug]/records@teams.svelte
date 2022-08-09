@@ -12,18 +12,13 @@
   import PersonalRecords from '@pages/personalRecords.svelte';
   import supabase from '@lib/db';
   import RecordsSkeleton from '@comp/skeleton/recordsSkeleton.svelte';
-  import { get } from 'svelte/store';
 
   let teamId = Cookies.get('qubicTeamId');
   let permissions = {
-    writeRecords: true,
+    writeRecords: false,
   };
-  let isTeamTab = false;
   let personalCsv;
   let teamCsv;
-  let isUpdated = false;
-
-  const updatedData = (e) => (isUpdated = e.detail);
 
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
@@ -57,18 +52,15 @@
     await getPersonalStorage();
     await getTeamStorage();
   };
-
+  let isTeamInactive = false;
   $: $userData?.filter((item) => {
-    if (item === 'allow_write_records') {
-      permissions.writeRecords = true;
-    } else permissions.writeRecords = false;
+    if (item === 'allow_write_records') permissions.writeRecords = true;
+    if (item === 'inactive') isTeamInactive = true;
   });
-
-  // $: if (isUpdated) getPersonalStorage(), getTeamStorage();
 </script>
 
 {#await getAllStorage()}
-  <RecordsSkeleton />
+  <RecordsSkeleton {permissions} />
 {:then name}
   <div
     class={`flex flex-col w-full pl-216 ${
@@ -82,18 +74,12 @@
         >
           <div class="flex gap-8">
             <Tab
-              on:click={() => {
-                isTeamTab = false;
-              }}
               class={({ selected }) =>
                 selected
                   ? 'text-white font-bold border-b-2 border-white pb-2'
                   : 'text-white pb-2'}>Personal</Tab
             >
             <Tab
-              on:click={() => {
-                isTeamTab = true;
-              }}
               class={({ selected }) =>
                 selected
                   ? 'text-white font-bold border-b-2 border-white pb-2'
@@ -122,7 +108,12 @@
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords {personalCsv} {teamCsv} {getPersonalStorage} />
+        <PersonalRecords
+          {personalCsv}
+          {teamCsv}
+          {getPersonalStorage}
+          {isTeamInactive}
+        />
       </div>
     {/if}
   </div>

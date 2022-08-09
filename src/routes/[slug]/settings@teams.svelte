@@ -50,7 +50,7 @@
 
 {#await getTeamsRoleMapping()}
   <div class="ml-24 mr-4 mt-4">
-    <SettingsSkeleton />
+    <SettingsSkeleton {permissions} />
   </div>
 {:then}
   <div class="flex justify-center pt-4 pl-24 pr-4">

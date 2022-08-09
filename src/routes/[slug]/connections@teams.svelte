@@ -30,9 +30,11 @@
   let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
   let isLoading = false;
   let tabs = 'user';
+  let isTeamInactive = false;
 
   $: $userData?.filter((item) => {
     if (item === 'allow_read_connections') permissions.readConnection = true;
+    if (item === 'inactive') isTeamInactive = true;
   });
 
   const setTabs = (tab) => (tabs = tab);
@@ -267,6 +269,7 @@
                 {#if tabs === 'all'}
                   {#each teamConnections as connection, i}
                     <ConnectionTableBody
+                      {isTeamInactive}
                       {innerWidth}
                       {connection}
                       tab="team"
@@ -276,6 +279,7 @@
                 {:else}
                   {#each userConnections as connection, i}
                     <ConnectionTableBody
+                      {isTeamInactive}
                       {innerWidth}
                       {connection}
                       tab="user"
@@ -357,6 +361,7 @@
             <tbody>
               {#each userConnections as connection, i}
                 <ConnectionTableBody
+                  {isTeamInactive}
                   {innerWidth}
                   {connection}
                   tab="user"
