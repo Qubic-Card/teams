@@ -1,12 +1,14 @@
 <div
-  class="animate-pulse w-full flex flex-col justify-center items-center gap-2"
+  class="animate-pulse w-full flex gap-2 h-screen justify-center items-center p-24"
 >
-  <div class="flex p-4 bg-neutral-800 h-12 rounded-lg w-52" />
-  <div
-    class="flex justify-center items-center mt-2 p-2 gap-4 border border-neutral-600 w-96"
-  >
-    <div class="bg-neutral-800 h-10 w-12 rounded-md" />
-    <div class="w-full bg-neutral-800 h-12" />
+  <div class="flex flex-col self-start mt-20 gap-2 w-1/2">
+    <div class="flex p-4 bg-neutral-800 h-10 rounded-md w-48" />
+    <div
+      class="flex justify-center items-center bg-neutral-600 p-2 h-12 rounded-md gap-4 w-96"
+    />
+    <div
+      class="flex justify-center items-center bg-neutral-600 p-2 h-12 rounded-md gap-4 w-96"
+    />
   </div>
-  <div class="flex p-4 bg-neutral-800 h-12 rounded-lg w-40" />
+  <div class="bg-neutral-800 rounded-md h-full w-1/2" />
 </div>
