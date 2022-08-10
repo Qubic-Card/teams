@@ -1,18 +1,5 @@
 import supabase from '@lib/db';
 
-export const getMemberId = async (uid, teamId) => {
-  const { data, error } = await supabase
-    .from('team_members')
-    .select('id')
-    .eq('uid', uid)
-    .eq('team_id', teamId);
-
-  if (error) console.log(error);
-  if (data) {
-    return data[0].id;
-  }
-};
-
 export const getProfileId = async (uid) => {
   const { data, error } = await supabase
     .from('profile')

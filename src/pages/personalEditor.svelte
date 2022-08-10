@@ -20,7 +20,7 @@
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
   import supabase from '@lib/db';
-  import { user, userData } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -32,14 +32,12 @@
     MenuButton,
     MenuItems,
     MenuItem,
-    Transition,
     Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
   import toNewTab from '@lib/utils/newTab';
   import Cookies from 'js-cookie';
   import { profileData } from '@lib/stores/profileData';
-  import CropModal from '@comp/modals/cropModal.svelte';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import {
     handleDeleteLink,

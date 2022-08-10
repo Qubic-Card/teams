@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { endDate } from '@lib/stores/endDateStore';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
+
   import { Switch } from '@rgossiaux/svelte-headlessui';
-  import Cookies from 'js-cookie';
 
   export let permissions;
   let isAutoRenew = false;
-  let teamId = Cookies.get('qubicTeamId');
 </script>
 
 <div class={`gap-4 ${permissions.readBilling ? 'flex' : 'hidden'}`}>
@@ -22,18 +23,22 @@
           }`}
         >
           <button
-            class="p-2 w-auto bg-blue-600 text-white rounded-lg"
+            class="p-2 w-auto bg-blue-600 text-white rounded-md"
             on:click={async () => await console.log('billing')}
             >Change subscription</button
           >
           <button
-            class="p-2 w-auto bg-blue-600 text-white rounded-lg"
+            class="p-2 w-auto bg-blue-600 text-white rounded-md"
             on:click={async () => await console.log('billing')}
             >Tambah saldo</button
           >
         </div>
       </div>
-      <p>Subscription valid hingga: 12 Feb 2023</p>
+      <p>
+        Subscription valid hingga: {new Date(convertToGMT7($endDate))
+          .toDateString()
+          .slice(4)}
+      </p>
       <p>Saldo tersisa: 0</p>
       <div
         class="flex justify-between items-center p-3 rounded mt-4 bg-neutral-900"

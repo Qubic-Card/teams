@@ -1,51 +1,50 @@
 <script>
+  import { fade } from 'svelte/transition';
   import '../app.css';
+  import MemberWrapper from '@comp/memberWrapper.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
-  import Cookies from 'js-cookie';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
-  import {
-    setUserData,
-    user,
-    userChangeTimestamp,
-    userData,
-  } from '@lib/stores/userStore';
+  import { userData } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
-  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
-  import getTeamData from '@lib/query/getTeamData';
   import { sidebarItems } from '@lib/constants';
-  import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
   import { endDate } from '@lib/stores/endDateStore';
+  import supabase from '@lib/db';
+  import getTeamData from '@lib/query/getTeamData';
+  import Cookies from 'js-cookie';
 
+  let teamId = Cookies.get('qubicTeamId');
   let isSidebarOpened = false;
   let isMenuOpened = false;
   let permissions = {
     readAnalytics: false,
   };
-  let roleMapping = { role_maps: [], role_name: '' };
+  let member = { id: 0, role: { role_maps: [], role_name: '' } };
   let team = null;
-  let teamId = Cookies.get('qubicTeamId');
+  let today;
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
-
-  onMount(async () => {
-    roleMapping = await getRoleMapsByProfile($user?.id, teamId);
-    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
-    team = await getTeamData(teamId);
-  });
-
-  $: setUserData(roleMapping?.role_maps);
-  $: $userData?.filter((item) => {
-    if (item === 'allow_read_analytics') permissions.readAnalytics = true;
-  });
-
   const handler = (id, title) => {
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
+  const getToday = async () => {
+    const { data, error } = await supabase.functions.invoke('globaldate');
+    if (error) console.log(error);
+    if (data) today = new Date(data).getTime();
+  };
+
+  $: $userData?.filter((item) => {
+    if (item === 'allow_read_analytics') permissions.readAnalytics = true;
+  });
+
+  onMount(async () => {
+    await getToday();
+    team = await getTeamData(teamId);
+  });
 
   // let endDate = new Date(today.setDate(today.getDate() + 30));
   let sevenDaysAfterEndDate = new Date(
@@ -53,8 +52,8 @@
   );
 
   $: {
-    if (new Date().getTime() > $endDate.getTime()) {
-      if (roleMapping.role_name !== 'superadmin') {
+    if (today > $endDate.getTime()) {
+      if (member.role.role_name !== 'superadmin') {
         $userData = ['inactive'];
       } else {
         $userData = [
@@ -69,7 +68,7 @@
       }
     } else if (sevenDaysAfterEndDate.getTime() === new Date().getTime()) {
       // if hari ini lebih besar daripada 7 hari setelah end date
-      if (roleMapping.role_name !== 'superadmin') {
+      if (member.role.role_name !== 'superadmin') {
         $userData = ['will_expired'];
       } else {
         $userData = [
@@ -87,9 +86,9 @@
     }
 
     // console.log(sevenDaysAfterEndDate);
-    // console.log(roleMapping);
-    console.log($userData);
-    console.log($endDate);
+    // console.log(member);
+    // console.log($userData);
+    // console.log($endDate);
   }
 </script>
 
@@ -98,6 +97,11 @@
 </svelte:head>
 
 <AuthWrapper>
+  {#if $userData.includes('inactive')}
+    <div class="bg-red-600 text-white text-center p-2 text-sm">
+      Your subscription has expired.
+    </div>
+  {/if}
   <div class="relative min-h-screen">
     <div
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
@@ -201,31 +205,68 @@
     <div
       class="absolute top-16 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
     >
-      {#if permissions.readAnalytics}
-        {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
-          <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
-            <button
-              on:click={() => goto(`/${team?.id}/dashboard`)}
-              class={`pb-2 w-1/5 text-md ${
-                $page.routeId === '[slug]/dashboard@teams'
-                  ? 'border-b-2 border-neutral-200 font-bold'
-                  : 'text-neutral-300'
-              }`}>Personal</button
-            >
-            <button
-              on:click={() => goto(`/${team?.id}/dashboard/team`)}
-              class={`pb-2 w-1/5 text-md ${
-                $page.routeId === '[slug]/dashboard/team@teams'
-                  ? 'border-b-2 border-neutral-200 font-bold'
-                  : 'text-neutral-300'
-              }`}>Team</button
-            >
-          </div>
-        {/if}
-      {/if}
-
       <SvelteToast />
-      <slot />
+      <MemberWrapper let:loading>
+        {#if loading}
+          <div
+            transition:fade|local
+            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40"
+          >
+            <small class="text-left w-1/2 mb-2">
+              Secondary security authenticating user access ...
+            </small>
+            <div class="h-6 w-1/2 rounded-md shim-red bg-neutral-700" />
+          </div>
+        {:else}
+          {#if permissions.readAnalytics}
+            {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
+              <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
+                <button
+                  on:click={() => goto(`/${team?.id}/dashboard`)}
+                  class={`pb-2 w-1/5 text-md ${
+                    $page.routeId === '[slug]/dashboard@teams'
+                      ? 'border-b-2 border-neutral-200 font-bold'
+                      : 'text-neutral-300'
+                  }`}>Personal</button
+                >
+                <button
+                  on:click={() => goto(`/${team?.id}/dashboard/team`)}
+                  class={`pb-2 w-1/5 text-md ${
+                    $page.routeId === '[slug]/dashboard/team@teams'
+                      ? 'border-b-2 border-neutral-200 font-bold'
+                      : 'text-neutral-300'
+                  }`}>Team</button
+                >
+              </div>
+            {/if}
+          {/if}
+          <slot />
+        {/if}
+      </MemberWrapper>
     </div>
   </div>
 </AuthWrapper>
+
+<style>
+  .shim-red {
+    position: relative;
+    overflow: hidden;
+  }
+  .shim-red::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg, #2563eb 0%, #2563eb 100%);
+    animation: shimmer 3s ease-out infinite;
+    content: '';
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(0%);
+    }
+  }
+</style>

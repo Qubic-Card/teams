@@ -1,5 +1,4 @@
 import supabase from '@lib/db';
-import { getTeamId } from '@lib/query/getId';
 
 const getTeamData = async (teamId) => {
   const { data, error } = await supabase

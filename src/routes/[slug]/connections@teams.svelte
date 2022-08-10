@@ -2,8 +2,7 @@
   import supabase from '@lib/db';
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import ConnectionTableBody from '@comp/tables/connectionTableBody.svelte';
-  import { user, userData } from '@lib/stores/userStore';
-  import { getMemberId } from '@lib/query/getId';
+  import { memberData, userData } from '@lib/stores/userStore';
   import Cookies from 'js-cookie';
   import {
     connectionsTable,
@@ -51,11 +50,10 @@
   };
 
   const getUserConnectionsList = async () => {
-    let id = await getMemberId($user?.id, teamId);
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq('by', id)
+      .eq('by', $memberData?.id)
       .order('dateConnected', { ascending: false });
 
     if (error) console.log(error);
@@ -70,10 +68,8 @@
     let column;
 
     tabs === 'all'
-      ? (id = permissions.readConnection
-          ? teamId
-          : await getMemberId($user?.id, teamId))
-      : (id = await getMemberId($user?.id, teamId));
+      ? (id = permissions.readConnection ? teamId : $memberData?.id)
+      : (id = $memberData?.id);
 
     tabs === 'all'
       ? (column = permissions.readConnection ? 'team_id' : 'by')
@@ -120,12 +116,11 @@
 
   const searchPersonalHandler = async () => {
     loading = true;
-    let id = await getMemberId($user?.id, teamId);
 
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq('by', id)
+      .eq('by', $memberData?.id)
       .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 

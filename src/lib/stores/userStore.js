@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 export const user = writable(null);
 export const userData = writable([]);
 export const userChangeTimestamp = writable(null);
+export const memberData = writable({ id: 0 });
 // export const permissions = writable({
 //   readAnalytics: false,
 //   readBilling: false,

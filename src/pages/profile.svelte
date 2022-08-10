@@ -127,7 +127,7 @@
             >
               <h1>{$teamData?.brochure?.title}</h1>
               <p class="text-xs text-neutral-400">
-                Download brochure {$teamData.company}
+                Know more about {$teamData.company}
               </p>
             </div>
           {/if}

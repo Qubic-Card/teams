@@ -8,8 +8,7 @@
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
-  import { getMemberId } from '@lib/query/getId';
+  import { memberData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
   import getDates, { last30Days, today } from '@lib/utils/getDates';
@@ -49,7 +48,6 @@
   };
 
   const createRecordHandler = async () => {
-    let id = await getMemberId($user?.id, teamId);
     let logsCsv = [];
     let connectionsCsv = [];
 
@@ -63,7 +61,7 @@
     } else {
       connectionsCsv = await getConnectionsRecords(
         'by',
-        id,
+        $memberData?.id,
         fromDateValue,
         toDateValue
       );
