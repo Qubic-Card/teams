@@ -141,8 +141,9 @@
 <svelte:window bind:innerWidth />
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-24 pr-4">
   {#await getAllData()}
-    <MemberSkeleton />
+    <MemberSkeleton {cards} {innerWidth} {permissions} />
   {:then}
+    <!-- <MemberSkeleton {allMember} /> -->
     <div
       class={`items-center w-full rounded-md gap-2 mt-2 bg-neutral-900 p-3 ${
         permissions.readMembers ? 'flex' : 'hidden'

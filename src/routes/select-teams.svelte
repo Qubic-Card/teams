@@ -2,10 +2,10 @@
   import Cookies from 'js-cookie';
   import { goto } from '$app/navigation';
   import supabase from '@lib/db';
-  import { fade, slide } from 'svelte/transition';
+  import { fade, fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
   import SelectTeamsSkeleton from '@comp/skeleton/selectTeamsSkeleton.svelte';
-  import AddTeamModal from '@comp/modals/addTeamModal.svelte';
+  // import AddTeamModal from '@comp/modals/addTeamModal.svelte';
 
   let teams = [];
 
@@ -19,12 +19,14 @@
     if (error) console.log(error);
 
     if (data) {
+      console.log(data);
       teams = data;
     }
   };
 
   const chooseTeam = (teamId) => {
     Cookies.set('qubicTeamId', teamId);
+    // Cookies.set('qubicTeamStartDate', startDate)
     goto(`/${teamId}/dashboard`);
   };
 </script>
@@ -37,8 +39,11 @@
   {#await getTeamsList()}
     <SelectTeamsSkeleton />
   {:then}
-    <div class="flex justify-center items-center h-screen p-24" in:fade|local>
-      <div class="flex flex-col h-full w-1/2 pr-32 py-16 gap-2">
+    <div class="flex justify-around items-center h-screen p-24">
+      <div
+        class="flex flex-col h-full w-[50%] pr-32 py-16 gap-2"
+        in:fly|local={{ y: 5000, duration: 1000 }}
+      >
         <h1 class="text-xl mb-4">Choose team</h1>
         {#if teams}
           {#if teams.length > 0}
@@ -61,61 +66,16 @@
             </div>
           {/if}
         {/if}
-        <AddTeamModal />
+        <!-- <AddTeamModal /> -->
       </div>
 
-      <img
-        src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-        class="h-full w-1/2 object-fit rounded-md"
-        alt=""
+      <div
+        in:fade|local
+        class="w-[40%] h-full rounded-md bg-cover"
+        style={`background-image:url(${'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'})`}
       />
     </div>
   {:catch}
     <h1>Something went wrong. Please try again later.</h1>
   {/await}
 </section>
-<!-- <div
-  class="h-screen flex flex-col gap-2 justify-center items-center bg-black/90 text-white"
->
-  {#await getTeamsList()}
-    <SelectTeamsSkeleton />
-  {:then}
-    <h1 class="text-3xl font-bold mb-4">Select team</h1>
-    {#if teams}
-      {#if teams.length > 0}
-        {#each teams as item}
-          <div
-            on:click={() => chooseTeam(item.team_id.id)}
-            transition:slide|local={{ duration: 500 }}
-            class="flex items-center border-2 border-neutral-500 p-4 rounded-md w-96 cursor-pointer hover:bg-neutral-900 transition-colors duration-200"
-          >
-            {#if item.team_id.metadata.logo === ''}
-              <div
-                class="bg-neutral-700 w-12 h-12 rounded-md flex justify-center items-center mr-2"
-              >
-                {item.team_id.name.charAt(0).toUpperCase()}
-              </div>
-            {:else}
-              <img
-                src={item.team_id.metadata.logo}
-                alt={item.team_id.name + ' logo'}
-                class="h-12 w-12 mr-2 rounded-md"
-              />
-            {/if}
-            <p>
-              {item.team_id.name.charAt(0).toUpperCase() +
-                item.team_id.name.slice(1) ?? 'No team name'}
-            </p>
-          </div>
-        {/each}
-      {:else}
-        <div class="text-center">
-          <p class="text-lg">You don't have any team yet</p>
-        </div>
-      {/if}
-    {/if}
-    <AddTeamModal />
-  {:catch}
-    <h1>Something went wrong. Please try again later.</h1>
-  {/await}
-</div> -->

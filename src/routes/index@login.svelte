@@ -85,8 +85,8 @@
     <div class="border-t border-neutral-700 absolute w-screen bottom-16" />
     <div class="border-r border-neutral-700 absolute h-screen right-16" />
     <div class="border-l border-neutral-700 h-screen absolute left-16" />
-    <div class="flex justify-center items-center h-screen p-24">
-      <div class="flex flex-col justify-between h-full w-1/2 pr-32 py-16">
+    <div class="flex justify-around items-center h-screen p-24">
+      <div class="flex flex-col justify-between h-full w-1/2 pr-60 py-16">
         <div class="text-xl">
           Work together with <br />
           <div class="flex items-center">
@@ -96,6 +96,13 @@
         </div>
         {#if !isSuccessful}
           <div>
+            {#if isForgotPassword}
+              <h1
+                class="mt-6 text-2xl mb-4 font-semibold tracking-tighter text-left sm:text-3xl title-font"
+              >
+                We got you!
+              </h1>
+            {/if}
             <p class="block text-sm text-left">Email Address</p>
             <input
               bind:value={email}
@@ -115,16 +122,6 @@
             {/if}
           </div>
 
-          <!-- <a href="/" class="flex items-center w-32 mb-4 font-medium md:mb-0">
-            <img src="/qubic.svg" alt="" />
-          </a>
-          {#if isForgotPassword}
-            <h1
-              class="mt-6 text-2xl font-semibold tracking-tighter text-left sm:text-3xl title-font"
-            >
-              We got you!
-            </h1>
-          {/if} -->
           <div class="mt-6">
             {#if !loading}
               {#if isForgotPassword}
@@ -145,13 +142,19 @@
             {/if}
 
             <p
-              class="mt-3 text-neutral-400 text-sm cursor-pointer"
+              class="mt-2 text-neutral-400 text-sm cursor-pointer"
               on:click={forgotPassword}
             >
               {isForgotPassword ? 'Back' : 'Forgot password?'}
             </p>
 
-            <p class="mt-3 text-neutral-400 text-sm">Not your team?</p>
+            <p
+              class="text-neutral-400 text-sm cursor-pointer"
+              on:click={() =>
+                window.open('https://qubic.id/teams', '_blank').focus()}
+            >
+              Don't have Teams?
+            </p>
           </div>
         {:else}
           <div in:fade|local>
@@ -164,10 +167,9 @@
         {/if}
       </div>
       <!-- <div class="w-1/2">asfasf</div> -->
-      <img
-        src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-        class="h-full w-1/2 object-fit rounded-md"
-        alt=""
+      <div
+        class="w-[40%] h-full rounded-md bg-cover"
+        style={`background-image:url(${'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'})`}
       />
     </div>
   </section>

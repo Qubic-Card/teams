@@ -5,7 +5,7 @@
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
-  export let record, teamId, deleteFromTable;
+  export let record, teamId, deleteFromTable, isTeamInactive;
 
   let showDeleteModal = false;
   let isLoading = false;
@@ -73,29 +73,31 @@
     {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
   <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
-    <ConfirmationModal
-      {isLoading}
-      isDelete
-      isIconVisible
-      isDispatch
-      heading="Are you sure you want to delete"
-      text={`${record.profileData?.firstname ?? record?.name}
+    {#if !isTeamInactive}
+      <ConfirmationModal
+        {isLoading}
+        isDelete
+        isIconVisible
+        isDispatch
+        heading="Are you sure you want to delete"
+        text={`${record.profileData?.firstname ?? record?.name}
       ${record.profileData?.lastname ?? ''} ?`}
-      buttonLabel="Delete"
-      showModal={showDeleteModal}
-      toggleModal={deleteModalHandler}
-      on:action={async () => {
-        await deleteCsv();
-        deleteFromTable(record.id);
-        deleteModalHandler();
-      }}
-    />
-    <!-- 76900f13-9d11-424a-b111-71b1f2cd6def -->
-    <img
-      src="/download-icon.svg"
-      alt=""
-      class="w-6 h-6 cursor-pointer"
-      on:click={async () => await downloadCsv(record.name)}
-    />
+        buttonLabel="Delete"
+        showModal={showDeleteModal}
+        toggleModal={deleteModalHandler}
+        on:action={async () => {
+          await deleteCsv();
+          deleteFromTable(record.id);
+          deleteModalHandler();
+        }}
+      />
+      <!-- 76900f13-9d11-424a-b111-71b1f2cd6def -->
+      <img
+        src="/download-icon.svg"
+        alt=""
+        class="w-6 h-6 cursor-pointer"
+        on:click={async () => await downloadCsv(record.name)}
+      />
+    {/if}
   </td>
 </tr>

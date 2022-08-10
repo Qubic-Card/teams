@@ -10,7 +10,7 @@ export const getRoleMapsByProfile = async (uid, teamId) => {
   if (error) console.log(error);
 
   if (data) {
-    return data[0]?.role?.role_maps;
+    return data[0]?.role;
   }
 };
 

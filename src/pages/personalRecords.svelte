@@ -16,7 +16,7 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let personalCsv, getPersonalStorage;
+  export let personalCsv, getPersonalStorage, isTeamInactive;
 
   let teamId = Cookies.get('qubicTeamId');
   let fileName = `${new Date().toDateString().slice(4)}`;
@@ -214,7 +214,12 @@
       {#if personalCsv}
         {#if personalCsv.length > 0}
           {#each personalCsv as record, i}
-            <RecordsTableBody {record} {teamId} {deleteFromTable} />
+            <RecordsTableBody
+              {record}
+              {teamId}
+              {deleteFromTable}
+              {isTeamInactive}
+            />
           {/each}
         {:else}
           <tr>

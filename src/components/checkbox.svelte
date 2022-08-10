@@ -77,7 +77,10 @@
             />
 
             <p class="ml-4 w-72">
-              {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
+              {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
+                checkbox.name.split('_')[0].slice(1)}
+              {checkbox.name.split('_')[1]}
+              {checkbox.name.split('_')[2]}
             </p>
           </label>
         </div>
@@ -109,7 +112,10 @@
             />
 
             <p class="ml-4 w-72">
-              {checkbox.name.charAt(0).toUpperCase() + checkbox.name.slice(1)}
+              {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
+                checkbox.name.split('_')[0].slice(1)}
+              {checkbox.name.split('_')[1]}
+              {checkbox.name.split('_')[2]}
             </p>
           </label>
         </div>
