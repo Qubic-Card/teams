@@ -1,11 +1,20 @@
 <script>
-  import Pagination from '@comp/pagination.svelte';
   import TeamAnalyticsLogsSkeleton from '@comp/skeleton/teamAnalyticsLogsSkeleton.svelte';
   import { fade } from 'svelte/transition';
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
 
   export let page, currentPageRows, setPage, loading, maxPage;
+
+  const setHours4Digit = (hours, minute) => {
+    if (hours < 10) {
+      hours = '0' + hours;
+    }
+    if (minute < 10) {
+      minute = '0' + minute;
+    }
+    return hours + ':' + minute;
+  };
 </script>
 
 {#if !loading}
@@ -25,9 +34,10 @@
                   item?.message?.slice(4)}
               </h1>
               <p class="text-neutral-500">
-                {convertToGMT7(item.created_at).getHours() +
-                  ':' +
-                  convertToGMT7(item.created_at).getMinutes()}
+                {setHours4Digit(
+                  convertToGMT7(item.created_at).getHours(),
+                  convertToGMT7(item.created_at).getMinutes()
+                )}
               </p>
             </div>
           {/each}

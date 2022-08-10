@@ -20,8 +20,7 @@
   import { doughnutChartBgColor, socialIcons } from '@lib/constants';
   import TeamAnalytics from '@pages/teamAnalytics.svelte';
   import TeamAnalyticsCardSkeleton from '@comp/skeleton/teamAnalyticsCardSkeleton.svelte';
-  import Cache from 'timed-cache';
-  // const cache = new Cache({ defaultTtl: 3600 * 1000 });
+
   let teamLogs = [];
   let loading = true;
 

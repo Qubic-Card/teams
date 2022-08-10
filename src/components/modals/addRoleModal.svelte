@@ -63,7 +63,7 @@
 </script>
 
 <button
-  class="p-2 w-36 bg-blue-600 text-white rounded-lg"
+  class="p-2 w-36 bg-blue-600 text-white rounded-md"
   on:click={toggleModal}
 >
   + Add new role

@@ -3,9 +3,9 @@
   import { onMount } from 'svelte';
   import Cookies from 'js-cookie';
   import supabase from '@lib/db';
-  import { user, userData } from '@lib/stores/userStore';
+  import { memberData, userData } from '@lib/stores/userStore';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
-  import { getMemberId } from '@lib/query/getId';
+
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
@@ -28,25 +28,10 @@
   let activeMembers = [];
   let state = 'all';
   let allMember = [];
-  let itemsPerPage = 9;
-
-  let totalPages = [];
-  let active = 0;
-  let currentPageRows = [];
   let updatedRole = '';
   let maxPage = 0;
   let page = 0;
   let toItem = 9;
-
-  // const paginate = (items) => {
-  //   const pages = Math.ceil(items.length / itemsPerPage);
-  //   const paginatedItems = Array.from({ length: pages }, (_, index) => {
-  //     const start = index * itemsPerPage;
-  //     return items.slice(start, start + itemsPerPage);
-  //   });
-  //   totalPages = [...paginatedItems];
-  //   currentPageRows = totalPages?.length > 0 ? totalPages[page] : [];
-  // };
 
   const setPage = (p) => (page = p);
 
@@ -61,11 +46,10 @@
   const setState = (newState) => (state = newState);
 
   const getUserCardId = async () => {
-    let memberId = await getMemberId($user?.id, teamId);
     const { data, error } = await supabase
       .from('team_cardcon')
       .select('card_id')
-      .eq('team_member_id', memberId);
+      .eq('team_member_id', $memberData?.id);
 
     if (error) console.log(error);
 

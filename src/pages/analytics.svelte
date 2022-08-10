@@ -1,15 +1,13 @@
 <script>
   import supabase from '@lib/db.js';
   import AnalyticTable from '@comp/tables/analyticTable.svelte';
-  import { user, userChangeTimestamp } from '@lib/stores/userStore.js';
-  import { getMemberId } from '@lib/query/getId';
+  import { memberData, userChangeTimestamp } from '@lib/stores/userStore.js';
   import {
     last3Days,
     last7Days,
     last14Days,
     last30Days,
   } from '@lib/utils/getDates';
-  import Cookies from 'js-cookie';
   import { count } from '@lib/utils/count';
   import AnalyticsDropdownButton from '@comp/buttons/analyticsDropdownButton.svelte';
   import { onMount } from 'svelte';
@@ -17,8 +15,8 @@
   import Chart from 'chart.js/auto/auto.js';
   import { analyticsChartConfig } from '@lib/constants';
   import PersonalAnalyticsCard from '@comp/cards/personalAnalyticsCard.svelte';
+  import convertToGMT7 from '@lib/utils/convertToGMT7';
 
-  let teamId = Cookies.get('qubicTeamId');
   let uniqueCount = 0;
   let activityCount = 0;
   let connectionCount = 0;
@@ -35,6 +33,15 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 5;
+  let minTime = new Date(
+    selectedDays === '7 Days'
+      ? last7Days[0]
+      : selectedDays === '14 Days'
+      ? last14Days[0]
+      : selectedDays === '30 Days'
+      ? last30Days[0]
+      : last3Days[0]
+  ).toUTCString();
 
   let logsChartData = {
     labels: [],
@@ -77,20 +84,7 @@
   const selectDaysHandler = (e) => (selectedDays = e.detail);
 
   const getConnectionsList = async () => {
-    let id = await getMemberId($user?.id, teamId);
-
     loading = true;
-    let minTime = new Date(
-      new Date(
-        selectedDays === '7 Days'
-          ? last7Days[0]
-          : selectedDays === '14 Days'
-          ? last14Days[0]
-          : selectedDays === '30 Days'
-          ? last30Days[0]
-          : last3Days[0]
-      )
-    ).toUTCString();
 
     let {
       data: connection_profile,
@@ -102,7 +96,7 @@
         'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
         { count: 'estimated' }
       )
-      .eq('by', id)
+      .eq('by', $memberData.id)
       .gte(
         'dateConnected',
         $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
@@ -127,22 +121,8 @@
     return { from, to };
   };
 
-  const getWeeklyLogsActivity = async () => {
-    const { from, to } = getPagination(page, toItem);
-    let id = await getMemberId($user?.id, teamId);
+  const getWeeklyLogsChartActivity = async () => {
     loading = true;
-
-    let minTime = new Date(
-      new Date(
-        selectedDays === '7 Days'
-          ? last7Days[0]
-          : selectedDays === '14 Days'
-          ? last14Days[0]
-          : selectedDays === '30 Days'
-          ? last30Days[0]
-          : last3Days[0]
-      )
-    ).toUTCString();
 
     let {
       data: logs,
@@ -156,7 +136,45 @@
           count: 'estimated',
         }
       )
-      .eq('team_member', id)
+      .eq('team_member', $memberData.id)
+      .gte(
+        'created_at',
+        $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
+      )
+      .order('created_at', {
+        ascending: false,
+      });
+
+    if (logs) {
+      activity = logs.map((log) =>
+        convertToGMT7(log.created_at).toDateString().slice(4)
+      );
+
+      loading = false;
+    }
+    if (error) {
+      console.log(error);
+      loading = false;
+    }
+  };
+
+  const getWeeklyLogsActivity = async () => {
+    const { from, to } = getPagination(page, toItem);
+    loading = true;
+
+    let {
+      data: logs,
+      error,
+      count,
+    } = await supabase
+      .from('team_logs')
+      .select(
+        'created_at, data->card, data->message, type, team, team_member(*), platform',
+        {
+          count: 'estimated',
+        }
+      )
+      .eq('team_member', $memberData.id)
       .gte(
         'created_at',
         $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
@@ -173,9 +191,6 @@
       });
       uniqueCount = newArr.length;
       activityCount = count;
-      activity = logs.map((log) =>
-        new Date(log.created_at).toDateString().slice(4)
-      );
 
       userLogs = logs;
       maxPage = Math.ceil(count / 10);
@@ -189,6 +204,7 @@
 
   const activityHandler = async () => {
     await getWeeklyLogsActivity();
+    await getWeeklyLogsChartActivity();
 
     logsChartData.labels =
       selectedDays === '7 Days'
