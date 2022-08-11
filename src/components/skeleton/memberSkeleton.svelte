@@ -24,6 +24,12 @@
       </div>
     </div>
   {:else}
-    <div class="bg-neutral-800 w-1/3 h-64 rounded-md" />
+    <div
+      class={`grid  ${
+        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-2'
+      } grid-flow-row`}
+    >
+      <div class="bg-neutral-800 w-full h-56 rounded-md" />
+    </div>
   {/if}
 </div>

@@ -12,21 +12,14 @@
   } from '@lib/stores/editorStore';
   import { theme } from '@lib/profileTheme';
   import Dummy from '@lib/dummy.json';
-  import {
-    Tab,
-    TabGroup,
-    TabList,
-    TabPanel,
-    TabPanels,
-  } from '@rgossiaux/svelte-headlessui';
   import { genvcard } from '@lib/vcard/vcardgen';
   import download from '@lib/utils/download';
   import { toastFailed } from '@lib/utils/toast';
   import toNewTab from '@lib/utils/newTab';
+  import { selectedTab } from '@lib/stores/selectedTab';
 
   export let data;
   export let isEditorMode = false;
-
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
   const popup = () => toastFailed(`You can't connect to your profile`);
@@ -86,133 +79,135 @@
       Add to Contacts
     </BorderButton>
   </div>
-  <TabGroup class="flex flex-col items-center w-full text-white mt-4">
-    <TabList class="flex w-2/3 h-16 rounded-lg p-2">
-      <Tab
-        class={({ selected }) =>
-          selected
-            ? 'border-b-2 border-neutral-300 w-1/2'
-            : 'border-b-2 border-neutral-700 w-1/2'}>Team</Tab
+  <div class="flex px-16">
+    <button
+      on:click={() => ($selectedTab = 'team')}
+      class={`${
+        $selectedTab === 'team'
+          ? 'border-b-2 border-white'
+          : 'border-b-2 border-neutral-700'
+      } p-2 w-1/2 text-white`}>Team</button
+    >
+    <button
+      on:click={() => ($selectedTab = 'personal')}
+      class={`${
+        $selectedTab === 'personal'
+          ? 'border-b-2 border-white'
+          : 'border-b-2 border-neutral-700'
+      } p-2 w-1/2 text-white`}>Personal</button
+    >
+  </div>
+
+  {#if $selectedTab == 'team'}
+    <div
+      class="gap-2 flex flex-col text-white px-16 justify-center items-center mt-4"
+    >
+      <div
+        class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"
       >
-      <Tab
-        class={({ selected }) =>
-          selected
-            ? 'border-b-2 border-neutral-300 w-1/2'
-            : 'border-b-2 border-neutral-700 w-1/2'}>My Contact</Tab
-      >
-    </TabList>
-    <TabPanels class="w-full">
-      <TabPanel>
-        <div class="gap-2 flex flex-col px-16 justify-center items-center mt-4">
-          <div
-            class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"
-          >
-            <div class="flex items-center">
-              <img
-                src={$teamData.logo !== '' ? $teamData.logo : Dummy.avatar}
+        <div class="flex items-center">
+          <img
+            src={$teamData.logo !== '' ? $teamData.logo : Dummy.avatar}
+            alt=""
+            class="rounded-lg w-16 h-16 mr-2"
+          />
+          <h1>{$teamData.company ?? '-'}</h1>
+        </div>
+        <p class="text-xs">{$teamData.address ?? '-'}</p>
+        <p class="text-xs text-neutral-400">
+          {$teamData.description ?? '-'}
+        </p>
+      </div>
+      {#if $teamData?.brochure?.url !== ''}
+        <div
+          on:click={downloadHandler}
+          class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
+        >
+          <h1>{$teamData?.brochure?.title}</h1>
+          <p class="text-xs text-neutral-400">
+            Know more about {$teamData.company}
+          </p>
+        </div>
+      {/if}
+      <div class={currentTheme.text}>
+        <div class="flex justify-between flex-wrap items-start gap-1 my-1">
+          {#each isEditorMode ? $teamSocials : data.socials as item}
+            {#if item.isActive}
+              <BorderButton
+                on:click={() => {
+                  toNewTab(item.type, item.data);
+                }}
+                class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+                ><img
+                  src={socialIcons[item.type]}
+                  width="34"
+                  height="34"
+                  alt=""
+                /></BorderButton
+              >
+            {/if}
+          {/each}
+        </div>
+
+        <div class="gap-2 flex flex-col justify-center items-center pb-5">
+          {#each isEditorMode ? $teamLinks : data.links as item}
+            {#if item.isActive}
+              <BorderButton
+                class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+                ><div class="p-2">
+                  <LinkPreview
+                    isShowMetaImage={$teamData.isShowMetaImage}
+                    title={item.title}
+                    url={item.link}
+                    className={currentTheme.secondary}
+                  />
+                </div></BorderButton
+              >
+            {/if}
+          {/each}
+        </div>
+      </div>
+    </div>
+  {:else}
+    <div class="px-16 mt-4 {currentTheme.text}">
+      <!-- UTILITIES -->
+      <div class="flex justify-between flex-wrap items-start gap-1 my-1">
+        {#each isEditorMode ? $socials : data.socials as item}
+          {#if item.isActive}
+            <BorderButton
+              on:click={() => {
+                toNewTab(item.type, item.data);
+              }}
+              class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+              ><img
+                src={socialIcons[item.type]}
+                width="34"
+                height="34"
                 alt=""
-                class="rounded-lg w-16 h-16 mr-2"
-              />
-              <h1>{$teamData.company ?? '-'}</h1>
-            </div>
-            <p class="text-xs">{$teamData.address ?? '-'}</p>
-            <p class="text-xs text-neutral-400">
-              {$teamData.description ?? '-'}
-            </p>
-          </div>
-          {#if $teamData?.brochure?.url !== ''}
-            <div
-              on:click={downloadHandler}
-              class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
+              /></BorderButton
             >
-              <h1>{$teamData?.brochure?.title}</h1>
-              <p class="text-xs text-neutral-400">
-                Know more about {$teamData.company}
-              </p>
-            </div>
           {/if}
-          <div class={currentTheme.text}>
-            <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-              {#each isEditorMode ? $teamSocials : data.socials as item}
-                {#if item.isActive}
-                  <BorderButton
-                    on:click={() => {
-                      toNewTab(item.type, item.data);
-                    }}
-                    class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
-                    ><img
-                      src={socialIcons[item.type]}
-                      width="34"
-                      height="34"
-                      alt=""
-                    /></BorderButton
-                  >
-                {/if}
-              {/each}
-            </div>
+        {/each}
+      </div>
 
-            <div class="gap-2 flex flex-col justify-center items-center pb-5">
-              {#each isEditorMode ? $teamLinks : data.links as item}
-                {#if item.isActive}
-                  <BorderButton
-                    class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-                    ><div class="p-2">
-                      <LinkPreview
-                        isShowMetaImage={$teamData.isShowMetaImage}
-                        title={item.title}
-                        url={item.link}
-                        className={currentTheme.secondary}
-                      />
-                    </div></BorderButton
-                  >
-                {/if}
-              {/each}
-            </div>
-          </div>
-        </div>
-      </TabPanel>
-      <TabPanel>
-        <div class="sm:px-20 px-16 mt-4 {currentTheme.text}">
-          <!-- UTILITIES -->
-          <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-            {#each isEditorMode ? $socials : data.socials as item}
-              {#if item.isActive}
-                <BorderButton
-                  on:click={() => {
-                    toNewTab(item.type, item.data);
-                  }}
-                  class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
-                  ><img
-                    src={socialIcons[item.type]}
-                    width="34"
-                    height="34"
-                    alt=""
-                  /></BorderButton
-                >
-              {/if}
-            {/each}
-          </div>
-
-          <!-- LINKS -->
-          <div class="gap-2 flex flex-col justify-center items-center pb-5">
-            {#each isEditorMode ? $links : data.links as item}
-              {#if item.isActive}
-                <BorderButton
-                  class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-                  ><div class="p-2">
-                    <LinkPreview
-                      isShowMetaImage={data.isShowMetaImage}
-                      title={item.title}
-                      url={item.link}
-                      className={currentTheme.secondary}
-                    />
-                  </div></BorderButton
-                >
-              {/if}
-            {/each}
-          </div>
-        </div>
-      </TabPanel>
-    </TabPanels>
-  </TabGroup>
+      <!-- LINKS -->
+      <div class="gap-2 flex flex-col justify-center items-center pb-5">
+        {#each isEditorMode ? $links : data.links as item}
+          {#if item.isActive}
+            <BorderButton
+              class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+              ><div class="p-2">
+                <LinkPreview
+                  isShowMetaImage={data.isShowMetaImage}
+                  title={item.title}
+                  url={item.link}
+                  className={currentTheme.secondary}
+                />
+              </div></BorderButton
+            >
+          {/if}
+        {/each}
+      </div>
+    </div>
+  {/if}
 </div>

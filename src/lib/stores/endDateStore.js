@@ -6,4 +6,4 @@ const setMonth = (startDate, month) => {
   return endDate;
 };
 
-export const endDate = writable(setMonth(new Date(), 1));
+export const endDate = writable(setMonth(new Date(), 12));

@@ -56,7 +56,7 @@
     FilePondPluginFileValidateType
   );
 
-  export let permissions;
+  export let permissions, isTeamInactive;
 
   let teamId = Cookies.get('qubicTeamId');
   let pond;
@@ -306,7 +306,7 @@
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="border-2 border-neutral-700 mb-4 pt-2">
+                <div class="border-2 border-neutral-700 mb-4 pt-2 pb-2">
                   <div class="px-3 grid grid-cols-1 space-x-5">
                     <Input
                       on:change={handleSave}
@@ -346,19 +346,6 @@
                       permissions.writeTeam ? '' : 'hidden'
                     }`}
                   >
-                    <FilePond
-                      bind:this={pond}
-                      {name}
-                      credits=""
-                      allowProcess={false}
-                      class="cursor-pointer"
-                      acceptedFileTypes={['image/png', 'image/jpeg']}
-                      instantUpload={false}
-                      labelIdle="Add Team Logo"
-                      allowMultiple={false}
-                      onpreparefile={handleCrop}
-                    />
-
                     {#if $teamData?.brochure?.url === ''}
                       <FilePond
                         bind:this={brochurePond}
@@ -374,7 +361,7 @@
                       />
                     {:else}
                       <div
-                        class="bg-neutral-100 rounded-md h-4/5 p-2 gap-2 flex items-center justify-between"
+                        class="bg-neutral-100 rounded-lg h-[76px] p-2 gap-2 flex items-center justify-between"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -415,6 +402,18 @@
                         </button>
                       </div>
                     {/if}
+                    <FilePond
+                      bind:this={pond}
+                      {name}
+                      credits=""
+                      allowProcess={false}
+                      class="cursor-pointer"
+                      acceptedFileTypes={['image/png', 'image/jpeg']}
+                      instantUpload={false}
+                      labelIdle="Add Team Logo"
+                      allowMultiple={false}
+                      onpreparefile={handleCrop}
+                    />
                   </div>
                 </div>
               </TabPanel>
@@ -475,7 +474,9 @@
                             : false}
                           isPhoneInput={item.type === 'phone' ? true : false}
                           isEmptyChecking={true}
-                          disabled={permissions.writeTeam ? false : true}
+                          disabled={permissions.writeTeam
+                            ? false
+                            : true || isTeamInactive}
                         />
 
                         {#if permissions.writeProfile || permissions.writeMembers}

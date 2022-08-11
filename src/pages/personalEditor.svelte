@@ -47,7 +47,7 @@
   } from '@lib/utils/editors';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
 
-  export let permissions;
+  export let permissions, isTeamInactive;
 
   // Register the plugins
   registerPlugin(
@@ -274,7 +274,7 @@
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="border-neutral-700 border-2 mb-4">
+                <div class="border-neutral-700 border-2 mb-4 pb-2">
                   <div class="px-3 pt-3 grid grid-cols-2 space-x-5">
                     <Input
                       on:change={handleSave}
@@ -419,6 +419,9 @@
                           isInstagramInput={item.type === 'instagram'}
                           isPhoneInput={item.type === 'phone'}
                           isEmptyChecking={true}
+                          disabled={!permissions.writeProfile ||
+                            !permissions.writeMembers ||
+                            isTeamInactive}
                         />
                         {#if permissions.writeProfile || permissions.writeMembers}
                           <div class="flex items-center h-[6.3rem]">
