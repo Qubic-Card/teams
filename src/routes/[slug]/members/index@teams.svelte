@@ -127,7 +127,6 @@
   {#await getAllData()}
     <MemberSkeleton {cards} {innerWidth} {permissions} />
   {:then}
-    <!-- <MemberSkeleton {allMember} /> -->
     <div
       class={`items-center w-full rounded-md gap-2 mt-2 bg-neutral-900 p-3 ${
         permissions.readMembers ? 'flex' : 'hidden'

@@ -14,7 +14,7 @@
 <div class="flex w-full md:w-auto">
   <input
     type="text"
-    class="w-full md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700
+    class="w-full rounded-md md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700
   text-white bg-neutral-900"
     placeholder="Search"
     bind:value

@@ -10,20 +10,13 @@
   import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount } from 'svelte';
   import { sidebarItems } from '@lib/constants';
-  import { endDate } from '@lib/stores/endDateStore';
-  import supabase from '@lib/db';
   import getTeamData from '@lib/query/getTeamData';
   import Cookies from 'js-cookie';
 
   let teamId = Cookies.get('qubicTeamId');
   let isSidebarOpened = false;
   let isMenuOpened = false;
-  let permissions = {
-    readAnalytics: false,
-  };
-  let member = { id: 0, role: { role_maps: [], role_name: '' } };
   let team = null;
-  let today;
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
@@ -31,65 +24,8 @@
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
-  const getToday = async () => {
-    const { data, error } = await supabase.functions.invoke('globaldate');
-    if (error) console.log(error);
-    if (data) today = new Date(data).getTime();
-  };
 
-  $: $userData?.filter((item) => {
-    if (item === 'allow_read_analytics') permissions.readAnalytics = true;
-  });
-
-  onMount(async () => {
-    await getToday();
-    team = await getTeamData(teamId);
-  });
-
-  // let endDate = new Date(today.setDate(today.getDate() + 30));
-  let sevenDaysAfterEndDate = new Date(
-    new Date().setDate(new Date().getDate() + 7)
-  );
-
-  $: {
-    if (today > $endDate.getTime()) {
-      if (member.role.role_name !== 'superadmin') {
-        $userData = ['inactive'];
-      } else {
-        $userData = [
-          'allow_read_roles',
-          'allow_read_team',
-          'allow_read_members',
-          'allow_read_analytics',
-          'allow_read_connections',
-          'allow_read_billing',
-          'inactive',
-        ];
-      }
-    } else if (sevenDaysAfterEndDate.getTime() === new Date().getTime()) {
-      // if hari ini lebih besar daripada 7 hari setelah end date
-      if (member.role.role_name !== 'superadmin') {
-        $userData = ['will_expired'];
-      } else {
-        $userData = [
-          'allow_read_roles',
-          'allow_read_team',
-          'allow_read_members',
-          'allow_read_analytics',
-          'allow_read_connections',
-          'allow_read_billing',
-          'will_expired',
-        ];
-      }
-    } else {
-      console.log('active');
-    }
-
-    // console.log(sevenDaysAfterEndDate);
-    // console.log(member);
-    // console.log($userData);
-    // console.log($endDate);
-  }
+  onMount(async () => (team = await getTeamData(teamId)));
 </script>
 
 <svelte:head>
@@ -97,12 +33,14 @@
 </svelte:head>
 
 <AuthWrapper>
-  {#if $userData.includes('inactive')}
-    <div class="bg-red-600 text-white text-center p-2 text-sm">
-      Your subscription has expired.
-    </div>
-  {/if}
   <div class="relative min-h-screen">
+    {#if $userData.length !== 0}
+      {#if $userData?.includes('inactive')}
+        <div class="bg-red-600 text-white text-center p-2 text-sm sticky">
+          Your subscription has expired.
+        </div>
+      {/if}
+    {/if}
     <div
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
@@ -163,7 +101,9 @@
     </div>
 
     <div
-      class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed top-16 bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
+      class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
+        $userData.includes('inactive') ? 'top-24' : 'top-16'
+      } bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
         isSidebarOpened ? 'w-full md:w-72' : ''
       }`}
     >
@@ -203,10 +143,12 @@
       </nav>
     </div>
     <div
-      class="absolute top-16 bottom-0 bg-neutral-900 text-white overflow-y-auto w-full"
+      class={`absolute ${
+        $userData.includes('inactive') ? 'top-24' : 'top-16'
+      } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
     >
       <SvelteToast />
-      <MemberWrapper let:loading>
+      <MemberWrapper let:loading let:permissions>
         {#if loading}
           <div
             transition:fade|local

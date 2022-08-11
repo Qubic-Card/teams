@@ -7,21 +7,14 @@
     teamLinks,
   } from '@lib/stores/editorStore';
   import EditorSkeleton from '@comp/skeleton/editorSkeleton.svelte';
-
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
-  import {
-    Tab,
-    TabGroup,
-    TabList,
-    TabPanel,
-    TabPanels,
-  } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
   import Cookies from 'js-cookie';
   import TeamEditor from '@pages/teamEditor.svelte';
   import PersonalEditor from '@pages/personalEditor.svelte';
   import { profileData, teamData } from '@lib/stores/profileData';
+  import { selectedTab } from '@lib/stores/selectedTab';
 
   let permissions = {
     writeProfile: false,
@@ -31,6 +24,7 @@
   };
 
   let isCheckRoleDone = false;
+  let isTeamInactive = false;
 
   $: $userData?.filter((item) => {
     if ($page.params.slug === $user?.id) {
@@ -52,14 +46,14 @@
       permissions.readTeam = true;
       isCheckRoleDone = true;
     }
+
+    if (item === 'inactive') isTeamInactive = true;
   });
 
   let teamId = Cookies.get('qubicTeamId');
 
   let profileId = null;
 
-  let message = '';
-  let isTeamTab = false;
   let companyNickname;
 
   const getTeams = async () => {
@@ -102,25 +96,31 @@
 {#await (getProfile(), getTeams())}
   <EditorSkeleton />
 {:then}
-  {#if isCheckRoleDone}
-    {#if $page.params.slug === $user?.id}
-      {#if !permissions.writeProfile && !isTeamTab}
+  {#if isTeamInactive === false}
+    {#if isCheckRoleDone}
+      {#if $page.params.slug === $user?.id}
+        {#if !permissions.writeProfile && $selectedTab === 'personal'}
+          <div
+            class="flex justify-center bg-blue-600 text-white p-2 rounded-lg"
+          >
+            You don't have permission to edit your profile
+          </div>
+        {:else if !permissions.writeTeam && $selectedTab === 'team'}
+          <div
+            class="flex justify-center bg-blue-600 text-white p-2 rounded-lg"
+          >
+            You dont have permission to edit this team's profile
+          </div>
+        {/if}
+      {:else if !permissions.writeMembers && $selectedTab === 'personal'}
         <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
-          You don't have permission to edit your profile
+          You don't have permission to edit this member's profile
         </div>
-      {:else if !permissions.writeTeam && isTeamTab}
+      {:else if !permissions.writeTeam && $selectedTab === 'team'}
         <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
           You dont have permission to edit this team's profile
         </div>
       {/if}
-    {:else if !permissions.writeMembers && !isTeamTab}
-      <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
-        You don't have permission to edit this member's profile
-      </div>
-    {:else if !permissions.writeTeam && isTeamTab}
-      <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
-        You dont have permission to edit this team's profile
-      </div>
     {/if}
   {/if}
 
@@ -129,48 +129,39 @@
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           {#if permissions.readTeam}
-            <TabGroup>
-              <TabList
-                class="w-full grid grid-cols-2 border-b-2 border-neutral-700 mb-4"
+            <div class="flex mb-4">
+              <button
+                on:click={() => ($selectedTab = 'personal')}
+                class={`${
+                  $selectedTab === 'personal'
+                    ? 'border-b-2 border-white'
+                    : 'border-b-2 border-neutral-700'
+                } p-2 w-1/2 text-white`}>Personal</button
               >
-                <Tab
-                  on:click={() => {
-                    isTeamTab = false;
-                    message = '';
-                  }}
-                  class={({ selected }) =>
-                    selected
-                      ? 'text-white font-bold border-b-2 border-white pb-2'
-                      : 'text-white pb-2'}>Personal</Tab
-                >
-                <Tab
-                  on:click={() => {
-                    isTeamTab = true;
-                    message = '';
-                  }}
-                  class={({ selected }) =>
-                    selected
-                      ? 'text-white font-bold border-b-2 border-white pb-2'
-                      : 'text-white pb-2'}>Team</Tab
-                >
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <PersonalEditor {permissions} />
-                </TabPanel>
-                <TabPanel>
-                  <TeamEditor {permissions} />
-                </TabPanel>
-              </TabPanels>
-            </TabGroup>
+              <button
+                on:click={() => ($selectedTab = 'team')}
+                class={`${
+                  $selectedTab === 'team'
+                    ? 'border-b-2 border-white'
+                    : 'border-b-2 border-neutral-700'
+                } p-2 w-1/2 text-white`}>Team</button
+              >
+            </div>
+
+            {#if $selectedTab === 'personal'}
+              <PersonalEditor {permissions} {isTeamInactive} />
+            {:else}
+              <TeamEditor {permissions} {isTeamInactive} />
+            {/if}
           {:else if !permissions.readTeam}
-            <PersonalEditor {permissions} />
+            <PersonalEditor {permissions} {isTeamInactive} />
           {/if}
         </div>
         <div
           class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
         >
           <Profile
+            {selectedTab}
             class="min-h-screen"
             isEditorMode={true}
             data={$profileData}

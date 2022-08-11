@@ -1,14 +1,14 @@
 <script>
   import { setNewRole } from '@lib/stores/roleStore';
+  import { userData } from '@lib/stores/userStore';
   import { createEventDispatcher } from 'svelte';
-
   export let checkboxes, checked, isHasWriteRolePermission;
   export let bg = 'bg-neutral-900';
   let isSuperAdmin = false;
-  // const superAdminCheckbox = checkboxes.slice(0, 1);
+  let selectAll = false;
+
   const readCheckbox = checkboxes.slice(1, 7);
   const writeCheckbox = checkboxes.slice(7);
-  let selectAll = false;
   const dispatch = createEventDispatcher();
   const clicked = () => dispatch('clicked', false);
 
@@ -48,11 +48,13 @@
 <div class="border border-neutral-600 mt-3 p-2 rounded">
   <!-- <h1 class="font-bold text-sm my-4 ml-2 self-start">Select all</h1> -->
   <button
+    disabled={$userData.includes('inactive') ||
+      $userData.includes('will_expired')}
     on:click={() => {
       clicked();
       selectAll = true;
     }}
-    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 transition-colors duration-300"
+    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300"
   >
     Select all
   </button>
@@ -62,28 +64,32 @@
     <div
       class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
     >
-      <div class="block">
-        <div class="mt-2">
-          <label
-            class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
-          >
-            <input
-              type="checkbox"
-              class="w-5 h-5 cursor-pointer disabled:cursor-default"
-              bind:group={checked}
-              value={checkbox.name}
-              on:change={clicked}
-              disabled={!isHasWriteRolePermission || isSuperAdmin}
-            />
+      <div class="flex justify-center items-center h-7">
+        <label
+          class={`flex ${
+            isSuperAdmin ||
+            $userData.includes('inactive') ||
+            $userData.includes('will_expired')
+              ? 'cursor-default'
+              : 'cursor-pointer'
+          }`}
+        >
+          <input
+            type="checkbox"
+            class="w-5 h-5 cursor-pointer disabled:cursor-default"
+            bind:group={checked}
+            value={checkbox.name}
+            on:change={clicked}
+            disabled={!isHasWriteRolePermission || isSuperAdmin}
+          />
 
-            <p class="ml-4 w-72">
-              {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
-                checkbox.name.split('_')[0].slice(1)}
-              {checkbox.name.split('_')[1]}
-              {checkbox.name.split('_')[2]}
-            </p>
-          </label>
-        </div>
+          <p class="ml-4 w-72">
+            {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
+              checkbox.name.split('_')[0].slice(1)}
+            {checkbox.name.split('_')[1]}
+            {checkbox.name.split('_')[2]}
+          </p>
+        </label>
       </div>
       <p class="w-1/2">
         {checkbox.desc}
@@ -96,30 +102,35 @@
     <div
       class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
     >
-      <div class="block">
-        <div class="mt-2">
-          <label
-            on:click={clicked}
-            class={`flex ${isSuperAdmin ? 'cursor-default' : 'cursor-pointer'}`}
-          >
-            <input
-              type="checkbox"
-              class="w-5 h-5 cursor-pointer disabled:cursor-default"
-              bind:group={checked}
-              value={checkbox.name}
-              on:change={clicked}
-              disabled={!isHasWriteRolePermission || isSuperAdmin}
-            />
+      <div class="flex justify-center items-center h-7">
+        <label
+          on:click={clicked}
+          class={`flex ${
+            isSuperAdmin ||
+            $userData.includes('inactive') ||
+            $userData.includes('will_expired')
+              ? 'cursor-default'
+              : 'cursor-pointer'
+          }`}
+        >
+          <input
+            type="checkbox"
+            class="w-5 h-5 cursor-pointer disabled:cursor-default"
+            bind:group={checked}
+            value={checkbox.name}
+            on:change={clicked}
+            disabled={!isHasWriteRolePermission || isSuperAdmin}
+          />
 
-            <p class="ml-4 w-72">
-              {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
-                checkbox.name.split('_')[0].slice(1)}
-              {checkbox.name.split('_')[1]}
-              {checkbox.name.split('_')[2]}
-            </p>
-          </label>
-        </div>
+          <p class="ml-4 w-72">
+            {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
+              checkbox.name.split('_')[0].slice(1)}
+            {checkbox.name.split('_')[1]}
+            {checkbox.name.split('_')[2]}
+          </p>
+        </label>
       </div>
+
       <p class="w-1/2">
         {checkbox.desc}
       </p>
