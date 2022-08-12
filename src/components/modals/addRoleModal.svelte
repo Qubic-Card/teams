@@ -9,7 +9,7 @@
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import { teamRoles } from '@lib/stores/roleStore';
 
-  export let isHasWriteRolePermission;
+  export let permissions;
 
   let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
@@ -18,6 +18,7 @@
   let checkedRole = [];
 
   const toggleModal = () => {
+    checkedRole = ['allow_read_profile'];
     if ($teamRoles.length < 5) {
       showModal = !showModal;
     } else {
@@ -72,7 +73,7 @@
   title="Add role"
   {showModal}
   on:showModal={toggleModal}
-  class="w-1/2 h-1/2"
+  class="w-1/2 h-[80%]"
 >
   <div
     class="flex flex-col h-82 justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
@@ -87,7 +88,7 @@
     <Checkboxes
       checkboxes={roleMapping}
       bind:checked={checkedRole}
-      {isHasWriteRolePermission}
+      {permissions}
       bg="bg-neutral-800"
     />
     <button

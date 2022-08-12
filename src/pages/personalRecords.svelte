@@ -32,6 +32,7 @@
       const dateLimiter = new Date(
         new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 29)
       );
+
       toDateOptions.minDate = new Date(selectedDates[0]);
       toDateOptions.maxDate = new Date(dateLimiter);
       toDateValue = new Date(dateLimiter);
@@ -54,7 +55,7 @@
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
         'team_member',
-        id,
+        $memberData?.id,
         fromDateValue,
         toDateValue
       );
@@ -136,6 +137,7 @@
     await getPersonalStorage();
   };
 
+  $: console.log(isTeamInactive, $userData);
   const selectTypeHandler = (e) => (selectedType = e.detail);
 </script>
 

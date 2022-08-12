@@ -86,7 +86,6 @@
                   : 'text-white pb-2'}>Team</Tab
             >
           </div>
-          <h1>0/5GB</h1>
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">

@@ -16,7 +16,7 @@ const roleMapping = [
     name: 'allow_read_analytics',
   },
   {
-    desc: 'Perbolehkan user untuk membaca user lain',
+    desc: 'Perbolehkan user untuk membaca koneksi team',
     name: 'allow_read_connections',
   },
   {
@@ -50,6 +50,14 @@ const roleMapping = [
   {
     desc: 'Perbolehkan user untuk membuat billing team',
     name: 'allow_write_billing',
+  },
+  {
+    desc: 'Perbolehkan user untuk mengedit koneksi team',
+    name: 'allow_write_connections',
+  },
+  {
+    desc: 'Perbolehkan user untuk melihat profile',
+    name: 'allow_read_profile',
   },
 ];
 

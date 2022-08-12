@@ -73,7 +73,7 @@
     {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
   <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
-    {#if !isTeamInactive}
+    {#if isTeamInactive === false}
       <ConfirmationModal
         {isLoading}
         isDelete

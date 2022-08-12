@@ -1,7 +1,6 @@
 <script>
   import { fade } from 'svelte/transition';
   import '../app.css';
-  import MemberWrapper from '@comp/memberWrapper.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -12,11 +11,96 @@
   import { sidebarItems } from '@lib/constants';
   import getTeamData from '@lib/query/getTeamData';
   import Cookies from 'js-cookie';
+  import { memberData, user, userChangeTimestamp } from '@lib/stores/userStore';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
+  import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
+  import { endDate } from '@lib/stores/endDateStore';
+  import supabase from '@lib/db';
 
-  let teamId = Cookies.get('qubicTeamId');
   let isSidebarOpened = false;
   let isMenuOpened = false;
   let team = null;
+  let member = [];
+  let teamId = Cookies.get('qubicTeamId');
+  let subscription = {};
+  let loading = true;
+  let permissions = {
+    readAnalytics: false,
+  };
+  let isTeamInactive = false;
+  let sevenDaysAfterEndDate;
+  const getSubscriptionsData = async () => {
+    const { data, error } = await supabase.functions.invoke('globaldate', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        teamId: teamId,
+      }),
+    });
+    if (error) console.log(error);
+    if (data) subscription = data;
+  };
+
+  $: console.log(subscription);
+
+  $: {
+    if ($userData)
+      $userData.filter((item) => {
+        if (item === 'allow_read_analytics') permissions.readAnalytics = true;
+        if (item === 'inactive') isTeamInactive = true;
+      });
+
+    if (subscription) {
+      if (subscription.isActive) {
+        console.log('active');
+      } else if (subscription.isActive === false && subscription.isAfter7Days) {
+        if (member?.role?.role_name !== 'superadmin') {
+          $userData = ['inactive'];
+        } else {
+          $userData = [
+            'allow_read_roles',
+            'allow_read_team',
+            'allow_read_members',
+            'allow_read_analytics',
+            'allow_read_connections',
+            'allow_read_billing',
+            'inactive',
+          ];
+        }
+      } else if (!subscription.isActive && !subscription.isAfter7Days) {
+        // if hari ini lebih besar daripada 7 hari setelah end date
+        if (member?.role?.role_name !== 'superadmin') {
+          $userData = ['will_expired'];
+        } else {
+          $userData = [
+            'allow_read_roles',
+            'allow_read_team',
+            'allow_read_members',
+            'allow_read_analytics',
+            'allow_read_connections',
+            'allow_read_billing',
+            'will_expired',
+          ];
+        }
+      }
+    }
+  }
+
+  onMount(async () => {
+    await getSubscriptionsData();
+    member = await getRoleMapsByProfile($user?.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
+    team = await getTeamData(teamId);
+    $userData = member?.role?.role_maps;
+    $memberData.id = member?.id;
+    sevenDaysAfterEndDate = new Date(
+      new Date(subscription?.subs_end_date).setDate(
+        new Date(subscription?.subs_end_date).getDate() + 7
+      )
+    );
+    if (member || userChangeTimestamp || $userData) loading = false;
+  });
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
@@ -24,8 +108,6 @@
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
-
-  onMount(async () => (team = await getTeamData(teamId)));
 </script>
 
 <svelte:head>
@@ -34,10 +116,12 @@
 
 <AuthWrapper>
   <div class="relative min-h-screen">
-    {#if $userData.length !== 0}
-      {#if $userData?.includes('inactive')}
+    {#if sevenDaysAfterEndDate}
+      {#if !subscription.isActive && !subscription.isAfter7Days}
         <div class="bg-red-600 text-white text-center p-2 text-sm sticky">
-          Your subscription has expired.
+          Your access to Qubic Team will be terminated completely on on {new Date(
+            sevenDaysAfterEndDate
+          ).toLocaleDateString()}. Please renew your subscription to continue.
         </div>
       {/if}
     {/if}
@@ -102,7 +186,9 @@
 
     <div
       class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
-        $userData.includes('inactive') ? 'top-24' : 'top-16'
+        !subscription.isActive && !subscription.isAfter7Days
+          ? 'top-[100px]'
+          : 'top-16'
       } bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
         isSidebarOpened ? 'w-full md:w-72' : ''
       }`}
@@ -144,47 +230,48 @@
     </div>
     <div
       class={`absolute ${
-        $userData.includes('inactive') ? 'top-24' : 'top-16'
+        !subscription.isActive && !subscription.isAfter7Days
+          ? 'top-24'
+          : 'top-16'
       } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
     >
       <SvelteToast />
-      <MemberWrapper let:loading let:permissions>
-        {#if loading}
-          <div
-            transition:fade|local
-            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40"
-          >
-            <small class="text-left w-1/2 mb-2">
-              Secondary security authenticating user access ...
-            </small>
-            <div class="h-6 w-1/2 rounded-md shim-red bg-neutral-700" />
-          </div>
-        {:else}
-          {#if permissions.readAnalytics}
-            {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
-              <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
-                <button
-                  on:click={() => goto(`/${team?.id}/dashboard`)}
-                  class={`pb-2 w-1/5 text-md ${
-                    $page.routeId === '[slug]/dashboard@teams'
-                      ? 'border-b-2 border-neutral-200 font-bold'
-                      : 'text-neutral-300'
-                  }`}>Personal</button
-                >
-                <button
-                  on:click={() => goto(`/${team?.id}/dashboard/team`)}
-                  class={`pb-2 w-1/5 text-md ${
-                    $page.routeId === '[slug]/dashboard/team@teams'
-                      ? 'border-b-2 border-neutral-200 font-bold'
-                      : 'text-neutral-300'
-                  }`}>Team</button
-                >
-              </div>
-            {/if}
+
+      {#if loading}
+        <div
+          transition:fade|local
+          class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40"
+        >
+          <small class="text-left w-1/2 mb-2">
+            Secondary security authenticating user access ...
+          </small>
+          <div class="h-6 w-1/2 rounded-md shim-red bg-neutral-700" />
+        </div>
+      {:else}
+        {#if permissions.readAnalytics}
+          {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
+            <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
+              <button
+                on:click={() => goto(`/${team?.id}/dashboard`)}
+                class={`pb-2 w-1/5 text-md ${
+                  $page.routeId === '[slug]/dashboard@teams'
+                    ? 'border-b-2 border-neutral-200 font-bold'
+                    : 'text-neutral-300'
+                }`}>Personal</button
+              >
+              <button
+                on:click={() => goto(`/${team?.id}/dashboard/team`)}
+                class={`pb-2 w-1/5 text-md ${
+                  $page.routeId === '[slug]/dashboard/team@teams'
+                    ? 'border-b-2 border-neutral-200 font-bold'
+                    : 'text-neutral-300'
+                }`}>Team</button
+              >
+            </div>
           {/if}
-          <slot />
         {/if}
-      </MemberWrapper>
+        <slot />
+      {/if}
     </div>
   </div>
 </AuthWrapper>

@@ -6,12 +6,7 @@
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
 
-  export let innerWidth,
-    connection,
-    tab,
-    deleteHandler,
-    isLoading,
-    isTeamInactive;
+  export let innerWidth, connection, tab, deleteHandler, isLoading, permissions;
 
   let loading = false;
   let showDeleteModal = false;
@@ -48,27 +43,41 @@
     {connection?.by?.team_profile?.lastname ?? '-'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
-    {#if !isTeamInactive}
-      <EditConnectionsModal
-        data={connection}
-        on:sendUpdatedData={(e) => (connection = e.detail)}
-      />
-      <ConfirmationModal
-        {isLoading}
-        isDelete
-        isIconVisible
-        isDispatch
-        heading="Are you sure you want to delete"
-        text={`${connection.profileData?.firstname ?? connection?.name}
+    {#if permissions.will_expire === false}
+      {#if permissions.writeConnection}
+        {#if permissions.isTeamInactive === false}
+          <EditConnectionsModal
+            data={connection}
+            on:sendUpdatedData={(e) => (connection = e.detail)}
+          />
+          <ConfirmationModal
+            {isLoading}
+            isDelete
+            isIconVisible
+            isDispatch
+            heading="Are you sure you want to delete"
+            text={`${connection.profileData?.firstname ?? connection?.name}
       ${connection.profileData?.lastname ?? ''} ?`}
-        on:action={() => {
-          deleteHandler(connection.id, tab);
-          deletModalHandler();
-        }}
-        buttonLabel="Delete"
-        showModal={showDeleteModal}
-        toggleModal={deletModalHandler}
-      />
+            on:action={() => {
+              deleteHandler(connection.id, tab);
+              deletModalHandler();
+            }}
+            buttonLabel="Delete"
+            showModal={showDeleteModal}
+            toggleModal={deletModalHandler}
+          />
+          <img
+            src="/download-icon.svg"
+            alt=""
+            class="w-6 h-6 cursor-pointer"
+            on:click={async () => {
+              download(await genvcard(connection?.profileData), 'contact');
+            }}
+          />
+          <small>{connection?.profileData.edited ? 'Edited' : ''}</small>
+        {/if}
+      {/if}
+    {:else}
       <img
         src="/download-icon.svg"
         alt=""
@@ -77,7 +86,6 @@
           download(await genvcard(connection?.profileData), 'contact');
         }}
       />
-      <small>{connection?.profileData.edited ? 'Edited' : ''}</small>
     {/if}
   </td>
 </tr>

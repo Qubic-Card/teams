@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
   import Cookies from 'js-cookie';
   import {
     memberData,
@@ -12,7 +12,7 @@
   import { endDate } from '@lib/stores/endDateStore';
   import supabase from '@lib/db';
 
-  let member = { id: 0, role: { role_maps: [], role_name: '' } };
+  let member;
   let teamId = Cookies.get('qubicTeamId');
   let today;
   let sevenDaysAfterEndDate = new Date(
@@ -24,26 +24,25 @@
   };
 
   const getToday = async () => {
-    const { data, error } = await supabase.functions.invoke('globaldate');
+    const { data, error } = await supabase.functions.invoke('globaldate', {
+      body: teamId,
+    });
     if (error) console.log(error);
-    if (data) today = new Date(data.date).getTime();
+    if (data) today = data;
   };
 
-  onMount(async () => {
-    await getToday();
-    member = await getRoleMapsByProfile($user?.id, teamId);
-    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
-
-    if (member || userChangeTimestamp) loading = false;
-  });
-
+  // $: console.log(today);
   $: {
-    $userData = member.role.role_maps;
-    $memberData.id = member.id;
+    if (member) {
+      userData.set(member.role.role_maps);
+      $memberData.id = member.id;
+    }
   }
-  $: $userData?.filter((item) => {
-    if (item === 'allow_read_analytics') permissions.readAnalytics = true;
-  });
+
+  $: if ($userData?.length > 0)
+    $userData?.filter((item) => {
+      if (item === 'allow_read_analytics') permissions.readAnalytics = true;
+    });
 
   $: if (today > sevenDaysAfterEndDate?.getTime()) {
     if (member.role.role_name !== 'superadmin') {
@@ -88,6 +87,13 @@
     // console.log($userData);
     // console.log($endDate);
   }
+  onMount(async () => {
+    // await getToday();
+    member = await getRoleMapsByProfile($user?.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
+
+    if (member || userChangeTimestamp || $userData?.length > 0) loading = false;
+  });
 </script>
 
-<slot {loading} {permissions} />
+<slot {loading} {permissions} /> -->

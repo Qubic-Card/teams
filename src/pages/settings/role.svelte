@@ -45,6 +45,7 @@
 
     isClicked = true;
     toastSuccess('Role updated');
+    // location.reload();
   };
 
   const clicked = (e) => (isClicked = e.detail);
@@ -106,7 +107,7 @@
     >
       <h1 class="font-bold text-xl">Role Settings</h1>
       {#if permissions.writeRoles}
-        <AddRoleModal isHasWriteRolePermission={permissions.writeRoles} />
+        <AddRoleModal {permissions} />
       {/if}
     </div>
     <h1 class="p-4 text-sm">Super Admin</h1>
@@ -144,7 +145,7 @@
                   on:click={async () => {
                     await updateTeamsRoleMapping(role.id);
                     roleMaps = await getRoleMapsByProfile($user?.id, teamId);
-                    setUserData(roleMaps);
+                    setUserData(roleMaps?.role?.role_maps);
                   }}
                   disabled={isClicked}
                 >
@@ -164,7 +165,7 @@
                   checkboxes={roleMapping}
                   bind:checked={role.role_maps}
                   on:clicked={clicked}
-                  isHasWriteRolePermission={permissions.writeRoles}
+                  {permissions}
                 />
               </DisclosurePanel>
             </div>

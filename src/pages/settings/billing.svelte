@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { endDate } from '@lib/stores/endDateStore';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
 
   import { Switch } from '@rgossiaux/svelte-headlessui';
 
-  export let permissions;
+  export let permissions, team;
   let isAutoRenew = false;
 </script>
 
@@ -35,12 +34,16 @@
         </div>
       </div>
       <p>
-        Subscription valid hingga: {new Date(convertToGMT7($endDate))
+        Subscription valid hingga: {new Date(
+          convertToGMT7(team.subscription_end_date)
+        )
           .toDateString()
           .slice(4)}
       </p>
-      <p>Saldo tersisa: 0</p>
-      <div
+      <p>
+        Jumlah member: {team.member_count}
+      </p>
+      <!-- <div
         class="flex justify-between items-center p-3 rounded mt-4 bg-neutral-900"
       >
         <p>Aktifkan auto renew</p>
@@ -59,7 +62,7 @@
             class:toggle-off={!isAutoRenew}
           />
         </Switch>
-      </div>
+      </div> -->
     </div>
   </div>
   <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-xl">
