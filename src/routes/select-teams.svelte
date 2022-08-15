@@ -19,7 +19,6 @@
     if (error) console.log(error);
 
     if (data) {
-      console.log(data);
       teams = data;
     }
   };

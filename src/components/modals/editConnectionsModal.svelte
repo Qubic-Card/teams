@@ -24,10 +24,10 @@
     if (open) $profileData = null;
   };
 
-  $: activeSocialMedia = data.profileData.socials.filter(
+  $: activeSocialMedia = data?.profileData?.socials?.filter(
     (social) => social.isActive
   );
-  $: activeLinks = data.profileData.links.filter((link) => link.isActive);
+  $: activeLinks = data?.profileData?.links?.filter((link) => link.isActive);
 
   const updateConnectionsData = async () => {
     data.profileData.socials = $socials;

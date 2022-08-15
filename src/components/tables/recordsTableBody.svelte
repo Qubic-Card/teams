@@ -4,6 +4,7 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { personal, team } from '@lib/stores/recordsStore';
 
   export let record, teamId, deleteFromTable;
   export let isTeamInactive = false;
@@ -14,15 +15,33 @@
 
   const deleteCsv = async () => {
     isLoading = true;
+    let noErr = false;
+
     const { error } = await supabase.storage
       .from('records')
-      .remove([`${teamId}/${$user?.id}/${record.name}`]);
+      .remove([
+        `${teamId}/${$user?.id}/${record.name ? record.name : record.filename}`,
+      ]);
+
+    const { data, error: err } = await supabase
+      .from('team_storage')
+      .delete()
+      .eq('filename', record.storage_url ? record.filename : record.name);
+    if (err) {
+      toastFailed(err.message);
+    } else {
+      noErr = true;
+    }
 
     if (error) {
       toastFailed('Failed to delete record');
       isLoading = false;
-    } else {
+    }
+
+    if (record.storage_url ? noErr && !error : !error) {
       toastSuccess(`${record.name} deleted successfully`);
+      $personal = $personal.filter((item) => item.id !== record.id);
+      $team = $team.filter((item) => item.id !== record.id);
       isLoading = false;
     }
   };
@@ -30,7 +49,12 @@
   const downloadCsv = async (filename) => {
     const { signedURL, error } = await supabase.storage
       .from('records')
-      .createSignedUrl(`${teamId}/${$user?.id}/${filename}`, 60);
+      .createSignedUrl(
+        record.storage_url
+          ? record.storage_url.slice(8)
+          : `${teamId}/${$user?.id}/${filename}`,
+        60
+      );
 
     if (error) {
       console.log(error);
@@ -44,11 +68,15 @@
           a.style.display = 'none';
           a.href = url;
 
-          a.download = `${filename}.csv`;
+          a.download = `${record.storage_url ? record.filename : filename}.csv`;
           document.body.appendChild(a);
           a.click();
           window.URL.revokeObjectURL(url);
-          toastSuccess(`${filename} has been downloaded`);
+          toastSuccess(
+            `${
+              record.storage_url ? record.filename : filename
+            } has been downloaded`
+          );
         })
         .catch((err) => toastFailed());
     }
@@ -61,7 +89,11 @@
 >
   <td class="font-bold text-ellipsis pl-4">
     <p class="w-96 truncate">
-      {record.name ?? '-'}
+      {#if record.storage_url}
+        {record.filename ?? '-'}
+      {:else}
+        {record.name ?? '-'}
+      {/if}
     </p>
   </td>
 
@@ -70,7 +102,11 @@
   </td>
 
   <td class="pl-4 pr-4">
-    {record.name.includes('activities') ? 'Activities' : 'Connections'}
+    {#if record.storage_url}
+      {record.type}
+    {:else}
+      {record.name.includes('activities') ? 'Activities' : 'Connections'}
+    {/if}
   </td>
   <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
     {#if isTeamInactive === false}
@@ -80,8 +116,12 @@
         isIconVisible
         isDispatch
         heading="Are you sure you want to delete"
-        text={`${record.profileData?.firstname ?? record?.name}
-      ${record.profileData?.lastname ?? ''} ?`}
+        text={`${
+          record.storage_url
+            ? record.filename
+            : record.profileData?.firstname ?? record?.name
+        }
+      ${!record.storage_url ? '' : record.profileData?.lastname ?? ''} ?`}
         buttonLabel="Delete"
         showModal={showDeleteModal}
         toggleModal={deleteModalHandler}
@@ -91,7 +131,6 @@
           deleteModalHandler();
         }}
       />
-      <!-- 76900f13-9d11-424a-b111-71b1f2cd6def -->
       <img
         src="/download-icon.svg"
         alt=""

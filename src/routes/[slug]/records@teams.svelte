@@ -12,13 +12,13 @@
   import PersonalRecords from '@pages/personalRecords.svelte';
   import supabase from '@lib/db';
   import RecordsSkeleton from '@comp/skeleton/recordsSkeleton.svelte';
+  import { personal, team } from '@lib/stores/recordsStore';
 
   let teamId = Cookies.get('qubicTeamId');
   let permissions = {
     writeRecords: false,
   };
-  let personalCsv;
-  let teamCsv;
+  let isTeamInactive = false;
 
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
@@ -30,21 +30,21 @@
     if (error) {
       console.log(error);
     } else {
-      personalCsv = data;
+      $personal = data;
     }
   };
 
   const getTeamStorage = async () => {
-    const { data, error } = await supabase.storage
-      .from('records')
-      .list(`${teamId}/${$user?.id}`, {
-        sortBy: { column: 'created_at', order: 'desc' },
-      });
+    const { data, error } = await supabase
+      .from('team_storage')
+      .select('*')
+      .eq('tid', teamId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.log(error);
     } else {
-      teamCsv = data;
+      $team = data;
     }
   };
 
@@ -52,7 +52,9 @@
     await getPersonalStorage();
     await getTeamStorage();
   };
-  let isTeamInactive = false;
+
+  $: $team, getAllStorage();
+
   $: $userData?.filter((item) => {
     if (item === 'allow_write_records') permissions.writeRecords = true;
     if (item === 'inactive') isTeamInactive = true;
@@ -89,32 +91,16 @@
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">
-            <PersonalRecords
-              {personalCsv}
-              {teamCsv}
-              {getPersonalStorage}
-              {isTeamInactive}
-              on:updated={(e) => (teamCsv = e.detail)}
-            />
+            <PersonalRecords {getPersonalStorage} {isTeamInactive} />
           </TabPanel>
           <TabPanel class="flex h-full">
-            <TeamRecords
-              {teamCsv}
-              {getTeamStorage}
-              {isTeamInactive}
-              on:updated={(e) => (teamCsv = e.detail)}
-            />
+            <TeamRecords {getTeamStorage} {isTeamInactive} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords
-          {personalCsv}
-          {teamCsv}
-          {getPersonalStorage}
-          {isTeamInactive}
-        />
+        <PersonalRecords {getPersonalStorage} {isTeamInactive} />
       </div>
     {/if}
   </div>

@@ -35,7 +35,7 @@
   {/if}
 
   <td class="flex-1 truncate pl-4">
-    {convertToGMT7(connection.dateConnected).toDateString().slice(4) ?? '-'}
+    {convertToGMT7(connection?.dateConnected).toDateString().slice(4) ?? '-'}
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">

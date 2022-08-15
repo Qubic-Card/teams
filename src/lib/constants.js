@@ -276,6 +276,7 @@ export const defaultRole = [
       'allow_read_analytics',
       'allow_read_connections',
       'allow_read_billing',
+      'allow_read_profile',
       'allow_write_profile',
       'allow_write_connections',
       'allow_write_billing',

@@ -8,22 +8,16 @@
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
+  import { memberData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
-  import { last30Days, today } from '@lib/utils/getDates';
+  import { formatDate, last30Days, today } from '@lib/utils/getDates';
   import Spinner from '@comp/loading/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
+  import sortBy from '@lib/utils/sortBy';
+  import { personal, team } from '@lib/stores/recordsStore';
 
-  export let teamCsv, getTeamStorage;
-
-  const formatDate = (dateArg) => {
-    const date = new Date(dateArg).getDate();
-    const month = new Date(dateArg).getMonth() + 1;
-    const year = new Date(dateArg).getFullYear();
-    const formattedDate = `${date}${month < 10 ? '0' + month : month}${year}`;
-    return formattedDate;
-  };
+  export let getTeamStorage;
 
   let teamId = Cookies.get('qubicTeamId');
   let fileName = formatDate(new Date());
@@ -32,7 +26,7 @@
   let toDateValue = new Date();
   let isLoading = false;
   let asc = false;
-
+  let holder = '';
   const dispatch = createEventDispatcher();
 
   const fromDateOptions = {
@@ -58,6 +52,37 @@
     enableTime: false,
     maxDate: new Date(),
     minDate: new Date(last30Days[0]),
+  };
+
+  const getMemberData = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_profile->>firstname, team_profile->>lastname')
+      .eq('id', $memberData.id);
+
+    if (error) {
+      console.log(error);
+    } else {
+      holder = data[0]?.firstname + ' ' + data[0]?.lastname;
+    }
+  };
+
+  const createTeamStorage = async (url) => {
+    await getMemberData();
+    const { data, error } = await supabase.from('team_storage').insert(
+      {
+        tid: teamId,
+        by: holder,
+        type: selectedType,
+        storage_url: url,
+        filename: `${fileName}-${
+          selectedType === 'Activities' ? 'activities' : 'connections'
+        }`,
+      },
+      { returning: 'minimal' }
+    );
+
+    if (error) console.log(error);
   };
 
   const createRecordHandler = async () => {
@@ -93,7 +118,6 @@
             contentType: 'text/csv',
           }
         );
-
       if (error) {
         if (
           (error.message =
@@ -114,8 +138,10 @@
             selectedType === 'Activities' ? 'activities' : 'connections'
           } created successfully`
         );
-        isLoading = false;
+        // await getRecordUrl();
         await getTeamStorage();
+        await createTeamStorage(data.Key);
+        isLoading = false;
       }
 
       fileName = formatDate(new Date());
@@ -130,22 +156,17 @@
   };
 
   const sortHandler = async (col) => {
-    const { data, error } = await supabase.storage
-      .from('records')
-      .list(`${teamId}/${$user?.id}`, {
-        sortBy: { column: col, order: asc ? 'asc' : 'desc' },
-      });
-
-    if (error) {
-      console.log(error);
-    } else {
-      teamCsv = data;
-    }
+    if (col === 'name') col = 'filename';
+    $team = $team.sort(
+      sortBy(col, asc, function (a) {
+        return a.toUpperCase();
+      })
+    );
   };
 
   const deleteFromTable = async (id) => {
-    teamCsv = teamCsv.filter((item) => item.id !== id);
-    dispatch('updated', teamCsv);
+    $team = $team.filter((item) => item.id !== id);
+    $personal = $personal.filter((item) => item.id !== id);
     await getTeamStorage();
   };
 
@@ -216,15 +237,15 @@
           data={recordsTable}
           on:sort={async (e) => {
             asc = !asc;
-            await sortHandler(e.detail ?? 'name');
+            await sortHandler(e.detail ?? 'filename');
           }}
         />
       </tr>
     </thead>
     <tbody>
-      {#if teamCsv}
-        {#if teamCsv.length > 0}
-          {#each teamCsv as record, i}
+      {#if $team}
+        {#if $team.length > 0}
+          {#each $team as record, i}
             <RecordsTableBody {record} {teamId} {deleteFromTable} />
           {/each}
         {:else}

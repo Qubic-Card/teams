@@ -128,14 +128,14 @@
       </button>
       <div
         class={`w-full mb-4 flex-wrap justify-center items-center gap-2 bg-neutral-800 rounded-md ${
-          connection.profileData.socials.length > 0
+          connection?.profileData?.socials?.length > 0
             ? 'grid grid-cols-3'
             : 'flex'
         }`}
       >
-        {#if connection.profileData.socials}
-          {#if connection.profileData.socials.length > 0}
-            {#each connection.profileData.socials as item}
+        {#if connection?.profileData?.socials}
+          {#if connection?.profileData?.socials?.length > 0}
+            {#each connection?.profileData?.socials as item}
               {#if item.isActive}
                 <button
                   class="col-span-1  rounded"
@@ -160,9 +160,9 @@
       <div
         class="grid grid-cols-1 grid-flow-row gap-2 rounded-md w-full text-center text-white"
       >
-        {#if connection.profileData.links}
-          {#if connection.profileData.links.length > 0}
-            {#each connection.profileData.links as item}
+        {#if connection?.profileData?.links}
+          {#if connection?.profileData?.links.length > 0}
+            {#each connection?.profileData?.links as item}
               {#if item.isActive}
                 <p
                   class="cursor-pointer border border-neutral-600 rounded p-3 hover:font-bold"
