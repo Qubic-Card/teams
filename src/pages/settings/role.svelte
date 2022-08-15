@@ -16,6 +16,7 @@
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import Cookies from 'js-cookie';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
+  import { defaultRole } from '@lib/constants';
 
   export let permissions;
   let roleMaps = [];
@@ -45,6 +46,7 @@
 
     isClicked = true;
     toastSuccess('Role updated');
+    // location.reload();
   };
 
   const clicked = (e) => (isClicked = e.detail);
@@ -106,11 +108,34 @@
     >
       <h1 class="font-bold text-xl">Role Settings</h1>
       {#if permissions.writeRoles}
-        <AddRoleModal isHasWriteRolePermission={permissions.writeRoles} />
+        <AddRoleModal {permissions} />
       {/if}
     </div>
-    <h1 class="p-4 text-sm">Super Admin</h1>
-    <h1 class="p-4 text-sm">Member</h1>
+    {#each defaultRole as role}
+      <Disclosure let:open>
+        <div class="flex justify-between items-center">
+          <DisclosureButton
+            on:click={() => (isClicked = true)}
+            class="text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
+          >
+            {role?.name?.charAt(0).toUpperCase() + role?.name?.slice(1)}
+          </DisclosureButton>
+        </div>
+        {#if open}
+          <div transition:slide|local={{ duration: 500 }} class="mb-4">
+            <DisclosurePanel static>
+              <Checkboxes
+                isDefault
+                checkboxes={roleMapping}
+                bind:checked={role.role_maps}
+                {permissions}
+              />
+            </DisclosurePanel>
+          </div>
+        {/if}
+      </Disclosure>
+    {/each}
+
     {#if $teamRoles.length > 0}
       {#each $teamRoles as role}
         <Disclosure let:open>
@@ -144,7 +169,7 @@
                   on:click={async () => {
                     await updateTeamsRoleMapping(role.id);
                     roleMaps = await getRoleMapsByProfile($user?.id, teamId);
-                    setUserData(roleMaps);
+                    setUserData(roleMaps?.role?.role_maps);
                   }}
                   disabled={isClicked}
                 >
@@ -164,7 +189,7 @@
                   checkboxes={roleMapping}
                   bind:checked={role.role_maps}
                   on:clicked={clicked}
-                  isHasWriteRolePermission={permissions.writeRoles}
+                  {permissions}
                 />
               </DisclosurePanel>
             </div>

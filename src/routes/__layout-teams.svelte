@@ -1,7 +1,6 @@
 <script>
   import { fade } from 'svelte/transition';
   import '../app.css';
-  import MemberWrapper from '@comp/memberWrapper.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -12,11 +11,50 @@
   import { sidebarItems } from '@lib/constants';
   import getTeamData from '@lib/query/getTeamData';
   import Cookies from 'js-cookie';
+  import { memberData, user, userChangeTimestamp } from '@lib/stores/userStore';
+  import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
+  import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
+  import supabase from '@lib/db';
 
-  let teamId = Cookies.get('qubicTeamId');
   let isSidebarOpened = false;
   let isMenuOpened = false;
   let team = null;
+  let member = [];
+  let teamId = Cookies.get('qubicTeamId');
+  let subscription = {};
+  let loading = true;
+  let permissions = {
+    readAnalytics: false,
+  };
+  let isTeamInactive = false;
+  let sevenDaysAfterEndDate;
+
+  const getSubscriptionsData = async () => {
+    const { data, error } = await supabase.functions.invoke('globaldate', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        teamId: teamId,
+      }),
+    });
+    if (error) console.log(error);
+    if (data) subscription = data;
+  };
+
+  onMount(async () => {
+    await getSubscriptionsData();
+    member = await getRoleMapsByProfile($user?.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
+    team = await getTeamData(teamId);
+
+    sevenDaysAfterEndDate = new Date(
+      new Date(subscription?.subs_end_date).setDate(
+        new Date(subscription?.subs_end_date).getDate() + 7
+      )
+    );
+    if (member || userChangeTimestamp || $userData) loading = false;
+  });
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
   const menuHandler = () => (isMenuOpened = !isMenuOpened);
@@ -25,7 +63,52 @@
     isSidebarOpened && sidebarHandler();
   };
 
-  onMount(async () => (team = await getTeamData(teamId)));
+  $: {
+    $userData = member?.role?.role_maps;
+    $memberData.id = member?.id;
+  }
+  $: {
+    if ($userData)
+      $userData.filter((item) => {
+        if (item === 'allow_read_analytics') permissions.readAnalytics = true;
+        if (item === 'inactive') isTeamInactive = true;
+      });
+    console.log($userData);
+    if (subscription) {
+      if (subscription.isActive) {
+        // console.log('active');
+      } else if (subscription.isActive === false && subscription.isAfter7Days) {
+        if (member?.role?.role_name !== 'superadmin') {
+          $userData = ['inactive'];
+        } else {
+          $userData = [
+            'allow_read_roles',
+            'allow_read_team',
+            'allow_read_members',
+            'allow_read_analytics',
+            'allow_read_connections',
+            'allow_read_billing',
+            'inactive',
+          ];
+        }
+      } else if (!subscription.isActive && !subscription.isAfter7Days) {
+        // if hari ini lebih besar daripada 7 hari setelah end date
+        if (member?.role?.role_name !== 'superadmin') {
+          $userData = ['will_expired'];
+        } else {
+          $userData = [
+            'allow_read_roles',
+            'allow_read_team',
+            'allow_read_members',
+            'allow_read_analytics',
+            'allow_read_connections',
+            'allow_read_billing',
+            'will_expired',
+          ];
+        }
+      }
+    }
+  }
 </script>
 
 <svelte:head>
@@ -34,39 +117,44 @@
 
 <AuthWrapper>
   <div class="relative min-h-screen">
-    {#if $userData.length !== 0}
-      {#if $userData?.includes('inactive')}
+    {#if sevenDaysAfterEndDate}
+      {#if !subscription.isActive && !subscription.isAfter7Days}
         <div class="bg-red-600 text-white text-center p-2 text-sm sticky">
-          Your subscription has expired.
+          Your access to Qubic Team will be terminated completely on {new Date(
+            sevenDaysAfterEndDate
+          ).toLocaleDateString()}. Please renew your subscription to continue.
         </div>
       {/if}
     {/if}
+
     <div
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
-        {#if team?.name}
-          {#if isSidebarOpened}
-            <img
-              src="/close-white.svg"
-              alt="close"
-              class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
-              on:click={sidebarHandler}
-            />
+        {#if subscription.isActive || (!subscription.isActive && !subscription.isAfter7Days)}
+          {#if team?.name}
+            {#if isSidebarOpened}
+              <img
+                src="/close-white.svg"
+                alt="close"
+                class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
+                on:click={sidebarHandler}
+              />
+            {:else}
+              <img
+                src="/menu-white.svg"
+                alt="humberger-menu"
+                class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
+                on:click={sidebarHandler}
+              />
+            {/if}
           {:else}
-            <img
-              src="/menu-white.svg"
-              alt="humberger-menu"
-              class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
-              on:click={sidebarHandler}
-            />
+            <div
+              class="w-16 h-16 border-r-2 border-neutral-800 flex justify-center items-center animate-pulse"
+            >
+              <div class="bg-neutral-800 w-10 h-10" />
+            </div>
           {/if}
-        {:else}
-          <div
-            class="w-16 h-16 border-r-2 border-neutral-800 flex justify-center items-center animate-pulse"
-          >
-            <div class="bg-neutral-800 w-10 h-10" />
-          </div>
         {/if}
         {#if team?.name}
           <p class="text-xl font-bold ml-4">
@@ -100,55 +188,81 @@
       {/if}
     </div>
 
-    <div
-      class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
-        $userData.includes('inactive') ? 'top-24' : 'top-16'
-      } bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
-        isSidebarOpened ? 'w-full md:w-72' : ''
-      }`}
-    >
-      <nav class="space-y-2 w-full flex flex-col justify-center items-center">
-        {#each sidebarItems as item}
-          {#if team?.name}
-            <!-- skeleton -->
-            <div
-              class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
-                isSidebarOpened ? 'justify-between' : 'justify-center'
-              } ${isSidebarOpened && 'px-12 w-full'} ${
-                $page.routeId === '[slug]/dashboard/team@teams'
-                  ? 'first:bg-neutral-900'
-                  : ''
-              }  ${
-                $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
-              } ${
-                isSidebarOpened && $page.routeId === item.routeId
-                  ? 'bg-neutral-900'
-                  : ''
-              }`}
-              on:click={() => handler(team?.id, item.title)}
-            >
-              {#if isSidebarOpened}
-                <p class="text-sm">
-                  {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
-                </p>
-              {/if}
-              <img src={item.urldefault} alt={item.title} class="w-5" />
-            </div>
-          {:else}
-            <div class="animate-pulse gap-5">
-              <p class="text-5xl h-16 w-16 text-neutral-800 bg-neutral-800" />
-            </div>
-          {/if}
-        {/each}
-      </nav>
-    </div>
-    <div
-      class={`absolute ${
-        $userData.includes('inactive') ? 'top-24' : 'top-16'
-      } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
-    >
-      <SvelteToast />
-      <MemberWrapper let:loading let:permissions>
+    {#if subscription.isActive === false && subscription.isAfter7Days}
+      <div class="flex flex-col text-white pt-24 pl-4 w-full gap-2">
+        <h1 class="text-lg border-b border-neutral-700 font-bold pb-2">
+          Your subscription has ended.
+        </h1>
+        <p>
+          Your membership has been expired since {new Date(
+            subscription?.subs_end_date
+          )
+            .toDateString()
+            .slice(4)}. <br /> Here are some options you can choose:
+        </p>
+        <button class="rounded-md bg-blue-600 p-3 text-left w-1/4"
+          >Renew membership</button
+        >
+        {#if member?.role?.role_name === 'superadmin'}
+          <button
+            class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
+            >Transfer everyone's card to basic</button
+          >
+        {/if}
+        <button class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
+          >Transfer only my card to basic</button
+        >
+      </div>
+    {:else}
+      <div
+        class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
+          subscription.isActive ? 'top-16' : 'top-[100px]'
+        } bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
+          isSidebarOpened ? 'w-full md:w-72' : ''
+        }`}
+      >
+        <nav class="space-y-2 w-full flex flex-col justify-center items-center">
+          {#each sidebarItems as item}
+            {#if team?.name}
+              <div
+                class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
+                  isSidebarOpened ? 'justify-between' : 'justify-center'
+                } ${isSidebarOpened && 'px-12 w-full'} ${
+                  $page.routeId === '[slug]/dashboard/team@teams'
+                    ? 'first:bg-neutral-900'
+                    : ''
+                }  ${
+                  $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
+                } ${
+                  isSidebarOpened && $page.routeId === item.routeId
+                    ? 'bg-neutral-900'
+                    : ''
+                }`}
+                on:click={() => handler(team?.id, item.title)}
+              >
+                {#if isSidebarOpened}
+                  <p class="text-sm">
+                    {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
+                  </p>
+                {/if}
+                <img src={item.urldefault} alt={item.title} class="w-5" />
+              </div>
+            {:else}
+              <div class="animate-pulse gap-5">
+                <p class="text-5xl h-16 w-16 text-neutral-800 bg-neutral-800" />
+              </div>
+            {/if}
+          {/each}
+        </nav>
+      </div>
+
+      <div
+        class={`absolute ${
+          subscription.isActive ? 'top-16' : 'top-24'
+        } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
+      >
+        <SvelteToast />
+
         {#if loading}
           <div
             transition:fade|local
@@ -184,8 +298,8 @@
           {/if}
           <slot />
         {/if}
-      </MemberWrapper>
-    </div>
+      </div>
+    {/if}
   </div>
 </AuthWrapper>
 

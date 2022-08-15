@@ -17,8 +17,16 @@
 
   export let teamCsv, getTeamStorage;
 
+  const formatDate = (dateArg) => {
+    const date = new Date(dateArg).getDate();
+    const month = new Date(dateArg).getMonth() + 1;
+    const year = new Date(dateArg).getFullYear();
+    const formattedDate = `${date}${month < 10 ? '0' + month : month}${year}`;
+    return formattedDate;
+  };
+
   let teamId = Cookies.get('qubicTeamId');
-  let fileName = `${new Date().toDateString().slice(4)}`;
+  let fileName = formatDate(new Date());
   let selectedType = 'Activities';
   let fromDateValue = new Date();
   let toDateValue = new Date();
@@ -32,9 +40,11 @@
       const dateLimiter = new Date(
         new Date(selectedDates[0]).setDate(selectedDates[0].getDate() + 29)
       );
+
       toDateOptions.minDate = new Date(selectedDates[0]);
       toDateOptions.maxDate = new Date(dateLimiter);
       toDateValue = new Date(dateLimiter);
+      fileName = `${formatDate(selectedDates[0])}-${formatDate(toDateValue)}`;
     },
     enableTime: false,
     // minDate: new Date(last30Days[0]),
@@ -42,6 +52,9 @@
   };
 
   let toDateOptions = {
+    onChange: (selectedDates, dateStr, instance) => {
+      fileName = `${formatDate(fromDateValue)}-${formatDate(selectedDates[0])}`;
+    },
     enableTime: false,
     maxDate: new Date(),
     minDate: new Date(last30Days[0]),
@@ -105,7 +118,7 @@
         await getTeamStorage();
       }
 
-      fileName = `${new Date().toDateString().slice(4)}`;
+      fileName = formatDate(new Date());
       selectedType = 'Activities';
       toDateValue = new Date(today);
       fromDateValue = new Date(today);

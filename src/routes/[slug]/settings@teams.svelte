@@ -8,28 +8,30 @@
   import Role from '@pages/settings/role.svelte';
 
   let roles = [];
-  let roleMaps = [];
   let isClicked = true;
-  let loading = false;
   let teamId = Cookies.get('qubicTeamId');
   let permissions = {
     readBilling: false,
     writeBilling: false,
     readRoles: false,
     writeRoles: false,
+    isTeamInactive: false,
+    isTeamWillExpire: false,
   };
+  let team = null;
 
   const getTeamsRoleMapping = async () => {
     try {
       const { data, error } = await supabase
         .from('team_roles')
-        .select('*')
+        .select('*, team_id(*)')
         .eq('team_id', teamId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
       if (data) {
+        team = data[0].team_id;
         roles = data;
         $teamRoles = data;
       }
@@ -40,12 +42,15 @@
 
   const clicked = (e) => (isClicked = e.detail);
 
-  $: $userData?.filter((item) => {
-    if (item === 'allow_read_billing') permissions.readBilling = true;
-    if (item === 'allow_write_billing') permissions.writeBilling = true;
-    if (item === 'allow_read_roles') permissions.readRoles = true;
-    if (item === 'allow_write_roles') permissions.writeRoles = true;
-  });
+  $: if ($userData?.length > 0)
+    $userData?.filter((item) => {
+      if (item === 'allow_read_billing') permissions.readBilling = true;
+      if (item === 'allow_write_billing') permissions.writeBilling = true;
+      if (item === 'allow_read_roles') permissions.readRoles = true;
+      if (item === 'allow_write_roles') permissions.writeRoles = true;
+      if (item === 'inactive') permissions.isTeamInactive = true;
+      if (item === 'will_expired') permissions.isTeamWillExpire = true;
+    });
 </script>
 
 {#await getTeamsRoleMapping()}
@@ -55,7 +60,7 @@
 {:then}
   <div class="flex justify-center pt-4 pl-24 pr-4">
     <div class="flex flex-col w-full gap-4 text-sm pb-10">
-      <Billing {permissions} />
+      <Billing {permissions} {team} />
       <Role {permissions} {roles} />
       <div class="flex flex-col p-4 bg-neutral-800 rounded-lg">
         <h1 class="text-xl font-bold">Contact us</h1>

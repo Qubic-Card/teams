@@ -6,18 +6,16 @@
     </div>
     <div class="grid grid-cols-2 gap-2 text-black mx-4 md:mx-12 mt-4">
       <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
-        <div class="border-neutral-700 border p-4 mb-4">
-          <div class="p-3 bg-neutral-900 flex flex-col">
-            <div class="flex gap-2">
-              <div class="w-full h-10 my-2 bg-neutral-800 rounded-md" />
-              <div class="w-full h-10 my-2 bg-neutral-800 rounded-md" />
-            </div>
-            <div class="w-full h-10 my-2 mr-3 bg-neutral-800 rounded-md" />
-            <div class="w-full h-10 my-2 mr-3 bg-neutral-800 rounded-md" />
-            <div class="w-full h-10 my-2 mr-3 bg-neutral-800 rounded-md" />
-            <div class="w-full h-20 my-2 mr-3 bg-neutral-800 rounded-md" />
-            <div class="w-full h-20 my-2 mr-3 bg-neutral-800 rounded-md" />
+        <div class="flex flex-col p-2 gap-4 border border-neutral-700">
+          <div class="flex gap-2">
+            <div class="w-full bg-neutral-800 h-12 rounded-md" />
+            <div class="w-full bg-neutral-800 h-12 rounded-md" />
           </div>
+          <div class="w-full bg-neutral-800 h-12 rounded-md" />
+          <div class="w-full bg-neutral-800 h-12 rounded-md" />
+          <div class="w-full bg-neutral-800 h-12 rounded-md" />
+          <div class="w-full bg-neutral-800 h-20 rounded-md" />
+          <div class="w-full bg-neutral-800 h-20 rounded-md" />
         </div>
       </div>
       <div

@@ -23,17 +23,21 @@
   let loading = false;
   let permissions = {
     readConnection: false,
+    writeConnection: false,
+    isTeamInactive: false,
+    will_expire: false,
   };
   let teamConnections = [];
   let userConnections = [];
   let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
   let isLoading = false;
   let tabs = 'user';
-  let isTeamInactive = false;
 
   $: $userData?.filter((item) => {
     if (item === 'allow_read_connections') permissions.readConnection = true;
-    if (item === 'inactive') isTeamInactive = true;
+    if (item === 'allow_write_connections') permissions.writeConnection = true;
+    if (item === 'inactive') permissions.isTeamInactive = true;
+    if (item === 'will_expired') permissions.will_expire = true;
   });
 
   const setTabs = (tab) => (tabs = tab);
@@ -264,7 +268,7 @@
                 {#if tabs === 'all'}
                   {#each teamConnections as connection, i}
                     <ConnectionTableBody
-                      {isTeamInactive}
+                      {permissions}
                       {innerWidth}
                       {connection}
                       tab="team"
@@ -274,7 +278,7 @@
                 {:else}
                   {#each userConnections as connection, i}
                     <ConnectionTableBody
-                      {isTeamInactive}
+                      {permissions}
                       {innerWidth}
                       {connection}
                       tab="user"
@@ -356,7 +360,7 @@
             <tbody>
               {#each userConnections as connection, i}
                 <ConnectionTableBody
-                  {isTeamInactive}
+                  {permissions}
                   {innerWidth}
                   {connection}
                   tab="user"

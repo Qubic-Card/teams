@@ -1,31 +1,30 @@
 <script>
   import { setNewRole } from '@lib/stores/roleStore';
   import { userData } from '@lib/stores/userStore';
-  import { createEventDispatcher } from 'svelte';
-  export let checkboxes, checked, isHasWriteRolePermission;
+  import { createEventDispatcher, onMount } from 'svelte';
+  export let checkboxes, checked, permissions, isDefault;
   export let bg = 'bg-neutral-900';
   let isSuperAdmin = false;
   let selectAll = false;
 
-  const readCheckbox = checkboxes.slice(1, 7);
-  const writeCheckbox = checkboxes.slice(7);
   const dispatch = createEventDispatcher();
   const clicked = () => dispatch('clicked', false);
 
   $: {
     setNewRole(checked);
     if (checked.includes('allow_write_members')) {
-      if (!checked.includes('allow_write_profile'))
-        checked.push('allow_write_profile');
+      if (!checked.includes('allow_read_members'))
+        checked.push('allow_read_members');
     }
 
-    if (checked.includes('allow_write_roles')) {
-      if (!checked.includes('allow_read_roles'))
-        checked.push('allow_read_roles');
+    if (checked.includes('allow_read_roles')) {
+      if (!checked.includes('allow_write_roles'))
+        checked.push('allow_write_roles');
     }
+
     if (selectAll) {
-      // isSuperAdmin = true;
       checked = [
+        'allow_read_profile',
         'allow_read_roles',
         'allow_read_team',
         'allow_read_members',
@@ -43,97 +42,103 @@
       selectAll = false;
     }
   }
+
+  let roles = checkboxes.slice(1);
+  let memberRole = [roles[0], roles[6]];
+  let companyRole = [roles[1], roles[7]];
+  let analyticsRecords = [roles[2], roles[9]];
+  let role = [roles[4], roles[10]];
+  let billing = [roles[5], roles[11]];
+  let profile = [roles[8], roles[13]];
+  let connections = [roles[3], roles[12]];
+
+  let rolesArr = [
+    {
+      role: { title: 'Team', roles: [companyRole[0], companyRole[1]] },
+    },
+    {
+      role: { title: 'Member', roles: [memberRole[0], memberRole[1]] },
+    },
+    {
+      role: { title: 'Profile', roles: [profile[0], profile[1]] },
+    },
+    {
+      role: {
+        title: 'Analytics & Records',
+        roles: [analyticsRecords[0], analyticsRecords[1]],
+      },
+    },
+    {
+      role: { title: 'Role', roles: [role[0], role[1]] },
+    },
+    {
+      role: { title: 'Billing', roles: [billing[0], billing[1]] },
+    },
+    {
+      role: { title: 'Connection', roles: [connections[0], connections[1]] },
+    },
+  ];
 </script>
 
 <div class="border border-neutral-600 mt-3 p-2 rounded">
-  <!-- <h1 class="font-bold text-sm my-4 ml-2 self-start">Select all</h1> -->
-  <button
-    disabled={$userData.includes('inactive') ||
-      $userData.includes('will_expired')}
-    on:click={() => {
-      clicked();
-      selectAll = true;
-    }}
-    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300"
-  >
-    Select all
-  </button>
-
-  <h1 class="font-bold text-sm my-4 ml-2 self-start">Read</h1>
-  {#each readCheckbox as checkbox}
-    <div
-      class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+  {#if !isDefault}
+    <button
+      disabled={permissions.isTeamInactive ||
+        permissions.isTeamWillExpire ||
+        isDefault}
+      on:click={() => {
+        clicked();
+        selectAll = true;
+      }}
+      class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300"
     >
-      <div class="flex justify-center items-center h-7">
-        <label
-          class={`flex ${
-            isSuperAdmin ||
-            $userData.includes('inactive') ||
-            $userData.includes('will_expired')
-              ? 'cursor-default'
-              : 'cursor-pointer'
-          }`}
-        >
-          <input
-            type="checkbox"
-            class="w-5 h-5 cursor-pointer disabled:cursor-default"
-            bind:group={checked}
-            value={checkbox.name}
-            on:change={clicked}
-            disabled={!isHasWriteRolePermission || isSuperAdmin}
-          />
+      Select all
+    </button>
+  {/if}
 
-          <p class="ml-4 w-72">
-            {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
-              checkbox.name.split('_')[0].slice(1)}
-            {checkbox.name.split('_')[1]}
-            {checkbox.name.split('_')[2]}
-          </p>
-        </label>
+  {#each rolesArr.map((item) => item.role) as items, i}
+    <h1 class="font-bold text-sm my-4 ml-2 self-start">{items.title}</h1>
+
+    {#each items.roles as role}
+      <div
+        class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+      >
+        <div class="flex justify-center items-center h-7">
+          <label
+            class={`flex ${
+              isDefault ||
+              isSuperAdmin ||
+              permissions.isTeamInactive ||
+              permissions.isTeamWillExpire ||
+              role.name === 'allow_read_profile'
+                ? 'cursor-default'
+                : 'cursor-pointer'
+            }`}
+          >
+            <input
+              type="checkbox"
+              class="w-5 h-5 cursor-pointer disabled:cursor-default a"
+              bind:group={checked}
+              value={role.name}
+              on:change={clicked}
+              disabled={!permissions.writeRoles ||
+                isSuperAdmin ||
+                role.name === 'allow_read_profile' ||
+                isDefault}
+            />
+
+            <p class="ml-4 w-72">
+              {role.name.split('_')[0].charAt(0).toUpperCase() +
+                role.name.split('_')[0].slice(1)}
+              {role.name.split('_')[1]}
+              {role.name.split('_')[2]}
+            </p>
+          </label>
+        </div>
+        <p class="w-1/2">
+          {role.desc}
+        </p>
       </div>
-      <p class="w-1/2">
-        {checkbox.desc}
-      </p>
-    </div>
-  {/each}
-
-  <h1 class="font-bold text-sm my-4 ml-2 self-start">Write</h1>
-  {#each writeCheckbox as checkbox}
-    <div
-      class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
-    >
-      <div class="flex justify-center items-center h-7">
-        <label
-          on:click={clicked}
-          class={`flex ${
-            isSuperAdmin ||
-            $userData.includes('inactive') ||
-            $userData.includes('will_expired')
-              ? 'cursor-default'
-              : 'cursor-pointer'
-          }`}
-        >
-          <input
-            type="checkbox"
-            class="w-5 h-5 cursor-pointer disabled:cursor-default"
-            bind:group={checked}
-            value={checkbox.name}
-            on:change={clicked}
-            disabled={!isHasWriteRolePermission || isSuperAdmin}
-          />
-
-          <p class="ml-4 w-72">
-            {checkbox.name.split('_')[0].charAt(0).toUpperCase() +
-              checkbox.name.split('_')[0].slice(1)}
-            {checkbox.name.split('_')[1]}
-            {checkbox.name.split('_')[2]}
-          </p>
-        </label>
-      </div>
-
-      <p class="w-1/2">
-        {checkbox.desc}
-      </p>
-    </div>
+    {/each}
   {/each}
 </div>

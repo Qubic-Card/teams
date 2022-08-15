@@ -21,6 +21,7 @@
     writeTeam: false,
     writeMembers: false,
     ReadTeam: false,
+    will_expire: false,
   };
 
   let isCheckRoleDone = false;
@@ -47,7 +48,7 @@
       isCheckRoleDone = true;
     }
 
-    if (item === 'inactive') isTeamInactive = true;
+    if (item === 'will_expired') permissions.will_expire = true;
   });
 
   let teamId = Cookies.get('qubicTeamId');
@@ -96,7 +97,7 @@
 {#await (getProfile(), getTeams())}
   <EditorSkeleton />
 {:then}
-  {#if isTeamInactive === false}
+  {#if permissions.will_expire === false}
     {#if isCheckRoleDone}
       {#if $page.params.slug === $user?.id}
         {#if !permissions.writeProfile && $selectedTab === 'personal'}

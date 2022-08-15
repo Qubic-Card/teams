@@ -86,7 +86,6 @@
                   : 'text-white pb-2'}>Team</Tab
             >
           </div>
-          <h1>0/5GB</h1>
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">
@@ -94,6 +93,7 @@
               {personalCsv}
               {teamCsv}
               {getPersonalStorage}
+              {isTeamInactive}
               on:updated={(e) => (teamCsv = e.detail)}
             />
           </TabPanel>
@@ -101,6 +101,7 @@
             <TeamRecords
               {teamCsv}
               {getTeamStorage}
+              {isTeamInactive}
               on:updated={(e) => (teamCsv = e.detail)}
             />
           </TabPanel>

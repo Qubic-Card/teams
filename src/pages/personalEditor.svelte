@@ -419,9 +419,13 @@
                           isInstagramInput={item.type === 'instagram'}
                           isPhoneInput={item.type === 'phone'}
                           isEmptyChecking={true}
-                          disabled={!permissions.writeProfile ||
-                            !permissions.writeMembers ||
-                            isTeamInactive}
+                          disabled={permissions.writeProfile
+                            ? false
+                            : permissions.writeMembers
+                            ? false
+                            : isTeamInactive === false
+                            ? false
+                            : true}
                         />
                         {#if permissions.writeProfile || permissions.writeMembers}
                           <div class="flex items-center h-[6.3rem]">

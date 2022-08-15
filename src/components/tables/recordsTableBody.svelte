@@ -5,8 +5,8 @@
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
-  export let record, teamId, deleteFromTable, isTeamInactive;
-
+  export let record, teamId, deleteFromTable;
+  export let isTeamInactive = false;
   let showDeleteModal = false;
   let isLoading = false;
 
@@ -73,7 +73,7 @@
     {record.name.includes('activities') ? 'Activities' : 'Connections'}
   </td>
   <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
-    {#if !isTeamInactive}
+    {#if isTeamInactive === false}
       <ConfirmationModal
         {isLoading}
         isDelete
