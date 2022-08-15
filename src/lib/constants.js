@@ -263,3 +263,38 @@ export const learnMoreContents = [
     bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
   },
 ];
+
+export const defaultRole = [
+  {
+    name: 'superAdmin',
+    role_maps: [
+      'super_admin',
+      'allow_read_roles',
+      'allow_read_team',
+      'allow_read_members',
+      'allow_read_records',
+      'allow_read_analytics',
+      'allow_read_connections',
+      'allow_read_billing',
+      'allow_write_profile',
+      'allow_write_connections',
+      'allow_write_billing',
+      'allow_write_analytics',
+      'allow_write_team',
+      'allow_write_members',
+      'allow_write_roles',
+      'allow_write_records',
+      ,
+    ],
+  },
+  {
+    name: 'member',
+    role_maps: [
+      'allow_read_members',
+      'allow_read_team',
+      'allow_write_profile',
+      'allow_read_analytics',
+      'allow_read_connections',
+    ],
+  },
+];

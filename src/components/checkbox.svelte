@@ -2,7 +2,7 @@
   import { setNewRole } from '@lib/stores/roleStore';
   import { userData } from '@lib/stores/userStore';
   import { createEventDispatcher, onMount } from 'svelte';
-  export let checkboxes, checked, permissions;
+  export let checkboxes, checked, permissions, isDefault;
   export let bg = 'bg-neutral-900';
   let isSuperAdmin = false;
   let selectAll = false;
@@ -81,16 +81,20 @@
 </script>
 
 <div class="border border-neutral-600 mt-3 p-2 rounded">
-  <button
-    disabled={permissions.isTeamInactive || permissions.isTeamWillExpire}
-    on:click={() => {
-      clicked();
-      selectAll = true;
-    }}
-    class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300"
-  >
-    Select all
-  </button>
+  {#if !isDefault}
+    <button
+      disabled={permissions.isTeamInactive ||
+        permissions.isTeamWillExpire ||
+        isDefault}
+      on:click={() => {
+        clicked();
+        selectAll = true;
+      }}
+      class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300"
+    >
+      Select all
+    </button>
+  {/if}
 
   {#each rolesArr.map((item) => item.role) as items, i}
     <h1 class="font-bold text-sm my-4 ml-2 self-start">{items.title}</h1>
@@ -102,6 +106,7 @@
         <div class="flex justify-center items-center h-7">
           <label
             class={`flex ${
+              isDefault ||
               isSuperAdmin ||
               permissions.isTeamInactive ||
               permissions.isTeamWillExpire ||
@@ -118,7 +123,8 @@
               on:change={clicked}
               disabled={!permissions.writeRoles ||
                 isSuperAdmin ||
-                role.name === 'allow_read_profile'}
+                role.name === 'allow_read_profile' ||
+                isDefault}
             />
 
             <p class="ml-4 w-72">

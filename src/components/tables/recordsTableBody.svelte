@@ -5,8 +5,8 @@
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
 
-  export let record, teamId, deleteFromTable, isTeamInactive;
-
+  export let record, teamId, deleteFromTable;
+  export let isTeamInactive = false;
   let showDeleteModal = false;
   let isLoading = false;
 

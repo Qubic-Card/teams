@@ -93,6 +93,7 @@
               {personalCsv}
               {teamCsv}
               {getPersonalStorage}
+              {isTeamInactive}
               on:updated={(e) => (teamCsv = e.detail)}
             />
           </TabPanel>
@@ -100,6 +101,7 @@
             <TeamRecords
               {teamCsv}
               {getTeamStorage}
+              {isTeamInactive}
               on:updated={(e) => (teamCsv = e.detail)}
             />
           </TabPanel>
