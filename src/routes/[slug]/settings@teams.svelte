@@ -18,7 +18,7 @@
     isTeamInactive: false,
     isTeamWillExpire: false,
   };
-  let team = null;
+  let team = {};
 
   const getTeamsRoleMapping = async () => {
     try {

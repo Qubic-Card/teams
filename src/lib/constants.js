@@ -214,6 +214,17 @@ export const recordsTable = [
   },
 ];
 
+export const recordsTableTeam = [
+  { name: 'Filename', id: 'name' },
+  { name: 'Created at', id: 'created_at' },
+  { name: 'Type', id: 'type' },
+  { name: 'By', id: 'by' },
+  {
+    name: '',
+    id: 'actions',
+  },
+];
+
 export const cardImage = {
   metalRed:
     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/cards/metal-card-red.webp',

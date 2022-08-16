@@ -14,7 +14,7 @@ const convertToCSV = (arr) => {
 };
 
 export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
-  fromDate = new Date(new Date(fromDate)).toUTCString();
+  fromDate = new Date(new Date(fromDate).setHours(0, 0, 0, 0)).toUTCString();
   toDate = new Date(
     new Date(toDate).setDate(new Date(toDate).getDate() + 1)
   ).toUTCString();
@@ -72,7 +72,7 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
 };
 
 export const getLogsRecords = async (col, id, fromDate, toDate) => {
-  fromDate = new Date(new Date(fromDate)).toUTCString();
+  fromDate = new Date(new Date(fromDate).setHours(0, 0, 0, 0)).toUTCString();
 
   toDate = new Date(
     new Date(toDate).setDate(new Date(toDate).getDate() + 1)

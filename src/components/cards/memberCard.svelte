@@ -346,25 +346,6 @@
               <MenuItems
                 class="top-16 z-50 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md text-sm border border-neutral-700 p-2 w-64"
               >
-                {#each roles as item}
-                  <MenuItem
-                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
-                    on:click={async () => {
-                      if ($user?.id === member.team_member_id.uid) {
-                        roleID = item.id;
-                        roleName = item.role_name;
-                        toggleModal();
-                      } else {
-                        await setMemberRole(item.id);
-                        // selectRole(item.role_name);
-                        setRole(item.role_name);
-                      }
-                    }}
-                  >
-                    {item.role_name.charAt(0).toUpperCase() +
-                      item.role_name.slice(1)}
-                  </MenuItem>
-                {/each}
                 <MenuItem
                   class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
                   on:click={async () => {
@@ -395,6 +376,25 @@
                 >
                   Member
                 </MenuItem>
+                {#each roles as item}
+                  <MenuItem
+                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                    on:click={async () => {
+                      if ($user?.id === member.team_member_id.uid) {
+                        roleID = item.id;
+                        roleName = item.role_name;
+                        toggleModal();
+                      } else {
+                        await setMemberRole(item.id);
+                        // selectRole(item.role_name);
+                        setRole(item.role_name);
+                      }
+                    }}
+                  >
+                    {item.role_name.charAt(0).toUpperCase() +
+                      item.role_name.slice(1)}
+                  </MenuItem>
+                {/each}
               </MenuItems>
             {/if}
           </Menu>

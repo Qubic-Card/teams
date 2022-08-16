@@ -79,8 +79,6 @@
       }`,
     });
 
-    console.log(data);
-
     $team = [data[0], ...$team];
     if (error) console.log(error);
   };
@@ -88,7 +86,7 @@
   const createRecordHandler = async () => {
     let logsCsv = [];
     let connectionsCsv = [];
-    console.log(fileName);
+
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
         'team_member',

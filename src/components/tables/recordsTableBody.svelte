@@ -6,7 +6,7 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { personal, team } from '@lib/stores/recordsStore';
 
-  export let record, teamId, deleteFromTable;
+  export let record, teamId, deleteFromTable, isTeam;
   export let isTeamInactive = false;
   let showDeleteModal = false;
   let isLoading = false;
@@ -81,6 +81,8 @@
         .catch((err) => toastFailed());
     }
   };
+
+  // $: console.log(record);
 </script>
 
 <tr
@@ -88,7 +90,7 @@
   class="h-12 text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
 >
   <td class="font-bold text-ellipsis pl-4">
-    <p class="w-96 truncate">
+    <p class="w-80 truncate">
       {#if record.storage_url}
         {record.filename ?? '-'}
       {:else}
@@ -108,6 +110,13 @@
       {record.name.includes('activities') ? 'Activities' : 'Connections'}
     {/if}
   </td>
+  {#if isTeam}
+    <td class="pl-4 pr-4">
+      <p class="w-60 truncate">
+        {record.by}
+      </p>
+    </td>
+  {/if}
   <td class="h-12 pl-4 pr-4 flex gap-4 items-center">
     {#if isTeamInactive === false}
       <ConfirmationModal

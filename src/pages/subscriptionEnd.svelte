@@ -1,7 +1,6 @@
 <script>
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
   import { toastSuccess } from '@lib/utils/toast';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
@@ -115,7 +114,24 @@
 
     if (error) console.log(error);
   };
-  // FALSE KAN STATUS TEAM CARD CON
+
+  const setFalseTeamCardCon = async () => {
+    if (teamMembersProfile) {
+      teamMembersProfile.forEach(async (member) => {
+        const { data, error } = await supabase
+          .from('team_cardcon')
+          .update({
+            status: false,
+          })
+          .match({
+            card_id: member.card_id,
+          });
+
+        if (error) console.log(error);
+      });
+    }
+  };
+
   const setNullTeamMemberUid = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -130,11 +146,12 @@
     isLoading = true;
     await setNullTeamMemberUid();
     await setNullTeamId();
+    await setFalseTeamCardCon();
     await createCardConnection();
     await updateBasicProfile();
     isLoading = false;
   };
-  $: console.log(teamMembersProfile);
+
   onMount(async () => await getMemberData());
 </script>
 
