@@ -25,7 +25,7 @@
   let loading = true;
 
   const analyticsData = [
-    { percentage: 0, data: 0, type: 'Active' },
+    { percentage: 0, data: 0, type: 'Activities' },
     {
       percentage: 0,
       data: 0,

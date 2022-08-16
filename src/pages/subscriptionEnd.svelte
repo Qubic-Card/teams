@@ -115,7 +115,7 @@
 
     if (error) console.log(error);
   };
-
+  // FALSE KAN STATUS TEAM CARD CON
   const setNullTeamMemberUid = async () => {
     const { data, error } = await supabase
       .from('team_members')
