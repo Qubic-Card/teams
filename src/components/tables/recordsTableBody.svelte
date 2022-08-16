@@ -19,9 +19,15 @@
 
     const { error } = await supabase.storage
       .from('records')
-      .remove([
-        `${teamId}/${$user?.id}/${record.name ? record.name : record.filename}`,
-      ]);
+      .remove(
+        record.storage_url
+          ? [`${teamId}/${record.name ? record.name : record.filename}`]
+          : [
+              `${teamId}/${$user?.id}/${
+                record.name ? record.name : record.filename
+              }`,
+            ]
+      );
 
     const { data, error: err } = await supabase
       .from('team_storage')
@@ -81,8 +87,14 @@
         .catch((err) => toastFailed());
     }
   };
-
-  // $: console.log(record);
+  // $: console.log(
+  //   record.storage_url
+  //     ? console.log('qq', record.filename)
+  //     : record.profileData?.firstname ?? record?.name
+  // );
+  $: console.log(record.filename);
+  // DELETE HANDLER DARI TEAM RECORDS ATAU PERSONAL RECORDS JANGAN DARI TABLE INI
+  // $: console.log(record.profileData?.firstname ?? record?.name);
 </script>
 
 <tr

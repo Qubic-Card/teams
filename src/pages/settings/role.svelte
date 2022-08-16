@@ -63,11 +63,13 @@
       toastFailed('Failed to check role');
     }
 
-    if (data.length > 0) {
-      toastFailed('Cannot delete role, it is used');
-      return true;
-    } else {
-      return false;
+    if (data) {
+      if (data?.length > 0) {
+        toastFailed('Cannot delete role, it is used');
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 
@@ -136,66 +138,68 @@
       </Disclosure>
     {/each}
 
-    {#if $teamRoles.length > 0}
-      {#each $teamRoles as role}
-        <Disclosure let:open>
-          <div class="flex justify-between items-center">
-            <DisclosureButton
-              on:click={() => (isClicked = true)}
-              class="text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
-            >
-              {role?.role_name?.charAt(0).toUpperCase() +
-                role?.role_name?.slice(1)}
-            </DisclosureButton>
-            {#if permissions.writeRoles}
-              <div class="bg-red-500 p-2 mr-2 rounded-md">
-                <img
-                  src="/delete-icon.svg"
-                  alt=""
-                  class="w-6 h-6 cursor-pointer"
-                  on:click={() => {
-                    toggleDelete();
-                    roleId = role?.id;
-                    roleName = role?.role_name;
-                  }}
-                />
-              </div>
-              <RenameModal id={role.id} roleName={role?.role_name} />
+    {#if $teamRoles}
+      {#if $teamRoles.length > 0}
+        {#each $teamRoles as role}
+          <Disclosure let:open>
+            <div class="flex justify-between items-center">
+              <DisclosureButton
+                on:click={() => (isClicked = true)}
+                class="text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
+              >
+                {role?.role_name?.charAt(0).toUpperCase() +
+                  role?.role_name?.slice(1)}
+              </DisclosureButton>
+              {#if permissions.writeRoles}
+                <div class="bg-red-500 p-2 mr-2 rounded-md">
+                  <img
+                    src="/delete-icon.svg"
+                    alt=""
+                    class="w-6 h-6 cursor-pointer"
+                    on:click={() => {
+                      toggleDelete();
+                      roleId = role?.id;
+                      roleName = role?.role_name;
+                    }}
+                  />
+                </div>
+                <RenameModal id={role.id} roleName={role?.role_name} />
 
-              {#if open}
-                <button
-                  transition:fade|local={{ duration: 200 }}
-                  class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
-                  on:click={async () => {
-                    await updateTeamsRoleMapping(role.id);
-                    roleMaps = await getRoleMapsByProfile($user?.id, teamId);
-                    setUserData(roleMaps?.role?.role_maps);
-                  }}
-                  disabled={isClicked}
-                >
-                  {#if loading}
-                    Saving...
-                  {:else}
-                    Save
-                  {/if}
-                </button>
+                {#if open}
+                  <button
+                    transition:fade|local={{ duration: 200 }}
+                    class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
+                    on:click={async () => {
+                      await updateTeamsRoleMapping(role.id);
+                      roleMaps = await getRoleMapsByProfile($user?.id, teamId);
+                      setUserData(roleMaps?.role?.role_maps);
+                    }}
+                    disabled={isClicked}
+                  >
+                    {#if loading}
+                      Saving...
+                    {:else}
+                      Save
+                    {/if}
+                  </button>
+                {/if}
               {/if}
-            {/if}
-          </div>
-          {#if open}
-            <div transition:slide|local={{ duration: 500 }} class="mb-4">
-              <DisclosurePanel static>
-                <Checkboxes
-                  checkboxes={roleMapping}
-                  bind:checked={role.role_maps}
-                  on:clicked={clicked}
-                  {permissions}
-                />
-              </DisclosurePanel>
             </div>
-          {/if}
-        </Disclosure>
-      {/each}
+            {#if open}
+              <div transition:slide|local={{ duration: 500 }} class="mb-4">
+                <DisclosurePanel static>
+                  <Checkboxes
+                    checkboxes={roleMapping}
+                    bind:checked={role.role_maps}
+                    on:clicked={clicked}
+                    {permissions}
+                  />
+                </DisclosurePanel>
+              </div>
+            {/if}
+          </Disclosure>
+        {/each}
+      {/if}
     {/if}
   </div>
   <div class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-xl">
