@@ -121,7 +121,7 @@
     {#if sevenDaysAfterEndDate}
       {#if !subscription.isActive && !subscription.isAfter7Days}
         <div class="bg-red-600 text-white text-center p-2 text-sm sticky">
-          Your access to Qubic Team will be terminated completely on {new Date(
+          Your access to Qubic Teams will be terminated completely on {new Date(
             sevenDaysAfterEndDate
           ).toLocaleDateString()}. Please renew your subscription to continue.
         </div>
@@ -190,11 +190,15 @@
     </div>
 
     {#if subscription.isActive === false && subscription.isAfter7Days}
-      <SubscriptionEnd {subscription} {member} />
+      <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
         class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
-          subscription.isActive ? 'top-16' : 'top-[100px]'
+          sevenDaysAfterEndDate
+            ? !subscription.isActive && !subscription.isAfter7Days
+              ? 'top-24'
+              : 'top-16'
+            : 'top-16'
         } bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
           isSidebarOpened ? 'w-full md:w-72' : ''
         }`}
@@ -236,7 +240,11 @@
 
       <div
         class={`absolute ${
-          subscription.isActive ? 'top-16' : 'top-24'
+          sevenDaysAfterEndDate
+            ? !subscription.isActive && !subscription.isAfter7Days
+              ? 'top-24'
+              : 'top-16'
+            : 'top-16'
         } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
       >
         <SvelteToast />

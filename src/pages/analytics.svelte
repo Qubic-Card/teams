@@ -96,7 +96,7 @@
         'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
         { count: 'estimated' }
       )
-      .eq('by', $memberData.id)
+      .eq('by', $memberData?.id)
       .gte(
         'dateConnected',
         $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
@@ -130,13 +130,10 @@
       count,
     } = await supabase
       .from('team_logs')
-      .select(
-        'created_at, data->card, data->message, type, team, team_member(*), platform',
-        {
-          count: 'estimated',
-        }
-      )
-      .eq('team_member', $memberData.id)
+      .select('created_at, uniqueId', {
+        count: 'estimated',
+      })
+      .eq('team_member', $memberData?.id)
       .gte(
         'created_at',
         $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
@@ -149,6 +146,12 @@
       activity = logs.map((log) =>
         convertToGMT7(log.created_at).toDateString().slice(4)
       );
+      let newArr = [];
+      logs.map((log) => {
+        if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
+      });
+      uniqueCount = newArr.length;
+      activityCount = count;
 
       loading = false;
     }
@@ -174,7 +177,7 @@
           count: 'estimated',
         }
       )
-      .eq('team_member', $memberData.id)
+      .eq('team_member', $memberData?.id)
       .gte(
         'created_at',
         $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
@@ -185,13 +188,6 @@
       .range(from, to);
 
     if (logs) {
-      let newArr = [];
-      logs.map((log) => {
-        if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
-      });
-      uniqueCount = newArr.length;
-      activityCount = count;
-
       userLogs = logs;
       maxPage = Math.ceil(count / 10);
       loading = false;
