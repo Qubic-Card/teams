@@ -17,9 +17,28 @@
         checked.push('allow_read_members');
     }
 
-    if (checked.includes('allow_read_roles')) {
-      if (!checked.includes('allow_write_roles'))
-        checked.push('allow_write_roles');
+    if (checked.includes('allow_write_roles')) {
+      if (!checked.includes('allow_read_roles'))
+        checked.push('allow_read_roles');
+    }
+
+    if (checked.includes('allow_write_team')) {
+      if (!checked.includes('allow_read_team')) checked.push('allow_read_team');
+    }
+
+    if (checked.includes('allow_write_billing')) {
+      if (!checked.includes('allow_read_billing'))
+        checked.push('allow_read_billing');
+    }
+
+    if (checked.includes('allow_write_connections')) {
+      if (!checked.includes('allow_read_connections'))
+        checked.push('allow_read_connections');
+    }
+
+    if (checked.includes('allow_write_records')) {
+      if (!checked.includes('allow_read_analytics'))
+        checked.push('allow_read_analytics');
     }
 
     if (selectAll) {
@@ -37,6 +56,7 @@
         'allow_write_members',
         'allow_write_roles',
         'allow_write_records',
+        'allow_write_connections',
       ];
 
       selectAll = false;
@@ -119,7 +139,7 @@
               type="checkbox"
               class="w-5 h-5 cursor-pointer disabled:cursor-default a"
               bind:group={checked}
-              value={role.name}
+              value={role.value}
               on:change={clicked}
               disabled={!permissions.writeRoles ||
                 isSuperAdmin ||

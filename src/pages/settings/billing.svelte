@@ -35,7 +35,7 @@
       </div>
       <p>
         Subscription valid hingga: {new Date(
-          convertToGMT7(team.subscription_end_date)
+          convertToGMT7(team?.subscription_end_date)
         )
           .toDateString()
           .slice(4)}

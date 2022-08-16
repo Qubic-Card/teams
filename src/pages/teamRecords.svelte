@@ -1,7 +1,7 @@
 <script>
   import Cookies from 'js-cookie';
   import Input from '@comp/input.svelte';
-  import { recordsTable } from '@lib/constants';
+  import { recordsTableTeam } from '@lib/constants';
   import RecordsTableBody from '@comp/tables/recordsTableBody.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
@@ -110,7 +110,7 @@
       const { data, error } = await supabase.storage
         .from('records')
         .upload(
-          `${teamId}/${$user?.id}/${fileName}-${
+          `${teamId}/${fileName}-${
             selectedType === 'Activities' ? 'activities' : 'connections'
           }`,
           selectedType === 'Activities' ? logsCsv : connectionsCsv,
@@ -234,7 +234,7 @@
       <tr>
         <TableHead
           class="w-1/6"
-          data={recordsTable}
+          data={recordsTableTeam}
           on:sort={async (e) => {
             asc = !asc;
             await sortHandler(e.detail ?? 'filename');
@@ -246,7 +246,7 @@
       {#if $team}
         {#if $team.length > 0}
           {#each $team as record, i}
-            <RecordsTableBody {record} {teamId} {deleteFromTable} />
+            <RecordsTableBody {record} {teamId} {deleteFromTable} isTeam />
           {/each}
         {:else}
           <tr>
