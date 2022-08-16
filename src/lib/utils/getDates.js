@@ -83,4 +83,14 @@ export const thirtyDays = getDates(
   thirtyDaysAgo
 );
 
+export const formatDate = (dateArg) => {
+  const date = new Date(dateArg).getDate();
+  const month = new Date(dateArg).getMonth() + 1;
+  const year = new Date(dateArg).getFullYear();
+  const formattedDate = `${date < 10 ? '0' + date : date}${
+    month < 10 ? '0' + month : month
+  }${year}`;
+  return formattedDate;
+};
+
 export default getDates;

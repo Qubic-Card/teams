@@ -15,6 +15,7 @@
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
   import supabase from '@lib/db';
+  import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -73,7 +74,7 @@
         if (item === 'allow_read_analytics') permissions.readAnalytics = true;
         if (item === 'inactive') isTeamInactive = true;
       });
-    console.log($userData);
+
     if (subscription) {
       if (subscription.isActive) {
         // console.log('active');
@@ -189,30 +190,7 @@
     </div>
 
     {#if subscription.isActive === false && subscription.isAfter7Days}
-      <div class="flex flex-col text-white pt-24 pl-4 w-full gap-2">
-        <h1 class="text-lg border-b border-neutral-700 font-bold pb-2">
-          Your subscription has ended.
-        </h1>
-        <p>
-          Your membership has been expired since {new Date(
-            subscription?.subs_end_date
-          )
-            .toDateString()
-            .slice(4)}. <br /> Here are some options you can choose:
-        </p>
-        <button class="rounded-md bg-blue-600 p-3 text-left w-1/4"
-          >Renew membership</button
-        >
-        {#if member?.role?.role_name === 'superadmin'}
-          <button
-            class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
-            >Transfer everyone's card to basic</button
-          >
-        {/if}
-        <button class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
-          >Transfer only my card to basic</button
-        >
-      </div>
+      <SubscriptionEnd {subscription} {member} />
     {:else}
       <div
         class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
