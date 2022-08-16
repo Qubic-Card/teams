@@ -33,15 +33,6 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 5;
-  let minTime = new Date(
-    selectedDays === '7 Days'
-      ? last7Days[0]
-      : selectedDays === '14 Days'
-      ? last14Days[0]
-      : selectedDays === '30 Days'
-      ? last30Days[0]
-      : last3Days[0]
-  ).toUTCString();
 
   let logsChartData = {
     labels: [],
@@ -86,6 +77,16 @@
   const getConnectionsList = async () => {
     loading = true;
 
+    let minTime = new Date(
+      selectedDays === '7 Days'
+        ? last7Days[0]
+        : selectedDays === '14 Days'
+        ? last14Days[0]
+        : selectedDays === '30 Days'
+        ? last30Days[0]
+        : last3Days[0]
+    ).toUTCString();
+
     let {
       data: connection_profile,
       error: error_profile,
@@ -124,6 +125,16 @@
   const getWeeklyLogsChartActivity = async () => {
     loading = true;
 
+    let minTime = new Date(
+      selectedDays === '7 Days'
+        ? last7Days[0]
+        : selectedDays === '14 Days'
+        ? last14Days[0]
+        : selectedDays === '30 Days'
+        ? last30Days[0]
+        : last3Days[0]
+    ).toUTCString();
+
     let {
       data: logs,
       error,
@@ -159,11 +170,25 @@
       console.log(error);
       loading = false;
     }
+
+    console.log(
+      $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
+    );
   };
 
   const getWeeklyLogsActivity = async () => {
     const { from, to } = getPagination(page, toItem);
     loading = true;
+
+    let minTime = new Date(
+      selectedDays === '7 Days'
+        ? last7Days[0]
+        : selectedDays === '14 Days'
+        ? last14Days[0]
+        : selectedDays === '30 Days'
+        ? last30Days[0]
+        : last3Days[0]
+    ).toUTCString();
 
     let {
       data: logs,
