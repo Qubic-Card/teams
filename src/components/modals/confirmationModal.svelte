@@ -4,6 +4,7 @@
   import { createEventDispatcher } from 'svelte';
 
   export let text,
+    isTransfer,
     isDelete,
     isIconVisible,
     isDispatch,
@@ -30,7 +31,11 @@
 
 {#if showModal}
   <ModalWrapper
-    title={isDelete ? 'Delete connection' : 'Change role'}
+    title={isDelete
+      ? 'Delete connection'
+      : isTransfer
+      ? 'Transfer card'
+      : 'Change role'}
     {showModal}
     on:showModal={toggleModal}
     class="w-1/2"

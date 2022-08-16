@@ -81,22 +81,13 @@
 
   const deleteMemberHandler = async (id, memberData) => {
     isLoading = true;
-    const { error } = await supabase
-      .from('team_cardcon')
-      .delete()
-      .eq('team_member_id', id);
 
     const { error: error_member } = await supabase
       .from('team_members')
       .update({ uid: null }, { returning: 'minimal' })
       .eq('id', id);
 
-    if (error) {
-      console.log(error);
-      toastFailed();
-      isLoading = false;
-      return;
-    } else if (error_member) {
+    if (error_member) {
       console.log(error_member);
       toastFailed();
       isLoading = false;
