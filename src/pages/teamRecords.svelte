@@ -8,26 +8,23 @@
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
   import supabase from '@lib/db';
-  import { memberData, user } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getConnectionsRecords, getLogsRecords } from '@lib/query/getRecords';
   import { formatDate, last30Days, today } from '@lib/utils/getDates';
   import Spinner from '@comp/loading/spinner.svelte';
-  import { createEventDispatcher } from 'svelte';
   import sortBy from '@lib/utils/sortBy';
   import { personal, team } from '@lib/stores/recordsStore';
 
-  export let getTeamStorage;
+  export let holder, getAllStorage;
 
   let teamId = Cookies.get('qubicTeamId');
-  let fileName = formatDate(new Date());
+  let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
   let selectedType = 'Activities';
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
   let asc = false;
-  let holder = '';
-  const dispatch = createEventDispatcher();
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
@@ -54,21 +51,7 @@
     minDate: new Date(last30Days[0]),
   };
 
-  const getMemberData = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_profile->>firstname, team_profile->>lastname')
-      .eq('id', $memberData.id);
-
-    if (error) {
-      console.log(error);
-    } else {
-      holder = data[0]?.firstname + ' ' + data[0]?.lastname;
-    }
-  };
-
   const createTeamStorage = async (url) => {
-    await getMemberData();
     const { data, error } = await supabase.from('team_storage').insert(
       {
         tid: teamId,
@@ -138,13 +121,12 @@
             selectedType === 'Activities' ? 'activities' : 'connections'
           } created successfully`
         );
-        // await getRecordUrl();
-        await getTeamStorage();
         await createTeamStorage(data.Key);
+        await getAllStorage();
         isLoading = false;
       }
 
-      fileName = formatDate(new Date());
+      fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
       selectedType = 'Activities';
       toDateValue = new Date(today);
       fromDateValue = new Date(today);
@@ -155,6 +137,48 @@
     }
   };
 
+  const deleteHandler = async (record) => {
+    isLoading = true;
+    let noErr = false;
+
+    //delete from team records storage
+    const { error } = await supabase.storage
+      .from('records')
+      .remove([`${teamId}/${record.filename}`]);
+
+    //delete from personal records storage, if exists
+    const { error: personalRecordsError } = await supabase.storage
+      .from('records')
+      .remove([`${teamId}/${$user?.id}/${record.filename}`]);
+
+    //delete from team storage database
+    const { data, error: err } = await supabase
+      .from('team_storage')
+      .delete()
+      .eq('filename', record.filename);
+
+    if (err) {
+      toastFailed(err.message);
+      isLoading = false;
+    } else {
+      noErr = true;
+      isLoading = false;
+    }
+
+    if (error) {
+      toastFailed('Failed to delete record');
+      isLoading = false;
+    }
+
+    if (noErr && !error) {
+      toastSuccess(`${record.filename} deleted successfully`);
+      await getAllStorage();
+      $personal = $personal.filter((item) => item.id !== record.id);
+      $team = $team.filter((item) => item.id !== record.id);
+      isLoading = false;
+    }
+  };
+
   const sortHandler = async (col) => {
     if (col === 'name') col = 'filename';
     $team = $team.sort(
@@ -162,12 +186,6 @@
         return a.toUpperCase();
       })
     );
-  };
-
-  const deleteFromTable = async (id) => {
-    $team = $team.filter((item) => item.id !== id);
-    $personal = $personal.filter((item) => item.id !== id);
-    await getTeamStorage();
   };
 
   const selectTypeHandler = (e) => (selectedType = e.detail);
@@ -246,7 +264,13 @@
       {#if $team}
         {#if $team.length > 0}
           {#each $team as record, i}
-            <RecordsTableBody {record} {teamId} {deleteFromTable} isTeam />
+            <RecordsTableBody
+              {record}
+              {teamId}
+              {deleteHandler}
+              {isLoading}
+              isTeam
+            />
           {/each}
         {:else}
           <tr>

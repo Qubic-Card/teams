@@ -1,6 +1,6 @@
 <script>
   import Cookies from 'js-cookie';
-  import { user, userData } from '@lib/stores/userStore';
+  import { memberData, user, userData } from '@lib/stores/userStore';
   import {
     Tab,
     TabGroup,
@@ -19,6 +19,7 @@
     writeRecords: false,
   };
   let isTeamInactive = false;
+  let holder = '';
 
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
@@ -48,13 +49,23 @@
     }
   };
 
+  const getMemberData = async () => {
+    const { data, error } = await supabase
+      .from('team_members')
+      .select('team_profile->>firstname, team_profile->>lastname')
+      .eq('id', $memberData.id);
+
+    if (error) {
+      console.log(error);
+    } else {
+      holder = data[0]?.firstname + ' ' + data[0]?.lastname;
+    }
+  };
+
   const getAllStorage = async () => {
     await getPersonalStorage();
     await getTeamStorage();
   };
-
-  // DISPATCH, IF TRUE AKAN QUERY LAGI
-  // $: $team, getAllStorage();
 
   $: $userData?.filter((item) => {
     if (item === 'allow_write_records') permissions.writeRecords = true;
@@ -62,7 +73,7 @@
   });
 </script>
 
-{#await getAllStorage()}
+{#await (getAllStorage(), getMemberData())}
   <RecordsSkeleton {permissions} />
 {:then name}
   <div
@@ -92,16 +103,21 @@
         </TabList>
         <TabPanels class="h-full">
           <TabPanel class="flex h-full">
-            <PersonalRecords {getPersonalStorage} {isTeamInactive} />
+            <PersonalRecords {isTeamInactive} {holder} {getAllStorage} />
           </TabPanel>
           <TabPanel class="flex h-full">
-            <TeamRecords {getTeamStorage} {isTeamInactive} />
+            <TeamRecords {isTeamInactive} {holder} {getAllStorage} />
           </TabPanel>
         </TabPanels>
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords {getPersonalStorage} {isTeamInactive} />
+        <PersonalRecords
+          {getAllStorage}
+          {getPersonalStorage}
+          {isTeamInactive}
+          {holder}
+        />
       </div>
     {/if}
   </div>
