@@ -4,53 +4,12 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { personal, team } from '@lib/stores/recordsStore';
 
-  export let record, teamId, deleteFromTable, isTeam;
+  export let record, teamId, isTeam, deleteHandler, isLoading;
   export let isTeamInactive = false;
   let showDeleteModal = false;
-  let isLoading = false;
 
   const deleteModalHandler = () => (showDeleteModal = !showDeleteModal);
-
-  const deleteCsv = async () => {
-    isLoading = true;
-    let noErr = false;
-
-    const { error } = await supabase.storage
-      .from('records')
-      .remove(
-        record.storage_url
-          ? [`${teamId}/${record.name ? record.name : record.filename}`]
-          : [
-              `${teamId}/${$user?.id}/${
-                record.name ? record.name : record.filename
-              }`,
-            ]
-      );
-
-    const { data, error: err } = await supabase
-      .from('team_storage')
-      .delete()
-      .eq('filename', record.storage_url ? record.filename : record.name);
-    if (err) {
-      toastFailed(err.message);
-    } else {
-      noErr = true;
-    }
-
-    if (error) {
-      toastFailed('Failed to delete record');
-      isLoading = false;
-    }
-
-    if (record.storage_url ? noErr && !error : !error) {
-      toastSuccess(`${record.name} deleted successfully`);
-      $personal = $personal.filter((item) => item.id !== record.id);
-      $team = $team.filter((item) => item.id !== record.id);
-      isLoading = false;
-    }
-  };
 
   const downloadCsv = async (filename) => {
     const { signedURL, error } = await supabase.storage
@@ -87,14 +46,6 @@
         .catch((err) => toastFailed());
     }
   };
-  // $: console.log(
-  //   record.storage_url
-  //     ? console.log('qq', record.filename)
-  //     : record.profileData?.firstname ?? record?.name
-  // );
-  $: console.log(record.filename);
-  // DELETE HANDLER DARI TEAM RECORDS ATAU PERSONAL RECORDS JANGAN DARI TABLE INI
-  // $: console.log(record.profileData?.firstname ?? record?.name);
 </script>
 
 <tr
@@ -147,8 +98,7 @@
         showModal={showDeleteModal}
         toggleModal={deleteModalHandler}
         on:action={async () => {
-          await deleteCsv();
-          deleteFromTable(record.id);
+          await deleteHandler(record);
           deleteModalHandler();
         }}
       />
