@@ -53,7 +53,8 @@
     await getTeamStorage();
   };
 
-  $: $team, getAllStorage();
+  // DISPATCH, IF TRUE AKAN QUERY LAGI
+  // $: $team, getAllStorage();
 
   $: $userData?.filter((item) => {
     if (item === 'allow_write_records') permissions.writeRecords = true;

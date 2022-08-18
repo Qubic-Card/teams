@@ -170,10 +170,6 @@
       console.log(error);
       loading = false;
     }
-
-    console.log(
-      $userChangeTimestamp > minTime ? $userChangeTimestamp : minTime
-    );
   };
 
   const getWeeklyLogsActivity = async () => {

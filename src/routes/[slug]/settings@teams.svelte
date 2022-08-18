@@ -42,7 +42,7 @@
 
   const clicked = (e) => (isClicked = e.detail);
 
-  $: if ($userData?.length > 0)
+  $: if ($userData)
     $userData?.filter((item) => {
       if (item === 'allow_read_billing') permissions.readBilling = true;
       if (item === 'allow_write_billing') permissions.writeBilling = true;
