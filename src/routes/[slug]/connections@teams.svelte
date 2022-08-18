@@ -3,7 +3,6 @@
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import ConnectionTableBody from '@comp/tables/connectionTableBody.svelte';
   import { memberData, userData } from '@lib/stores/userStore';
-  import Cookies from 'js-cookie';
   import {
     connectionsTable,
     connectionsTableMobile,
@@ -12,8 +11,8 @@
   import Search from '@comp/search.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { teamId } from '@lib/stores/profileData';
 
-  let teamId = Cookies.get('qubicTeamId');
   let innerWidth;
   let asc = false;
   let searchQuery = '';
@@ -46,7 +45,7 @@
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*), team_id(*)')
-      .eq('team_id', teamId)
+      .eq('team_id', $teamId)
       .order('dateConnected', { ascending: false });
 
     if (error) console.log(error);
@@ -56,7 +55,7 @@
   const getUserConnectionsList = async () => {
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(*)')
+      .select('*, by(team_profile->>firstname, team_profile->>lastname)')
       .eq('by', $memberData?.id)
       .order('dateConnected', { ascending: false });
 
@@ -72,7 +71,7 @@
     let column;
 
     tabs === 'all'
-      ? (id = permissions.readConnection ? teamId : $memberData?.id)
+      ? (id = permissions.readConnection ? $teamId : $memberData?.id)
       : (id = $memberData?.id);
 
     tabs === 'all'
@@ -101,7 +100,7 @@
     const { data, error } = await supabase
       .from('team_connection_acc')
       .select('*, by(*)')
-      .eq('team_id', teamId)
+      .eq('team_id', $teamId)
       .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 

@@ -6,10 +6,11 @@
   import Cookies from 'js-cookie';
   import Billing from '@pages/settings/billing.svelte';
   import Role from '@pages/settings/role.svelte';
+  import { teamId } from '@lib/stores/profileData';
 
   let roles = [];
   let isClicked = true;
-  let teamId = Cookies.get('qubicTeamId');
+
   let permissions = {
     readBilling: false,
     writeBilling: false,
@@ -25,7 +26,7 @@
       const { data, error } = await supabase
         .from('team_roles')
         .select('*, team_id(*)')
-        .eq('team_id', teamId)
+        .eq('team_id', $teamId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;

@@ -16,7 +16,7 @@
 
   import { teamSocials, teamLinks } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
-  import { user, userData } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -31,9 +31,8 @@
     Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import toNewTab from '@lib/utils/newTab';
-  import Cookies from 'js-cookie';
   import { theme } from '@lib/profileTheme';
-  import { teamData } from '@lib/stores/profileData';
+  import { teamData, teamId } from '@lib/stores/profileData';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import {
     handleDeleteLink,
@@ -58,7 +57,6 @@
 
   export let permissions, isTeamInactive;
 
-  let teamId = Cookies.get('qubicTeamId');
   let pond;
   let brochurePond;
   let name = 'filepond';
@@ -144,7 +142,6 @@
   };
 
   const handleSave = async () => {
-    // let teamId = await getTeamId($user?.id);
     $teamData.socials = $teamSocials;
     $teamData.links = $teamLinks;
     const { error } = await supabase
@@ -153,7 +150,7 @@
         { metadata: $teamData, nickname: teamNickname },
         { returning: 'minimal' }
       )
-      .eq('id', teamId);
+      .eq('id', $teamId);
 
     if (error) {
       toastFailed();
@@ -164,11 +161,10 @@
   };
 
   const getTeamsDetail = async () => {
-    // let teamId = await getTeamId($user?.id);
     const { data, error } = await supabase
       .from('teams')
       .select('*')
-      .eq('id', teamId);
+      .eq('id', $teamId);
 
     if (error) console.log(error);
 
@@ -178,7 +174,7 @@
       teamNickname = data[0].nickname;
       $teamSocials = team['socials'];
       $teamLinks = team['links'];
-      // teamId = team['id'];
+      // $teamId = team['id'];
       $teamSocials.map((social) => {
         if (social.type === 'phone') $teamData.phone = social.data;
         if (social.type === 'email') $teamData.email = social.data;

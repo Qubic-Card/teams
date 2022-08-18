@@ -8,10 +8,10 @@
   import Checkboxes from '@comp/checkbox.svelte';
   import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import { teamRoles } from '@lib/stores/roleStore';
+  import { teamId } from '@lib/stores/profileData';
 
   export let permissions;
 
-  let teamId = Cookies.get('qubicTeamId');
   let roleName = '';
   let showModal = false;
   let loading = false;
@@ -34,9 +34,9 @@
         .insert({
           role_maps: checkedRole,
           role_name: roleName,
-          team_id: teamId,
+          team_id: $teamId,
         })
-        .eq('id', teamId);
+        .eq('id', $teamId);
 
       if (error) {
         loading = false;

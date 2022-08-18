@@ -5,6 +5,7 @@
   import { fade, fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
   import SelectTeamsSkeleton from '@comp/skeleton/selectTeamsSkeleton.svelte';
+  import { teamId } from '@lib/stores/profileData';
   // import AddTeamModal from '@comp/modals/addTeamModal.svelte';
 
   let teams = [];
@@ -23,10 +24,11 @@
     }
   };
 
-  const chooseTeam = (teamId) => {
-    Cookies.set('qubicTeamId', teamId);
+  const chooseTeam = (tid) => {
+    $teamId = tid;
+    // Cookies.set('qubicTeamId', teamId);
     // Cookies.set('qubicTeamStartDate', startDate)
-    goto(`/${teamId}/dashboard`);
+    goto(`/${tid}/dashboard`);
   };
 </script>
 

@@ -35,7 +35,6 @@
     let profileId = await getProfileId($user?.id);
 
     try {
-      // let teamId = await getTeamId($user?.id);
       const { data: team, error: teamError } = await supabase
         .from('teams')
         .insert({

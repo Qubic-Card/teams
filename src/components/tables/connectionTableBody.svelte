@@ -24,7 +24,7 @@
     class="font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1"
   >
     {connection?.profileData?.firstname ?? '-'}
-    {connection?.profileData?.lastname ?? '-'}
+    {connection?.profileData?.lastname ?? ''}
   </td>
 
   {#if innerWidth > 640}
@@ -39,8 +39,8 @@
   </td>
 
   <td class="flex-1 truncate pl-4 pr-4">
-    {connection?.by?.team_profile?.firstname ?? '-'}
-    {connection?.by?.team_profile?.lastname ?? '-'}
+    {connection?.by?.firstname ?? '-'}
+    {connection?.by?.lastname ?? '-'}
   </td>
   <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">
     {#if permissions.will_expire === false}

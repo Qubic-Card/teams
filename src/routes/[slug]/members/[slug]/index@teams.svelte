@@ -10,10 +10,9 @@
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import { page } from '$app/stores';
-  import Cookies from 'js-cookie';
   import TeamEditor from '@pages/teamEditor.svelte';
   import PersonalEditor from '@pages/personalEditor.svelte';
-  import { profileData, teamData } from '@lib/stores/profileData';
+  import { profileData, teamData, teamId } from '@lib/stores/profileData';
   import { selectedTab } from '@lib/stores/selectedTab';
 
   let permissions = {
@@ -51,8 +50,6 @@
     if (item === 'will_expired') permissions.will_expire = true;
   });
 
-  let teamId = Cookies.get('qubicTeamId');
-
   let profileId = null;
 
   let companyNickname;
@@ -61,7 +58,7 @@
     const { data, error } = await supabase
       .from('teams')
       .select('*')
-      .eq('id', teamId);
+      .eq('id', $teamId);
 
     if (error) console.log(error);
     if (data) {
@@ -79,7 +76,7 @@
       .from('team_members')
       .select('team_profile, uid, team_id')
       .eq('uid', $page.params.slug)
-      .eq('team_id', teamId);
+      .eq('team_id', $teamId);
 
     if (data) {
       const profile = data[0]['team_profile'];
@@ -167,7 +164,7 @@
             isEditorMode={true}
             data={$profileData}
             id={profileId}
-            {teamId}
+            {$teamId}
             {companyNickname}
           />
         </div>

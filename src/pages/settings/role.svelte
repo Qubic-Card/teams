@@ -17,12 +17,12 @@
   import Cookies from 'js-cookie';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { defaultRole } from '@lib/constants';
+  import { teamId } from '@lib/stores/profileData';
 
   export let permissions;
   let roleMaps = [];
   let isClicked = true;
   let loading = false;
-  let teamId = Cookies.get('qubicTeamId');
   let roleId = null;
   let roleName = '';
   let isLoading = false;
@@ -171,7 +171,7 @@
                     class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
                     on:click={async () => {
                       await updateTeamsRoleMapping(role.id);
-                      roleMaps = await getRoleMapsByProfile($user?.id, teamId);
+                      roleMaps = await getRoleMapsByProfile($user?.id, $teamId);
                       setUserData(roleMaps?.role?.role_maps);
                     }}
                     disabled={isClicked}

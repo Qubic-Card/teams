@@ -20,6 +20,7 @@
   import { doughnutChartBgColor, socialIcons } from '@lib/constants';
   import TeamAnalytics from '@pages/teamAnalytics.svelte';
   import TeamAnalyticsCardSkeleton from '@comp/skeleton/teamAnalyticsCardSkeleton.svelte';
+  import { teamId } from '@lib/stores/profileData';
 
   let teamLogs = [];
   let loading = true;
@@ -83,7 +84,6 @@
   let currentConnectionCount = 0;
   let previousTeamLogsCount = 0;
   let currentTeamLogsCount = 0;
-  let teamId = Cookies.get('qubicTeamId');
   let selectedDays = '3 Days';
 
   const selectDaysHandler = (e) => {
@@ -128,7 +128,7 @@
     } = await supabase
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
-      .eq('team_id', teamId)
+      .eq('team_id', $teamId)
       .gte(
         'dateConnected',
         new Date(
@@ -157,7 +157,7 @@
       let { error, count } = await supabase
         .from('team_logs')
         .select('created_at', { count: 'estimated' })
-        .eq('team', teamId)
+        .eq('team', $teamId)
         .gte(
           'created_at',
           new Date(
@@ -190,7 +190,7 @@
     } = await supabase
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
-      .eq('team_id', teamId)
+      .eq('team_id', $teamId)
       .gte(
         'dateConnected',
         new Date(
@@ -230,7 +230,7 @@
           'created_at, data->card, data->message, data->link, type, team, team_member(team_profile->firstname, team_profile->lastname)',
           { count: 'estimated' }
         )
-        .eq('team', teamId)
+        .eq('team', $teamId)
         .gte(
           'created_at',
           new Date(
@@ -306,7 +306,7 @@
           'created_at, data->card, data->message, data->link, type, team, team_member(team_profile->firstname, team_profile->lastname)',
           { count: 'estimated' }
         )
-        .eq('team', teamId)
+        .eq('team', $teamId)
         .gte(
           'created_at',
           new Date(
