@@ -34,14 +34,12 @@
         </div>
       </div>
       <p>
-        Subscription valid hingga: {new Date(
-          convertToGMT7(team?.subscription_end_date)
-        )
+        Subscription valid hingga: {convertToGMT7(team?.subscription_end_date)
           .toDateString()
           .slice(4)}
       </p>
       <p>
-        Jumlah member: {team.member_count}
+        Jumlah member: {team?.member_count}
       </p>
       <!-- <div
         class="flex justify-between items-center p-3 rounded mt-4 bg-neutral-900"

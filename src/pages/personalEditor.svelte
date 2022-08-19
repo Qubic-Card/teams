@@ -61,7 +61,6 @@
 
   let pond;
   let name = 'filepond';
-  let teamIdCookies = Cookies.get('qubicTeamId');
 
   let isOpen = false;
   let croppedImage = '';
@@ -162,7 +161,6 @@
   $: query, getUnsplash();
 
   const handleSave = async () => {
-    // let teamId = await getTeamId($user?.id);
     $profileData.socials = $socials;
     $profileData.links = $links;
     const { error } = await supabase

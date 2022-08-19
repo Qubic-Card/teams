@@ -9,8 +9,8 @@
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
+  import { teamId } from '@lib/stores/profileData';
 
-  let teamId = Cookies.get('qubicTeamId');
   let permissions = {
     readMembers: false,
     writeMembers: false,
@@ -62,8 +62,9 @@
     const { from, to } = getPagination(page, toItem);
     const { data, error, count } = await supabase
       .from('business_cards')
-      .select('id, type, color, team_id')
-      .eq('team_id', teamId)
+      .select('id, type, color, team_id, mode')
+      .eq('team_id', $teamId)
+      .eq('mode', 'team')
       .order('created_at', { ascending: true })
       .range(from, to);
 
@@ -119,7 +120,7 @@
 
   $: allMember = [...activeMembers, ...inactiveCards];
 
-  onMount(async () => (roles = await getAllRoleByTeam(teamId)));
+  onMount(async () => (roles = await getAllRoleByTeam($teamId)));
 </script>
 
 <svelte:window bind:innerWidth />

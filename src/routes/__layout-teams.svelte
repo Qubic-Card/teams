@@ -16,12 +16,12 @@
   import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
   import supabase from '@lib/db';
   import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
+  import { teamId } from '@lib/stores/profileData';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
   let team = null;
   let member = [];
-  let teamId = Cookies.get('qubicTeamId');
   let subscription = {};
   let loading = true;
   let permissions = {
@@ -36,7 +36,7 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        teamId: teamId,
+        teamId: $teamId,
       }),
     });
     if (error) console.log(error);
@@ -45,9 +45,9 @@
 
   onMount(async () => {
     await getSubscriptionsData();
-    member = await getRoleMapsByProfile($user?.id, teamId);
-    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
-    team = await getTeamData(teamId);
+    member = await getRoleMapsByProfile($user?.id, $teamId);
+    userChangeTimestamp.set(await getUserChangeTs($user?.id, $teamId));
+    team = await getTeamData($teamId);
 
     sevenDaysAfterEndDate = new Date(
       new Date(subscription?.subs_end_date).setDate(
@@ -65,6 +65,10 @@
   };
 
   $: {
+    if ($page.routeId === '[slug]/members/[slug]@teams') {
+      $teamId = $page.url.pathname.split('/')[1];
+    } else $teamId = $page.params.slug;
+
     $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
   }
@@ -190,7 +194,7 @@
     </div>
 
     {#if subscription.isActive === false && subscription.isAfter7Days}
-      <SubscriptionEnd {subscription} {member} {teamId} />
+      <SubscriptionEnd {subscription} {member} teamId={$teamId} />
     {:else}
       <div
         class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${

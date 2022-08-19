@@ -3,17 +3,17 @@
   import { onMount } from 'svelte';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
-  import { setUserData, user, userChangeTimestamp } from '@lib/stores/userStore';
+  import {
+    setUserData,
+    user,
+    userChangeTimestamp,
+  } from '@lib/stores/userStore';
   import '../app.css';
+  import { teamId } from '@lib/stores/profileData';
 
-  let teamId = Cookies.get('qubicTeamId');
-
-  onMount(
-    async () => {
-      setUserData(await getRoleMapsByProfile($user?.id, teamId));
-    }
-  );
-  
+  onMount(async () => {
+    setUserData(await getRoleMapsByProfile($user?.id, $teamId));
+  });
 </script>
 
 <svelte:head>

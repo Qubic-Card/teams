@@ -15,10 +15,10 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import sortBy from '@lib/utils/sortBy';
   import { personal, team } from '@lib/stores/recordsStore';
+  import { teamId } from '@lib/stores/profileData';
 
   export let holder, getAllStorage;
 
-  let teamId = Cookies.get('qubicTeamId');
   let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
   let selectedType = 'Activities';
   let fromDateValue = new Date();
@@ -54,7 +54,7 @@
   const createTeamStorage = async (url) => {
     const { data, error } = await supabase.from('team_storage').insert(
       {
-        tid: teamId,
+        tid: $teamId,
         by: holder,
         type: selectedType,
         storage_url: url,
@@ -75,14 +75,14 @@
     if (selectedType === 'Activities') {
       logsCsv = await getLogsRecords(
         'team',
-        teamId,
+        $teamId,
         fromDateValue,
         toDateValue
       );
     } else {
       connectionsCsv = await getConnectionsRecords(
         'team_id',
-        teamId,
+        $teamId,
         fromDateValue,
         toDateValue
       );
@@ -93,7 +93,7 @@
       const { data, error } = await supabase.storage
         .from('records')
         .upload(
-          `${teamId}/${fileName}-${
+          `${$teamId}/${fileName}-${
             selectedType === 'Activities' ? 'activities' : 'connections'
           }`,
           selectedType === 'Activities' ? logsCsv : connectionsCsv,
@@ -144,12 +144,12 @@
     //delete from team records storage
     const { error } = await supabase.storage
       .from('records')
-      .remove([`${teamId}/${record.filename}`]);
+      .remove([`${$teamId}/${record.filename}`]);
 
     //delete from personal records storage, if exists
     const { error: personalRecordsError } = await supabase.storage
       .from('records')
-      .remove([`${teamId}/${$user?.id}/${record.filename}`]);
+      .remove([`${$teamId}/${$user?.id}/${record.filename}`]);
 
     //delete from team storage database
     const { data, error: err } = await supabase
@@ -266,7 +266,7 @@
           {#each $team as record, i}
             <RecordsTableBody
               {record}
-              {teamId}
+              teamId={$teamId}
               {deleteHandler}
               {isLoading}
               isTeam

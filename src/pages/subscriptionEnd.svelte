@@ -15,25 +15,70 @@
   let isLoading = false;
   let showModal = false;
 
-  const uniqueByKeepFirst = (a, key) => {
-    let seen = new Set();
-    return a?.filter((item) => {
-      let k = key(item);
-      return seen.has(k) ? false : seen.add(k);
-    });
-  };
   const toggleModal = () => (showModal = !showModal);
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = async () => await supabase.auth.signOut();
+  const toWhatsApp = () =>
+    window.open('https://wa.me/628113087599', '_blank').focus();
+  let teamMembersProfile = null;
+  // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9
+  // eac9c236-da25-4d9c-a058-632bd92bc951
+
+  const createCardConnection = async (member) => {
+    const { data, error } = await supabase.from('card_connection').insert(
+      {
+        uid: member.team_member_id.uid,
+        card_id: member.card_id,
+      },
+      { returning: 'minimal' }
+    );
+
+    if (error) console.log(error);
   };
 
-  let teamMembersProfile = null;
+  const deleteCardConnection = async (userCardId) => {
+    const { data, error } = await supabase
+      .from('card_connection')
+      .delete()
+      .eq('card_id', userCardId);
+
+    if (error) console.log(error);
+  };
+
+  const cardConnectionHandler = async () => {
+    if (teamMembersProfile) {
+      teamMembersProfile.forEach(async (member) => {
+        const { data, error } = await supabase
+          .from('card_connection')
+          .select('card_id, uid')
+          .eq('card_id', member.card_id);
+
+        data.filter(async (user) => {
+          if (
+            user.card_id === member.card_id &&
+            user.uid !== member.team_member_id.uid
+          ) {
+            await deleteCardConnection(user.card_id);
+            await createCardConnection(member);
+          } else if (
+            user.card_id === member.card_id &&
+            user.uid === member.team_member_id.uid
+          ) {
+            return;
+          } else {
+            await createCardConnection(member);
+          }
+        });
+      });
+    }
+  };
 
   const getMemberData = async () => {
     const { data, error } = await supabase
       .from('business_cards')
       .select('id')
-      .match({ team_id: teamId });
+      .eq('mode', 'team')
+      .eq('team_id', teamId);
+    // .match({ team_id: teamId });
 
     if (error) console.log(error);
 
@@ -51,64 +96,11 @@
     }
   };
 
-  const updateBasicProfile = async () => {
-    if (teamMembersProfile) {
-      teamMembersProfile.forEach(async (member) => {
-        const { data, error } = await supabase
-          .from('profile')
-          .update(
-            {
-              uid: member.team_member_id.uid,
-              metadata: {
-                avatar: member?.team_member_id?.team_profile?.avatar,
-                address: member?.team_member_id?.team_profile?.address,
-                company: member?.team_member_id?.team_profile?.company,
-                design: member?.team_member_id?.team_profile?.design,
-                firstname: member?.team_member_id?.team_profile?.firstname,
-                lastname: member?.team_member_id?.team_profile?.lastname,
-                job: member?.team_member_id?.team_profile?.job,
-                isShowMetaImage:
-                  member?.team_member_id?.team_profile?.isShowMetaImage,
-                socials: uniqueByKeepFirst(
-                  member?.team_member_id?.team_profile?.socials,
-                  (social) => social.type
-                ),
-                links: member?.team_member_id?.team_profile?.links,
-              },
-            },
-            { returning: 'minimal' }
-          )
-          .in(
-            'uid',
-            teamMembersProfile.map((item) => item.team_member_id.uid)
-          );
-
-        if (error) console.log(error);
-      });
-    }
-  };
-
-  const createCardConnection = async () => {
-    if (teamMembersProfile) {
-      teamMembersProfile.forEach(async (member) => {
-        const { data, error } = await supabase.from('card_connection').insert(
-          {
-            uid: member.team_member_id.uid,
-            card_id: member.card_id,
-          },
-          { returning: 'minimal' }
-        );
-
-        if (error) console.log(error);
-      });
-    }
-  };
-
-  const setNullTeamId = async () => {
+  const changeCardMode = async () => {
     const { data, error } = await supabase
       .from('business_cards')
       .update({
-        team_id: null,
+        mode: 'basic',
       })
       .match({ team_id: teamId });
 
@@ -145,10 +137,9 @@
   const transferBulkCardHandler = async () => {
     isLoading = true;
     await setNullTeamMemberUid();
-    await setNullTeamId();
+    await changeCardMode();
     await setFalseTeamCardCon();
-    await createCardConnection();
-    await updateBasicProfile();
+    await cardConnectionHandler();
     isLoading = false;
   };
 
@@ -188,8 +179,9 @@
     </span>
   </p>
   {#if member?.role?.role_name === 'superadmin'}
-    <button class="rounded-md bg-blue-600 p-3 text-left w-1/4"
-      >Renew membership</button
+    <button
+      class="rounded-md bg-blue-600 p-3 text-left w-1/4"
+      on:click={toWhatsApp}>Renew membership</button
     >
     <button
       on:click={toggleModal}
