@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { slide, fly } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';

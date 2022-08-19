@@ -1,5 +1,4 @@
 <script>
-  import Cookies from 'js-cookie';
   import Input from '@comp/input.svelte';
   import { recordsTable } from '@lib/constants';
   import RecordsTableBody from '@comp/tables/recordsTableBody.svelte';
@@ -15,10 +14,12 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import sortBy from '@lib/utils/sortBy';
   import { personal, team } from '@lib/stores/recordsStore';
-  import { teamId } from '@lib/stores/profileData';
+
+  import { getContext } from 'svelte';
 
   export let isTeamInactive, holder, getAllStorage;
 
+  const teamId = getContext('teamId');
   let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
   let selectedType = 'Activities';
   let fromDateValue = new Date();
@@ -53,7 +54,7 @@
 
   const createTeamStorage = async (url) => {
     const { data, error } = await supabase.from('team_storage').insert({
-      tid: $teamId,
+      tid: teamId,
       by: holder,
       type: selectedType,
       storage_url: url,
@@ -91,7 +92,7 @@
       const { data, error } = await supabase.storage
         .from('records')
         .upload(
-          `${$teamId}/${$user?.id}/${fileName}-${
+          `${teamId}/${$user?.id}/${fileName}-${
             selectedType === 'Activities' ? 'activities' : 'connections'
           }`,
           selectedType === 'Activities' ? logsCsv : connectionsCsv,
@@ -143,12 +144,12 @@
     //delete from team records storage, if exists
     const { error } = await supabase.storage
       .from('records')
-      .remove([`${$teamId}/${record.name}`]);
+      .remove([`${teamId}/${record.name}`]);
 
     // delete from personal records storage
     const { error: personalRecordsError } = await supabase.storage
       .from('records')
-      .remove([`${$teamId}/${$user?.id}/${record.name}`]);
+      .remove([`${teamId}/${$user?.id}/${record.name}`]);
 
     //delete from team storage database
     const { data, error: err } = await supabase
@@ -293,7 +294,7 @@
           {#each $personal as record, i}
             <RecordsTableBody
               {record}
-              teamId={$teamId}
+              {teamId}
               {isTeamInactive}
               {deleteHandler}
               {isLoading}

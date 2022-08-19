@@ -6,8 +6,9 @@
   import Cookies from 'js-cookie';
   import Billing from '@pages/settings/billing.svelte';
   import Role from '@pages/settings/role.svelte';
-  import { teamId } from '@lib/stores/profileData';
+  import { getContext } from 'svelte';
 
+  const teamId = getContext('teamId');
   let roles = [];
   let isClicked = true;
 
@@ -26,7 +27,7 @@
       const { data, error } = await supabase
         .from('team_roles')
         .select('*, team_id(*)')
-        .eq('team_id', $teamId)
+        .eq('team_id', teamId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;

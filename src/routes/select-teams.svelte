@@ -1,12 +1,9 @@
 <script>
-  import Cookies from 'js-cookie';
   import { goto } from '$app/navigation';
   import supabase from '@lib/db';
   import { fade, fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
   import SelectTeamsSkeleton from '@comp/skeleton/selectTeamsSkeleton.svelte';
-  import { teamId } from '@lib/stores/profileData';
-  // import AddTeamModal from '@comp/modals/addTeamModal.svelte';
 
   let teams = [];
 
@@ -24,12 +21,7 @@
     }
   };
 
-  const chooseTeam = (tid) => {
-    $teamId = tid;
-    // Cookies.set('qubicTeamId', teamId);
-    // Cookies.set('qubicTeamStartDate', startDate)
-    goto(`/${tid}/dashboard`);
-  };
+  const chooseTeam = (tid) => goto(`/${tid}/dashboard`);
 </script>
 
 <section class="text-white">

@@ -12,8 +12,9 @@
   import { page } from '$app/stores';
   import TeamEditor from '@pages/teamEditor.svelte';
   import PersonalEditor from '@pages/personalEditor.svelte';
-  import { profileData, teamData, teamId } from '@lib/stores/profileData';
+  import { profileData, teamData } from '@lib/stores/profileData';
   import { selectedTab } from '@lib/stores/selectedTab';
+  import { getContext } from 'svelte';
 
   let permissions = {
     writeProfile: false,
@@ -22,7 +23,7 @@
     ReadTeam: false,
     will_expire: false,
   };
-
+  const teamId = getContext('teamId');
   let isCheckRoleDone = false;
   let isTeamInactive = false;
 
@@ -58,7 +59,7 @@
     const { data, error } = await supabase
       .from('teams')
       .select('*')
-      .eq('id', $teamId);
+      .eq('id', teamId);
 
     if (error) console.log(error);
     if (data) {
@@ -76,7 +77,7 @@
       .from('team_members')
       .select('team_profile, uid, team_id')
       .eq('uid', $page.params.slug)
-      .eq('team_id', $teamId);
+      .eq('team_id', teamId);
 
     if (data) {
       const profile = data[0]['team_profile'];
@@ -164,7 +165,7 @@
             isEditorMode={true}
             data={$profileData}
             id={profileId}
-            {$teamId}
+            {teamId}
             {companyNickname}
           />
         </div>

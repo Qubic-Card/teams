@@ -4,24 +4,18 @@
   import { toastSuccess } from '@lib/utils/toast';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  // 39ba7789-537c-4b0f-a8a7-c8a8345838f3 uid
-  // 76900f13-9d11-424a-b111-71b1f2cd6def team
-  // b9069595-2a92-487a-8756-2ab437c29758
 
-  // eac9c236-da25-4d9c-a058-632bd92bc951 ----------------id 2
-  // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9 ----------------id 41
   export let subscription, member, teamId;
 
   let isLoading = false;
   let showModal = false;
+  let teamMembersProfile = null;
+  let isSuccess = false;
 
   const toggleModal = () => (showModal = !showModal);
   const handleLogout = async () => await supabase.auth.signOut();
   const toWhatsApp = () =>
     window.open('https://wa.me/628113087599', '_blank').focus();
-  let teamMembersProfile = null;
-  // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9
-  // eac9c236-da25-4d9c-a058-632bd92bc951
 
   const createCardConnection = async (member) => {
     const { data, error } = await supabase.from('card_connection').insert(
@@ -52,22 +46,28 @@
           .select('card_id, uid')
           .eq('card_id', member.card_id);
 
-        data.filter(async (user) => {
-          if (
-            user.card_id === member.card_id &&
-            user.uid !== member.team_member_id.uid
-          ) {
-            await deleteCardConnection(user.card_id);
-            await createCardConnection(member);
-          } else if (
-            user.card_id === member.card_id &&
-            user.uid === member.team_member_id.uid
-          ) {
-            return;
-          } else {
-            await createCardConnection(member);
-          }
-        });
+        let neverActivatedMemberBasic;
+        let alreadyActivatedMemberBasic;
+
+        data.length > 0
+          ? (alreadyActivatedMemberBasic = data)
+          : (neverActivatedMemberBasic = member);
+
+        if (alreadyActivatedMemberBasic) {
+          alreadyActivatedMemberBasic.filter(async (user) => {
+            if (
+              user.card_id === member.card_id &&
+              user.uid !== member.team_member_id.uid
+            ) {
+              await deleteCardConnection(user.card_id);
+              await createCardConnection(member);
+            }
+          });
+        }
+
+        if (neverActivatedMemberBasic) {
+          await createCardConnection(neverActivatedMemberBasic);
+        }
       });
     }
   };
@@ -140,7 +140,9 @@
     await changeCardMode();
     await setFalseTeamCardCon();
     await cardConnectionHandler();
-    isLoading = false;
+    toastSuccess('All cards transferred to basic');
+    setTimeout(() => (isLoading = false), 4000);
+    setInterval(() => (isSuccess = true), 3000);
   };
 
   onMount(async () => await getMemberData());
@@ -157,15 +159,14 @@
   {toggleModal}
   on:action={async () => {
     await transferBulkCardHandler();
-    await handleLogout();
-    toastSuccess('All cards transferred to basic');
+    setTimeout(async () => await handleLogout(), 4000);
     showModal = false;
   }}
 />
 
 <div
   class="flex flex-col text-white pt-24 pl-4 w-full gap-2 text-sm"
-  in:fade|local
+  transition:fade|local
 >
   <h1 class="text-lg border-b border-neutral-700 font-bold pb-2">
     Your subscription has ended.
@@ -179,14 +180,21 @@
     </span>
   </p>
   {#if member?.role?.role_name === 'superadmin'}
-    <button
-      class="rounded-md bg-blue-600 p-3 text-left w-1/4"
-      on:click={toWhatsApp}>Renew membership</button
-    >
-    <button
-      on:click={toggleModal}
-      class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
-      >Transfer everyone's card to basic</button
-    >
+    {#if isLoading}
+      <h1 in:fade|local>Transfer to basic...</h1>
+      {#if isSuccess}
+        <h1 class="text-xl font-extrabold uppercase" in:fade|local>Success!</h1>
+      {/if}
+    {:else}
+      <button
+        class="rounded-md bg-blue-600 p-3 text-left w-1/4"
+        on:click={toWhatsApp}>Renew membership</button
+      >
+      <button
+        on:click={toggleModal}
+        class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
+        >Transfer everyone's card to basic</button
+      >
+    {/if}
   {/if}
 </div>

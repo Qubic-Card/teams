@@ -13,7 +13,7 @@
   import supabase from '@lib/db';
   import RecordsSkeleton from '@comp/skeleton/recordsSkeleton.svelte';
   import { personal, team } from '@lib/stores/recordsStore';
-  import { teamId } from '@lib/stores/profileData';
+  import { getContext } from 'svelte';
 
   let permissions = {
     writeRecords: false,
@@ -21,10 +21,12 @@
   let isTeamInactive = false;
   let holder = '';
 
+  const teamId = getContext('teamId');
+
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
       .from('records')
-      .list(`${$teamId}/${$user?.id}`, {
+      .list(`${teamId}/${$user?.id}`, {
         sortBy: { column: 'created_at', order: 'desc' },
       });
 
@@ -39,7 +41,7 @@
     const { data, error } = await supabase
       .from('team_storage')
       .select('*')
-      .eq('tid', $teamId)
+      .eq('tid', teamId)
       .order('created_at', { ascending: false });
 
     if (error) {

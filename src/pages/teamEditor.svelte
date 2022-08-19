@@ -32,7 +32,7 @@
   } from '@rgossiaux/svelte-headlessui';
   import toNewTab from '@lib/utils/newTab';
   import { theme } from '@lib/profileTheme';
-  import { teamData, teamId } from '@lib/stores/profileData';
+  import { teamData } from '@lib/stores/profileData';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import {
     handleDeleteLink,
@@ -44,6 +44,7 @@
   import getCroppedImg from '@lib/utils/canvas';
   import Cropper from 'svelte-easy-crop';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
+  import { getContext } from 'svelte';
 
   // Register the plugins
   registerPlugin(
@@ -56,6 +57,8 @@
   );
 
   export let permissions, isTeamInactive;
+
+  const teamId = getContext('teamId');
 
   let pond;
   let brochurePond;
@@ -150,7 +153,7 @@
         { metadata: $teamData, nickname: teamNickname },
         { returning: 'minimal' }
       )
-      .eq('id', $teamId);
+      .eq('id', teamId);
 
     if (error) {
       toastFailed();
@@ -164,7 +167,7 @@
     const { data, error } = await supabase
       .from('teams')
       .select('*')
-      .eq('id', $teamId);
+      .eq('id', teamId);
 
     if (error) console.log(error);
 
@@ -174,7 +177,7 @@
       teamNickname = data[0].nickname;
       $teamSocials = team['socials'];
       $teamLinks = team['links'];
-      // $teamId = team['id'];
+      // teamId = team['id'];
       $teamSocials.map((social) => {
         if (social.type === 'phone') $teamData.phone = social.data;
         if (social.type === 'email') $teamData.email = social.data;
