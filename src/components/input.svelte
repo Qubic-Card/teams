@@ -35,8 +35,8 @@
   const whatsappValidator = () => {
     let whatsapp = value.trim();
 
-    if (whatsapp.charAt(0) === '0') {
-      value = value.slice(1, 2);
+    if (whatsapp.charAt(0) === '0' || whatsapp.charAt(0) === '+') {
+      value = value.slice(1);
       value = value.replace(value, '62' + value);
     }
 
