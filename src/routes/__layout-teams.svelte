@@ -15,6 +15,7 @@
   import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
   import supabase from '@lib/db';
   import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
+  import { teams } from '@lib/stores/teamStore';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -29,6 +30,13 @@
   let sevenDaysAfterEndDate;
   let teamId = '';
 
+  const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
+  const menuHandler = () => (isMenuOpened = !isMenuOpened);
+  const handler = (id, title) => {
+    goto(`/${id}/${title}`);
+    isSidebarOpened && sidebarHandler();
+  };
+
   const getSubscriptionsData = async () => {
     const { data, error } = await supabase.functions.invoke('globaldate', {
       headers: {
@@ -38,33 +46,31 @@
         teamId: teamId,
       }),
     });
+
     if (error) console.log(error);
     if (data) subscription = data;
   };
+
   onMount(async () => {
     await getSubscriptionsData();
     member = await getRoleMapsByProfile($user?.id, teamId);
     userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
     team = await getTeamData(teamId);
 
+    $teams = {
+      subscription_end_date: member?.team_id?.subscription_end_date,
+      member_count: member?.team_id?.member_count,
+    };
+
     sevenDaysAfterEndDate = new Date(
       new Date(subscription?.subs_end_date).setDate(
         new Date(subscription?.subs_end_date).getDate() + 7
       )
     );
+
     if (member || userChangeTimestamp || $userData) loading = false;
   });
 
-  const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
-  const menuHandler = () => (isMenuOpened = !isMenuOpened);
-  const handler = (id, title) => {
-    goto(`/${id}/${title}`);
-    isSidebarOpened && sidebarHandler();
-  };
-  // import { getContext } from 'svelte';
-
-  // const teamId = getContext('teamId');
-  // $: console.log(teamId);
   $: {
     if ($page.routeId === '[slug]/members/[slug]@teams') {
       teamId = $page.url.pathname.split('/')[1];
@@ -77,6 +83,7 @@
     $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
   }
+
   $: {
     if ($userData)
       $userData.filter((item) => {

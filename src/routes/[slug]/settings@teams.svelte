@@ -3,15 +3,14 @@
   import { teamRoles } from '@lib/stores/roleStore';
   import SettingsSkeleton from '@comp/skeleton/settingsSkeleton.svelte';
   import { userData } from '@lib/stores/userStore';
-  import Cookies from 'js-cookie';
   import Billing from '@pages/settings/billing.svelte';
   import Role from '@pages/settings/role.svelte';
   import { getContext } from 'svelte';
 
   const teamId = getContext('teamId');
+
   let roles = [];
   let isClicked = true;
-
   let permissions = {
     readBilling: false,
     writeBilling: false,
@@ -20,20 +19,19 @@
     isTeamInactive: false,
     isTeamWillExpire: false,
   };
-  let team = {};
 
   const getTeamsRoleMapping = async () => {
     try {
       const { data, error } = await supabase
         .from('team_roles')
-        .select('*, team_id(*)')
+        .select('*, team_id(subscription_end_date, member_count)')
         .eq('team_id', teamId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
 
       if (data) {
-        team = data[0].team_id;
+        // team = data[0]?.team_id;
         roles = data;
         $teamRoles = data;
       }
@@ -62,7 +60,7 @@
 {:then}
   <div class="flex justify-center pt-4 pl-24 pr-4">
     <div class="flex flex-col w-full gap-4 text-sm pb-10">
-      <Billing {permissions} {team} />
+      <Billing {permissions} />
       <Role {permissions} {roles} />
       <div class="flex flex-col p-4 bg-neutral-800 rounded-lg">
         <h1 class="text-xl font-bold">Contact us</h1>

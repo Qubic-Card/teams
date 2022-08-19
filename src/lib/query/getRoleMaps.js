@@ -3,7 +3,9 @@ import supabase from '@lib/db';
 export const getRoleMapsByProfile = async (uid, teamId) => {
   const { data, error } = await supabase
     .from('team_members')
-    .select('role(*),id, team_profile')
+    .select(
+      'role(*),id, team_profile, team_id(subscription_end_date, member_count)'
+    )
     .eq('uid', uid)
     .eq('team_id', teamId);
 
