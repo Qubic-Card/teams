@@ -1,10 +1,8 @@
 <script lang="ts">
+  import { teams } from '@lib/stores/teamStore';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
 
-  import { Switch } from '@rgossiaux/svelte-headlessui';
-
-  export let permissions, team;
-  let isAutoRenew = false;
+  export let permissions;
 </script>
 
 <div class={`gap-4 ${permissions.readBilling ? 'flex' : 'hidden'}`}>
@@ -29,12 +27,12 @@
         </div>
       </div>
       <p>
-        Subscription valid hingga: {convertToGMT7(team?.subscription_end_date)
+        Subscription valid hingga: {convertToGMT7($teams?.subscription_end_date)
           .toDateString()
-          .slice(4)}
+          .slice(4) ?? '-'}
       </p>
       <p>
-        Jumlah member: {team?.member_count}
+        Jumlah member: {$teams?.member_count ?? '-'}
       </p>
       <!-- <div
         class="flex justify-between items-center p-3 rounded mt-4 bg-neutral-900"

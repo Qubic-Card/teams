@@ -55,9 +55,9 @@
   <td class="font-bold text-ellipsis pl-4">
     <p class="w-80 truncate">
       {#if record.storage_url}
-        {record.filename ?? '-'}
+        {record?.filename?.split('-').slice(0, -1).join('-') ?? '-'}
       {:else}
-        {record.name ?? '-'}
+        {record?.name?.split('-').slice(0, -1).join('-') ?? '-'}
       {/if}
     </p>
   </td>
