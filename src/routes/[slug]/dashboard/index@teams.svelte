@@ -4,7 +4,6 @@
   import QuickActionsModal from '@comp/modals/quickActionsModal.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import LinkPreview from '@comp/cards/linkPreview/linkPreview.svelte';
   import { learnMoreContents } from '@lib/constants';
 
   let permissions = {

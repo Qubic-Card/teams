@@ -1,7 +1,6 @@
 <script lang="ts">
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
-  import { onMount } from 'svelte';
-  import Cookies from 'js-cookie';
+  import { getContext, onMount } from 'svelte';
   import supabase from '@lib/db';
   import { memberData, userData } from '@lib/stores/userStore';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
@@ -9,7 +8,6 @@
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
-  import { teamId } from '@lib/stores/profileData';
 
   let permissions = {
     readMembers: false,
@@ -32,6 +30,7 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 9;
+  const teamId = getContext('teamId');
 
   const setPage = (p) => (page = p);
 
@@ -63,7 +62,7 @@
     const { data, error, count } = await supabase
       .from('business_cards')
       .select('id, type, color, team_id, mode')
-      .eq('team_id', $teamId)
+      .eq('team_id', teamId)
       .eq('mode', 'team')
       .order('created_at', { ascending: true })
       .range(from, to);
@@ -120,7 +119,7 @@
 
   $: allMember = [...activeMembers, ...inactiveCards];
 
-  onMount(async () => (roles = await getAllRoleByTeam($teamId)));
+  onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
 <svelte:window bind:innerWidth />

@@ -361,7 +361,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="border border-neutral-700 rounded-lg mb-4 p-4">
+                <div class="border-2 border-neutral-700 mb-4 p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal

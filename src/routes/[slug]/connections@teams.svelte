@@ -11,8 +11,9 @@
   import Search from '@comp/search.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { teamId } from '@lib/stores/profileData';
+  import { getContext } from 'svelte';
 
+  const teamId = getContext('teamId');
   let innerWidth;
   let asc = false;
   let searchQuery = '';
@@ -44,8 +45,10 @@
   const getTeamConnectionsList = async () => {
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(*), team_id(*)')
-      .eq('team_id', $teamId)
+      .select(
+        '*, by(team_profile->firstname, team_profile->lastname), team_id(*)'
+      )
+      .eq('team_id', teamId)
       .order('dateConnected', { ascending: false });
 
     if (error) console.log(error);
@@ -55,7 +58,7 @@
   const getUserConnectionsList = async () => {
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(team_profile->>firstname, team_profile->>lastname)')
+      .select('*, by(team_profile->firstname, team_profile->lastname)')
       .eq('by', $memberData?.id)
       .order('dateConnected', { ascending: false });
 
@@ -71,7 +74,7 @@
     let column;
 
     tabs === 'all'
-      ? (id = permissions.readConnection ? $teamId : $memberData?.id)
+      ? (id = permissions.readConnection ? teamId : $memberData?.id)
       : (id = $memberData?.id);
 
     tabs === 'all'
@@ -80,7 +83,7 @@
 
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(*)')
+      .select('*, by(team_profile->firstname, team_profile->lastname)')
       .eq(column, id)
       .order(col, { ascending: asc });
 
@@ -99,8 +102,8 @@
 
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(*)')
-      .eq('team_id', $teamId)
+      .select('*, by(team_profile->firstname, team_profile->lastname)')
+      .eq('team_id', teamId)
       .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 
@@ -122,7 +125,7 @@
 
     const { data, error } = await supabase
       .from('team_connection_acc')
-      .select('*, by(*)')
+      .select('*, by(team_profile->firstname, team_profile->lastname)')
       .eq('by', $memberData?.id)
       .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });

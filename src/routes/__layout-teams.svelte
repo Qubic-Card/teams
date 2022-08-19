@@ -7,16 +7,14 @@
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { userData } from '@lib/stores/userStore';
   import MenuButton from '@comp/buttons/menuButton.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, setContext } from 'svelte';
   import { sidebarItems } from '@lib/constants';
   import getTeamData from '@lib/query/getTeamData';
-  import Cookies from 'js-cookie';
   import { memberData, user, userChangeTimestamp } from '@lib/stores/userStore';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { getUserChangeTs } from '@lib/query/getUserChangeTimestamp';
   import supabase from '@lib/db';
   import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
-  import { teamId } from '@lib/stores/profileData';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
@@ -29,6 +27,7 @@
   };
   let isTeamInactive = false;
   let sevenDaysAfterEndDate;
+  let teamId = '';
 
   const getSubscriptionsData = async () => {
     const { data, error } = await supabase.functions.invoke('globaldate', {
@@ -36,18 +35,17 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        teamId: $teamId,
+        teamId: teamId,
       }),
     });
     if (error) console.log(error);
     if (data) subscription = data;
   };
-
   onMount(async () => {
     await getSubscriptionsData();
-    member = await getRoleMapsByProfile($user?.id, $teamId);
-    userChangeTimestamp.set(await getUserChangeTs($user?.id, $teamId));
-    team = await getTeamData($teamId);
+    member = await getRoleMapsByProfile($user?.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
+    team = await getTeamData(teamId);
 
     sevenDaysAfterEndDate = new Date(
       new Date(subscription?.subs_end_date).setDate(
@@ -63,11 +61,18 @@
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
   };
+  // import { getContext } from 'svelte';
 
+  // const teamId = getContext('teamId');
+  // $: console.log(teamId);
   $: {
     if ($page.routeId === '[slug]/members/[slug]@teams') {
-      $teamId = $page.url.pathname.split('/')[1];
-    } else $teamId = $page.params.slug;
+      teamId = $page.url.pathname.split('/')[1];
+      setContext('teamId', $page.url.pathname.split('/')[1]);
+    } else {
+      teamId = $page.params.slug;
+      setContext('teamId', $page.params.slug);
+    }
 
     $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
@@ -194,7 +199,7 @@
     </div>
 
     {#if subscription.isActive === false && subscription.isAfter7Days}
-      <SubscriptionEnd {subscription} {member} teamId={$teamId} />
+      <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
         class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${

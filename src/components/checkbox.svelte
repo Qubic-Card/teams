@@ -80,7 +80,7 @@
       role: { title: 'Member', roles: [memberRole[0], memberRole[1]] },
     },
     {
-      role: { title: 'Profile', roles: [profile[0], profile[1]] },
+      role: { title: 'Profile', roles: [profile[1], profile[0]] },
     },
     {
       role: {
@@ -105,7 +105,8 @@
     <button
       disabled={permissions.isTeamInactive ||
         permissions.isTeamWillExpire ||
-        isDefault}
+        isDefault ||
+        checked.length >= 14}
       on:click={() => {
         clicked();
         selectAll = true;

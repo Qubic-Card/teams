@@ -14,11 +14,11 @@
   import { setUserData, user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
-  import Cookies from 'js-cookie';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { defaultRole } from '@lib/constants';
-  import { teamId } from '@lib/stores/profileData';
+  import { getContext } from 'svelte';
 
+  const teamId = getContext('teamId');
   export let permissions;
   let roleMaps = [];
   let isClicked = true;
@@ -171,7 +171,7 @@
                     class="w-20 p-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 ml-2"
                     on:click={async () => {
                       await updateTeamsRoleMapping(role.id);
-                      roleMaps = await getRoleMapsByProfile($user?.id, $teamId);
+                      roleMaps = await getRoleMapsByProfile($user?.id, teamId);
                       setUserData(roleMaps?.role?.role_maps);
                     }}
                     disabled={isClicked}

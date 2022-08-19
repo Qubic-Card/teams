@@ -23,5 +23,3 @@ export const teamData = writable({
     background: '',
   },
 });
-
-export const teamId = writable('');
