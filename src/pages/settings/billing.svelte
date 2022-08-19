@@ -26,11 +26,6 @@
             on:click={async () => await console.log('billing')}
             >Change subscription</button
           >
-          <button
-            class="p-2 w-auto bg-blue-600 text-white rounded-md"
-            on:click={async () => await console.log('billing')}
-            >Tambah saldo</button
-          >
         </div>
       </div>
       <p>

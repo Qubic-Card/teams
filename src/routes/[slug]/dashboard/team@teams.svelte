@@ -1,6 +1,5 @@
 <script>
   import { fade } from 'svelte/transition';
-  import Cookies from 'js-cookie';
   import { onMount } from 'svelte';
   import Chart from 'chart.js/auto/auto.js';
   import {
