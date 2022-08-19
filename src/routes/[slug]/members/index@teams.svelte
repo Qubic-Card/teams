@@ -30,6 +30,7 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 9;
+  let cardsId = [];
   const teamId = getContext('teamId');
 
   const setPage = (p) => (page = p);
@@ -69,6 +70,7 @@
 
     if (error) console.log(error);
     if (data) {
+      cardsId = data.map((card) => card.id);
       cards = data;
       maxPage = Math.ceil(count / 9);
     }
@@ -79,7 +81,8 @@
       .from('team_cardcon')
       .select(
         'card_id(id, type, color), status, team_member_id(*, role(id, role_name))'
-      );
+      )
+      .in('card_id', cardsId);
 
     if (error) console.log(error);
     if (data) {
@@ -96,6 +99,8 @@
     if (cards.length > 0 && teamCardCon.length > 0) {
       cards.map((item, i) => {
         if (teamCardCon[i] !== undefined) {
+          console.log(item.id, teamCardCon[i].card_id.id);
+          console.log(teamCardCon[i].card_id.id == item.id);
           activeMembers = [...activeMembers, teamCardCon[i]];
           inactiveCards = [];
         } else {
