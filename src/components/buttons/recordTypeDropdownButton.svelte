@@ -18,7 +18,7 @@
 
 <Menu as="div" class="flex w-full" let:open>
   <div class="flex flex-col gap-2 w-full">
-    <p>Type</p>
+    <p class="text-gray-400">Type</p>
     <DropdownButton label={selectedType} class="w-full" />
   </div>
 

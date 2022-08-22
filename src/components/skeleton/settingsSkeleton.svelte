@@ -1,16 +1,22 @@
 <script>
-  export let permissions;
+  export let permissions, isSuperAdmin;
 </script>
 
-<div class="animate-pulse my-1 gap-4 flex flex-col">
+<div class="animate-pulse my-1 gap-3 flex flex-col">
   {#if permissions.readBilling}
-    <div class="flex gap-4">
+    <div class="flex gap-3">
       <div class="bg-neutral-800 h-56 w-full rounded-lg" />
       <div class="bg-neutral-800 h-56 w-1/3 rounded-lg" />
     </div>
   {/if}
+  {#if isSuperAdmin}
+    <div class="flex gap-3">
+      <div class="bg-neutral-800 h-40 w-full rounded-lg" />
+      <div class="bg-neutral-800 h-40 w-1/3 rounded-lg" />
+    </div>
+  {/if}
   {#if permissions.readRoles}
-    <div class="flex gap-4">
+    <div class="flex gap-3">
       <div class="bg-neutral-800 h-56 w-full rounded-lg" />
       <div class="bg-neutral-800 h-56 w-1/3 rounded-lg" />
     </div>

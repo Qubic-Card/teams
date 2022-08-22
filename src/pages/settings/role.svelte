@@ -103,7 +103,7 @@
   {deleteRoleHandler}
 />
 
-<div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-4`}>
+<div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-3`}>
   <div class="bg-neutral-800 rounded-lg w-3/4 p-4">
     <div
       class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"

@@ -82,6 +82,7 @@
 
     $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
+    $memberData.roleName = member?.role?.role_name;
   }
 
   $: {

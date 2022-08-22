@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+
   import { teams } from '@lib/stores/teamStore';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
 
   export let permissions;
 </script>
 
-<div class={`gap-4 ${permissions.readBilling ? 'flex' : 'hidden'}`}>
+<div class={`gap-3 ${permissions.readBilling ? 'flex' : 'hidden'}`}>
   <div class="bg-neutral-800 rounded-lg p-4 w-3/4">
     <div class="flex flex-col my-4">
       <div
@@ -20,8 +22,9 @@
           }`}
         >
           <button
-            class="p-2 w-auto bg-blue-600 text-white rounded-md"
-            on:click={async () => await console.log('billing')}
+            class="p-2 w-40 bg-blue-600 text-white rounded-md"
+            on:click={async () =>
+              await window.open('https://wa.me/628113087599', '_blank').focus()}
             >Change subscription</button
           >
         </div>

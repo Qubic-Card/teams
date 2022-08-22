@@ -357,9 +357,9 @@
   onMount(async () => await renderChart());
 
   $: {
-    page,
+    selectedDays,
+      page,
       toItem,
-      selectedDays,
       getTeamWeeklyLogsActivity(),
       getTeamConnectionsList(),
       getTeamConnectionsPreviousList(),

@@ -199,7 +199,7 @@
     <RecordTypeDropdownButton on:select={selectTypeHandler} {selectedType} />
 
     <div class="flex flex-col gap-2">
-      <p>From</p>
+      <p class="text-gray-400">From</p>
       <Flatpickr
         options={fromDateOptions}
         bind:value={fromDateValue}
@@ -208,7 +208,7 @@
       />
     </div>
     <div class="flex flex-col gap-2">
-      <p>To</p>
+      <p class="text-gray-400">To</p>
       <Flatpickr
         options={toDateOptions}
         bind:value={toDateValue}
