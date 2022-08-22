@@ -14,7 +14,11 @@
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
-  import { teamSocials, teamLinks } from '@lib/stores/editorStore';
+  import {
+    teamSocials,
+    teamLinks,
+    isDisplayPersonal,
+  } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -56,8 +60,7 @@
     FilePondPluginFileValidateType
   );
 
-  export let permissions, isTeamInactive;
-
+  export let permissions, isTeamInactive, memberId;
   const teamId = getContext('teamId');
 
   let pond;
@@ -70,9 +73,12 @@
   let pixelCrop;
   let image;
   let fileImage;
-  let currentTheme = theme[$teamData.design?.theme?.toString() ?? 'dark'];
   let isLoading = false;
   let brochureFilename = '';
+  let showDeleteBrochureModal = false;
+
+  const toggleBrochureModal = () =>
+    (showDeleteBrochureModal = !toggleBrochureModal);
 
   const cropImage = async () => {
     croppedImage = await getCroppedImg(image, pixelCrop);
@@ -186,11 +192,18 @@
     return data;
   };
 
-  let showDeleteBrochureModal = false;
-  const toggleBrochureModal = () =>
-    (showDeleteBrochureModal = !toggleBrochureModal);
+  const setDisplayPersonal = async () => {
+    const { data, error } = await supabase
+      .from('team_cardcon')
+      .update({ display_personal: $isDisplayPersonal })
+      .eq('team_member_id', memberId);
 
-  $: console.log(brochureFilename);
+    if (error) {
+      toastFailed();
+      console.log(error);
+    }
+    if (data) toastSuccess('Changes saved');
+  };
 </script>
 
 {#if showDeleteBrochureModal}
@@ -339,81 +352,87 @@
                     />
                   </div>
 
-                  <!-- <CropModal {handleSave} {isOpen} {fileName} {image} /> -->
-                  <div
-                    class={`grid grid-cols-2 gap-2 px-3 pt-3 ${
-                      permissions.writeTeam ? '' : 'hidden'
-                    }`}
-                  >
-                    {#if $teamData?.brochure?.url === ''}
-                      <FilePond
-                        bind:this={brochurePond}
-                        {name}
-                        credits=""
-                        allowProcess={false}
-                        class="cursor-pointer"
-                        acceptedFileTypes={['application/pdf']}
-                        instantUpload={false}
-                        labelIdle="Add Brochure"
-                        allowMultiple={false}
-                        onaddfile={handleAddBrochure}
+                  {#if permissions.writeTeam}
+                    <div
+                      class="flex justify-between items-center p-2 bg-neutral-500 mx-3 rounded-md my-2"
+                    >
+                      <h1 class="text-white">Show personal profile</h1>
+                      <SwitchButton
+                        bind:checked={$isDisplayPersonal}
+                        on:change={setDisplayPersonal}
                       />
-                    {:else}
-                      <div
-                        class="bg-neutral-100 rounded-lg h-[76px] p-2 gap-2 flex items-center justify-between"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-7 w-7"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-
-                        <p class="w-64 truncate text-neutral-700 text-md">
-                          {$teamData?.brochure?.filename}
-                        </p>
-                        <button
-                          class="p-2 h-full bg-red-600 rounded-md self-start"
-                          on:click={() => (showDeleteBrochureModal = true)}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 px-3 pt-3">
+                      {#if $teamData?.brochure?.url === ''}
+                        <FilePond
+                          bind:this={brochurePond}
+                          {name}
+                          credits=""
+                          allowProcess={false}
+                          class="cursor-pointer"
+                          acceptedFileTypes={['application/pdf']}
+                          instantUpload={false}
+                          labelIdle="Add Brochure"
+                          allowMultiple={false}
+                          onaddfile={handleAddBrochure}
+                        />
+                      {:else}
+                        <div
+                          class="bg-neutral-100 rounded-lg h-[76px] p-2 gap-2 flex items-center justify-between"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
+                            class="h-7 w-7"
                             fill="none"
                             viewBox="0 0 24 24"
-                            stroke="white"
+                            stroke="currentColor"
                             stroke-width="2"
                           >
                             <path
                               stroke-linecap="round"
                               stroke-linejoin="round"
-                              d="M6 18L18 6M6 6l12 12"
+                              d="M5 13l4 4L19 7"
                             />
                           </svg>
-                        </button>
-                      </div>
-                    {/if}
-                    <FilePond
-                      bind:this={pond}
-                      {name}
-                      credits=""
-                      allowProcess={false}
-                      class="cursor-pointer"
-                      acceptedFileTypes={['image/png', 'image/jpeg']}
-                      instantUpload={false}
-                      labelIdle="Add Team Logo"
-                      allowMultiple={false}
-                      onpreparefile={handleCrop}
-                    />
-                  </div>
+
+                          <p class="w-64 truncate text-neutral-700 text-md">
+                            {$teamData?.brochure?.filename}
+                          </p>
+                          <button
+                            class="p-2 h-full bg-red-600 rounded-md self-start"
+                            on:click={() => (showDeleteBrochureModal = true)}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="h-5 w-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="white"
+                              stroke-width="2"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      {/if}
+                      <FilePond
+                        bind:this={pond}
+                        {name}
+                        credits=""
+                        allowProcess={false}
+                        class="cursor-pointer"
+                        acceptedFileTypes={['image/png', 'image/jpeg']}
+                        instantUpload={false}
+                        labelIdle="Add Team Logo"
+                        allowMultiple={false}
+                        onpreparefile={handleCrop}
+                      />
+                    </div>
+                  {/if}
                 </div>
               </TabPanel>
               <TabPanel>

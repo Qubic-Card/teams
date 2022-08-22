@@ -99,8 +99,6 @@
     if (cards.length > 0 && teamCardCon.length > 0) {
       cards.map((item, i) => {
         if (teamCardCon[i] !== undefined) {
-          console.log(item.id, teamCardCon[i].card_id.id);
-          console.log(teamCardCon[i].card_id.id == item.id);
           activeMembers = [...activeMembers, teamCardCon[i]];
           inactiveCards = [];
         } else {

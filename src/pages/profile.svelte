@@ -9,6 +9,7 @@
     teamSocials,
     teamLinks,
     links,
+    isDisplayPersonal,
   } from '@lib/stores/editorStore';
   import { theme } from '@lib/profileTheme';
   import Dummy from '@lib/dummy.json';
@@ -80,25 +81,68 @@
     </BorderButton>
   </div>
   <div class="flex px-16">
-    <button
-      on:click={() => ($selectedTab = 'team')}
-      class={`${
-        $selectedTab === 'team'
-          ? 'border-b-2 border-white'
-          : 'border-b-2 border-neutral-700'
-      } p-2 w-1/2 text-white`}>Team</button
-    >
-    <button
-      on:click={() => ($selectedTab = 'personal')}
-      class={`${
-        $selectedTab === 'personal'
-          ? 'border-b-2 border-white'
-          : 'border-b-2 border-neutral-700'
-      } p-2 w-1/2 text-white`}>Personal</button
-    >
+    {#if $isDisplayPersonal}
+      <button
+        on:click={() => ($selectedTab = 'team')}
+        class={`${
+          $selectedTab === 'team'
+            ? 'border-b-2 border-white'
+            : 'border-b-2 border-neutral-700'
+        } p-2 w-1/2 text-white`}>Team</button
+      >
+      <button
+        on:click={() => ($selectedTab = 'personal')}
+        class={`${
+          $selectedTab === 'personal'
+            ? 'border-b-2 border-white'
+            : 'border-b-2 border-neutral-700'
+        } p-2 w-1/2 text-white`}>Personal</button
+      >
+    {/if}
   </div>
 
-  {#if $selectedTab == 'team'}
+  {#if $selectedTab == 'personal' && !$isDisplayPersonal}
+    <div class="px-16 mt-4 {currentTheme.text}">
+      <!-- UTILITIES -->
+      <div class="flex justify-between flex-wrap items-start gap-1 my-1">
+        {#each isEditorMode ? $socials : data.socials as item}
+          {#if item.isActive}
+            <BorderButton
+              on:click={() => {
+                toNewTab(item.type, item.data);
+              }}
+              class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
+              ><img
+                src={socialIcons[item.type]}
+                width="34"
+                height="34"
+                alt=""
+              /></BorderButton
+            >
+          {/if}
+        {/each}
+      </div>
+
+      <!-- LINKS -->
+      <div class="gap-2 flex flex-col justify-center items-center pb-5">
+        {#each isEditorMode ? $links : data.links as item}
+          {#if item.isActive}
+            <BorderButton
+              class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
+              ><div class="p-2">
+                <LinkPreview
+                  isShowMetaImage={data.isShowMetaImage}
+                  title={item.title}
+                  url={item.link}
+                  className={currentTheme.secondary}
+                />
+              </div></BorderButton
+            >
+          {/if}
+        {/each}
+      </div>
+    </div>
+  {:else}
     <div
       class="gap-2 flex flex-col text-white px-16 justify-center items-center mt-4"
     >
@@ -166,47 +210,6 @@
             {/if}
           {/each}
         </div>
-      </div>
-    </div>
-  {:else}
-    <div class="px-16 mt-4 {currentTheme.text}">
-      <!-- UTILITIES -->
-      <div class="flex justify-between flex-wrap items-start gap-1 my-1">
-        {#each isEditorMode ? $socials : data.socials as item}
-          {#if item.isActive}
-            <BorderButton
-              on:click={() => {
-                toNewTab(item.type, item.data);
-              }}
-              class="p-5 flex-grow flex justify-center rounded-md items-center {currentTheme.border} {currentTheme.secondary}"
-              ><img
-                src={socialIcons[item.type]}
-                width="34"
-                height="34"
-                alt=""
-              /></BorderButton
-            >
-          {/if}
-        {/each}
-      </div>
-
-      <!-- LINKS -->
-      <div class="gap-2 flex flex-col justify-center items-center pb-5">
-        {#each isEditorMode ? $links : data.links as item}
-          {#if item.isActive}
-            <BorderButton
-              class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-              ><div class="p-2">
-                <LinkPreview
-                  isShowMetaImage={data.isShowMetaImage}
-                  title={item.title}
-                  url={item.link}
-                  className={currentTheme.secondary}
-                />
-              </div></BorderButton
-            >
-          {/if}
-        {/each}
       </div>
     </div>
   {/if}

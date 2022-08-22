@@ -29,6 +29,10 @@
     if (error) console.log(error);
   };
 
+  // 39ba7789-537c-4b0f-a8a7-c8a8345838f3 1
+  // eac9c236-da25-4d9c-a058-632bd92bc951 2
+  // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9 3
+
   const deleteCardConnection = async (userCardId) => {
     const { data, error } = await supabase
       .from('card_connection')
@@ -107,23 +111,6 @@
     if (error) console.log(error);
   };
 
-  const setFalseTeamCardCon = async () => {
-    if (teamMembersProfile) {
-      teamMembersProfile.forEach(async (member) => {
-        const { data, error } = await supabase
-          .from('team_cardcon')
-          .update({
-            status: false,
-          })
-          .match({
-            card_id: member.card_id,
-          });
-
-        if (error) console.log(error);
-      });
-    }
-  };
-
   const setNullTeamMemberUid = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -138,7 +125,6 @@
     isLoading = true;
     await setNullTeamMemberUid();
     await changeCardMode();
-    await setFalseTeamCardCon();
     await cardConnectionHandler();
     toastSuccess('All cards transferred to basic');
     setTimeout(() => (isLoading = false), 4000);

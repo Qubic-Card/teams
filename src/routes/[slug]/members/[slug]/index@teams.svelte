@@ -5,6 +5,7 @@
     links,
     teamSocials,
     teamLinks,
+    isDisplayPersonal,
   } from '@lib/stores/editorStore';
   import EditorSkeleton from '@comp/skeleton/editorSkeleton.svelte';
   import supabase from '@lib/db';
@@ -51,7 +52,7 @@
     if (item === 'will_expired') permissions.will_expire = true;
   });
 
-  let profileId = null;
+  let memberId = null;
 
   let companyNickname;
 
@@ -75,7 +76,7 @@
   const getProfile = async () => {
     let { data, error } = await supabase
       .from('team_members')
-      .select('team_profile, uid, team_id')
+      .select('team_profile, uid, team_id, id')
       .eq('uid', $page.params.slug)
       .eq('team_id', teamId);
 
@@ -84,12 +85,24 @@
       $profileData = { ...profile };
       $socials = profile['socials'];
       $links = profile['links'];
-      profileId = data[0]['id'];
+      memberId = data[0]['id'];
     }
     if (error) console.log(error);
 
     return data;
   };
+
+  const getDisplayPersonal = async () => {
+    const { data, error } = await supabase
+      .from('team_cardcon')
+      .select('display_personal')
+      .eq('team_member_id', memberId);
+
+    if (error) console.log(error);
+    if (data) $isDisplayPersonal = data[0].display_personal;
+  };
+
+  $: if (memberId) getDisplayPersonal();
 </script>
 
 {#await (getProfile(), getTeams())}
@@ -150,7 +163,7 @@
             {#if $selectedTab === 'personal'}
               <PersonalEditor {permissions} {isTeamInactive} />
             {:else}
-              <TeamEditor {permissions} {isTeamInactive} />
+              <TeamEditor {permissions} {isTeamInactive} {memberId} />
             {/if}
           {:else if !permissions.readTeam}
             <PersonalEditor {permissions} {isTeamInactive} />
@@ -164,7 +177,6 @@
             class="min-h-screen"
             isEditorMode={true}
             data={$profileData}
-            id={profileId}
             {teamId}
             {companyNickname}
           />

@@ -2,3 +2,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.snap-container::-webkit-scrollbar {
+  height: 5px;
+}
+.snap-container::-webkit-scrollbar-track {
+  background-color: #e4e4e4;
+}
+.snap-container::-webkit-scrollbar-thumb {
+  background-color: #71717a;
+}
