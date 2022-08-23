@@ -87,48 +87,50 @@ export const genvcard = async (prop, team) => {
   }
 
   //set social media URLs
-  if (prop.socials) {
-    prop.socials.map((e) => {
-      if (e.isActive) {
-        if (e.type === 'email') personalEmail = e.data;
-        if (e.type === 'phone') {
-          phoneNumber = e.data;
-          // if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
-          if (phoneNumber.startsWith('08')) {
-            phoneNumber = phoneNumber.slice(1);
-            phoneNumber = '+62' + phoneNumber;
+  if (team.display_personal) {
+    if (prop.socials) {
+      prop.socials.map((e) => {
+        if (e.isActive) {
+          if (e.type === 'email') personalEmail = e.data;
+          if (e.type === 'phone') {
+            phoneNumber = e.data;
+            // if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
+            if (phoneNumber.startsWith('08')) {
+              phoneNumber = phoneNumber.slice(1);
+              phoneNumber = '+62' + phoneNumber;
+            }
+            if (phoneNumber.startsWith('62')) phoneNumber = '+' + e.data;
           }
-          if (phoneNumber.startsWith('62')) phoneNumber = '+' + e.data;
+
+          if (e.type === 'whatsapp') {
+            if ('+' + e.data !== phoneNumber)
+              vCard.cellPhone = ['+' + e.data, phoneNumber];
+          }
+
+          if (e.type == 'phone') return (vCard.cellPhone = phoneNumber);
+
+          return (vCard.socialUrls[e.type] = e.data);
         }
+      });
+    }
 
-        if (e.type === 'whatsapp') {
-          if ('+' + e.data !== phoneNumber)
-            vCard.cellPhone = ['+' + e.data, phoneNumber];
-        }
+    if (prop.address) {
+      vCard.homeAddress.label = 'Home Address';
+      vCard.homeAddress.street = prop.address;
+    }
 
-        if (e.type == 'phone') return (vCard.cellPhone = phoneNumber);
-
-        return (vCard.socialUrls[e.type] = e.data);
-      }
-    });
+    if (prop.links) {
+      prop.links.map((e) => {
+        if (e.isActive) return (vCard.socialUrls[e.title] = e.link);
+      });
+    }
   }
 
   if (teamEmail === undefined) {
-    vCard.email = personalEmail;
+    if (team.display_personal) vCard.email = personalEmail;
   } else {
-    vCard.email = personalEmail;
+    if (team.display_personal) vCard.email = personalEmail;
     vCard.workEmail = teamEmail;
-  }
-
-  if (prop.address) {
-    vCard.homeAddress.label = 'Home Address';
-    vCard.homeAddress.street = prop.address;
-  }
-
-  if (prop.links) {
-    prop.links.map((e) => {
-      if (e.isActive) return (vCard.socialUrls[e.title] = e.link);
-    });
   }
 
   vCard.version = '3.0'; //can also support 2.1 and 4.0, certain versions only support certain fields
