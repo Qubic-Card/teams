@@ -29,7 +29,7 @@
   let updatedRole = '';
   let maxPage = 0;
   let page = 0;
-  let toItem = 9;
+  let toItem = 2;
   let cardsId = [];
   const teamId = getContext('teamId');
 
@@ -59,20 +59,20 @@
   };
 
   const getTeamCard = async () => {
-    const { from, to } = getPagination(page, toItem);
+    // const { from, to } = getPagination(page, toItem);
     const { data, error, count } = await supabase
       .from('business_cards')
-      .select('id, type, color, team_id, mode')
+      .select('id, type, color, team_id, mode', { count: 'estimated' })
       .eq('team_id', teamId)
       .eq('mode', 'team')
-      .order('created_at', { ascending: true })
-      .range(from, to);
+      .order('created_at', { ascending: true });
+    // .range(from, to);
 
     if (error) console.log(error);
     if (data) {
       cardsId = data.map((card) => card.id);
       cards = data;
-      maxPage = Math.ceil(count / 9);
+      maxPage = Math.ceil(count / 2);
     }
   };
 
@@ -87,7 +87,7 @@
     if (error) console.log(error);
     if (data) {
       if (data.length > 0) {
-        teamCardCon = data;
+        teamCardCon = data.filter((c) => c.team_member_id.uid !== null);
       }
     }
   };
@@ -122,6 +122,8 @@
 
   $: allMember = [...activeMembers, ...inactiveCards];
 
+  $: console.log('page', page, allMember);
+  // $: page, toItem, getTeamCard();
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
@@ -170,7 +172,7 @@
       {/if}
     {/if}
     <div
-      class={`grid grid-flow-row my-4 h-64 gap-2 ${
+      class={`grid grid-flow-row my-4 h-full gap-2 ${
         innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-2'
       }`}
     >
@@ -215,14 +217,14 @@
         {searchNotFoundMsg}
       </div>
     {/if}
-    {#if permissions.readMembers && allMember.length < 9}
+    <!-- {#if permissions.readMembers && allMember.length > 1}
       <PaginationButton
         currentPageRows={allMember}
         {setPage}
         {page}
         {maxPage}
       />
-    {/if}
+    {/if} -->
   {:catch}
     <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again.

@@ -125,7 +125,7 @@
   isDelete
   isDispatch
   heading="Are you sure you want to delete"
-  text={`${teamProfile?.firstname} ${teamProfile?.lastname} from this team?`}
+  text={`${teamProfile?.firstname} ${teamProfile?.lastname}?`}
   buttonLabel="Delete"
   showModal={showDeleteMemberModal}
   toggleModal={toggleDeleteMemberModal}
@@ -148,9 +148,9 @@
           >
             <div class="flex flex-row-reverse relative">
               <img
-                src={teamProfile.avatar === ''
+                src={teamProfile?.avatar === ''
                   ? '/favicon.svg'
-                  : teamProfile.avatar}
+                  : teamProfile?.avatar}
                 alt="Profile"
                 class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
                   $user.id === member?.team_member_id?.uid
@@ -171,15 +171,15 @@
                 <h1
                   class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
                 >
-                  {teamProfile.firstname === ''
+                  {teamProfile?.firstname === ''
                     ? 'No name'
-                    : teamProfile.firstname}
-                  {teamProfile.lastname === ''
+                    : teamProfile?.firstname}
+                  {teamProfile?.lastname === ''
                     ? ''
-                    : ' ' + teamProfile.lastname}
+                    : ' ' + teamProfile?.lastname}
                 </h1>
                 <h2 class="text-neutral-300">
-                  {teamProfile.job}
+                  {teamProfile?.job}
                 </h2>
                 <h2 class="text-neutral-300 text-xs">
                   Joined since {new Date(member?.team_member_id.member_from)
@@ -218,9 +218,9 @@
         >
           <div class="flex flex-row-reverse relative">
             <img
-              src={teamProfile.avatar === ''
+              src={teamProfile?.avatar === ''
                 ? '/favicon.svg'
-                : teamProfile.avatar}
+                : teamProfile?.avatar}
               alt="Profile"
               class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
                 $user.id === member?.team_member_id?.uid
@@ -241,13 +241,15 @@
               <h1
                 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
               >
-                {teamProfile.firstname === ''
+                {teamProfile?.firstname === ''
                   ? 'No name'
-                  : teamProfile.firstname}
-                {teamProfile.lastname === '' ? '' : ' ' + teamProfile.lastname}
+                  : teamProfile?.firstname}
+                {teamProfile?.lastname === ''
+                  ? ''
+                  : ' ' + teamProfile?.lastname}
               </h1>
               <h2 class="text-neutral-300">
-                {teamProfile.job}
+                {teamProfile?.job}
               </h2>
               <h2 class="text-neutral-300 text-xs">
                 Joined since {convertToGMT7(member?.team_member_id.member_from)
