@@ -74,7 +74,7 @@ export const genvcard = async (prop, team) => {
           }
         }
 
-        return (vCard.socialUrls[e.type + 'company'] = e.data);
+        return (vCard.socialUrls[e.type + 'cmpny'] = e.data);
       });
     }
 

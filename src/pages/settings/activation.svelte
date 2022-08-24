@@ -24,7 +24,7 @@
       {/if} Submit</button
     >
   </div>
-  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-xl">
+  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-lg">
     <p class="mb-4">
       Atur activation code untuk digunakan ketika member baru melakukan
       aktivasi.
