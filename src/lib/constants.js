@@ -241,37 +241,37 @@ export const learnMoreContents = [
     title: 'Produk Qubic',
     desc: 'Beberapa pilihan produk Qubic yang dapat disesuaikan dengan keinginan dan dapat disesuaikan dengan fashion serta event tertentu dengan beberapa pilihan bahan dan warna. Seluruh tipe produk dapat digunakan menjadi Qubic Basic ataupun Qubic Teams.',
     url: 'https://qubicid.notion.site/Produk-Qubic-51424b37949c45e98ba256ad6a9d8ed2',
-    bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    bg: 'https://images.unsplash.com/photo-1565688842882-e0b2693d349a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTU0NjB8MHwxfHNlYXJjaHw1fHxidXNpbmVzcyUyMGNhcmR8ZW58MHx8fHwxNjYxMjQ2OTQ0&ixlib=rb-1.2.1&q=80&w=1080',
   },
   {
     title: 'Perbedaan Qubic Teams & Basic',
     desc: 'Qubic Teams dan Qubic Basic bekerja secara berdampingan, dengan tambahan fitur yang lebih powerful untuk perusahaan memaksimalkan penggunakan product Qubic dengan adanya biaya subscription yang dibayarkan setiap tahunnya.',
     url: 'https://qubicid.notion.site/Perbedaan-Qubic-Teams-Basic-916f8ff01ae54374b7a2c6a594534835',
-    bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    bg: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTU0NjB8MHwxfHNlYXJjaHwyfHxhbmFseXRpY3N8ZW58MHx8fHwxNjYxMjQ3MTQ0&ixlib=rb-1.2.1&q=80&w=1080',
   },
   {
     title: 'Menambah User Saat Subscription Berjalan',
     desc: 'Qubic Teams dapat disesuaikan ketika menambah user saat subscription sudah berjalan dengan tambahan user sistem PRO RATA hingga subscription awal telah selesai.',
     url: 'https://qubicid.notion.site/Menambah-User-Saat-Subscription-Berjalan-5bb318c30c3b4e3a99e2aebb5f3cbb08',
-    bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    bg: 'https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTU0NjB8MHwxfHNlYXJjaHw0fHxzdGFydHVwfGVufDB8fHx8MTY2MTI0NzE5Nw&ixlib=rb-1.2.1&q=80&w=1080',
   },
   {
     title: 'Minimal Pengguna Qubic Teams',
     desc: 'Beberapa pilihan produk Qubic yang dapat disesuaikan dengan keinginan dan dapat disesuaikan dengan fashion serta event tertentu dengan beberapa pilihan bahan dan warna. Seluruh tipe produk dapat digunakan menjadi Qubic Basic ataupun Qubic Teams.',
     url: 'https://qubicid.notion.site/Minimal-Pengguna-Qubic-Teams-de4c3cf21b5144089fc78184ec856b62',
-    bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    bg: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTU0NjB8MHwxfHNlYXJjaHw5fHx3b3JrfGVufDB8fHx8MTY2MTI0Njg4MA&ixlib=rb-1.2.1&q=80&w=1080',
   },
   {
     title: 'Penggunaan Product Qubic Teams',
     desc: 'Beberapa pilihan produk Qubic yang dapat disesuaikan dengan keinginan dan dapat disesuaikan dengan fashion serta event tertentu dengan beberapa pilihan bahan dan warna. Seluruh tipe produk dapat digunakan menjadi Qubic Basic ataupun Qubic Teams.',
     url: 'https://qubicid.notion.site/Penggunaan-Product-Qubic-Teams-94876ae60adb4e9a9541e43df8e87a3c',
-    bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    bg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTU0NjB8MHwxfHNlYXJjaHwxMHx8YnVzaW5lc3N8ZW58MHx8fHwxNjYxMjQ2OTk2&ixlib=rb-1.2.1&q=80&w=1080',
   },
   {
     title: 'Cara Berpindah Qubic Basic → Teams',
     desc: 'Beberapa pilihan produk Qubic yang dapat disesuaikan dengan keinginan dan dapat disesuaikan dengan fashion serta event tertentu dengan beberapa pilihan bahan dan warna. Seluruh tipe produk dapat digunakan menjadi Qubic Basic ataupun Qubic Teams.',
     url: 'https://qubicid.notion.site/Cara-Berpindah-Qubic-Basic-Teams-2472d3cd8aa6479c80b36d607f509186',
-    bg: 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    bg: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTU0NjB8MHwxfHNlYXJjaHwzfHx0ZWFtfGVufDB8fHx8MTY2MTI0NzA0MA&ixlib=rb-1.2.1&q=80&w=1080',
   },
 ];
 

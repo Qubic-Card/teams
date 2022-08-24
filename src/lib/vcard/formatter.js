@@ -24,7 +24,7 @@ const formatter = (vcard) => {
         let title = line?.split('=')[1].split(':')[0];
         let link = line?.split(':')[1];
         let domain = line.split(':')[2];
-        let isCompany = line.includes('company');
+        let isCompany = line.includes('cmpny');
 
         if (line.includes('facebook')) {
           line = `item${i - 17}.URL;LABEL=${
@@ -87,7 +87,7 @@ const formatter = (vcard) => {
         let url = line.split(':')[2];
         let title = line?.split('=')[1].split(':')[0];
         let link = line?.split(':')[1];
-        let isCompany = line.includes('company');
+        let isCompany = line.includes('cmpny');
         let domain = line.split(':')[2];
 
         if (line.includes('facebook')) {

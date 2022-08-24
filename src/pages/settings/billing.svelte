@@ -59,7 +59,7 @@
       </div> -->
     </div>
   </div>
-  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-xl">
+  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-lg">
     <p class="mb-4">Atur subscription dalam billing</p>
   </div>
 </div>

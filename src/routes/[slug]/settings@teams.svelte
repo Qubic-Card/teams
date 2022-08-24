@@ -8,6 +8,7 @@
   import { getContext } from 'svelte';
   import Activation from '@pages/settings/activation.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import sha256 from 'crypto-js/sha256';
 
   const teamId = getContext('teamId');
 
@@ -22,7 +23,7 @@
     isTeamWillExpire: false,
   };
   let isLoading = false;
-  let activationCode = '';
+  let activationCode = 'QUBICPASS';
 
   const getTeamsRoleMapping = async () => {
     try {
@@ -35,7 +36,7 @@
       if (error) throw error;
 
       if (data) {
-        activationCode = data[0].team_id.team_token;
+        // activationCode = data[0].team_id.team_token;
         // team = data[0]?.team_id;
         roles = data;
         $teamRoles = data;
@@ -47,10 +48,11 @@
 
   const addActivationCode = async (newToken) => {
     isLoading = true;
+    let hash = sha256(newToken).toString();
     const { data, error } = await supabase
       .from('teams')
       .update({
-        team_token: newToken,
+        team_token: hash,
       })
       .eq('id', teamId);
 
@@ -61,7 +63,7 @@
     }
     if (data) {
       toastSuccess('Activation code changed');
-      activationCode = newToken;
+      activationCode = 'QUBICPASS';
       isLoading = false;
     }
   };
@@ -95,7 +97,6 @@
           {isLoading}
           bind:value={activationCode}
           on:click={async () => addActivationCode(activationCode)}
-          {activationCode}
         />
       {/if}
       <Role {permissions} {roles} />

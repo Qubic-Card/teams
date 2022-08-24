@@ -75,7 +75,15 @@
     <BorderButton
       class="w-full h-12  {currentTheme.border} {currentTheme.secondary} rounded-md"
       on:click={async () =>
-        download(await genvcard(data, $teamData), 'contact')}
+        download(
+          await genvcard(
+            data,
+            Object.assign({}, $teamData, {
+              display_personal: $isDisplayPersonal,
+            })
+          ),
+          'contact'
+        )}
     >
       Add to Contacts
     </BorderButton>
@@ -101,7 +109,7 @@
     {/if}
   </div>
 
-  {#if $selectedTab == 'personal' && !$isDisplayPersonal}
+  {#if $selectedTab == 'personal'}
     <div class="px-16 mt-4 {currentTheme.text}">
       <!-- UTILITIES -->
       <div class="flex justify-between flex-wrap items-start gap-1 my-1">
@@ -142,7 +150,7 @@
         {/each}
       </div>
     </div>
-  {:else}
+  {:else if $selectedTab == 'team'}
     <div
       class="gap-2 flex flex-col text-white px-16 justify-center items-center mt-4"
     >

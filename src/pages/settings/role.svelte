@@ -202,7 +202,7 @@
       {/if}
     {/if}
   </div>
-  <div class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-xl">
+  <div class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-lg">
     <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
     <p>Berikan permissions yang sesuai di setiap role.</p>
   </div>

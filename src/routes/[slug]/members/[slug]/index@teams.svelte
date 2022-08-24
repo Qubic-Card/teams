@@ -141,24 +141,26 @@
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           {#if permissions.readTeam}
-            <div class="flex mb-4">
-              <button
-                on:click={() => ($selectedTab = 'personal')}
-                class={`${
-                  $selectedTab === 'personal'
-                    ? 'border-b-2 border-white'
-                    : 'border-b-2 border-neutral-700'
-                } p-2 w-1/2 text-white`}>Personal</button
-              >
-              <button
-                on:click={() => ($selectedTab = 'team')}
-                class={`${
-                  $selectedTab === 'team'
-                    ? 'border-b-2 border-white'
-                    : 'border-b-2 border-neutral-700'
-                } p-2 w-1/2 text-white`}>Team</button
-              >
-            </div>
+            {#if $isDisplayPersonal}
+              <div class="flex mb-4">
+                <button
+                  on:click={() => ($selectedTab = 'personal')}
+                  class={`${
+                    $selectedTab === 'personal'
+                      ? 'border-b-2 border-white'
+                      : 'border-b-2 border-neutral-700'
+                  } p-2 w-1/2 text-white`}>Personal</button
+                >
+                <button
+                  on:click={() => ($selectedTab = 'team')}
+                  class={`${
+                    $selectedTab === 'team'
+                      ? 'border-b-2 border-white'
+                      : 'border-b-2 border-neutral-700'
+                  } p-2 w-1/2 text-white`}>Team</button
+                >
+              </div>
+            {/if}
 
             {#if $selectedTab === 'personal'}
               <PersonalEditor {permissions} {isTeamInactive} />

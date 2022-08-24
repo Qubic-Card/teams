@@ -59,7 +59,7 @@
             }`}
           >
             {connection.profileData.job
-              ? connection.profileData.job + 'at'
+              ? connection.profileData.job + ' at'
               : ''}
             {connection.profileData.company ?? ''}
           </p>
@@ -121,7 +121,10 @@
     <div class="flex flex-col items-center">
       <button
         on:click={async () =>
-          download(await genvcard(connection.profileData), 'contact')}
+          download(
+            await genvcard(connection.profileData, { display_personal: true }),
+            'contact'
+          )}
         class="w-full bg-blue-600 rounded-md hover:font-bold text-white mx-auto p-3 mb-4"
       >
         Save to Contacts
