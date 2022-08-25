@@ -2,7 +2,7 @@
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
   import { getContext, onMount } from 'svelte';
   import supabase from '@lib/db';
-  import { memberData, userData } from '@lib/stores/userStore';
+  import { memberData, user, userData } from '@lib/stores/userStore';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
 
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
@@ -107,7 +107,7 @@
       });
 
       await getUserCardId();
-      activeMembers = moveArrItemToFront(activeMembers, userCardId);
+      activeMembers = moveArrItemToFront(activeMembers, $user?.id);
     }
   };
 
@@ -122,7 +122,6 @@
 
   $: allMember = [...activeMembers, ...inactiveCards];
 
-  $: console.log('page', page, allMember);
   // $: page, toItem, getTeamCard();
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>

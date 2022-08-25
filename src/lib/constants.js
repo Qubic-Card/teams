@@ -310,3 +310,14 @@ export const defaultRole = [
     ],
   },
 ];
+
+export const teamProfileTemplate = {
+  job: 'Onboarding Manager',
+  links: [{ link: 'https://qubic.id', title: 'My Website', isActive: true }],
+  avatar: '',
+  design: { theme: 'dark', background: '' },
+  company: 'Qubic',
+  socials: [{ data: 'qubic.id', type: 'instagram', isActive: true }],
+  lastname: 'Template',
+  firstname: 'Qubic',
+};

@@ -1,7 +1,9 @@
 const moveArrItemToFront = (data = [], matchingId) => {
   //find the index of the element in the array
 
-  const index = data.findIndex((item) => item?.card_id?.id === matchingId);
+  const index = data.findIndex(
+    (item) => item?.team_member_id?.uid === matchingId
+  );
 
   if (index !== -1) {
     //if the matching element is found,

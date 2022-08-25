@@ -6,7 +6,8 @@
   import SelectTeamsSkeleton from '@comp/skeleton/selectTeamsSkeleton.svelte';
 
   let teams = [];
-
+  // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
+  // 59
   const getTeamsList = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -17,7 +18,18 @@
     if (error) console.log(error);
 
     if (data) {
-      teams = data;
+      let newData = [];
+
+      let uniqueTeamId = [...new Set(data.map((t) => t.team_id.id))];
+
+      data.filter((t) => {
+        if (uniqueTeamId.includes(t.team_id.id)) {
+          newData.push(t.team_id);
+          uniqueTeamId = uniqueTeamId.filter((m) => m !== t.team_id.id);
+        }
+      });
+
+      teams = newData;
     }
   };
 
@@ -42,13 +54,13 @@
           {#if teams.length > 0}
             {#each teams as item}
               <div
-                on:click={() => chooseTeam(item.team_id.id)}
+                on:click={() => chooseTeam(item.id)}
                 transition:slide|local={{ duration: 500 }}
                 class="flex items-center justify-between p-4 rounded-md w-96 cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
               >
                 <p>
-                  {item.team_id.name.charAt(0).toUpperCase() +
-                    item.team_id.name.slice(1) ?? 'No team name'}
+                  {item.name.charAt(0).toUpperCase() + item.name.slice(1) ??
+                    'No team name'}
                 </p>
                 ->
               </div>

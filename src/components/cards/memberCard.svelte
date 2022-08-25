@@ -17,6 +17,7 @@
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { createEventDispatcher } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
+  import { teamProfileTemplate } from '@lib/constants';
 
   export let permissions;
   export let roles = [];
@@ -84,7 +85,11 @@
 
     const { error: error_member } = await supabase
       .from('team_members')
-      .update({ uid: null }, { returning: 'minimal' })
+      .update({
+        uid: null,
+        team_profile: teamProfileTemplate,
+        returning: 'minimal',
+      })
       .eq('id', id);
 
     if (error_member) {
@@ -252,7 +257,7 @@
                 {teamProfile?.job}
               </h2>
               <h2 class="text-neutral-300 text-xs">
-                Joined since {convertToGMT7(member?.team_member_id.member_from)
+                Joined since {convertToGMT7(member?.team_member_id.user_change)
                   .toDateString()
                   .slice(4)}
               </h2>

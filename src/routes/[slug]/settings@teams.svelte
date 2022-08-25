@@ -8,7 +8,7 @@
   import { getContext } from 'svelte';
   import Activation from '@pages/settings/activation.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import sha256 from 'crypto-js/sha256';
+  import encryptActivationCode from '@lib/utils/encryptActivationCode';
 
   const teamId = getContext('teamId');
 
@@ -48,7 +48,7 @@
 
   const addActivationCode = async (newToken) => {
     isLoading = true;
-    let hash = sha256(newToken).toString();
+    let hash = encryptActivationCode(newToken);
     const { data, error } = await supabase
       .from('teams')
       .update({
