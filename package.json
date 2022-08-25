@@ -29,7 +29,6 @@
     "@types/vcards-js": "^2.10.2",
     "@zerodevx/svelte-toast": "^0.7.1",
     "chart.js": "^3.8.0",
-    "crypto-js": "^4.1.1",
     "filepond": "^4.30.3",
     "filepond-plugin-file-validate-size": "^2.2.5",
     "filepond-plugin-file-validate-type": "^1.2.6",
