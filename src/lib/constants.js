@@ -11,6 +11,7 @@ export const socialIcons = {
   email: 'https://img.icons8.com/fluency/96/000000/new-post.png',
   phone: 'https://img.icons8.com/fluency/96/000000/phone.png',
   line: 'https://img.icons8.com/fluency/96/000000/line-me.png',
+  github: 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png',
 };
 
 export const cartImage = {

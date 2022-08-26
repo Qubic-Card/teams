@@ -20,7 +20,6 @@
   let innerWidth = 0;
   let cards = [];
   let roles = [];
-  let userCardId = null;
   let teamCardCon = [];
   let inactiveCards = [];
   let activeMembers = [];
@@ -44,19 +43,6 @@
   };
 
   const setState = (newState) => (state = newState);
-
-  const getUserCardId = async () => {
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .select('card_id')
-      .eq('team_member_id', $memberData?.id);
-
-    if (error) console.log(error);
-
-    if (data) {
-      userCardId = data[0].card_id;
-    }
-  };
 
   const getTeamCard = async () => {
     // const { from, to } = getPagination(page, toItem);
@@ -106,7 +92,6 @@
         }
       });
 
-      await getUserCardId();
       activeMembers = moveArrItemToFront(activeMembers, $user?.id);
     }
   };
@@ -122,7 +107,6 @@
 
   $: allMember = [...activeMembers, ...inactiveCards];
 
-  // $: page, toItem, getTeamCard();
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 

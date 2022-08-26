@@ -37,7 +37,7 @@
   const toggleModal = () => (showModal = !showModal);
 
   const toProfileEditor = (slug) =>
-    goto(`/${$page.params.slug}/members/${slug}`);
+    goto(`/${$page.params.slug}/members/${slug}`, { state: card });
 
   const selectRole = (role) => (selectedRole = role);
 

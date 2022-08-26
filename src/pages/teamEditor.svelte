@@ -196,7 +196,8 @@
     const { data, error } = await supabase
       .from('team_cardcon')
       .update({ display_personal: $isDisplayPersonal })
-      .eq('team_member_id', memberId);
+      .eq('team_member_id', memberId)
+      .eq('card_id', history.state.id);
 
     if (error) {
       toastFailed();
@@ -235,6 +236,27 @@
   open={isOpen}
   on:close={() => (isOpen = false)}
 >
+  <div class="h-full flex flex-col gap-2">
+    <h2>Crop image</h2>
+    <div class="relative h-1/2">
+      <Cropper
+        {image}
+        aspect={1}
+        zoom="1"
+        crop={{ x: 0, y: 0 }}
+        on:cropcomplete={previewCrop}
+      />
+    </div>
+    {#if croppedImage}
+      <h2>Cropped Image</h2>
+      <img
+        transition:fade|local={{ duration: 300 }}
+        src={croppedImage}
+        alt="Cropped profile"
+        class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+      /><br />
+    {/if}
+  </div>
   <div class="flex w-full gap-2">
     {#if croppedImage}
       <button
@@ -265,25 +287,6 @@
       >
     {/if}
   </div>
-  <h2>Crop image</h2>
-  <div class="relative h-1/2">
-    <Cropper
-      {image}
-      aspect={1}
-      zoom="1"
-      crop={{ x: 0, y: 0 }}
-      on:cropcomplete={previewCrop}
-    />
-  </div>
-  {#if croppedImage}
-    <h2>Cropped Image</h2>
-    <img
-      transition:fade|local={{ duration: 300 }}
-      src={croppedImage}
-      alt="Cropped profile"
-      class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
-    /><br />
-  {/if}
 </Dialog>
 
 <div class="flex justify-center">

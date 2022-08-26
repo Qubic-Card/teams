@@ -1,19 +1,15 @@
 const moveArrItemToFront = (data = [], matchingId) => {
-  //find the index of the element in the array
+  const matchedData = data
+    .filter((item) => item?.team_member_id?.uid === matchingId)
+    .sort((a, b) => a.team_member_id.id + b.team_member_id.id);
 
-  const index = data.findIndex(
-    (item) => item?.team_member_id?.uid === matchingId
-  );
+  const unmatchedData = data
+    .filter((item) => item?.team_member_id?.uid !== matchingId)
+    .sort((a, b) => a.team_member_id.id + b.team_member_id.id);
 
-  if (index !== -1) {
-    //if the matching element is found,
-    const updatedData = [...data];
-    //then remove that element and use `unshift`
-    updatedData.unshift(...updatedData.splice(index, 1));
-    return updatedData;
-  }
-  //if the matching element is not found, then return the same array
-  return data;
+  let newData = [...matchedData, ...unmatchedData];
+
+  return newData;
 };
 
 export default moveArrItemToFront;
