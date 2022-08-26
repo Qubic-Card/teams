@@ -27,6 +27,8 @@
   const teamId = getContext('teamId');
   let isCheckRoleDone = false;
   let isTeamInactive = false;
+  let memberId = null;
+  let companyNickname;
 
   $: $userData?.filter((item) => {
     if ($page.params.slug === $user?.id) {
@@ -51,10 +53,6 @@
 
     if (item === 'will_expired') permissions.will_expire = true;
   });
-
-  let memberId = null;
-
-  let companyNickname;
 
   const getTeams = async () => {
     const { data, error } = await supabase
@@ -95,11 +93,15 @@
   const getDisplayPersonal = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .select('display_personal')
-      .eq('team_member_id', memberId);
+      .select('id,display_personal')
+      .eq('team_member_id', memberId)
+      .eq('card_id', history.state.id);
 
     if (error) console.log(error);
-    if (data) $isDisplayPersonal = data[0].display_personal;
+    if (data) {
+      $isDisplayPersonal = data[0].display_personal;
+      if (!data[0].display_personal) $selectedTab = 'team';
+    }
   };
 
   $: if (memberId) getDisplayPersonal();

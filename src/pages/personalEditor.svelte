@@ -36,7 +36,6 @@
   } from '@rgossiaux/svelte-headlessui';
   import { page } from '$app/stores';
   import toNewTab from '@lib/utils/newTab';
-  import Cookies from 'js-cookie';
   import { profileData } from '@lib/stores/profileData';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import {
@@ -183,10 +182,31 @@
   static
   class={`${
     isOpen ? 'translate-x-0' : 'translate-x-[900px]'
-  } transition-all duration-300 ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+  } transition-all duration-300 justify-between ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   open={isOpen}
   on:close={() => (isOpen = false)}
 >
+  <div class="h-full flex flex-col gap-2">
+    <h2>Crop image</h2>
+    <div class="relative h-1/2">
+      <Cropper
+        {image}
+        aspect={1}
+        zoom="1"
+        crop={{ x: 0, y: 0 }}
+        on:cropcomplete={previewCrop}
+      />
+    </div>
+    {#if croppedImage}
+      <h2>Cropped Image</h2>
+      <img
+        transition:fade|local={{ duration: 300 }}
+        src={croppedImage}
+        alt="Cropped profile"
+        class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+      /><br />
+    {/if}
+  </div>
   <div class="flex w-full gap-2">
     {#if croppedImage}
       <button
@@ -217,25 +237,6 @@
       >
     {/if}
   </div>
-  <h2>Crop image</h2>
-  <div class="relative h-1/2">
-    <Cropper
-      {image}
-      aspect={1}
-      zoom="1"
-      crop={{ x: 0, y: 0 }}
-      on:cropcomplete={previewCrop}
-    />
-  </div>
-  {#if croppedImage}
-    <h2>Cropped Image</h2>
-    <img
-      transition:fade|local={{ duration: 300 }}
-      src={croppedImage}
-      alt="Cropped profile"
-      class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
-    /><br />
-  {/if}
 </Dialog>
 
 {#await getProfile()}
@@ -467,7 +468,10 @@
                                 </MenuItem>
                                 <MenuItem
                                   class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
-                                  on:click={() => handleDeleteSocial(item)}
+                                  on:click={async () => {
+                                    handleDeleteSocial(item, $socials);
+                                    await handleSave();
+                                  }}
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -488,7 +492,10 @@
                                 {#if i != 0}
                                   <MenuItem
                                     class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
-                                    on:click={() => handleUpSocial(item, i)}
+                                    on:click={async () => {
+                                      handleUpSocial(item, i, $socials);
+                                      await handleSave();
+                                    }}
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"

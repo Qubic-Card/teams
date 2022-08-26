@@ -25,7 +25,7 @@
 >
   <div class="flex w-full justify-between items-center text-white">
     <div class="flex flex-col w-full">
-      <div class="flex flex-col items-center mb-2">
+      <div class="flex flex-col mb-2">
         {#if connection.profileData.avatar}
           {#if connection.profileData.avatar === ''}
             <div
@@ -41,12 +41,12 @@
           {/if}
         {:else}
           <div
-            class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-black bg-neutral-600 "
+            class="flex justify-center items-center w-24 md:w-32 lg:w-36 h-24 md:h-32 lg:h-36 text-5xl rounded-lg text-neutral-900 bg-neutral-200 "
           >
             Q
           </div>
         {/if}
-        <div class="flex flex-col  mt-3 text-center ">
+        <div class="flex flex-col  mt-3">
           <p class="font-bold">
             {connection.profileData.firstname ?? ''}
             {connection.profileData.lastname ?? ''}
@@ -54,7 +54,7 @@
           <p
             class={`${
               connection.profileData.firstname
-                ? 'text-neutral-300 text-sm text-center'
+                ? 'text-neutral-300 text-sm'
                 : 'hidden'
             }`}
           >
@@ -151,17 +151,11 @@
                 >
               {/if}
             {/each}
-          {:else}
-            <div class="flex flex-col items-center">
-              <p class="text-center text-white">
-                No social media accounts connected
-              </p>
-            </div>
           {/if}
         {/if}
       </div>
       <div
-        class="grid grid-cols-1 grid-flow-row gap-2 rounded-md w-full text-center text-white"
+        class="grid grid-cols-1 grid-flow-row gap-2 rounded-md w-full text-white"
       >
         {#if connection?.profileData?.links}
           {#if connection?.profileData?.links.length > 0}
@@ -175,10 +169,6 @@
                 </p>
               {/if}
             {/each}
-          {:else}
-            <div class="flex flex-col items-center">
-              <p class="text-center text-white">No link added</p>
-            </div>
           {/if}
         {/if}
       </div>

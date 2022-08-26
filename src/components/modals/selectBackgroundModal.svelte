@@ -157,13 +157,34 @@
     static
     class={`${
       isOpen ? 'translate-x-0' : 'translate-x-[900px]'
-    } transition-all duration-300 ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+    } transition-all duration-300 ease-in-out justify-between flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
     open={isOpen}
     on:close={() => {
       isOpen = false;
       setState('idle');
     }}
   >
+    <div class="h-full flex flex-col gap-2">
+      <h2>Crop image</h2>
+      <div class="relative h-1/2">
+        <Cropper
+          {image}
+          aspect={3 / 1}
+          zoom="1"
+          crop={{ x: 0, y: 0 }}
+          on:cropcomplete={previewCrop}
+        />
+      </div>
+      {#if croppedImage}
+        <h2>Cropped Image</h2>
+        <img
+          transition:fade|local={{ duration: 300 }}
+          src={croppedImage}
+          alt="Cropped profile"
+          class="w-full h-48 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+        /><br />
+      {/if}
+    </div>
     <div class="flex w-full gap-2">
       {#if croppedImage}
         <button
@@ -194,25 +215,6 @@
         >
       {/if}
     </div>
-    <h2>Crop image</h2>
-    <div class="relative h-1/2">
-      <Cropper
-        {image}
-        aspect={3 / 1}
-        zoom="1"
-        crop={{ x: 0, y: 0 }}
-        on:cropcomplete={previewCrop}
-      />
-    </div>
-    {#if croppedImage}
-      <h2>Cropped Image</h2>
-      <img
-        transition:fade|local={{ duration: 300 }}
-        src={croppedImage}
-        alt="Cropped profile"
-        class="w-full h-48 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
-      /><br />
-    {/if}
   </Dialog>
 {/if}
 
@@ -266,7 +268,7 @@
           bind:value={searchQuery}
           type="text"
           placeholder="Search for images..."
-          class="p-4 bg-neutral-700 text-white rounded-lg w-full"
+          class="p-2 bg-neutral-700 text-white rounded-lg w-full"
         />
       </div>
       <div
