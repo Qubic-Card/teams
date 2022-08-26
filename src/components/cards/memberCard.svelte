@@ -85,11 +85,13 @@
 
     const { error: error_member } = await supabase
       .from('team_members')
-      .update({
-        uid: null,
-        team_profile: teamProfileTemplate,
-        returning: 'minimal',
-      })
+      .update(
+        {
+          uid: null,
+          team_profile: teamProfileTemplate,
+        },
+        { returning: 'minimal' }
+      )
       .eq('id', id);
 
     if (error_member) {
