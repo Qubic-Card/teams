@@ -76,5 +76,5 @@
 </div>
 
 {#if isAlreadySeeMore}
-  <PaginationButton {currentPageRows} {setPage} {page} {maxPage} />
+  <PaginationButton {setPage} {page} {maxPage} />
 {/if}

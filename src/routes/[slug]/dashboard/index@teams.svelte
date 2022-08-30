@@ -1,16 +1,15 @@
 <script>
   import { user, userData } from '@lib/stores/userStore';
   import Analytics from '@pages/analytics.svelte';
-  import QuickActionsModal from '@comp/modals/quickActionsModal.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { learnMoreContents } from '@lib/constants';
+  import { toastFailed } from '@lib/utils/toast';
 
   let permissions = {
     writeMembers: false,
     writeProfile: false,
   };
-  let showModal = false;
 
   $: $userData?.filter((item) => {
     if (item === 'allow_write_members') {
@@ -24,54 +23,25 @@
   const quickActions = [
     {
       handler: () =>
-        permissions.writeMembers === false
-          ? (showModal = true)
+        !permissions.writeMembers
+          ? toastFailed('You do not have access to this page')
           : goto(`/${$page.params.slug}/members`),
       name: 'Manage Members',
     },
     {
       handler: () =>
-        permissions.writeProfile === false
-          ? (showModal = true)
+        !permissions.writeProfile
+          ? toastFailed('You do not have access to this page')
           : goto(`/${$page.params.slug}/members/${$user.id}`),
       name: 'Edit profile',
     },
   ];
-  let faq = [
-    {
-      title: 'Perbedaan Qubic Teams & Basic',
-      link: 'https://qubicid.notion.site/Produk-Qubic-51424b37949c45e98ba256ad6a9d8ed2',
-    },
-    {
-      title: 'Produk Qubic',
-      link: 'https://qubicid.notion.site/Perbedaan-Qubic-Teams-Basic-916f8ff01ae54374b7a2c6a594534835',
-    },
-    {
-      title: 'Menambah User Saat Subscription Berjalan',
-      link: 'https://qubicid.notion.site/Menambah-User-Saat-Subscription-Berjalan-5bb318c30c3b4e3a99e2aebb5f3cbb08',
-    },
-    {
-      title: 'Minimal Pengguna Qubic Teams',
-      link: 'https://qubicid.notion.site/Minimal-Pengguna-Qubic-Teams-de4c3cf21b5144089fc78184ec856b62',
-    },
-    {
-      title: 'Penggunaan Product Qubic Teams',
-      link: 'https://qubicid.notion.site/Penggunaan-Product-Qubic-Teams-94876ae60adb4e9a9541e43df8e87a3c',
-    },
-    {
-      title: 'Cara Berpindah Qubic Basic → Teams ',
-      link: 'https://qubicid.notion.site/Cara-Berpindah-Qubic-Basic-Teams-2472d3cd8aa6479c80b36d607f509186',
-    },
-  ];
-
-  const modalHandler = () => (showModal = !showModal);
 </script>
 
 <div
   class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-24 pr-4"
 >
   <div class="flex flex-col">
-    <QuickActionsModal {showModal} {modalHandler} />
     <h1 class="text-lg font-bold">Quick Actions</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-16 lg:h-12 flex w-full overflow-x-auto mt-2 gap-2"

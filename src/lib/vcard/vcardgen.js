@@ -135,16 +135,6 @@ export const genvcard = async (prop, team) => {
 
   vCard.version = '3.0'; //can also support 2.1 and 4.0, certain versions only support certain fields
 
-  // try to sorting social media
-  // let newObj = Object.entries(vCard.socialUrls).reduce(
-  //   (p, [k, v]) => ({ ...p, [k]: vCard.socialUrls[k] }),
-  //   {}
-  // );
-  // console.log(newObj);
-  // vCard.socialUrls = newObj;
-  // console.log(vCard);
-
   const formatted = formatter(vCard.getFormattedString());
-
   return formatted;
 };

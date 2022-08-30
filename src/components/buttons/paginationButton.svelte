@@ -1,5 +1,4 @@
 <script>
-  export let currentPageRows = [];
   export let setPage, page, maxPage;
 </script>
 

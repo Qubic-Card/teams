@@ -58,7 +58,7 @@
     if (data) {
       cardsId = data.map((card) => card.id);
       cards = data;
-      maxPage = Math.ceil(count / 2);
+      // maxPage = Math.ceil(count / 2);
     }
   };
 
@@ -202,7 +202,6 @@
     {/if}
     <!-- {#if permissions.readMembers && allMember.length > 1}
       <PaginationButton
-        currentPageRows={allMember}
         {setPage}
         {page}
         {maxPage}

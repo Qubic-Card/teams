@@ -73,7 +73,7 @@
             class={`my-2 ${
               connection.link === '' || connection.link === null
                 ? 'hidden'
-                : 'flex justify-center'
+                : 'flex'
             }`}
           >
             <img
@@ -94,11 +94,7 @@
             </p>
           </div>
           <div>
-            <div
-              class={`${
-                connection.message === null ? 'hidden' : 'flex justify-center'
-              }`}
-            >
+            <div class={`${connection.message === null ? 'hidden' : 'flex'}`}>
               <img
                 class="mr-2 bg-neutral-300 rounded-md h-7 w-7 p-1"
                 draggable="false"
