@@ -23,6 +23,20 @@
 
   const teamId = getContext('teamId');
 
+  let maxPage = 0;
+  let page = 0;
+  let toItem = 15;
+  let totalTeamRecords = 0;
+  let isLoading = false;
+  const setPage = (p) => (page = p);
+  const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const from = page ? page * limit : 0;
+    const to = page ? from + size - 1 : size - 1;
+
+    return { from, to };
+  };
+
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
       .from('records')
@@ -38,16 +52,23 @@
   };
 
   const getTeamStorage = async () => {
-    const { data, error } = await supabase
+    isLoading = true;
+    const { from, to } = getPagination(page, toItem);
+    const { data, error, count } = await supabase
       .from('team_storage')
-      .select('*')
+      .select('*', { count: 'estimated' })
       .eq('tid', teamId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (error) {
       console.log(error);
+      isLoading = false;
     } else {
+      totalTeamRecords = count;
       $team = data;
+      maxPage = Math.ceil(count / toItem);
+      isLoading = false;
     }
   };
 
@@ -73,6 +94,8 @@
     if (item === 'allow_write_records') permissions.writeRecords = true;
     if (item === 'inactive') isTeamInactive = true;
   });
+
+  $: toItem, page, getTeamStorage();
 </script>
 
 {#await (getAllStorage(), getMemberData())}
@@ -108,21 +131,31 @@
             <PersonalRecords {isTeamInactive} {holder} {getAllStorage} />
           </TabPanel>
           <TabPanel class="flex h-full">
-            <TeamRecords {isTeamInactive} {holder} {getAllStorage} />
+            <TeamRecords
+              loading={isLoading}
+              {isTeamInactive}
+              {holder}
+              {getAllStorage}
+              {maxPage}
+              {page}
+              {totalTeamRecords}
+              {setPage}
+              {toItem}
+            />
           </TabPanel>
         </TabPanels>
       </TabGroup>
     {:else}
       <div class="flex h-full">
-        <PersonalRecords
-          {getAllStorage}
-          {getPersonalStorage}
-          {isTeamInactive}
-          {holder}
-        />
+        <PersonalRecords {getAllStorage} {isTeamInactive} {holder} />
       </div>
     {/if}
   </div>
 {:catch name}
-  <h1>Error</h1>
+  <div>
+    <h1 class="text-xl text-white text-center w-full mt-8">
+      Some error occurred. Please reload the page and try again <br /> or
+      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+    </h1>
+  </div>
 {/await}

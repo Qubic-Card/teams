@@ -1,12 +1,10 @@
 <script>
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
-  import Pagination from '@comp/pagination.svelte';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
   import { fade } from 'svelte/transition';
 
   export let loading, isAlreadySeeMore, currentPageRows, setPage, page, maxPage;
-  const dispatch = createEventDispatcher();
 </script>
 
 <div class="bg-neutral-800 rounded-lg border border-neutral-700">
@@ -76,5 +74,5 @@
 </div>
 
 {#if isAlreadySeeMore}
-  <PaginationButton {currentPageRows} {setPage} {page} {maxPage} />
+  <PaginationButton {setPage} {page} {maxPage} />
 {/if}

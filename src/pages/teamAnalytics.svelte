@@ -49,7 +49,7 @@
       <h1 class="text-sm font-bold text-white">No logs</h1>
     </div>
   {/if}
-  <PaginationButton {currentPageRows} {setPage} {page} {maxPage} />
+  <PaginationButton {setPage} {page} {maxPage} />
 {:else}
   <TeamAnalyticsLogsSkeleton />
 {/if}

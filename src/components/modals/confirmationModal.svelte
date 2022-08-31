@@ -58,6 +58,7 @@
           >Cancel</button
         >
         <button
+          disabled={isLoading}
           on:click={async () =>
             isDispatch ? action() : await deleteRoleHandler(id)}
           class={`text-lg font-semibold ${

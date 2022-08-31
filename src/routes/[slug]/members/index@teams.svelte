@@ -58,17 +58,19 @@
     if (data) {
       cardsId = data.map((card) => card.id);
       cards = data;
-      maxPage = Math.ceil(count / 2);
+      // maxPage = Math.ceil(count / 2);
     }
   };
 
   const getTeamCardCon = async () => {
+    // const { from, to } = getPagination(page, toItem);
     const { data, error } = await supabase
       .from('team_cardcon')
       .select(
         'card_id(id, type, color), status, team_member_id(*, role(id, role_name))'
       )
       .in('card_id', cardsId);
+    // .range(from, to);
 
     if (error) console.log(error);
     if (data) {
@@ -200,17 +202,15 @@
         {searchNotFoundMsg}
       </div>
     {/if}
-    <!-- {#if permissions.readMembers && allMember.length > 1}
-      <PaginationButton
-        currentPageRows={allMember}
-        {setPage}
-        {page}
-        {maxPage}
-      />
-    {/if} -->
+    {#if permissions.readMembers && allMember.length > 1}
+      <PaginationButton {setPage} {page} {maxPage} />
+    {/if}
   {:catch}
-    <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-      Some error occurred. Please reload the page and try again.
-    </h1>
+    <div>
+      <h1 class="text-xl text-white text-center w-full mt-8">
+        Some error occurred. Please reload the page and try again <br /> or
+        <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      </h1>
+    </div>
   {/await}
 </div>

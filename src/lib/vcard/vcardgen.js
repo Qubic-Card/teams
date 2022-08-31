@@ -87,7 +87,7 @@ export const genvcard = async (prop, team) => {
   }
 
   //set social media URLs
-  if (team.display_personal) {
+  if (team?.display_personal) {
     if (prop.socials) {
       prop.socials.map((e) => {
         if (e.isActive) {
@@ -127,24 +127,14 @@ export const genvcard = async (prop, team) => {
   }
 
   if (teamEmail === undefined) {
-    if (team.display_personal) vCard.email = personalEmail;
+    if (team?.display_personal) vCard.email = personalEmail;
   } else {
-    if (team.display_personal) vCard.email = personalEmail;
+    if (team?.display_personal) vCard.email = personalEmail;
     vCard.workEmail = teamEmail;
   }
 
   vCard.version = '3.0'; //can also support 2.1 and 4.0, certain versions only support certain fields
 
-  // try to sorting social media
-  // let newObj = Object.entries(vCard.socialUrls).reduce(
-  //   (p, [k, v]) => ({ ...p, [k]: vCard.socialUrls[k] }),
-  //   {}
-  // );
-  // console.log(newObj);
-  // vCard.socialUrls = newObj;
-  // console.log(vCard);
-
   const formatted = formatter(vCard.getFormattedString());
-
   return formatted;
 };

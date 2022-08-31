@@ -53,11 +53,11 @@
   class="h-12 text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
 >
   <td class="font-bold text-ellipsis pl-4">
-    <p class="w-80 truncate">
+    <p class="w-56 lg:w-80 truncate">
       {#if record.storage_url}
-        {record?.filename?.split('-').slice(0, -1).join('-') ?? '-'}
+        {record?.filename?.split('-').slice(0, -1).join('-') ?? '-'}asfasfasf
       {:else}
-        {record?.name?.split('-').slice(0, -1).join('-') ?? '-'}
+        {record?.name?.split('-').slice(0, -1).join('-') ?? '-'}afassfasf
       {/if}
     </p>
   </td>
@@ -75,7 +75,7 @@
   </td>
   {#if isTeam}
     <td class="pl-4 pr-4">
-      <p class="w-60 truncate">
+      <p class="w-40 lg:w-60 truncate">
         {record.by}
       </p>
     </td>

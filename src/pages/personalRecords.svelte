@@ -258,7 +258,7 @@
     class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
     disabled={fileName.includes('.') || fileName.length < 4
       ? true
-      : false || $userData.includes('inactive')}
+      : false || $userData.includes('inactive') || isLoading}
     on:click={async () => {
       if (selectedType === 'Choose Type') {
         toastFailed('Please select a type');

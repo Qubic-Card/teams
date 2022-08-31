@@ -71,7 +71,12 @@
             alt=""
             class="w-6 h-6 cursor-pointer"
             on:click={async () => {
-              download(await genvcard(connection?.profileData), 'contact');
+              download(
+                await genvcard(connection?.profileData, {
+                  display_personal: true,
+                }),
+                'contact'
+              );
             }}
           />
           <small>{connection?.profileData.edited ? 'Edited' : ''}</small>
@@ -83,7 +88,10 @@
         alt=""
         class="w-6 h-6 cursor-pointer"
         on:click={async () => {
-          download(await genvcard(connection?.profileData), 'contact');
+          download(
+            await genvcard(connection?.profileData, { display_personal: true }),
+            'contact'
+          );
         }}
       />
     {/if}
