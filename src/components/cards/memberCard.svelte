@@ -147,7 +147,7 @@
     {#if $user?.id === member.team_member_id.uid}
       <div class="flex flex-col justify-between">
         <div
-          class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
+          class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
         >
           <div
             class="flex cursor-pointer h-full gap-4 p-4"
@@ -217,7 +217,7 @@
   {:else}
     <div class="flex flex-col justify-between">
       <div
-        class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
+        class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
       >
         <div
           class="flex cursor-pointer h-full gap-4 p-4"
@@ -421,7 +421,7 @@
 {:else if permissions.readMembers}
   <div class="flex flex-col justify-between">
     <div
-      class="flex flex-col justify-between w-full h-full bg-neutral-800 rounded-md"
+      class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
     >
       <div class="flex h-full gap-4 p-4">
         <img

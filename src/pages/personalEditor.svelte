@@ -45,6 +45,7 @@
     handleUpSocial,
   } from '@lib/utils/editors';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
+  import { getContext } from 'svelte';
 
   export let permissions, isTeamInactive;
 
@@ -60,7 +61,7 @@
 
   let pond;
   let name = 'filepond';
-
+  const teamID = getContext('teamId');
   let isOpen = false;
   let croppedImage = '';
   let fileName = '';
@@ -127,7 +128,8 @@
     let { data, error } = await supabase
       .from('team_members')
       .select('team_profile, uid, team_id')
-      .eq('uid', $page.params.slug);
+      .eq('uid', $page.params.slug)
+      .eq('team_id', teamID);
 
     if (data) {
       const profile = data[0]['team_profile'];
@@ -165,7 +167,8 @@
     const { error } = await supabase
       .from('team_members')
       .update({ team_profile: $profileData }, { returning: 'minimal' })
-      .eq('uid', $page.params.slug);
+      .eq('uid', $page.params.slug)
+      .eq('team_id', teamID);
     if (error) {
       toastFailed();
       console.log(error);

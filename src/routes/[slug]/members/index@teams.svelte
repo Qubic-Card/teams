@@ -56,6 +56,7 @@
 
     if (error) console.log(error);
     if (data) {
+      console.log(data);
       cardsId = data.map((card) => card.id);
       cards = data;
       // maxPage = Math.ceil(count / 2);
@@ -67,13 +68,14 @@
     const { data, error } = await supabase
       .from('team_cardcon')
       .select(
-        'card_id(id, type, color), status, team_member_id(*, role(id, role_name))'
+        'card_id(id, type, color), status, team_member_id(*, role(id, role_name), team_id)'
       )
       .in('card_id', cardsId);
     // .range(from, to);
 
     if (error) console.log(error);
     if (data) {
+      console.log(data);
       if (data.length > 0) {
         teamCardCon = data.filter((c) => c.team_member_id.uid !== null);
       }
@@ -108,7 +110,7 @@
   }
 
   $: allMember = [...activeMembers, ...inactiveCards];
-
+  $: console.log(allMember);
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 

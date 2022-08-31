@@ -54,7 +54,7 @@ export const genvcard = async (prop, team) => {
     }
 
     if (team.socials) {
-      team.socials.map((e) => {
+      team.socials.map((e, i) => {
         if (e.type === 'phone') {
           teamPhoneNumber = e.data;
           if (teamPhoneNumber.startsWith('+'))
@@ -74,7 +74,7 @@ export const genvcard = async (prop, team) => {
           }
         }
 
-        return (vCard.socialUrls[e.type + 'cmpny'] = e.data);
+        return (vCard.socialUrls[e.type + i + 'cmpny'] = e.data);
       });
     }
 
@@ -89,7 +89,7 @@ export const genvcard = async (prop, team) => {
   //set social media URLs
   if (team?.display_personal) {
     if (prop.socials) {
-      prop.socials.map((e) => {
+      prop.socials.map((e, i) => {
         if (e.isActive) {
           if (e.type === 'email') personalEmail = e.data;
           if (e.type === 'phone') {
@@ -109,7 +109,7 @@ export const genvcard = async (prop, team) => {
 
           if (e.type == 'phone') return (vCard.cellPhone = phoneNumber);
 
-          return (vCard.socialUrls[e.type] = e.data);
+          return (vCard.socialUrls[e.type + i] = e.data);
         }
       });
     }
