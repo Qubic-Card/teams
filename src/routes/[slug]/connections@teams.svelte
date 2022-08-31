@@ -12,14 +12,13 @@
   import TableHead from '@comp/tables/tableHead.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getContext } from 'svelte';
+  import PaginationButton from '@comp/buttons/paginationButton.svelte';
 
   const teamId = getContext('teamId');
   let innerWidth;
   let asc = false;
   let searchQuery = '';
   let searchNotFoundMsg = '';
-
-  // let currentPageRows = [2, 2, 2, 2, 2];
   let loading = false;
   let permissions = {
     readConnection: false,
@@ -32,6 +31,11 @@
   let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
   let isLoading = false;
   let tabs = 'user';
+  let maxPage = 0;
+  let page = 0;
+  let toItem = 15;
+  let totalTeamData = 0;
+  let totalUserData = 0;
 
   $: $userData?.filter((item) => {
     if (item === 'allow_read_connections') permissions.readConnection = true;
@@ -40,31 +44,68 @@
     if (item === 'will_expired') permissions.will_expire = true;
   });
 
+  const setPage = (p) => (page = p);
+  const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
   const setTabs = (tab) => (tabs = tab);
 
+  const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const from = page ? page * limit : 0;
+    const to = page ? from + size - 1 : size - 1;
+
+    return { from, to };
+  };
+
   const getTeamConnectionsList = async () => {
-    const { data, error } = await supabase
+    loading = true;
+    const { from, to } = getPagination(page, toItem);
+    const { data, error, count } = await supabase
       .from('team_connection_acc')
       .select(
-        '*, by(team_profile->firstname, team_profile->lastname), team_id(*)'
+        '*, by(team_profile->firstname, team_profile->lastname), team_id(*)',
+        { count: 'estimated' }
       )
       .eq('team_id', teamId)
+      .order('dateConnected', { ascending: false })
+      .range(from, to)
+      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 
-    if (error) console.log(error);
-    if (data) teamConnections = data;
+    if (error) {
+      loading = false;
+      console.log(error);
+    }
+    if (data) {
+      totalTeamData = count;
+      teamConnections = data;
+      maxPage = Math.ceil(count / toItem);
+      loading = false;
+    }
   };
 
   const getUserConnectionsList = async () => {
-    const { data, error } = await supabase
+    loading = true;
+    const { from, to } = getPagination(page, toItem);
+    const { data, error, count } = await supabase
       .from('team_connection_acc')
-      .select('*, by(team_profile->firstname, team_profile->lastname)')
+      .select('*, by(team_profile->firstname, team_profile->lastname)', {
+        count: 'estimated',
+      })
       .eq('by', $memberData?.id)
+      .order('dateConnected', { ascending: false })
+      .range(from, to)
+      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 
-    if (error) console.log(error);
+    if (error) {
+      loading = false;
+      console.log(error);
+    }
     if (data) {
       userConnections = data;
+      totalUserData = count;
+      maxPage = Math.ceil(count / toItem);
+      loading = false;
     }
   };
 
@@ -97,52 +138,6 @@
     }
   };
 
-  const searchTeamHandler = async () => {
-    loading = true;
-
-    const { data, error } = await supabase
-      .from('team_connection_acc')
-      .select('*, by(team_profile->firstname, team_profile->lastname)')
-      .eq('team_id', teamId)
-      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
-      .order('dateConnected', { ascending: false });
-
-    loading = false;
-    if (error) console.log(error);
-    if (data) {
-      teamConnections = data;
-
-      data.length === 0
-        ? (searchNotFoundMsg = 'No connection found.')
-        : (searchNotFoundMsg = '');
-
-      return data;
-    }
-  };
-
-  const searchPersonalHandler = async () => {
-    loading = true;
-
-    const { data, error } = await supabase
-      .from('team_connection_acc')
-      .select('*, by(team_profile->firstname, team_profile->lastname)')
-      .eq('by', $memberData?.id)
-      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
-      .order('dateConnected', { ascending: false });
-
-    loading = false;
-    if (error) console.log(error);
-    if (data) {
-      userConnections = data;
-
-      data.length === 0
-        ? (searchNotFoundMsg = 'No connection found.')
-        : (searchNotFoundMsg = '');
-
-      return data;
-    }
-  };
-
   const deleteConnectionHandler = async (id, tab) => {
     isLoading = true;
     const { error } = await supabase
@@ -166,15 +161,28 @@
     }
   };
 
-  $: if (permissions.readConnection && tabs === 'all') {
-    searchQuery, selectedSearchMenu, searchTeamHandler();
-  } else if (permissions.readConnection && tabs === 'user') {
-    searchQuery, selectedSearchMenu, searchPersonalHandler();
+  $: if (searchQuery !== '') {
+    page = 0;
+    if (permissions.readConnection && tabs === 'all') {
+      searchQuery, selectedSearchMenu, getTeamConnectionsList();
+    } else if (permissions.readConnection && tabs === 'user') {
+      searchQuery, selectedSearchMenu, getUserConnectionsList();
+    } else {
+      searchQuery, selectedSearchMenu, getUserConnectionsList();
+    }
   } else {
-    searchQuery, selectedSearchMenu, searchPersonalHandler();
+    if (permissions.readConnection && tabs === 'all') {
+      getTeamConnectionsList();
+    } else if (permissions.readConnection && tabs === 'user') {
+      getUserConnectionsList();
+    } else {
+      getUserConnectionsList();
+    }
   }
 
-  const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
+  $: if (tabs === 'user') {
+    toItem, page, getUserConnectionsList();
+  } else toItem, page, getTeamConnectionsList();
 </script>
 
 <svelte:window bind:innerWidth />
@@ -291,6 +299,7 @@
               </tbody>
             {/if}
           </table>
+
           {#if searchNotFoundMsg !== ''}
             <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
               {searchNotFoundMsg}
@@ -304,12 +313,24 @@
               No connection found.
             </h1>
           {/if}
+          {#if tabs === 'all'}
+            {#if totalTeamData > toItem}
+              <PaginationButton {setPage} {page} {maxPage} />
+            {/if}
+          {:else if tabs === 'user' && totalUserData > toItem}
+            <PaginationButton {setPage} {page} {maxPage} />
+          {/if}
         </div>
       {/if}
     {:catch}
-      <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-        Some error occurred. Please reload the page and try again.
-      </h1>
+      <div>
+        <h1 class="text-xl text-white text-center w-full mt-8">
+          Some error occurred. Please reload the page and try again <br /> or
+          <a href="https://wa.me/628113087599" class="font-bold">
+            contact us!
+          </a>
+        </h1>
+      </div>
     {/await}
   {:else}
     {#await getUserConnectionsList()}
@@ -380,27 +401,21 @@
               No connection found.
             </h1>
           {/if}
+
+          {#if totalUserData > toItem}
+            <PaginationButton {setPage} {page} {maxPage} />
+          {/if}
         </div>
       {/if}
     {:catch}
-      <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
-        Some error occurred. Please reload the page and try again.
-      </h1>
+      <div>
+        <h1 class="text-xl text-white text-center w-full mt-8">
+          Some error occurred. Please reload the page and try again <br /> or
+          <a href="https://wa.me/628113087599" class="font-bold">
+            contact us!
+          </a>
+        </h1>
+      </div>
     {/await}
   {/if}
 </div>
-
-<!-- <div
-  class="w-full flex justify-center items-center mt-4 p-4 font-bold bg-neutral-300 text-black"
->
-  <h1>Upgrade Your Subscription</h1>
-</div> -->
-
-<!-- <Pagination
-  {subscriptionType}
-  {currentPageRows}
-  {totalPages}
-  {active}
-  {setPage}
-  {page}
-/> -->

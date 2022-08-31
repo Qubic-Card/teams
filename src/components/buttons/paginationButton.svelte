@@ -25,8 +25,10 @@
           1
         </button>
       {/if}
-      {#if i === page - 2 && i !== maxPage - 1}
-        <span class="text-white self-end mx-1">...</span>
+      {#if maxPage > 3}
+        {#if i === page - 2 && i !== maxPage - 1}
+          <span class="text-white self-end mx-1">...</span>
+        {/if}
       {/if}
       {#if i === page - 1}
         <button
@@ -53,8 +55,10 @@
           {i + 1}
         </button>
       {/if}
-      {#if i === page + 1 && i !== maxPage - 2 && i !== maxPage - 1}
-        <span class="text-white self-end mx-1">...</span>
+      {#if maxPage > 3}
+        {#if i === page + 1 && i !== maxPage - 2 && i !== maxPage - 1}
+          <span class="text-white self-end mx-1">...</span>
+        {/if}
       {/if}
       {#if i === page + 2}
         <button

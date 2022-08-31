@@ -108,5 +108,10 @@
     </div>
   </div>
 {:catch name}
-  <h1>Error</h1>
+  <div>
+    <h1 class="text-xl text-white text-center w-full mt-8">
+      Some error occurred. Please reload the page and try again <br /> or
+      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+    </h1>
+  </div>
 {/await}

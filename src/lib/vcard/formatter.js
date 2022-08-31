@@ -38,12 +38,10 @@ const formatter = (vcard) => {
       return val;
     };
 
-    const linkFormatter = (val) => {
-      val = `URL;LABEL=${title}:${
+    const linkFormatter = () => {
+      socialsFormatted[idx] = `URL;LABEL=${title}:${
         link.includes('http') ? http + ':' + domain : link
       }`;
-
-      return val;
     };
 
     const iOSSocialFormatter = (val, titleCompany, title, link, idx) => {
@@ -179,7 +177,7 @@ const formatter = (vcard) => {
     } else {
       if (socialsFormatted[idx].includes('facebook')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -190,7 +188,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('instagram')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -201,7 +199,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('twitter')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -212,7 +210,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('linkedin')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -223,7 +221,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('youtube')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -234,7 +232,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('whatsapp')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -245,7 +243,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('github')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -256,7 +254,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('tiktok')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -267,7 +265,7 @@ const formatter = (vcard) => {
         }
       } else if (socialsFormatted[idx].includes('line')) {
         if (checkIsLink(socialsFormatted[idx])) {
-          linkFormatter(socialsFormatted[idx]);
+          linkFormatter();
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
@@ -279,7 +277,7 @@ const formatter = (vcard) => {
       } else if (socialsFormatted[idx].includes('email')) {
         socialsFormatted[idx] = '';
       } else {
-        linkFormatter(socialsFormatted[idx]);
+        linkFormatter();
       }
     }
   }

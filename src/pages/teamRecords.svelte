@@ -1,5 +1,5 @@
 <script>
-  import Cookies from 'js-cookie';
+  import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import Input from '@comp/input.svelte';
   import { recordsTableTeam } from '@lib/constants';
   import RecordsTableBody from '@comp/tables/recordsTableBody.svelte';
@@ -16,8 +16,16 @@
   import sortBy from '@lib/utils/sortBy';
   import { personal, team } from '@lib/stores/recordsStore';
   import { getContext } from 'svelte';
+  import PaginationButton from '@comp/buttons/paginationButton.svelte';
 
-  export let holder, getAllStorage;
+  export let holder,
+    getAllStorage,
+    maxPage,
+    setPage,
+    page,
+    totalTeamRecords,
+    toItem,
+    loading;
 
   const teamId = getContext('teamId');
   let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
@@ -231,7 +239,9 @@
   </div>
   <button
     class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
-    disabled={fileName.includes('.') || fileName.length < 4 ? true : false}
+    disabled={fileName.includes('.') || fileName.length < 4
+      ? true
+      : false || isLoading}
     on:click={async () => {
       if (selectedType === 'Choose Type') {
         toastFailed('Please select a type');
@@ -248,41 +258,49 @@
 <div
   class="w-3/4 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
 >
-  <table class="snap-center text-black w-full">
-    <thead class="text-left text-neutral-400 bg-black/70">
-      <tr>
-        <TableHead
-          class="w-1/6"
-          data={recordsTableTeam}
-          on:sort={async (e) => {
-            asc = !asc;
-            await sortHandler(e.detail ?? 'filename');
-          }}
-        />
-      </tr>
-    </thead>
-    <tbody>
-      {#if $team}
-        {#if $team.length > 0}
-          {#each $team as record, i}
-            <RecordsTableBody
-              {record}
-              {teamId}
-              {deleteHandler}
-              {isLoading}
-              isTeam
-            />
-          {/each}
-        {:else}
-          <tr>
-            <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
-              No records found
-            </td>
-          </tr>
+  {#if loading}
+    <ConnectionsSkeletion items={$team} />
+  {:else}
+    <table class="snap-center text-black w-full">
+      <thead class="text-left text-neutral-400 bg-black/70">
+        <tr>
+          <TableHead
+            class="w-1/6"
+            data={recordsTableTeam}
+            on:sort={async (e) => {
+              asc = !asc;
+              await sortHandler(e.detail ?? 'filename');
+            }}
+          />
+        </tr>
+      </thead>
+      <tbody>
+        {#if $team}
+          {#if $team.length > 0}
+            {#each $team as record, i}
+              <RecordsTableBody
+                {record}
+                {teamId}
+                {deleteHandler}
+                {isLoading}
+                isTeam
+              />
+            {/each}
+          {:else}
+            <tr>
+              <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
+                No records found
+              </td>
+            </tr>
+          {/if}
         {/if}
-      {/if}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  {/if}
+
+  {#if totalTeamRecords > toItem}
+    <PaginationButton {setPage} {page} {maxPage} />
+  {/if}
 </div>
 
 <style>

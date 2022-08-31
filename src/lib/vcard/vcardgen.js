@@ -87,7 +87,7 @@ export const genvcard = async (prop, team) => {
   }
 
   //set social media URLs
-  if (team.display_personal) {
+  if (team?.display_personal) {
     if (prop.socials) {
       prop.socials.map((e) => {
         if (e.isActive) {
@@ -127,9 +127,9 @@ export const genvcard = async (prop, team) => {
   }
 
   if (teamEmail === undefined) {
-    if (team.display_personal) vCard.email = personalEmail;
+    if (team?.display_personal) vCard.email = personalEmail;
   } else {
-    if (team.display_personal) vCard.email = personalEmail;
+    if (team?.display_personal) vCard.email = personalEmail;
     vCard.workEmail = teamEmail;
   }
 
