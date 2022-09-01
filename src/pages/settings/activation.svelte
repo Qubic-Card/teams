@@ -5,7 +5,7 @@
 
 <div class="flex gap-3">
   <div
-    class="bg-neutral-800 rounded-lg p-4 w-3/4 flex justify-between items-center"
+    class="bg-neutral-800 rounded-lg p-4 w-full md:w-3/4 flex flex-col md:flex-row justify-between items-center"
   >
     <div class="flex flex-col gap-2">
       <h1 class="font-bold text-xl">Activation code</h1>
@@ -24,7 +24,7 @@
       {/if} Submit</button
     >
   </div>
-  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-lg">
+  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-lg hidden md:flex">
     <p class="mb-4">
       Atur activation code untuk digunakan ketika member baru melakukan
       aktivasi.

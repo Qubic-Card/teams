@@ -104,7 +104,7 @@
 />
 
 <div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-3`}>
-  <div class="bg-neutral-800 rounded-lg w-3/4 p-4">
+  <div class="bg-neutral-800 rounded-lg w-full md:w-3/4 p-4">
     <div
       class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
     >
@@ -202,7 +202,7 @@
       {/if}
     {/if}
   </div>
-  <div class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-lg">
+  <div class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-lg hidden md:flex">
     <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
     <p>Berikan permissions yang sesuai di setiap role.</p>
   </div>

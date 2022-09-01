@@ -56,7 +56,6 @@
 
     if (error) console.log(error);
     if (data) {
-      console.log(data);
       cardsId = data.map((card) => card.id);
       cards = data;
       // maxPage = Math.ceil(count / 2);
@@ -75,7 +74,6 @@
 
     if (error) console.log(error);
     if (data) {
-      console.log(data);
       if (data.length > 0) {
         teamCardCon = data.filter((c) => c.team_member_id.uid !== null);
       }
@@ -110,7 +108,6 @@
   }
 
   $: allMember = [...activeMembers, ...inactiveCards];
-  $: console.log(allMember);
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
@@ -160,7 +157,7 @@
     {/if}
     <div
       class={`grid grid-flow-row my-4 h-full gap-2 ${
-        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-2'
+        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
       }`}
     >
       {#if state === 'all'}

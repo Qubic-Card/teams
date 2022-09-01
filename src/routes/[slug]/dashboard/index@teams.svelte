@@ -62,7 +62,7 @@
   <div class="flex flex-col">
     <h1 class="text-lg font-bold">Learn More</h1>
     <div
-      class="snap-container snap-x mx-auto snap-mandatory h-52 md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
+      class="snap-container snap-x mx-auto snap-mandatory h-40 md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
     >
       {#each learnMoreContents as content}
         <div
@@ -85,6 +85,7 @@
 <style>
   .snap-container::-webkit-scrollbar {
     height: 5px;
+    width: 5px;
   }
   .snap-container::-webkit-scrollbar-track {
     background-color: #e4e4e4;

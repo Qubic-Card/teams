@@ -65,7 +65,7 @@
       {data?.company == '' ? Dummy.company : data?.company}
     </h1>
   </div>
-  <div class="flex gap-2 px-16 text-white my-4">
+  <div class="flex gap-2 px-8 md:px-16 text-white my-4">
     <BorderButton
       class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
       on:click={popup}
@@ -88,7 +88,7 @@
       Add to Contacts
     </BorderButton>
   </div>
-  <div class="flex px-16">
+  <div class="flex px-8 md:px-16">
     {#if $isDisplayPersonal}
       <button
         on:click={() => ($selectedTab = 'team')}
@@ -110,7 +110,7 @@
   </div>
 
   {#if $selectedTab == 'personal'}
-    <div class="px-16 mt-4 {currentTheme.text}">
+    <div class="px-8 md:px-16 mt-4 {currentTheme.text}">
       <!-- UTILITIES -->
       <div class="flex justify-between flex-wrap items-start gap-1 my-1">
         {#each isEditorMode ? $socials : data.socials as item}
@@ -152,7 +152,7 @@
     </div>
   {:else if $selectedTab == 'team'}
     <div
-      class="gap-2 flex flex-col text-white px-16 justify-center items-center mt-4"
+      class="gap-2 flex flex-col text-white px-8 md:px-16 justify-center items-center mt-4"
     >
       <div
         class="flex flex-col gap-2 w-full border-2 border-neutral-700 rounded-lg p-4"

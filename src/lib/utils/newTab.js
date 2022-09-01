@@ -1,5 +1,8 @@
 const toNewTab = async (type, data) => {
   switch (type) {
+    case 'github':
+      await window.open('https://github.com/' + data, '_blank').focus();
+      break;
     case 'whatsapp':
       await window.open('https://wa.me/' + data, '_blank').focus();
       break;

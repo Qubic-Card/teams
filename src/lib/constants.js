@@ -313,12 +313,58 @@ export const defaultRole = [
 ];
 
 export const teamProfileTemplate = {
-  job: 'Onboarding Manager',
-  links: [{ link: 'https://qubic.id', title: 'My Website', isActive: true }],
-  avatar: '',
-  design: { theme: 'dark', background: '' },
+  job: 'Smart Business Card',
+  links: [
+    {
+      link: 'https://qubic.id',
+      title: 'Qubic Official Website',
+      isActive: true,
+    },
+  ],
+  avatar:
+    'https://xbrgrzbpugippzsbortq.supabase.co/storage/v1/object/public/avatars/5a259a83-0749-45e2-ac55-8b16538c9d4a/1C6CDA82-3691-4244-BFC6-7341CAF6B3C2.jpeg',
+  design: {
+    theme: 'dark',
+    background: '',
+  },
   company: 'Qubic',
-  socials: [{ data: 'qubic.id', type: 'instagram', isActive: true }],
-  lastname: 'Template',
-  firstname: 'Qubic',
+  socials: [
+    {
+      data: 'qubiccard',
+      type: 'twitter',
+      isActive: false,
+    },
+    {
+      data: 'qubic.id',
+      type: 'instagram',
+      isActive: false,
+    },
+    {
+      data: 'support@qubic.id',
+      type: 'email',
+      isActive: false,
+    },
+    {
+      data: 'qubic.id',
+      type: 'facebook',
+      isActive: false,
+    },
+    {
+      data: '628113087599',
+      type: 'whatsapp',
+      isActive: false,
+    },
+    {
+      data: 'channel/UC4kUcG-bHD1ARIPINkS_n8A',
+      type: 'youtube',
+      isActive: false,
+    },
+    {
+      data: '+628113087599',
+      type: 'phone',
+      isActive: false,
+    },
+  ],
+  lastname: '',
+  firstname: 'Qubic.id',
 };
