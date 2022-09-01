@@ -1,7 +1,6 @@
 <script>
   import AvatarCard from '@comp/cards/avatarCard.svelte';
   import { socialIcons } from '@lib/constants';
-  import go from '@lib/utils/go';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
   import { Dialog } from '@rgossiaux/svelte-headlessui';
@@ -11,6 +10,10 @@
   export let connection;
   export let showModal;
   export let modalHandler;
+
+  let isBusiness =
+    connection.profileData.socials.filter((s) => s.type.includes('business'))
+      .length > 0;
 </script>
 
 <ModalOverlay isOpen={showModal} on:click={modalHandler} />
@@ -138,9 +141,15 @@
               {#if item.isActive}
                 <button
                   class="col-span-1  rounded"
-                  on:click={async () => await toNewTab(item.type, item.data)}
+                  on:click={async () =>
+                    await toNewTab(
+                      isBusiness ? item.type.split('-')[0] : item.type,
+                      item.data
+                    )}
                   ><img
-                    src={socialIcons[item.type]}
+                    src={socialIcons[
+                      isBusiness ? item.type.split('-')[0] : item.type
+                    ]}
                     class="w-14 h-14 rounded  mx-auto p-3"
                     alt=""
                   /></button

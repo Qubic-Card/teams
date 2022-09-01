@@ -299,7 +299,7 @@
       </ChartEl>
     </div>
     <div
-      class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[100px] my-2 space-x-0 md:space-x-2"
+      class="grid grid-cols-1 md:grid-cols-3 h-auto md:h-[100px] my-2 gap-2 md:gap-0 space-x-0 md:space-x-2"
     >
       <PersonalAnalyticsCard
         {loading}

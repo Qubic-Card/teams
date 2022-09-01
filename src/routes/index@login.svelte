@@ -81,12 +81,20 @@
 
 <AuthWrapper>
   <section class="text-white">
-    <div class="border-b border-neutral-700 absolute w-screen top-16" />
-    <div class="border-t border-neutral-700 absolute w-screen bottom-16" />
-    <div class="border-r border-neutral-700 absolute h-screen right-16" />
-    <div class="border-l border-neutral-700 h-screen absolute left-16" />
-    <div class="flex justify-around items-center h-screen p-24">
-      <div class="flex flex-col justify-between h-full w-1/2 pr-60 py-16">
+    <div
+      class="border-b border-neutral-700 absolute w-screen top-10 md:top-16"
+    />
+    <div
+      class="border-t border-neutral-700 absolute w-screen bottom-10 md:bottom-16"
+    />
+    <div
+      class="border-r border-neutral-700 absolute h-screen right-10 md:right-16"
+    />
+    <div
+      class="border-l border-neutral-700 h-screen absolute left-10 md:left-16"
+    />
+    <div class="flex justify-around items-center h-screen p-16 md:p-24">
+      <div class="flex flex-col justify-between h-full w-1/2 pr-60 md:py-16">
         <div class="text-xl">
           Work together with <br />
           <div class="flex items-center">
@@ -108,7 +116,7 @@
               bind:value={email}
               type="email"
               placeholder="Your Email"
-              class="w-full px-4 py-2 mt-2 text-base rounded-md text-white transition duration-500 ease-in-out transform border-transparent bg-neutral-700 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
+              class="w-56 md:w-full px-4 py-2 mt-2 text-base rounded-md text-white transition duration-500 ease-in-out transform border-transparent bg-neutral-700 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
             />
             {#if !isForgotPassword}
               <p class="block text-sm mt-2 text-left">Password</p>
@@ -117,7 +125,7 @@
                 on:keypress={onKeyPress}
                 type="password"
                 placeholder="Your Password"
-                class="w-full px-4 py-2 mt-2 text-base rounded-md text-white transition duration-500 ease-in-out transform border-transparent bg-neutral-700 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
+                class="w-56 md:w-full px-4 py-2 mt-2 text-base rounded-md text-white transition duration-500 ease-in-out transform border-transparent bg-neutral-700 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
               />
             {/if}
           </div>
@@ -128,14 +136,14 @@
                 <button
                   disabled={loading}
                   on:click={async () => await handleForgotPassword()}
-                  class="block w-full px-4 py-3 mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                  class="block w-56 md:w-full px-4 py-3 mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                   >Send Email</button
                 >
               {:else}
                 <button
                   disabled={loading}
                   on:click={async () => await handleLogin()}
-                  class="block w-full px-4 py-3 mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                  class="block w-56 md:w-full px-4 py-3 mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                   >Log In</button
                 >
               {/if}
@@ -144,14 +152,14 @@
             {/if}
 
             <p
-              class="mt-2 text-neutral-400 text-sm cursor-pointer"
+              class="mt-2 text-neutral-400 text-sm cursor-pointer w-56"
               on:click={forgotPassword}
             >
               {isForgotPassword ? 'Back' : 'Forgot password?'}
             </p>
 
             <p
-              class="text-neutral-400 text-sm cursor-pointer"
+              class="text-neutral-400 text-sm cursor-pointer w-56"
               on:click={() =>
                 window.open('https://qubic.id/teams', '_blank').focus()}
             >
@@ -170,7 +178,7 @@
       </div>
       <!-- <div class="w-1/2">asfasf</div> -->
       <div
-        class="w-[40%] h-full rounded-md bg-cover"
+        class="md:w-[40%] h-full rounded-md bg-cover"
         style={`background-image:url(${'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'})`}
       />
     </div>

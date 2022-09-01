@@ -11,7 +11,6 @@
   import encryptActivationCode from '@lib/utils/encryptActivationCode';
 
   const teamId = getContext('teamId');
-
   let roles = [];
   let isClicked = true;
   let permissions = {
@@ -93,11 +92,13 @@
     <div class="flex flex-col w-full gap-3 text-sm pb-10">
       <Billing {permissions} />
       {#if $memberData?.roleName === 'superadmin'}
-        <Activation
-          {isLoading}
-          bind:value={activationCode}
-          on:click={async () => addActivationCode(activationCode)}
-        />
+        {#if !permissions.isTeamInactive && !permissions.isTeamWillExpire}
+          <Activation
+            {isLoading}
+            bind:value={activationCode}
+            on:click={async () => addActivationCode(activationCode)}
+          />
+        {/if}
       {/if}
       <Role {permissions} {roles} />
       <div class="flex flex-col p-4 bg-neutral-800 rounded-lg">

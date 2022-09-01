@@ -3,11 +3,9 @@ import getBase64FromUrl from '@lib/utils/getBase64';
 import { default as vCardJS } from 'tappin-vcards-js';
 
 export const genvcard = async (prop, team) => {
-  let phoneNumber;
-  let teamPhoneNumber;
   let personalEmail;
   let teamEmail;
-
+  let wa;
   let vCard = new vCardJS();
   //set basic properties shown before
   vCard.firstName = prop.firstname;
@@ -55,27 +53,46 @@ export const genvcard = async (prop, team) => {
 
     if (team.socials) {
       team.socials.map((e, i) => {
-        if (e.type === 'phone') {
-          teamPhoneNumber = e.data;
-          if (teamPhoneNumber.startsWith('+'))
-            teamPhoneNumber = teamPhoneNumber.slice(1);
-          if (teamPhoneNumber.startsWith('08')) {
-            teamPhoneNumber = teamPhoneNumber.slice(1);
-            teamPhoneNumber = '+62' + teamPhoneNumber;
-          }
-          if (teamPhoneNumber.startsWith('62')) teamPhoneNumber = '+' + e.data;
-        }
         if (e.type === 'email') teamEmail = e.data;
-        if (e.type == 'phone') return (vCard.workPhone = e.data);
-
-        if (e.type === 'whatsapp') {
-          if ('+' + e.data !== teamPhoneNumber) {
-            vCard.workPhone = ['+' + e.data, teamPhoneNumber];
-          }
+        if (
+          (e.type.includes('phone') && e.data.length > 0) ||
+          e.type.includes('email')
+        ) {
+          return '';
         }
+
+        if (e.type.includes('whatsapp'))
+          wa = e.data.startsWith('+') ? e.data : '+' + e.data;
 
         return (vCard.socialUrls[e.type + i + 'cmpny'] = e.data);
       });
+
+      let teamPhone = team.socials
+        .filter((s) => s.type.includes('phone') && s.isActive)
+        .map((s) => {
+          s.data = s.data;
+          if (s.data.startsWith('62')) s.data = '+' + s.data;
+          if (s.data.startsWith('08')) {
+            s.data = s.data.slice(1);
+            s.data = '+62' + s.data;
+          }
+
+          return s.data;
+        });
+
+      if (teamPhone.length > 0) {
+        teamPhone.forEach((p) => {
+          if (wa !== p) {
+            if (wa) {
+              vCard.workPhone = teamPhone.concat(wa);
+            } else vCard.workPhone = teamPhone.length > 1 ? teamPhone : p;
+          } else {
+            vCard.workPhone = teamPhone;
+          }
+        });
+      } else {
+        if (wa) vCard.workPhone = wa;
+      }
     }
 
     if (team.links) {
@@ -92,26 +109,47 @@ export const genvcard = async (prop, team) => {
       prop.socials.map((e, i) => {
         if (e.isActive) {
           if (e.type === 'email') personalEmail = e.data;
-          if (e.type === 'phone') {
-            phoneNumber = e.data;
-            // if (phoneNumber.startsWith('+')) phoneNumber = phoneNumber.slice(1);
-            if (phoneNumber.startsWith('08')) {
-              phoneNumber = phoneNumber.slice(1);
-              phoneNumber = '+62' + phoneNumber;
-            }
-            if (phoneNumber.startsWith('62')) phoneNumber = '+' + e.data;
-          }
 
-          if (e.type === 'whatsapp') {
-            if ('+' + e.data !== phoneNumber)
-              vCard.cellPhone = ['+' + e.data, phoneNumber];
-          }
+          if (e.type.includes('whatsapp'))
+            wa = e.data.startsWith('+') ? e.data : '+' + e.data;
 
-          if (e.type == 'phone') return (vCard.cellPhone = phoneNumber);
+          if (
+            (e.type.includes('phone') && e.data.length > 0) ||
+            e.type.includes('email')
+          ) {
+            return '';
+          }
 
           return (vCard.socialUrls[e.type + i] = e.data);
         }
       });
+
+      let phone = prop.socials
+        .filter((s) => s.type.includes('phone') && s.isActive)
+        .map((s) => {
+          s.data = s.data;
+          if (s.data.startsWith('62')) s.data = '+' + s.data;
+          if (s.data.startsWith('08')) {
+            s.data = s.data.slice(1);
+            s.data = '+62' + s.data;
+          }
+
+          return s.data;
+        });
+
+      if (phone.length > 0) {
+        phone.forEach((p) => {
+          if (wa !== p) {
+            if (wa) {
+              vCard.cellPhone = phone.concat(wa);
+            } else vCard.cellPhone = phone.length > 1 ? phone : p;
+          } else {
+            vCard.cellPhone = phone;
+          }
+        });
+      } else {
+        if (wa) vCard.cellPhone = wa;
+      }
     }
 
     if (prop.address) {

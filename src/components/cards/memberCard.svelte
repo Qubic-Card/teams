@@ -153,7 +153,7 @@
             class="flex cursor-pointer h-full gap-4 p-4"
             on:click={() => toProfileEditor(member?.team_member_id.uid)}
           >
-            <div class="flex flex-row-reverse relative">
+            <div class="hidden md:flex flex-row-reverse relative">
               <img
                 src={teamProfile?.avatar === ''
                   ? '/favicon.svg'
@@ -223,7 +223,7 @@
           class="flex cursor-pointer h-full gap-4 p-4"
           on:click={() => toProfileEditor(member?.team_member_id.uid)}
         >
-          <div class="flex flex-row-reverse relative">
+          <div class="hidden md:flex flex-row-reverse relative">
             <img
               src={teamProfile?.avatar === ''
                 ? '/favicon.svg'
@@ -326,7 +326,7 @@
               {#if permissions.writeRoles}
                 {#if role?.role_name}
                   <DropdownButton
-                    class="w-60 text-sm"
+                    class="w-28 md:w-60 text-sm"
                     label={selectedRole !== ''
                       ? selectedRole.charAt(0).toUpperCase() +
                         selectedRole.slice(1)
