@@ -7,6 +7,13 @@ export const genvcard = async (prop, team) => {
   let teamEmail;
   let wa;
   let vCard = new vCardJS();
+  let email = prop.socials
+    .filter((e) => e.type.includes('email') && e.isActive)
+    .map((e) => e.data);
+  let emailTeam = team?.socials
+    .filter((e) => e.type.includes('email') && e.isActive)
+    .map((e) => e.data);
+
   //set basic properties shown before
   vCard.firstName = prop.firstname;
   vCard.lastName = prop.lastname ?? '';
@@ -51,6 +58,8 @@ export const genvcard = async (prop, team) => {
       vCard.workAddress.countryRegion = team.address.country;
     }
 
+    vCard.workEmail = emailTeam;
+    console.log(emailTeam);
     if (team.socials) {
       team.socials.map((e, i) => {
         if (e.type === 'email') teamEmail = e.data;
@@ -124,6 +133,8 @@ export const genvcard = async (prop, team) => {
         }
       });
 
+      if (team?.display_personal) vCard.email = email;
+
       let phone = prop.socials
         .filter((s) => s.type.includes('phone') && s.isActive)
         .map((s) => {
@@ -162,13 +173,6 @@ export const genvcard = async (prop, team) => {
         if (e.isActive) return (vCard.socialUrls[e.title] = e.link);
       });
     }
-  }
-
-  if (teamEmail === undefined) {
-    if (team?.display_personal) vCard.email = personalEmail;
-  } else {
-    if (team?.display_personal) vCard.email = personalEmail;
-    vCard.workEmail = teamEmail;
   }
 
   vCard.version = '3.0'; //can also support 2.1 and 4.0, certain versions only support certain fields
