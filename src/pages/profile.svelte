@@ -23,7 +23,7 @@
   export let isEditorMode = false;
   let currentTheme = theme[$profileData?.design?.theme?.toString() ?? 'dark'];
 
-  const popup = () => toastFailed(`You can't connect to your profile`);
+  const popup = () => toastFailed(`You can't connect to this profile`);
 
   const downloadHandler = () => {
     $teamData?.brochure?.url !== ''

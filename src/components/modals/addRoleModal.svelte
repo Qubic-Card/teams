@@ -65,7 +65,7 @@
 </script>
 
 <button
-  class="p-2 w-40 bg-blue-600 text-white rounded-md"
+  class="p-2 mt-2 md:mt-0 w-40 bg-blue-600 text-white rounded-md"
   on:click={toggleModal}
 >
   + Add new role
@@ -93,7 +93,7 @@
       bg="bg-neutral-800"
     />
     <button
-      disabled={roleName === ''}
+      disabled={roleName === '' || loading}
       class="flex gap-2 justify-center items-center p-4 w-full bg-blue-600 text-white rounded-lg disabled:bg-blue-600/60"
       on:click={async () => await addRoleHandler()}
     >

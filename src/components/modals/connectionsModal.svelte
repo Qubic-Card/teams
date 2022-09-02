@@ -24,9 +24,16 @@
   on:close={modalHandler}
   class={`${
     showModal ? 'translate-x-0' : 'translate-x-96'
-  } transition-all duration-300 ease-in-out min-w-[360px] flex flex-col h-screen p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto`}
+  } transition-all duration-300 ease-in-out min-w-full md:min-w-[360px] flex flex-col h-screen p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto`}
 >
-  <div class="flex w-full justify-between items-center text-white">
+  <p
+    class="self-end text-lg cursor-pointer block md:hidden"
+    on:click={modalHandler}
+  >
+    x
+  </p>
+
+  <div class="flex w-full justify-between items-center text-white md:mt-4">
     <div class="flex flex-col w-full">
       <div class="flex flex-col mb-2">
         {#if connection.profileData.avatar}

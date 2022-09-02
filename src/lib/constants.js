@@ -128,14 +128,14 @@ export const connectionsTable = [
 
 export const connectionsTableMobile = [
   { name: 'Name', id: 'profileData->>firstname' },
-  {
-    name: 'Connected At',
-    id: 'dateConnected',
-  },
-  {
-    name: 'By',
-    id: 'by',
-  },
+  // {
+  //   name: 'Connected At',
+  //   id: 'dateConnected',
+  // },
+  // {
+  //   name: 'By',
+  //   id: 'by',
+  // },
 ];
 
 export const connectionSearchMenu = [
@@ -215,11 +215,27 @@ export const recordsTable = [
   },
 ];
 
+export const recordsTableMobile = [
+  { name: 'Filename', id: 'name' },
+  {
+    name: '',
+    id: 'actions',
+  },
+];
+
 export const recordsTableTeam = [
   { name: 'Filename', id: 'name' },
   { name: 'Created at', id: 'created_at' },
   { name: 'Type', id: 'type' },
   { name: 'By', id: 'by' },
+  {
+    name: '',
+    id: 'actions',
+  },
+];
+
+export const recordsTableTeamMobile = [
+  { name: 'Filename', id: 'name' },
   {
     name: '',
     id: 'actions',

@@ -62,15 +62,15 @@
   <div class="flex flex-col">
     <h1 class="text-lg font-bold">Learn More</h1>
     <div
-      class="snap-container snap-x mx-auto snap-mandatory h-40 md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
+      class="snap-container snap-x mx-auto snap-mandatory h-full md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
     >
       {#each learnMoreContents as content}
         <div
-          class="w-[250px] md:w-[350px] lg:w-[450px] py-4 cursor-pointer"
+          class="w-[350px] lg:w-[450px] py-4 cursor-pointer"
           on:click={() => window.open(content.url, '_blank').focus()}
         >
           <div
-            class="bg-neutral-800 w-[250px] md:w-[350px] lg:w-[450px] h-full p-3 rounded-md"
+            class="bg-neutral-800 w-[350px] lg:w-[450px] h-full p-3 rounded-md"
           >
             <div class="Image" style={`background-image:url(${content.bg})`} />
             <h1 class="font-bold text-md my-2">{content.title}</h1>
