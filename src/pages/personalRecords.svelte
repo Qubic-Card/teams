@@ -1,6 +1,6 @@
 <script>
   import Input from '@comp/input.svelte';
-  import { recordsTable } from '@lib/constants';
+  import { recordsTable, recordsTableMobile } from '@lib/constants';
   import RecordsTableBody from '@comp/tables/recordsTableBody.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
@@ -26,6 +26,7 @@
   let toDateValue = new Date();
   let isLoading = false;
   let asc = false;
+  let innerWidth;
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
@@ -189,8 +190,9 @@
   const selectTypeHandler = (e) => (selectedType = e.detail);
 </script>
 
+<svelte:window bind:innerWidth />
 <div
-  class="w-1/4 flex flex-col justify-between gap-4 border-r-2 border-neutral-700 h-full"
+  class="w-1/4 hidden md:flex flex-col justify-between gap-4 border-r-2 border-neutral-700 h-full"
 >
   <div class="pl-20 pt-4 pr-4 flex flex-col gap-4">
     {#if $userData.includes('inactive')}
@@ -273,19 +275,30 @@
   >
 </div>
 <div
-  class="w-3/4 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
+  class="w-full md:w-3/4 ml-16 md:ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
 >
   <table class="snap-center text-black w-full">
     <thead class="text-left text-neutral-400 bg-black/70">
       <tr>
-        <TableHead
-          class="w-1/6"
-          data={recordsTable}
-          on:sort={async (e) => {
-            asc = !asc;
-            await sortHandler(e.detail ?? 'name');
-          }}
-        />
+        {#if innerWidth > 640}
+          <TableHead
+            class="w-1/6"
+            data={recordsTable}
+            on:sort={async (e) => {
+              asc = !asc;
+              await sortHandler(e.detail ?? 'name');
+            }}
+          />
+        {:else}
+          <TableHead
+            class="w-1/6"
+            data={recordsTableMobile}
+            on:sort={async (e) => {
+              asc = !asc;
+              await sortHandler(e.detail ?? 'name');
+            }}
+          />
+        {/if}
       </tr>
     </thead>
     <tbody>
@@ -293,6 +306,7 @@
         {#if $personal.length > 0}
           {#each $personal as record, i}
             <RecordsTableBody
+              {innerWidth}
               {record}
               {teamId}
               {isTeamInactive}

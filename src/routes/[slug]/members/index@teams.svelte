@@ -15,7 +15,6 @@
     writeRoles: false,
     readRoles: false,
   };
-  let searchNotFoundMsg = '';
   let loading = false;
   let innerWidth = 0;
   let cards = [];
@@ -112,7 +111,7 @@
 </script>
 
 <svelte:window bind:innerWidth />
-<div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-24 pr-4">
+<div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-20 md:pl-24 pr-4">
   {#await getAllData()}
     <MemberSkeleton {cards} {innerWidth} {permissions} />
   {:then}
@@ -156,7 +155,7 @@
       {/if}
     {/if}
     <div
-      class={`grid grid-flow-row my-4 h-full gap-2 ${
+      class={`grid grid-flow-row my-4 h-64 gap-2 ${
         innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
       }`}
     >
@@ -196,14 +195,10 @@
         {/if}
       {/if}
     </div>
-    {#if searchNotFoundMsg !== ''}
-      <div class="text-2xl font-bold text-white text-center w-full mt-8">
-        {searchNotFoundMsg}
-      </div>
-    {/if}
-    {#if permissions.readMembers && allMember.length > 1}
+
+    <!-- {#if permissions.readMembers && allMember.length > 1}
       <PaginationButton {setPage} {page} {maxPage} />
-    {/if}
+    {/if} -->
   {:catch}
     <div>
       <h1 class="text-xl text-white text-center w-full mt-8">

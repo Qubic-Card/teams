@@ -178,9 +178,7 @@
                 <h1
                   class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
                 >
-                  {teamProfile?.firstname === ''
-                    ? 'No name'
-                    : teamProfile?.firstname}
+                  {teamProfile?.firstname === '' ? '' : teamProfile?.firstname}
                   {teamProfile?.lastname === ''
                     ? ''
                     : ' ' + teamProfile?.lastname}
@@ -248,9 +246,7 @@
               <h1
                 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
               >
-                {teamProfile?.firstname === ''
-                  ? 'No name'
-                  : teamProfile?.firstname}
+                {teamProfile?.firstname === '' ? '' : teamProfile?.firstname}
                 {teamProfile?.lastname === ''
                   ? ''
                   : ' ' + teamProfile?.lastname}
@@ -326,7 +322,7 @@
               {#if permissions.writeRoles}
                 {#if role?.role_name}
                   <DropdownButton
-                    class="w-28 md:w-60 text-sm"
+                    class="w-full md:w-60 text-sm"
                     label={selectedRole !== ''
                       ? selectedRole.charAt(0).toUpperCase() +
                         selectedRole.slice(1)
@@ -423,7 +419,7 @@
     <div
       class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
     >
-      <div class="flex h-full gap-4 p-4">
+      <div class="flex h-64 gap-4 p-4">
         <img
           src="/favicon.svg"
           alt="Profile"
@@ -432,7 +428,7 @@
         <div class="flex flex-col justify-between">
           <div class="flex flex-col flex-wrap">
             <h1 class="md:text-md lg:text-lg text-left w-56">
-              This card is inactive
+              This card is <br class="block md:hidden" /> inactive
             </h1>
           </div>
           <div>

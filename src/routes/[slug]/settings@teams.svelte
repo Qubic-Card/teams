@@ -88,7 +88,7 @@
     />
   </div>
 {:then}
-  <div class="flex justify-center pt-4 pl-24 pr-4">
+  <div class="flex justify-center pt-4 pl-20 md:pl-24 pr-4">
     <div class="flex flex-col w-full gap-3 text-sm pb-10">
       <Billing {permissions} />
       {#if $memberData?.roleName === 'superadmin'}

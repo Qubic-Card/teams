@@ -22,7 +22,7 @@
           }`}
         >
           <button
-            class="p-2 w-40 bg-blue-600 text-white rounded-md"
+            class="p-2 w-full md:w-40 bg-blue-600 text-white rounded-md"
             on:click={async () =>
               await window.open('https://wa.me/628113087599', '_blank').focus()}
             >Change subscription</button
@@ -59,7 +59,9 @@
       </div> -->
     </div>
   </div>
-  <div class="bg-neutral-800 p-4 w-1/4 rounded-lg text-lg hidden md:flex">
+  <div
+    class="bg-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
+  >
     <p class="mb-4">Atur subscription dalam billing</p>
   </div>
 </div>
