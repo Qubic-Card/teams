@@ -50,20 +50,28 @@
     let hash = encryptActivationCode(newToken);
     const { data, error } = await supabase
       .from('teams')
-      .update({
-        team_token: hash,
-      })
+      .update(
+        {
+          team_token: hash,
+        },
+        { returning: 'minimal' }
+      )
       .eq('id', teamId);
 
     if (error) {
       toastFailed('Failed to change activation code');
       console.log(error);
       isLoading = false;
-    }
-    if (data) {
+    } else {
       toastSuccess('Activation code changed');
       activationCode = 'QUBICPASS';
       isLoading = false;
+    }
+  };
+
+  const onKeyPress = async (e) => {
+    if (e.charCode === 13) {
+      await addActivationCode(activationCode);
     }
   };
 
@@ -96,6 +104,7 @@
           <Activation
             {isLoading}
             bind:value={activationCode}
+            on:keypress={onKeyPress}
             on:click={async () => addActivationCode(activationCode)}
           />
         {/if}

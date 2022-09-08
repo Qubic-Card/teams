@@ -605,7 +605,10 @@
                               : 'hidden'
                           }`}
                         >
-                          <SwitchButton bind:checked={item.isActive} />
+                          <SwitchButton
+                            bind:checked={item.isActive}
+                            on:change={handleSave}
+                          />
                           {#if i != 0}
                             <svg
                               on:click={async () => {

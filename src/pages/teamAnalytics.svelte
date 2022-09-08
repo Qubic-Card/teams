@@ -30,8 +30,7 @@
               class="text-sm flex justify-between p-1 hover:bg-neutral-800 hover:p-1"
             >
               <h1 class="text-white">
-                {`${item.team_member?.firstname ?? 'Member'}'s` +
-                  item?.message?.slice(4)}
+                {`${item?.card_holder ?? 'Member'}'s` + item?.message?.slice(4)}
               </h1>
               <p class="text-neutral-500">
                 {setHours4Digit(
