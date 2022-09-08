@@ -227,7 +227,7 @@
       } = await supabase
         .from('team_logs')
         .select(
-          'created_at, data->card, data->message, data->link, type, team, team_member(team_profile->firstname, team_profile->lastname)',
+          'created_at, data->card, data->message, data->link, type, team, card_holder',
           { count: 'estimated' }
         )
         .eq('team', teamId)
@@ -303,7 +303,7 @@
       } = await supabase
         .from('team_logs')
         .select(
-          'created_at, data->card, data->message, data->link, type, team, team_member(team_profile->firstname, team_profile->lastname)',
+          'created_at, data->card, data->message, data->link, type, team, card_holder',
           { count: 'estimated' }
         )
         .eq('team', teamId)

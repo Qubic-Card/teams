@@ -10,6 +10,7 @@
     <div class="flex flex-col gap-2 w-full md:w-auto">
       <h1 class="font-bold text-xl">Activation code</h1>
       <input
+        on:keypress
         type="password"
         bind:value
         class="p-2 bg-neutral-700 rounded-md w-full"

@@ -20,7 +20,7 @@
     isDisplayPersonal,
   } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
+  import { memberData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -66,7 +66,7 @@
   let pond;
   let brochurePond;
   let name = 'filepond';
-  let teamNickname = null;
+  let teamName = null;
   let isOpen = false;
   let croppedImage = '';
   let fileName = '';
@@ -155,10 +155,7 @@
     $teamData.links = $teamLinks;
     const { error } = await supabase
       .from('teams')
-      .update(
-        { metadata: $teamData, nickname: teamNickname },
-        { returning: 'minimal' }
-      )
+      .update({ metadata: $teamData, name: teamName }, { returning: 'minimal' })
       .eq('id', teamId);
 
     if (error) {
@@ -180,7 +177,7 @@
     if (data) {
       const team = data[0].metadata;
       $teamData = { ...team };
-      teamNickname = data[0].nickname;
+      teamName = data[0].name;
       $teamSocials = team['socials'];
       $teamLinks = team['links'];
       // teamId = team['id'];
@@ -195,7 +192,10 @@
   const setDisplayPersonal = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .update({ display_personal: $isDisplayPersonal })
+      .update(
+        { display_personal: $isDisplayPersonal },
+        { returning: 'minimal' }
+      )
       .eq('team_member_id', memberId)
       .eq('card_id', history.state.id);
 
@@ -332,6 +332,17 @@
                       disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
+                  {#if $memberData.roleName === 'superadmin'}
+                    <div class="px-3 grid grid-cols-1 space-x-5">
+                      <Input
+                        on:change={handleSave}
+                        placeholder="Team Name"
+                        title="Team Name"
+                        bind:value={teamName}
+                        disabled={permissions.writeTeam ? false : true}
+                      />
+                    </div>
+                  {/if}
                   <div class="px-3">
                     <Input
                       on:change={handleSave}

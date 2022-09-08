@@ -29,17 +29,3 @@ export const getAllRoleByTeam = async (teamId) => {
     return data;
   }
 };
-
-export const getMemberRole = async (uid, teamId) => {
-  const { data, error } = await supabase
-    .from('team_members')
-    .select('role(role_name, id)')
-    .eq('uid', uid)
-    .eq('team_id', teamId);
-
-  if (error) console.log(error);
-
-  if (data) {
-    return data[0].role;
-  }
-};

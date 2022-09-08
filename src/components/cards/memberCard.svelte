@@ -15,7 +15,7 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { teamProfileTemplate } from '@lib/constants';
 
@@ -24,14 +24,16 @@
   export let member, i, updatedRole;
 
   const dispatch = createEventDispatcher();
+  const teamId = getContext('teamId');
   let selectedRole = '';
   let showModal = false;
   let roleID = null;
   let roleName = null;
-  let teamProfile = member?.team_member_id?.team_profile;
   let card = member?.card_id;
-  let role = member?.team_member_id?.role;
   let isLoading = false;
+  let memberData = member?.team_cardcon[0]?.team_member_id;
+  let role = member?.team_cardcon[0]?.team_member_id.role;
+  let teamCardCon = member?.team_cardcon[0];
 
   const setRole = (role) => dispatch('setRole', { role: role, index: i });
   const toggleModal = () => (showModal = !showModal);
@@ -44,17 +46,17 @@
   const setStatus = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .update({ status: !member.status }, { returning: 'minimal' })
-      .eq('card_id', member.card_id.id);
+      .update({ status: !teamCardCon.status }, { returning: 'minimal' })
+      .eq('card_id', teamCardCon.card_id);
 
-    member.status = !member.status;
+    teamCardCon.status = !teamCardCon.status;
 
     if (error) {
       toastFailed();
       return;
     }
 
-    if (member.status) {
+    if (teamCardCon.status) {
       toastSuccess('Card has been activated');
     } else {
       toastSuccess('Card has been deactivated');
@@ -66,8 +68,8 @@
     const { data, error } = await supabase
       .from('team_members')
       .update({ role: id }, { returning: 'minimal' })
-      .eq('uid', member?.team_member_id?.uid)
-      .eq('team_id', member?.team_member_id?.team_id);
+      .eq('uid', memberData.uid)
+      .eq('team_id', memberData.team_id);
 
     if (error) {
       console.log(error);
@@ -80,7 +82,7 @@
     }
   };
 
-  const deleteMemberHandler = async (id, memberData) => {
+  const deleteMemberHandler = async (id) => {
     isLoading = true;
 
     const { error: error_member } = await supabase
@@ -103,6 +105,17 @@
       toastSuccess('Member has been deleted');
       isLoading = false;
       location.reload();
+    }
+  };
+
+  const setRoleHandlers = async (idx) => {
+    if ($user?.id === memberData.uid) {
+      roleID = roleId[idx].id;
+      roleName = roleId[idx].name;
+      toggleModal();
+    } else {
+      await setMemberRole(roleId[idx].id);
+      selectRole(roleId[idx].name);
     }
   };
 
@@ -132,40 +145,36 @@
   isDelete
   isDispatch
   heading="Are you sure you want to delete"
-  text={`${teamProfile?.firstname} ${teamProfile?.lastname}?`}
+  text={`${memberData?.team_profile?.firstname} ${memberData?.team_profile?.lastname}?`}
   buttonLabel="Delete"
   showModal={showDeleteMemberModal}
   toggleModal={toggleDeleteMemberModal}
   on:action={async () => {
-    await deleteMemberHandler(member?.team_member_id?.id, member);
+    await deleteMemberHandler(memberData.id);
     showDeleteMemberModal = false;
   }}
 />
 
-{#if member.team_member_id}
+{#if memberData?.uid}
   {#if !permissions.readMembers}
-    {#if $user?.id === member.team_member_id.uid}
+    {#if $user?.id === memberData.uid}
       <div class="flex flex-col justify-between">
         <div
           class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
         >
           <div
             class="flex cursor-pointer h-full gap-4 p-4"
-            on:click={() => toProfileEditor(member?.team_member_id.uid)}
+            on:click={() => toProfileEditor(memberData.uid)}
           >
             <div class="hidden md:flex flex-row-reverse relative">
               <img
-                src={teamProfile?.avatar === ''
-                  ? '/favicon.svg'
-                  : teamProfile?.avatar}
+                src={memberData.team_profile?.avatar ?? '/favicon.svg'}
                 alt="Profile"
                 class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
-                  $user.id === member?.team_member_id?.uid
-                    ? 'border-2 border-blue-600'
-                    : ''
+                  $user.id === memberData.uid ? 'border-2 border-blue-600' : ''
                 }`}
               />
-              {#if $user.id === member?.team_member_id?.uid}
+              {#if $user.id === memberData.uid}
                 <h1
                   class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
                 >
@@ -178,16 +187,16 @@
                 <h1
                   class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
                 >
-                  {teamProfile?.firstname === '' ? '' : teamProfile?.firstname}
-                  {teamProfile?.lastname === ''
+                  {memberData.team_profile?.firstname ?? ''}
+                  {memberData.team_profile?.lastname ?? ''
                     ? ''
-                    : ' ' + teamProfile?.lastname}
+                    : ' ' + memberData.team_profile?.lastname}
                 </h1>
                 <h2 class="text-neutral-300">
-                  {teamProfile?.job}
+                  {memberData.team_profile?.job}
                 </h2>
                 <h2 class="text-neutral-300 text-xs">
-                  Joined since {new Date(member?.team_member_id.member_from)
+                  Joined since {convertToGMT7(memberData.user_change)
                     .toDateString()
                     .slice(4)}
                 </h2>
@@ -195,19 +204,21 @@
               <div>
                 <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
                 <p class="text-neutral-300 text-sm">
-                  {#if card?.type === 'pvc'}
+                  {#if member?.type === 'pvc'}
                     PVC
                   {:else}
-                    {card?.type?.charAt(0).toUpperCase() + card?.type?.slice(1)}
+                    {member?.type?.charAt(0).toUpperCase() +
+                      member?.type?.slice(1)}
                   {/if}
-                  {card?.color?.charAt(0).toUpperCase() + card?.color?.slice(1)}
+                  {member?.color?.charAt(0).toUpperCase() +
+                    member?.color?.slice(1)}
                 </p>
               </div>
             </div>
           </div>
 
           <div
-            class="flex relative h-20 w-full justify-between items-center bg-neutral-900 rounded-b-md p-4"
+            class="flex relative w-full h-16 justify-between items-center bg-neutral-900 rounded-b-md p-4"
           />
         </div>
       </div>
@@ -219,21 +230,17 @@
       >
         <div
           class="flex cursor-pointer h-full gap-4 p-4"
-          on:click={() => toProfileEditor(member?.team_member_id.uid)}
+          on:click={() => toProfileEditor(memberData?.uid)}
         >
           <div class="hidden md:flex flex-row-reverse relative">
             <img
-              src={teamProfile?.avatar === ''
-                ? '/favicon.svg'
-                : teamProfile?.avatar}
+              src={memberData?.team_profile?.avatar ?? '/favicon.svg'}
               alt="Profile"
               class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
-                $user.id === member?.team_member_id?.uid
-                  ? 'border-2 border-blue-600'
-                  : ''
+                $user.id === memberData?.uid ? 'border-2 border-blue-600' : ''
               }`}
             />
-            {#if $user.id === member?.team_member_id?.uid}
+            {#if $user.id === memberData?.uid}
               <h1
                 class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
               >
@@ -246,16 +253,16 @@
               <h1
                 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
               >
-                {teamProfile?.firstname === '' ? '' : teamProfile?.firstname}
-                {teamProfile?.lastname === ''
+                {memberData?.team_profile?.firstname ?? ''}
+                {memberData?.team_profile?.lastname ?? ''
                   ? ''
-                  : ' ' + teamProfile?.lastname}
+                  : ' ' + memberData?.team_profile?.lastname}
               </h1>
               <h2 class="text-neutral-300">
-                {teamProfile?.job}
+                {memberData?.team_profile?.job}
               </h2>
               <h2 class="text-neutral-300 text-xs">
-                Joined since {convertToGMT7(member?.team_member_id.user_change)
+                Joined since {convertToGMT7(memberData?.user_change)
                   .toDateString()
                   .slice(4)}
               </h2>
@@ -263,12 +270,14 @@
             <div>
               <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
               <p class="text-neutral-300 text-sm">
-                {#if card?.type === 'pvc'}
+                {#if member?.type === 'pvc'}
                   PVC
                 {:else}
-                  {card?.type?.charAt(0).toUpperCase() + card?.type?.slice(1)}
+                  {member?.type?.charAt(0).toUpperCase() +
+                    member?.type?.slice(1)}
                 {/if}
-                {card?.color?.charAt(0).toUpperCase() + card?.color?.slice(1)}
+                {member?.color?.charAt(0).toUpperCase() +
+                  member?.color?.slice(1)}
               </p>
             </div>
           </div>
@@ -324,11 +333,11 @@
                   <DropdownButton
                     class="w-full md:w-60 text-sm"
                     label={selectedRole !== ''
-                      ? selectedRole.charAt(0).toUpperCase() +
-                        selectedRole.slice(1)
+                      ? selectedRole?.charAt(0).toUpperCase() +
+                        selectedRole?.slice(1)
                       : role?.role_name
-                      ? role?.role_name.charAt(0).toUpperCase() +
-                        role?.role_name.slice(1)
+                      ? role?.role_name?.charAt(0).toUpperCase() +
+                        role?.role_name?.slice(1)
                       : 'No role'}
                   />
                 {/if}
@@ -337,11 +346,11 @@
                   class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md w-60 text-sm"
                 >
                   {selectedRole !== ''
-                    ? selectedRole.charAt(0).toUpperCase() +
-                      selectedRole.slice(1)
+                    ? selectedRole?.charAt(0).toUpperCase() +
+                      selectedRole?.slice(1)
                     : role?.role_name
-                    ? role.role_name.charAt(0).toUpperCase() +
-                      role.role_name.slice(1)
+                    ? role.role_name?.charAt(0).toUpperCase() +
+                      role.role_name?.slice(1)
                     : 'No role'}
                 </p>
               {/if}
@@ -351,55 +360,47 @@
               <MenuItems
                 class="top-16 z-50 absolute mb-20 rounded-md flex flex-col bg-neutral-900 shadow-md text-sm border border-neutral-700 p-2 w-64"
               >
-                <MenuItem
-                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
-                  on:click={async () => {
-                    if ($user?.id === member.team_member_id.uid) {
-                      roleID = roleId[0].id;
-                      roleName = roleId[0].name;
-                      toggleModal();
-                    } else {
-                      await setMemberRole(roleId[0].id);
-                      selectRole(roleId[0].name);
-                    }
-                  }}
-                >
-                  Super Admin
-                </MenuItem>
-                <MenuItem
-                  class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
-                  on:click={async () => {
-                    if ($user?.id === member.team_member_id.uid) {
-                      roleID = roleId[1].id;
-                      roleName = roleId[1].name;
-                      toggleModal();
-                    } else {
-                      await setMemberRole(roleId[1].id);
-                      selectRole(roleId[1].name);
-                    }
-                  }}
-                >
-                  Member
-                </MenuItem>
-                {#each roles as item}
-                  <MenuItem
-                    class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
-                    on:click={async () => {
-                      if ($user?.id === member.team_member_id.uid) {
-                        roleID = item.id;
-                        roleName = item.role_name;
-                        toggleModal();
-                      } else {
-                        await setMemberRole(item.id);
-                        // selectRole(item.role_name);
-                        setRole(item.role_name);
-                      }
-                    }}
-                  >
-                    {item.role_name.charAt(0).toUpperCase() +
-                      item.role_name.slice(1)}
-                  </MenuItem>
-                {/each}
+                {#if roles}
+                  {#if selectedRole !== '' ? selectedRole !== 'Super Admin' : role?.role_name !== 'superadmin'}
+                    <MenuItem
+                      class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                      on:click={async () => await setRoleHandlers(0)}
+                    >
+                      Super Admin
+                    </MenuItem>
+                  {/if}
+
+                  {#if selectedRole !== '' ? selectedRole !== 'Member' : role?.role_name !== 'member'}
+                    <MenuItem
+                      class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                      on:click={async () => await setRoleHandlers(1)}
+                    >
+                      Member
+                    </MenuItem>
+                  {/if}
+
+                  {#each roles as item}
+                    {#if selectedRole !== '' ? selectedRole !== item.role_name : role?.role_name !== item.role_name}
+                      <MenuItem
+                        class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+                        on:click={async () => {
+                          if ($user?.id === memberData.uid) {
+                            roleID = item.id;
+                            roleName = item.role_name;
+                            toggleModal();
+                          } else {
+                            await setMemberRole(item.id);
+                            // selectRole(item.role_name);
+                            setRole(item.role_name);
+                          }
+                        }}
+                      >
+                        {item.role_name.charAt(0).toUpperCase() +
+                          item.role_name.slice(1)}
+                      </MenuItem>
+                    {/if}
+                  {/each}
+                {/if}
               </MenuItems>
             {/if}
           </Menu>
@@ -407,7 +408,7 @@
           {#if permissions.writeMembers}
             <SwitchButton
               on:change={async () => await setStatus()}
-              checked={member.status}
+              checked={teamCardCon?.status}
             />
           {/if}
         </div>

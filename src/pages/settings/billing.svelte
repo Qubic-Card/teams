@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-
   import { teams } from '@lib/stores/teamStore';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
 

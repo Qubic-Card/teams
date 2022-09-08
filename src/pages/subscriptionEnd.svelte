@@ -103,9 +103,12 @@
   const changeCardMode = async () => {
     const { data, error } = await supabase
       .from('business_cards')
-      .update({
-        mode: 'basic',
-      })
+      .update(
+        {
+          mode: 'basic',
+        },
+        { returning: 'minimal' }
+      )
       .match({ team_id: teamId });
 
     if (error) console.log(error);
@@ -114,9 +117,12 @@
   const setNullTeamMemberUid = async () => {
     const { data, error } = await supabase
       .from('team_members')
-      .update({
-        uid: null,
-      })
+      .update(
+        {
+          uid: null,
+        },
+        { returning: 'minimal' }
+      )
       .match({ team_id: teamId });
     if (error) console.log(error);
   };

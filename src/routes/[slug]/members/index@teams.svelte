@@ -2,12 +2,11 @@
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
   import { getContext, onMount } from 'svelte';
   import supabase from '@lib/db';
-  import { memberData, user, userData } from '@lib/stores/userStore';
-  import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
-
+  import { user, userData } from '@lib/stores/userStore';
   import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberCard from '@comp/cards/memberCard.svelte';
+  import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
 
   let permissions = {
     readMembers: false,
@@ -17,9 +16,7 @@
   };
   let loading = false;
   let innerWidth = 0;
-  let cards = [];
   let roles = [];
-  let teamCardCon = [];
   let inactiveCards = [];
   let activeMembers = [];
   let state = 'all';
@@ -27,8 +24,7 @@
   let updatedRole = '';
   let maxPage = 0;
   let page = 0;
-  let toItem = 2;
-  let cardsId = [];
+  let toItem = 1;
   const teamId = getContext('teamId');
 
   const setPage = (p) => (page = p);
@@ -47,7 +43,10 @@
     // const { from, to } = getPagination(page, toItem);
     const { data, error, count } = await supabase
       .from('business_cards')
-      .select('id, type, color, team_id, mode', { count: 'estimated' })
+      .select(
+        'id, type, color,team_cardcon : team_cardcon(status, card_id, NFCtap, QRScan,team_member_id (id,uid,team_profile, role(id, role_name), user_change, team_id))',
+        { count: 'estimated' }
+      )
       .eq('team_id', teamId)
       .eq('mode', 'team')
       .order('created_at', { ascending: true });
@@ -55,45 +54,18 @@
 
     if (error) console.log(error);
     if (data) {
-      cardsId = data.map((card) => card.id);
-      cards = data;
-      // maxPage = Math.ceil(count / 2);
-    }
-  };
-
-  const getTeamCardCon = async () => {
-    // const { from, to } = getPagination(page, toItem);
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .select(
-        'card_id(id, type, color), status, team_member_id(*, role(id, role_name), team_id)'
-      )
-      .in('card_id', cardsId);
-    // .range(from, to);
-
-    if (error) console.log(error);
-    if (data) {
-      if (data.length > 0) {
-        teamCardCon = data.filter((c) => c.team_member_id.uid !== null);
-      }
-    }
-  };
-
-  const getAllData = async () => {
-    await getTeamCard();
-    await getTeamCardCon();
-
-    if (cards.length > 0 && teamCardCon.length > 0) {
-      cards.map((item, i) => {
-        if (teamCardCon[i] !== undefined) {
-          activeMembers = [...activeMembers, teamCardCon[i]];
-          inactiveCards = [];
-        } else {
-          inactiveCards = [...inactiveCards, cards[i]];
-        }
-      });
+      activeMembers = data.filter(
+        (c) => c.team_cardcon[0]?.team_member_id?.uid
+      );
+      inactiveCards = data.filter(
+        (c) =>
+          c.team_cardcon.length === 0 || !c.team_cardcon[0]?.team_member_id?.uid
+      );
 
       activeMembers = moveArrItemToFront(activeMembers, $user?.id);
+      allMember = [...activeMembers, ...inactiveCards];
+
+      // maxPage = Math.ceil(count / toItem);
     }
   };
 
@@ -106,14 +78,14 @@
     });
   }
 
-  $: allMember = [...activeMembers, ...inactiveCards];
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
 
 <svelte:window bind:innerWidth />
+
 <div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-20 md:pl-24 pr-4">
-  {#await getAllData()}
-    <MemberSkeleton {cards} {innerWidth} {permissions} />
+  {#await getTeamCard()}
+    <MemberSkeleton {allMember} {innerWidth} {permissions} />
   {:then}
     <div
       class={`items-center w-full rounded-md gap-2 mt-2 bg-neutral-900 p-3 ${
@@ -172,33 +144,27 @@
         {/each}
       {/if}
       {#if state === 'active'}
-        {#each allMember as member, i}
-          {#if member.team_member_id}
-            <MemberCard
-              {member}
-              {roles}
-              {permissions}
-              {i}
-              {updatedRole}
-              on:setRole={(e) => (updatedRole = e.detail)}
-            />
-          {/if}
+        {#each activeMembers as member, i}
+          <MemberCard
+            {member}
+            {roles}
+            {permissions}
+            {i}
+            {updatedRole}
+            on:setRole={(e) => (updatedRole = e.detail)}
+          />
         {/each}
       {/if}
       {#if state === 'inactive'}
         {#if inactiveCards.length !== 0}
-          {#each allMember as member, i}
-            {#if member.id}
-              <MemberCard {member} {roles} {permissions} {updatedRole} />
-            {/if}
+          {#each inactiveCards as member, i}
+            <MemberCard {member} {roles} {permissions} {updatedRole} />
           {/each}
         {/if}
       {/if}
     </div>
 
-    <!-- {#if permissions.readMembers && allMember.length > 1}
-      <PaginationButton {setPage} {page} {maxPage} />
-    {/if} -->
+    <!-- <PaginationButton {setPage} {page} {maxPage} /> -->
   {:catch}
     <div>
       <h1 class="text-xl text-white text-center w-full mt-8">

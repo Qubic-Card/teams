@@ -74,7 +74,9 @@
   const getProfile = async () => {
     let { data, error } = await supabase
       .from('team_members')
-      .select('team_profile, uid, team_id, id')
+      .select(
+        'team_profile, uid, team_id, id, team_cardcon!inner(display_personal)'
+      )
       .eq('uid', $page.params.slug)
       .eq('team_id', teamId);
 
@@ -84,27 +86,14 @@
       $socials = profile['socials'];
       $links = profile['links'];
       memberId = data[0]['id'];
+
+      $isDisplayPersonal = data[0].team_cardcon[0].display_personal;
+      if (!data[0].team_cardcon[0].display_personal) $selectedTab = 'team';
     }
     if (error) console.log(error);
 
     return data;
   };
-
-  const getDisplayPersonal = async () => {
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .select('id,display_personal')
-      .eq('team_member_id', memberId)
-      .eq('card_id', history.state.id);
-
-    if (error) console.log(error);
-    if (data) {
-      $isDisplayPersonal = data[0].display_personal;
-      if (!data[0].display_personal) $selectedTab = 'team';
-    }
-  };
-
-  $: if (memberId) getDisplayPersonal();
 </script>
 
 {#await (getProfile(), getTeams())}
