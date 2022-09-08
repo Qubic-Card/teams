@@ -21,12 +21,14 @@
 >
   <td
     on:click={modalHandler}
-    class="font-bold text-ellipsis truncate pl-4 cursor-pointer flex-1 md:flex gap-1"
+    class="font-bold truncate pl-4 cursor-pointer flex-1"
   >
-    {connection?.profileData?.firstname ?? '-'}
-    <span class="hidden md:flex">
-      {connection?.profileData?.lastname ?? ''}
-    </span>
+    <p class="flex items-center gap-1">
+      {connection?.profileData?.firstname ?? '-'}
+      <span class="hidden md:flex">
+        {connection?.profileData?.lastname ?? ''}
+      </span>
+    </p>
   </td>
 
   {#if innerWidth > 640}

@@ -210,7 +210,7 @@
       <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
-        class={`overflow-y-auto border-r border-neutral-700 bg-black w-16 fixed ${
+        class={`overflow-y-auto overflow-x-hidden border-r border-neutral-700 bg-black w-16 fixed ${
           sevenDaysAfterEndDate
             ? !subscription.isActive && !subscription.isAfter7Days
               ? 'top-24'

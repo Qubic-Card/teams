@@ -36,7 +36,7 @@
   const chooseTeam = (tid) => goto(`/${tid}/dashboard`);
 </script>
 
-<section class="text-white">
+<section class="text-white overflow-hidden">
   <div class="border-b border-neutral-700 absolute w-screen top-10 md:top-16" />
   <div
     class="border-t border-neutral-700 absolute w-screen bottom-10 md:bottom-16"
