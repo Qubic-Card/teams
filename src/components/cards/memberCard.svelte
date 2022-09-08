@@ -203,16 +203,21 @@
               </div>
               <div>
                 <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
-                <p class="text-neutral-300 text-sm">
-                  {#if member?.type === 'pvc'}
-                    PVC
-                  {:else}
-                    {member?.type?.charAt(0).toUpperCase() +
-                      member?.type?.slice(1)}
-                  {/if}
-                  {member?.color?.charAt(0).toUpperCase() +
-                    member?.color?.slice(1)}
-                </p>
+                <div class="flex justify-between gap-2">
+                  <p class="text-neutral-300 text-sm">
+                    {#if member?.type === 'pvc'}
+                      PVC
+                    {:else}
+                      {member?.type?.charAt(0).toUpperCase() +
+                        member?.type?.slice(1)}
+                    {/if}
+                    {member?.color?.charAt(0).toUpperCase() +
+                      member?.color?.slice(1)}
+                  </p>
+                  <p class="text-neutral-300 text-sm">
+                    ****{member?.id.slice(-6)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -269,16 +274,21 @@
             </div>
             <div>
               <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
-              <p class="text-neutral-300 text-sm">
-                {#if member?.type === 'pvc'}
-                  PVC
-                {:else}
-                  {member?.type?.charAt(0).toUpperCase() +
-                    member?.type?.slice(1)}
-                {/if}
-                {member?.color?.charAt(0).toUpperCase() +
-                  member?.color?.slice(1)}
-              </p>
+              <div class="flex justify-between gap-2">
+                <p class="text-neutral-300 text-sm">
+                  {#if member?.type === 'pvc'}
+                    PVC
+                  {:else}
+                    {member?.type?.charAt(0).toUpperCase() +
+                      member?.type?.slice(1)}
+                  {/if}
+                  {member?.color?.charAt(0).toUpperCase() +
+                    member?.color?.slice(1)}
+                </p>
+                <p class="text-neutral-300 text-sm">
+                  ****{member?.id.slice(-6)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -434,8 +444,8 @@
           </div>
           <div>
             <h2 class="text-neutral-300 text-xs mt-3">Card:</h2>
-            <p class="text-neutral-300 text-sm">
-              {#if !member.status}
+            <div class="flex justify-between gap-2">
+              <p class="text-neutral-300 text-sm">
                 {#if member?.type === 'pvc'}
                   PVC
                 {:else}
@@ -444,10 +454,11 @@
                 {/if}
                 {member?.color?.charAt(0).toUpperCase() +
                   member?.color?.slice(1)}
-              {:else}
-                <span>No card found</span>
-              {/if}
-            </p>
+              </p>
+              <p class="text-neutral-300 text-sm">
+                ****{member?.id.slice(-6)}
+              </p>
+            </div>
           </div>
         </div>
       </div>
