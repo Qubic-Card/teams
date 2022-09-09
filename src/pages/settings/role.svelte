@@ -94,6 +94,7 @@
 <ConfirmationModal
   {isLoading}
   isDelete
+  isRole
   id={roleId}
   heading="Are you sure you want to delete"
   text={`${roleName}?`}
@@ -108,7 +109,7 @@
     <div
       class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
     >
-      <h1 class="font-bold text-xl">Role Settings</h1>
+      <h1 class="font-bold text-sm md:text-xl">Role Settings</h1>
       {#if permissions.writeRoles}
         <AddRoleModal {permissions} />
       {/if}

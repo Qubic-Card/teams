@@ -186,7 +186,7 @@
 </script>
 
 <svelte:window bind:innerWidth />
-<div class="flex flex-col pt-4 pl-16">
+<div class="flex flex-col md:pt-4 pl-16">
   {#if permissions.readConnection === true}
     {#await getUserConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
@@ -198,7 +198,7 @@
           <button
             class={`${
               tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-1/2 h-16`}
+            } w-full md:w-1/2 h-16`}
             on:click={async () => {
               setTabs('user');
               searchQuery = '';

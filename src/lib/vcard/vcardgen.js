@@ -7,12 +7,12 @@ export const genvcard = async (prop, team) => {
   let teamEmail;
   let wa;
   let vCard = new vCardJS();
-  let email = prop.socials
-    .filter((e) => e.type.includes('email') && e.isActive)
-    .map((e) => e.data);
+  let email = prop?.socials
+    ?.filter((e) => e.type.includes('email') && e.isActive)
+    ?.map((e) => e.data);
   let emailTeam = team?.socials
-    .filter((e) => e.type.includes('email') && e.isActive)
-    .map((e) => e.data);
+    ?.filter((e) => e.type.includes('email') && e.isActive)
+    ?.map((e) => e.data);
 
   //set basic properties shown before
   vCard.firstName = prop.firstname;
@@ -59,7 +59,7 @@ export const genvcard = async (prop, team) => {
     }
 
     vCard.workEmail = emailTeam;
-    console.log(emailTeam);
+
     if (team.socials) {
       team.socials.map((e, i) => {
         if (e.type === 'email') teamEmail = e.data;

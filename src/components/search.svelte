@@ -10,7 +10,7 @@
   const selectHandler = (item) => dispatch('select', item);
 </script>
 
-<div class="flex w-full md:w-auto">
+<div class="flex w-full md:w-auto px-2 md:px-0">
   <input
     type="text"
     class="w-full rounded-md md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700

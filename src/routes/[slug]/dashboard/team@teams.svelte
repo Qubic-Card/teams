@@ -381,14 +381,16 @@
   }
 </script>
 
-<div class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-24 pr-4">
+<div
+  class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-20 md:pl-24 pr-4"
+>
   <div class="flex justify-between gap-4">
     {#if loading}
       <TeamAnalyticsCardSkeleton />
     {:else}
       <div class="flex flex-col w-full gap-4">
         <AnalyticsDropdownButton on:select={selectDaysHandler} />
-        <div class="flex gap-4">
+        <div class="flex flex-col md:flex-row gap-4">
           {#each analyticsData as item}
             <TeamAnalyticsCard {item} {selectedDays} />
           {/each}
@@ -397,7 +399,11 @@
     {/if}
   </div>
 
-  <div class="flex gap-4">
+  <div class="flex lg:hidden w-full justify-center mt-8">
+    View more on desktop
+  </div>
+
+  <div class="hidden md:flex gap-4">
     {#if teamLogs}
       <div class="flex flex-col w-2/3 gap-4">
         <div class="flex justify-between">

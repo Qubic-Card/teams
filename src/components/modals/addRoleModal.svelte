@@ -74,7 +74,7 @@
   title="Add role"
   {showModal}
   on:showModal={toggleModal}
-  class="w-1/2 h-[80%]"
+  class="w-[90%] md:w-1/2 h-[80%]"
 >
   <div
     class="flex flex-col h-82 justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"

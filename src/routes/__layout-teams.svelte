@@ -16,10 +16,10 @@
   import supabase from '@lib/db';
   import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
   import { teams } from '@lib/stores/teamStore';
+  import { teamData } from '@lib/stores/teamStore';
 
   let isSidebarOpened = false;
   let isMenuOpened = false;
-  let team = null;
   let member = [];
   let subscription = {};
   let loading = true;
@@ -55,7 +55,7 @@
     await getSubscriptionsData();
     member = await getRoleMapsByProfile($user?.id, teamId);
     userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
-    team = await getTeamData(teamId);
+    $teamData = await getTeamData(teamId);
 
     $teams = {
       subscription_end_date: member?.team_id?.subscription_end_date,
@@ -146,11 +146,17 @@
     {/if}
 
     <div
+      class="flex justify-center items-center md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-sm"
+    >
+      Please Sign-in on Desktop
+    </div>
+
+    <div
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
         {#if subscription.isActive || (!subscription.isActive && !subscription.isAfter7Days)}
-          {#if team?.name}
+          {#if $teamData.name}
             {#if isSidebarOpened}
               <img
                 src="/close-white.svg"
@@ -162,7 +168,7 @@
               <img
                 src="/menu-white.svg"
                 alt="humberger-menu"
-                class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
+                class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700 hidden md:block"
                 on:click={sidebarHandler}
               />
             {/if}
@@ -174,9 +180,9 @@
             </div>
           {/if}
         {/if}
-        {#if team?.name}
+        {#if $teamData.name}
           <p class="text-xl font-bold ml-4">
-            {team?.name}
+            {$teamData.name}
           </p>
         {:else}
           <div class="animate-pulse p-4">
@@ -184,14 +190,14 @@
           </div>
         {/if}
       </div>
-      {#if team?.logo}
+      {#if $teamData.logo}
         <img
           on:click={menuHandler}
-          src={team?.logo}
+          src={$teamData.logo}
           alt="avatar"
           class="rounded-full w-10 h-10 cursor-pointer"
         />
-      {:else if team?.logo === ''}
+      {:else if $teamData.logo === ''}
         <div
           on:click={menuHandler}
           class="bg-neutral-800 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
@@ -210,19 +216,19 @@
       <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
-        class={`overflow-y-auto overflow-x-hidden border-r border-neutral-700 bg-black w-16 fixed ${
+        class={`border-r border-neutral-700 bg-black w-16 fixed ${
           sevenDaysAfterEndDate
             ? !subscription.isActive && !subscription.isAfter7Days
               ? 'top-24'
-              : 'top-16'
+              : 'top-[100px] md:top-16'
             : 'top-16'
-        } bottom-0 left-0 z-30 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
+        } bottom-0 left-0 z-50 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
           isSidebarOpened ? 'w-full md:w-72' : ''
         }`}
       >
         <nav class="space-y-2 w-full flex flex-col justify-center items-center">
           {#each sidebarItems as item}
-            {#if team?.name}
+            {#if $teamData.name}
               <div
                 class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
                   isSidebarOpened ? 'justify-between' : 'justify-center'
@@ -237,7 +243,7 @@
                     ? 'bg-neutral-900'
                     : ''
                 }`}
-                on:click={() => handler(team?.id, item.title)}
+                on:click={() => handler($teamData?.id, item.title)}
               >
                 {#if isSidebarOpened}
                   <p class="text-sm">
@@ -260,7 +266,7 @@
           sevenDaysAfterEndDate
             ? !subscription.isActive && !subscription.isAfter7Days
               ? 'top-24'
-              : 'top-16'
+              : 'top-[100px] md:top-16'
             : 'top-16'
         } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
       >
@@ -279,9 +285,11 @@
         {:else}
           {#if permissions.readAnalytics}
             {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
-              <div class="border-b-2 border-neutral-700 pl-24 mt-4 gap-4 flex">
+              <div
+                class="border-b-2 border-neutral-700 pl-20 md:pl-24 mt-4 gap-4 flex"
+              >
                 <button
-                  on:click={() => goto(`/${team?.id}/dashboard`)}
+                  on:click={() => goto(`/${$teamData?.id}/dashboard`)}
                   class={`pb-2 w-1/5 text-md ${
                     $page.routeId === '[slug]/dashboard@teams'
                       ? 'border-b-2 border-neutral-200 font-bold'
@@ -289,7 +297,7 @@
                   }`}>Personal</button
                 >
                 <button
-                  on:click={() => goto(`/${team?.id}/dashboard/team`)}
+                  on:click={() => goto(`/${$teamData?.id}/dashboard/team`)}
                   class={`pb-2 w-1/5 text-md ${
                     $page.routeId === '[slug]/dashboard/team@teams'
                       ? 'border-b-2 border-neutral-200 font-bold'

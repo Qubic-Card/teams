@@ -59,10 +59,10 @@
         : data?.firstname + ' ' + data?.lastname}
     </h1>
     <h1 class="text-sm opacity-80">
-      {data?.job == '' ? Dummy.job : data?.job}
+      {data?.job ?? ''}
     </h1>
     <h1 class="text-md opacity-90">
-      {data?.company == '' ? Dummy.company : data?.company}
+      {data?.company ?? ''}
     </h1>
   </div>
   <div class="flex gap-2 px-8 md:px-16 text-white my-4">

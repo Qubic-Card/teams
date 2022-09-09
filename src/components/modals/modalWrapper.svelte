@@ -15,7 +15,7 @@
     <div class={`relative my-6 mx-auto md:max-w-3xl max-w-md ${$$props.class}`}>
       <!--content-->
       <div
-        class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-neutral-900 outline-none focus:outline-none h-full overflow-y-auto snap-y snap-mandatory snap-container"
+        class="border-0 rounded-lg shadow-lg relative flex flex-col overflow-x-hidden w-full bg-neutral-900 outline-none focus:outline-none h-full overflow-y-auto snap-y snap-mandatory snap-container"
       >
         <!--header-->
         <div

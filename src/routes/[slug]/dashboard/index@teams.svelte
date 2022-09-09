@@ -39,7 +39,7 @@
 </script>
 
 <div
-  class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-24 pr-4"
+  class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-20 md:pl-24 pr-4"
 >
   <div class="flex flex-col">
     <h1 class="text-lg font-bold">Quick Actions</h1>
@@ -49,7 +49,7 @@
       {#each quickActions as item}
         <div
           on:click={item.handler}
-          class="flex justify-center items-center px-4 bg-neutral-800 text-sm rounded-md border border-neutral-700 snap-center text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
+          class="flex justify-center items-center px-4 bg-neutral-800 text-sm rounded-md border border-neutral-700 snap-center h-12 text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
         >
           {item.name}
         </div>

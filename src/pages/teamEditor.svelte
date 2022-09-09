@@ -66,7 +66,6 @@
   let pond;
   let brochurePond;
   let name = 'filepond';
-  let teamName = null;
   let isOpen = false;
   let croppedImage = '';
   let fileName = '';
@@ -155,7 +154,7 @@
     $teamData.links = $teamLinks;
     const { error } = await supabase
       .from('teams')
-      .update({ metadata: $teamData, name: teamName }, { returning: 'minimal' })
+      .update({ metadata: $teamData }, { returning: 'minimal' })
       .eq('id', teamId);
 
     if (error) {
@@ -177,7 +176,6 @@
     if (data) {
       const team = data[0].metadata;
       $teamData = { ...team };
-      teamName = data[0].name;
       $teamSocials = team['socials'];
       $teamLinks = team['links'];
       // teamId = team['id'];
@@ -332,17 +330,6 @@
                       disabled={permissions.writeTeam ? false : true}
                     />
                   </div>
-                  {#if $memberData.roleName === 'superadmin'}
-                    <div class="px-3 grid grid-cols-1 space-x-5">
-                      <Input
-                        on:change={handleSave}
-                        placeholder="Team Name"
-                        title="Team Name"
-                        bind:value={teamName}
-                        disabled={permissions.writeTeam ? false : true}
-                      />
-                    </div>
-                  {/if}
                   <div class="px-3">
                     <Input
                       on:change={handleSave}

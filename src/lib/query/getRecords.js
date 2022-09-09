@@ -32,7 +32,6 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
   if (error) {
     console.log(error);
   } else {
-    console.log(data);
     if (data.length === 0) {
       toastFailed('No data found for this period');
     } else {

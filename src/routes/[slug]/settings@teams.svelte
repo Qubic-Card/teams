@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TeamName from './../../pages/settings/teamName.svelte';
   import supabase from '@lib/db';
   import { teamRoles } from '@lib/stores/roleStore';
   import SettingsSkeleton from '@comp/skeleton/settingsSkeleton.svelte';
@@ -9,6 +10,7 @@
   import Activation from '@pages/settings/activation.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import encryptActivationCode from '@lib/utils/encryptActivationCode';
+  import { teamData } from '@lib/stores/teamStore';
 
   const teamId = getContext('teamId');
   let roles = [];
@@ -22,6 +24,7 @@
     isTeamWillExpire: false,
   };
   let isLoading = false;
+  let loading = false;
   let activationCode = 'QUBICPASS';
 
   const getTeamsRoleMapping = async () => {
@@ -42,6 +45,23 @@
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const updateTeamName = async () => {
+    loading = true;
+    const { error } = await supabase
+      .from('teams')
+      .update({ name: $teamData.name }, { returning: 'minimal' })
+      .eq('id', teamId);
+
+    if (error) {
+      loading = false;
+      toastFailed();
+      console.log(error);
+    } else {
+      loading = false;
+      toastSuccess('Changes saved');
     }
   };
 
@@ -75,6 +95,12 @@
     }
   };
 
+  const onTeamNameKeyPress = async (e) => {
+    if (e.charCode === 13) {
+      await updateTeamName();
+    }
+  };
+
   const clicked = (e) => (isClicked = e.detail);
 
   $: if ($userData)
@@ -89,7 +115,7 @@
 </script>
 
 {#await getTeamsRoleMapping()}
-  <div class="ml-24 mr-4 mt-4">
+  <div class="ml-20 md:ml-24 mr-4 mt-4">
     <SettingsSkeleton
       {permissions}
       isSuperAdmin={$memberData?.roleName === 'superadmin'}
@@ -101,6 +127,12 @@
       <Billing {permissions} />
       {#if $memberData?.roleName === 'superadmin'}
         {#if !permissions.isTeamInactive && !permissions.isTeamWillExpire}
+          <TeamName
+            {loading}
+            on:keypress={onTeamNameKeyPress}
+            bind:value={$teamData.name}
+            on:click={updateTeamName}
+          />
           <Activation
             {isLoading}
             bind:value={activationCode}

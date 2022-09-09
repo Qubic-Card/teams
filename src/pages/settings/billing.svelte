@@ -11,7 +11,7 @@
       <div
         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4"
       >
-        <h1 class="font-bold text-xl">Billing</h1>
+        <h1 class="font-bold text-sm md:text-xl">Billing</h1>
         <div
           class={`gap-2 ${
             permissions.writeBilling && permissions.readBilling
@@ -27,12 +27,12 @@
           >
         </div>
       </div>
-      <p>
+      <p class="text-xs md:text-md">
         Subscription valid hingga: {convertToGMT7($teams?.subscription_end_date)
           .toDateString()
           .slice(4) ?? '-'}
       </p>
-      <p>
+      <p class="text-xs md:text-md">
         Jumlah member: {$teams?.member_count ?? '-'}
       </p>
       <!-- <div

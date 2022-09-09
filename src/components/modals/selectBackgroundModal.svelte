@@ -181,7 +181,7 @@
           transition:fade|local={{ duration: 300 }}
           src={croppedImage}
           alt="Cropped profile"
-          class="w-full h-48 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+          class="w-full h-40 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-contain"
         /><br />
       {/if}
     </div>
@@ -228,7 +228,7 @@
 <ModalWrapper
   isUnsplash={state === 'unsplash'}
   title="Select background image"
-  class="w-1/2"
+  class="w-[90%] md:w-1/2"
   {showModal}
   on:showModal={() => {
     showModal = !showModal;

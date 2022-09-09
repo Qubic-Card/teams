@@ -19,7 +19,7 @@
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { teamProfileTemplate } from '@lib/constants';
 
-  export let permissions;
+  export let permissions, deleteMember;
   export let roles = [];
   export let member, i, updatedRole;
 
@@ -104,7 +104,7 @@
     } else {
       toastSuccess('Member has been deleted');
       isLoading = false;
-      location.reload();
+      // location.reload();
     }
   };
 
@@ -143,6 +143,7 @@
 <ConfirmationModal
   {isLoading}
   isDelete
+  isMember
   isDispatch
   heading="Are you sure you want to delete"
   text={`${memberData?.team_profile?.firstname} ${memberData?.team_profile?.lastname}?`}
@@ -151,6 +152,7 @@
   toggleModal={toggleDeleteMemberModal}
   on:action={async () => {
     await deleteMemberHandler(memberData.id);
+    await deleteMember(memberData.id);
     showDeleteMemberModal = false;
   }}
 />
@@ -176,7 +178,7 @@
               />
               {#if $user.id === memberData.uid}
                 <h1
-                  class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
+                  class="absolute translate-y-24 lg:translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
                 >
                   You
                 </h1>
@@ -247,7 +249,7 @@
             />
             {#if $user.id === memberData?.uid}
               <h1
-                class="absolute translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
+                class="absolute translate-y-24 lg:translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
               >
                 You
               </h1>
@@ -434,7 +436,7 @@
         <img
           src="/favicon.svg"
           alt="Profile"
-          class="w-32 lg:w-36 h-32 lg:h-36 rounded-md"
+          class="w-32 lg:w-36 h-32 lg:h-36 rounded-md hidden md:block"
         />
         <div class="flex flex-col justify-between">
           <div class="flex flex-col flex-wrap">
@@ -464,7 +466,7 @@
       </div>
 
       <div
-        class="flex relative w-full h-20 justify-between items-center bg-neutral-900 rounded-b-md p-4"
+        class="flex relative w-full h-[75px] justify-between items-center bg-neutral-900 rounded-b-md p-4"
       />
     </div>
   </div>
