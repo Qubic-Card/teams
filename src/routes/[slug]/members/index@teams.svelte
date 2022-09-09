@@ -25,6 +25,7 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 1;
+  let isDeleteMember = false;
   const teamId = getContext('teamId');
 
   const setPage = (p) => (page = p);
@@ -68,7 +69,7 @@
       // maxPage = Math.ceil(count / toItem);
     }
   };
-
+  // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9
   $: {
     $userData?.filter((item) => {
       if (item === 'allow_read_members') permissions.readMembers = true;
@@ -77,6 +78,35 @@
       if (item === 'allow_read_roles') permissions.readRoles = true;
     });
   }
+
+  const deleteMember = async (id) => {
+    let deletedMember = activeMembers.filter(
+      (m) => m.team_cardcon[0].team_member_id.id === id
+    );
+
+    deletedMember = deletedMember.map((m) => {
+      return {
+        id: m.id,
+        color: m.color,
+        team_cardcon: [],
+        type: m.type,
+      };
+    });
+
+    activeMembers = activeMembers.filter(
+      (m) => m.team_cardcon[0].team_member_id.id !== id
+    );
+
+    inactiveCards = [...inactiveCards, ...deletedMember];
+
+    isDeleteMember = true;
+    setTimeout(() => {
+      isDeleteMember = false;
+    }, 500);
+
+    activeMembers = moveArrItemToFront(activeMembers, $user?.id);
+    allMember = [...activeMembers, ...inactiveCards];
+  };
 
   onMount(async () => (roles = await getAllRoleByTeam(teamId)));
 </script>
@@ -126,43 +156,48 @@
         </div>
       {/if}
     {/if}
-    <div
-      class={`grid grid-flow-row my-4 h-64 gap-2 ${
-        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
-      }`}
-    >
-      {#if state === 'all'}
-        {#each allMember as member, i}
-          <MemberCard
-            {member}
-            {roles}
-            {permissions}
-            {i}
-            {updatedRole}
-            on:setRole={(e) => (updatedRole = e.detail)}
-          />
-        {/each}
-      {/if}
-      {#if state === 'active'}
-        {#each activeMembers as member, i}
-          <MemberCard
-            {member}
-            {roles}
-            {permissions}
-            {i}
-            {updatedRole}
-            on:setRole={(e) => (updatedRole = e.detail)}
-          />
-        {/each}
-      {/if}
-      {#if state === 'inactive'}
-        {#if inactiveCards.length !== 0}
-          {#each inactiveCards as member, i}
-            <MemberCard {member} {roles} {permissions} {updatedRole} />
+    {#if isDeleteMember}
+      <MemberSkeleton {allMember} {innerWidth} {permissions} />
+    {:else}
+      <div
+        class={`grid grid-flow-row my-4 h-full md:h-64 gap-2 ${
+          innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
+        }`}
+      >
+        {#if state === 'all'}
+          {#each allMember as member, i}
+            <MemberCard
+              {member}
+              {roles}
+              {permissions}
+              {i}
+              {updatedRole}
+              {deleteMember}
+              on:setRole={(e) => (updatedRole = e.detail)}
+            />
           {/each}
         {/if}
-      {/if}
-    </div>
+        {#if state === 'active'}
+          {#each activeMembers as member, i}
+            <MemberCard
+              {member}
+              {roles}
+              {permissions}
+              {i}
+              {updatedRole}
+              on:setRole={(e) => (updatedRole = e.detail)}
+            />
+          {/each}
+        {/if}
+        {#if state === 'inactive'}
+          {#if inactiveCards.length !== 0}
+            {#each inactiveCards as member, i}
+              <MemberCard {member} {roles} {permissions} {updatedRole} />
+            {/each}
+          {/if}
+        {/if}
+      </div>
+    {/if}
 
     <!-- <PaginationButton {setPage} {page} {maxPage} /> -->
   {:catch}

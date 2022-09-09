@@ -9,7 +9,7 @@
     <div class="flex flex-col gap-6">
       <div
         class={`grid ${
-          innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-2'
+          innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
         } grid-flow-row gap-2 mt-4`}
       >
         {#if cards}
@@ -26,7 +26,7 @@
   {:else}
     <div
       class={`grid  ${
-        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-2'
+        innerWidth > 1370 ? 'grid-cols-3' : 'grid-cols-1 md:grid-cols-2'
       } grid-flow-row`}
     >
       <div class="bg-neutral-800 w-full h-56 rounded-md" />

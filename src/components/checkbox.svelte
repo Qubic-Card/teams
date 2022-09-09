@@ -1,7 +1,6 @@
 <script>
   import { setNewRole } from '@lib/stores/roleStore';
-  import { userData } from '@lib/stores/userStore';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   export let checkboxes, checked, permissions, isDefault;
   export let bg = 'bg-neutral-900';
   let isSuperAdmin = false;
@@ -122,11 +121,11 @@
 
     {#each items.roles as role}
       <div
-        class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 ${bg}`}
+        class={`flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 h-16 md:h-auto ${bg}`}
       >
         <div class="flex justify-center items-center h-7">
           <label
-            class={`flex ${
+            class={`flex text-xs md:text-md ${
               isDefault ||
               isSuperAdmin ||
               permissions.isTeamInactive ||
@@ -156,7 +155,7 @@
             </p>
           </label>
         </div>
-        <p class="w-1/2">
+        <p class="w-1/2 hidden md:block">
           {role.desc}
         </p>
       </div>
