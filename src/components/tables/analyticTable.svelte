@@ -42,7 +42,17 @@
               <td class="pl-4 p-2 w-48">
                 {new Date(row.created_at).toDateString().slice(4)}
               </td>
-              <td class="pl-4 w-auto">{row.message}</td>
+              {#if row.type === 'DANGER'}
+                <td class="pl-4 w-auto">
+                  You have removed {row.message.split(' ')[0]} from team
+                </td>
+              {:else if row.type === 'SUCCESS'}
+                <td class="pl-4 w-auto">You have activated new card to team</td>
+              {:else if row.type === 'WARN'}
+                <td class="pl-4 w-auto"> You have changed team name</td>
+              {:else}
+                <td class="pl-4 w-auto">{row.message}</td>
+              {/if}
               <td class="flex flex-col pl-4 h-[40px] justify-center">
                 {row?.platform ?? 'Unknown'}
               </td>

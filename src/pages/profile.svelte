@@ -137,15 +137,14 @@
           {#if item.isActive}
             <BorderButton
               class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-              ><div class="p-2">
-                <LinkPreview
-                  isShowMetaImage={data.isShowMetaImage}
-                  title={item.title}
-                  url={item.link}
-                  className={currentTheme.secondary}
-                />
-              </div></BorderButton
             >
+              <LinkPreview
+                isShowMetaImage={data.isShowMetaImage}
+                title={item.title}
+                url={item.link}
+                className={currentTheme.secondary}
+              />
+            </BorderButton>
           {/if}
         {/each}
       </div>
@@ -206,15 +205,14 @@
             {#if item.isActive}
               <BorderButton
                 class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
-                ><div class="p-2">
-                  <LinkPreview
-                    isShowMetaImage={$teamData.isShowMetaImage}
-                    title={item.title}
-                    url={item.link}
-                    className={currentTheme.secondary}
-                  />
-                </div></BorderButton
               >
+                <LinkPreview
+                  isShowMetaImage={$teamData.isShowMetaImage}
+                  title={item.title}
+                  url={item.link}
+                  className={currentTheme.secondary}
+                />
+              </BorderButton>
             {/if}
           {/each}
         </div>

@@ -83,6 +83,8 @@
     $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
     $memberData.roleName = member?.role?.role_name;
+    $memberData.fullName =
+      member?.team_profile?.firstname + ' ' + member?.team_profile?.lastname;
   }
 
   $: {
