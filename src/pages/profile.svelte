@@ -166,10 +166,10 @@
         </div>
         <p class="text-xs">{$teamData.address ?? '-'}</p>
         <p class="text-xs text-neutral-400">
-          {$teamData.description ?? '-'}
+          {$teamData.description ?? ''}
         </p>
       </div>
-      {#if $teamData?.brochure?.url !== ''}
+      {#if $teamData?.brochure?.url !== ""}
         <div
           on:click={downloadHandler}
           class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
