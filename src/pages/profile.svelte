@@ -169,7 +169,7 @@
           {$teamData.description ?? '-'}
         </p>
       </div>
-      {#if $teamData?.brochure?.url !== ''}
+      {#if $teamData?.brochure}
         <div
           on:click={downloadHandler}
           class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
