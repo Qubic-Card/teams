@@ -27,11 +27,26 @@
         <div class="flex flex-col pl-7">
           {#each log.logs as item}
             <div
-              class="text-sm flex justify-between p-1 hover:bg-neutral-800 hover:p-1"
+              class={`text-sm flex mb-1 rounded-md justify-between p-1 hover:bg-neutral-800 hover:p-1 ${
+                item.type === 'DANGER'
+                  ? 'bg-red-500/30'
+                  : item.type === 'SUCCESS'
+                  ? 'bg-green-500/30'
+                  : item.type === 'WARN'
+                  ? 'bg-yellow-500/30'
+                  : 'bg-transparent'
+              }`}
             >
-              <h1 class="text-white">
-                {`${item?.card_holder ?? 'Member'}'s` + item?.message?.slice(4)}
-              </h1>
+              {#if item.type === 'DANGER' || item.type === 'SUCCESS' || item.type === 'WARN'}
+                <h1 class="text-white">
+                  {item?.message}
+                </h1>
+              {:else}
+                <h1 class="text-white">
+                  {`${item?.card_holder ?? 'Member'}'s` +
+                    item?.message?.slice(4)}
+                </h1>
+              {/if}
               <p class="text-neutral-500">
                 {setHours4Digit(
                   convertToGMT7(item.created_at).getHours(),

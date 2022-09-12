@@ -13,6 +13,13 @@ const convertToCSV = (arr) => {
     .join('\n');
 };
 
+const removeByName = (arr) => {
+  let idxBy = arr.findIndex((item) => item === 'by');
+  let newArr = arr.slice(0, idxBy);
+
+  return newArr;
+};
+
 export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
   fromDate = new Date(new Date(fromDate).setHours(0, 0, 0, 0)).toUTCString();
   toDate = new Date(
@@ -100,10 +107,19 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
             Created_at: convertToGMT7(log?.created_at),
             Team: log?.team?.name,
             Company: log?.team?.company,
-            Message:
-              log?.data?.message.slice(5).charAt(0).toUpperCase() +
-              log?.data?.message.slice(6),
+            Message: log?.data?.message?.includes('removed')
+              ? log?.data?.message.split(' ')[0] +
+                ' ' +
+                'has been removed from team'
+              : log?.data?.message?.includes('activated')
+              ? log?.data?.message
+              : log?.type === 'WARN'
+              ? removeByName(log?.data?.message.split(' ')).join(' ')
+              : log?.data?.message.slice(5).charAt(0).toUpperCase() +
+                log?.data?.message.slice(6),
             Holder: log.card_holder ?? '-',
+            latitude: log?.data?.position?.lat ?? '-',
+            longitude: log?.data?.position?.long ?? '-',
           };
         });
 

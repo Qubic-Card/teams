@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { fly } from 'svelte/transition';
   import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
+  import { memberData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import roleId from '@lib/roleConfig';
   import DropdownButton from '@comp/buttons/dropdownButton.svelte';
@@ -15,9 +15,10 @@
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher, getContext, onMount } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { teamProfileTemplate } from '@lib/constants';
+  import { log } from '@lib/logger/logger';
 
   export let permissions, deleteMember;
   export let roles = [];
@@ -31,7 +32,7 @@
   let roleName = null;
   let card = member?.card_id;
   let isLoading = false;
-  let memberData = member?.team_cardcon[0]?.team_member_id;
+  let memberProfile = member?.team_cardcon[0]?.team_member_id;
   let role = member?.team_cardcon[0]?.team_member_id.role;
   let teamCardCon = member?.team_cardcon[0];
 
@@ -68,8 +69,8 @@
     const { data, error } = await supabase
       .from('team_members')
       .update({ role: id }, { returning: 'minimal' })
-      .eq('uid', memberData.uid)
-      .eq('team_id', memberData.team_id);
+      .eq('uid', memberProfile.uid)
+      .eq('team_id', memberProfile.team_id);
 
     if (error) {
       console.log(error);
@@ -82,7 +83,14 @@
     }
   };
 
-  const deleteMemberHandler = async (id) => {
+  // 3bc4953a-262d-49e0-acdb-c3a09357be65
+
+  const deleteMemberHandler = async () => {
+    let card_holder =
+      member.team_cardcon[0].team_member_id.team_profile.firstname +
+      ' ' +
+      member.team_cardcon[0].team_member_id.team_profile.lastname;
+
     isLoading = true;
 
     const { error: error_member } = await supabase
@@ -94,7 +102,7 @@
         },
         { returning: 'minimal' }
       )
-      .eq('id', id);
+      .eq('id', member.team_cardcon[0].team_member_id.id);
 
     if (error_member) {
       console.log(error_member);
@@ -102,14 +110,22 @@
       isLoading = false;
       return;
     } else {
+      log(
+        `${card_holder} has been removed from team by ${$memberData.fullName}`,
+        'DANGER',
+        null,
+        member.team_cardcon[0].team_member_id.team_id,
+        $memberData.fullName,
+        '',
+        $memberData.id
+      );
       toastSuccess('Member has been deleted');
       isLoading = false;
-      // location.reload();
     }
   };
 
   const setRoleHandlers = async (idx) => {
-    if ($user?.id === memberData.uid) {
+    if ($user?.id === memberProfile.uid) {
       roleID = roleId[idx].id;
       roleName = roleId[idx].name;
       toggleModal();
@@ -146,37 +162,39 @@
   isMember
   isDispatch
   heading="Are you sure you want to delete"
-  text={`${memberData?.team_profile?.firstname} ${memberData?.team_profile?.lastname}?`}
+  text={`${memberProfile?.team_profile?.firstname} ${memberProfile?.team_profile?.lastname}?`}
   buttonLabel="Delete"
   showModal={showDeleteMemberModal}
   toggleModal={toggleDeleteMemberModal}
   on:action={async () => {
-    await deleteMemberHandler(memberData.id);
-    await deleteMember(memberData.id);
+    await deleteMemberHandler();
+    await deleteMember(memberProfile.id);
     showDeleteMemberModal = false;
   }}
 />
 
-{#if memberData?.uid}
+{#if memberProfile?.uid}
   {#if !permissions.readMembers}
-    {#if $user?.id === memberData.uid}
+    {#if $user?.id === memberProfile.uid}
       <div class="flex flex-col justify-between">
         <div
           class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
         >
           <div
             class="flex cursor-pointer h-full gap-4 p-4"
-            on:click={() => toProfileEditor(memberData.uid)}
+            on:click={() => toProfileEditor(memberProfile.uid)}
           >
             <div class="hidden md:flex flex-row-reverse relative">
               <img
-                src={memberData.team_profile?.avatar ?? '/favicon.svg'}
+                src={memberProfile.team_profile?.avatar ?? '/favicon.svg'}
                 alt="Profile"
                 class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
-                  $user.id === memberData.uid ? 'border-2 border-blue-600' : ''
+                  $user.id === memberProfile.uid
+                    ? 'border-2 border-blue-600'
+                    : ''
                 }`}
               />
-              {#if $user.id === memberData.uid}
+              {#if $user.id === memberProfile.uid}
                 <h1
                   class="absolute translate-y-24 lg:translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
                 >
@@ -189,16 +207,16 @@
                 <h1
                   class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
                 >
-                  {memberData.team_profile?.firstname ?? ''}
-                  {memberData.team_profile?.lastname ?? ''
+                  {memberProfile.team_profile?.firstname ?? ''}
+                  {memberProfile.team_profile?.lastname ?? ''
                     ? ''
-                    : ' ' + memberData.team_profile?.lastname}
+                    : ' ' + memberProfile.team_profile?.lastname}
                 </h1>
                 <h2 class="text-neutral-300">
-                  {memberData.team_profile?.job}
+                  {memberProfile.team_profile?.job}
                 </h2>
                 <h2 class="text-neutral-300 text-xs">
-                  Joined since {convertToGMT7(memberData.user_change)
+                  Joined since {convertToGMT7(memberProfile.user_change)
                     .toDateString()
                     .slice(4)}
                 </h2>
@@ -237,17 +255,19 @@
       >
         <div
           class="flex cursor-pointer h-full gap-4 p-4"
-          on:click={() => toProfileEditor(memberData?.uid)}
+          on:click={() => toProfileEditor(memberProfile?.uid)}
         >
           <div class="hidden md:flex flex-row-reverse relative">
             <img
-              src={memberData?.team_profile?.avatar ?? '/favicon.svg'}
+              src={memberProfile?.team_profile?.avatar ?? '/favicon.svg'}
               alt="Profile"
               class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
-                $user.id === memberData?.uid ? 'border-2 border-blue-600' : ''
+                $user.id === memberProfile?.uid
+                  ? 'border-2 border-blue-600'
+                  : ''
               }`}
             />
-            {#if $user.id === memberData?.uid}
+            {#if $user.id === memberProfile?.uid}
               <h1
                 class="absolute translate-y-24 lg:translate-y-28 w-12 font-bold bg-blue-600/60 p-1 rounded-br-md rounded-tl-md text-center"
               >
@@ -260,16 +280,16 @@
               <h1
                 class="md:text-lg lg:text-xl text-left w-56 overflow-clip text-ellipsis"
               >
-                {memberData?.team_profile?.firstname ?? ''}
-                {memberData?.team_profile?.lastname ?? ''
+                {memberProfile?.team_profile?.firstname ?? ''}
+                {memberProfile?.team_profile?.lastname ?? ''
                   ? ''
-                  : ' ' + memberData?.team_profile?.lastname}
+                  : ' ' + memberProfile?.team_profile?.lastname}
               </h1>
               <h2 class="text-neutral-300">
-                {memberData?.team_profile?.job}
+                {memberProfile?.team_profile?.job}
               </h2>
               <h2 class="text-neutral-300 text-xs">
-                Joined since {convertToGMT7(memberData?.user_change)
+                Joined since {convertToGMT7(memberProfile?.user_change)
                   .toDateString()
                   .slice(4)}
               </h2>
@@ -396,7 +416,7 @@
                       <MenuItem
                         class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
                         on:click={async () => {
-                          if ($user?.id === memberData.uid) {
+                          if ($user?.id === memberProfile.uid) {
                             roleID = item.id;
                             roleName = item.role_name;
                             toggleModal();

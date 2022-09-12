@@ -11,6 +11,8 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import encryptActivationCode from '@lib/utils/encryptActivationCode';
   import { teamData } from '@lib/stores/teamStore';
+  import { log } from '@lib/logger/logger';
+  import { team } from '@lib/stores/recordsStore';
 
   const teamId = getContext('teamId');
   let roles = [];
@@ -61,6 +63,17 @@
       console.log(error);
     } else {
       loading = false;
+
+      log(
+        `Team Name has been changed to ${$teamData.name} by ${$memberData.fullName}`,
+        'WARN',
+        null,
+        teamId,
+        $memberData.fullName,
+        '',
+        $memberData.id
+      );
+
       toastSuccess('Changes saved');
     }
   };
