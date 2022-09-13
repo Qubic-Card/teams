@@ -345,13 +345,15 @@
                       bind:value={$teamData.description}
                       disabled={permissions.writeTeam ? false : true}
                     />
-                    <Input
-                      on:change={handleSave}
-                      placeholder="Brochure Title"
-                      title="Brochure Title"
-                      bind:value={$teamData.brochure.title}
-                      disabled={permissions.writeTeam ? false : true}
-                    />
+                    {#if $teamData.brochure}
+                      <Input
+                        on:change={handleSave}
+                        placeholder="Brochure Title"
+                        title="Brochure Title"
+                        bind:value={$teamData.brochure.title}
+                        disabled={permissions.writeTeam ? false : true}
+                      />
+                    {/if}
                   </div>
 
                   {#if permissions.writeTeam}
@@ -365,7 +367,7 @@
                       />
                     </div>
                     <div class="grid grid-cols-2 gap-2 px-3 pt-3">
-                      {#if $teamData?.brochure?.url === ''}
+                      {#if !$teamData?.brochure?.url}
                         <FilePond
                           bind:this={brochurePond}
                           {name}

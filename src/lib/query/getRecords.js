@@ -111,15 +111,15 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
               ? log?.data?.message.split(' ')[0] +
                 ' ' +
                 'has been removed from team'
-              : log?.data?.message?.includes('activated')
-              ? log?.data?.message
-              : log?.type === 'WARN'
+              : log?.data?.message?.includes('activated') ||
+                log?.type === 'WARN'
               ? removeByName(log?.data?.message.split(' ')).join(' ')
               : log?.data?.message.slice(5).charAt(0).toUpperCase() +
                 log?.data?.message.slice(6),
             Holder: log.card_holder ?? '-',
-            latitude: log?.data?.position?.lat ?? '-',
-            longitude: log?.data?.position?.long ?? '-',
+            position: `latitude: ${
+              log?.data?.position?.lat ?? '-'
+            }, longitude: ${log?.data?.position?.long ?? '-'}`,
           };
         });
 
