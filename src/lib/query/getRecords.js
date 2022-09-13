@@ -116,10 +116,10 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
               ? removeByName(log?.data?.message.split(' ')).join(' ')
               : log?.data?.message.slice(5).charAt(0).toUpperCase() +
                 log?.data?.message.slice(6),
-            Holder: log.card_holder ?? '-',
+            Holder: log.card_holder ?? '',
             position: `latitude: ${
-              log?.data?.position?.lat ?? '-'
-            }, longitude: ${log?.data?.position?.long ?? '-'}`,
+              log?.data?.position?.lat ?? ''
+            }, longitude: ${log?.data?.position?.long ?? ''}`,
           };
         });
 

@@ -54,9 +54,8 @@
     class=" justify-center items-center flex flex-col pt-6 {currentTheme.text}"
   >
     <h1 class="text-lg font-bold">
-      {data?.firstname == ''
-        ? Dummy.firstname
-        : data?.firstname + ' ' + data?.lastname}
+      {data?.firstname ?? ''}
+      {data?.lastname ?? ''}
     </h1>
     <h1 class="text-sm opacity-80">
       {data?.job ?? ''}
@@ -162,9 +161,9 @@
             alt=""
             class="rounded-lg w-16 h-16 mr-2"
           />
-          <h1>{$teamData.company ?? '-'}</h1>
+          <h1>{$teamData.company ?? ''}</h1>
         </div>
-        <p class="text-xs">{$teamData.address ?? '-'}</p>
+        <p class="text-xs">{$teamData.address ?? ''}</p>
         <p class="text-xs text-neutral-400">
           {$teamData.description ?? ''}
         </p>
