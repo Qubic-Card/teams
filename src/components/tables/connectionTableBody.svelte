@@ -24,7 +24,7 @@
     class="font-bold truncate pl-4 cursor-pointer flex-1"
   >
     <p class="flex items-center gap-1">
-      {connection?.profileData?.firstname ?? '-'}
+      {connection?.profileData?.firstname ?? ''}
       <span class="hidden md:flex">
         {connection?.profileData?.lastname ?? ''}
       </span>
@@ -32,18 +32,18 @@
   </td>
 
   {#if innerWidth > 640}
-    <td class="flex-1 truncate pl-4">{connection?.profileData?.job ?? '-'}</td>
+    <td class="flex-1 truncate pl-4">{connection?.profileData?.job ?? ''}</td>
     <td class="flex-1 truncate pl-4">
-      {connection?.profileData?.company ?? '-'}
+      {connection?.profileData?.company ?? ''}
     </td>
 
     <td class="flex-1 truncate pl-4">
-      {convertToGMT7(connection?.dateConnected).toDateString().slice(4) ?? '-'}
+      {convertToGMT7(connection?.dateConnected).toDateString().slice(4) ?? ''}
     </td>
 
     <td class="flex-1 truncate pl-4 pr-4">
-      {connection?.by?.firstname ?? '-'}
-      {connection?.by?.lastname ?? '-'}
+      {connection?.by?.firstname ?? ''}
+      {connection?.by?.lastname ?? ''}
     </td>
 
     <td class="flex-1 h-12 truncate pl-4 pr-4 flex gap-4 items-center">

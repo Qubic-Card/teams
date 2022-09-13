@@ -26,7 +26,7 @@
   const popup = () => toastFailed(`You can't connect to this profile`);
 
   const downloadHandler = () => {
-    $teamData?.brochure?.url !== ''
+    $teamData?.brochure?.url
       ? window.open($teamData?.brochure?.url, '_blank').focus()
       : toastFailed('No brochure uploaded yet');
   };
@@ -54,9 +54,8 @@
     class=" justify-center items-center flex flex-col pt-6 {currentTheme.text}"
   >
     <h1 class="text-lg font-bold">
-      {data?.firstname == ''
-        ? Dummy.firstname
-        : data?.firstname + ' ' + data?.lastname}
+      {data?.firstname ?? ''}
+      {data?.lastname ?? ''}
     </h1>
     <h1 class="text-sm opacity-80">
       {data?.job ?? ''}
@@ -162,25 +161,27 @@
             alt=""
             class="rounded-lg w-16 h-16 mr-2"
           />
-          <h1>{$teamData.company ?? '-'}</h1>
+          <h1>{$teamData.company ?? ''}</h1>
         </div>
-        <p class="text-xs">{$teamData.address ?? '-'}</p>
+        <p class="text-xs">{$teamData.address ?? ''}</p>
         <p class="text-xs text-neutral-400">
           {$teamData.description ?? ''}
         </p>
       </div>
-      {#if $teamData?.brochure?.url !== ""}
-        <div
-          on:click={downloadHandler}
-          class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
-        >
-          <h1>{$teamData?.brochure?.title}</h1>
-          <p class="text-xs text-neutral-400">
-            Know more about {$teamData.company}
-          </p>
-        </div>
+      {#if $teamData?.brochure}
+        {#if $teamData?.brochure?.url}
+          <div
+            on:click={downloadHandler}
+            class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
+          >
+            <h1>{$teamData?.brochure?.title}</h1>
+            <p class="text-xs text-neutral-400">
+              Know more about {$teamData.company}
+            </p>
+          </div>
+        {/if}
       {/if}
-      <div class={currentTheme.text}>
+      <div class={`${currentTheme.text} w-full`}>
         <div class="flex justify-between flex-wrap items-start gap-1 my-1">
           {#each isEditorMode ? $teamSocials : data.socials as item}
             {#if item.isActive}
