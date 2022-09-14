@@ -169,7 +169,7 @@
   {#if member.isDone}
     {#if !member.isActivated && $selectedTab === 'personal'}
       <div
-        class="flex flex-col md:flex-row justify-between bg-yellow-600 text-white p-2 text-sm pl-20"
+        class="flex flex-col md:flex-row justify-between bg-yellow-600/70 border border-yellow-400 text-white p-2 text-sm ml-12 md:ml-16"
       >
         <p>
           Warning! The member you are about to edit hasn't confirmed his/her
