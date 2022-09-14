@@ -39,17 +39,17 @@
 </script>
 
 <div
-  class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-20 md:pl-24 pr-4"
+  class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-16 md:pl-24 pr-4"
 >
   <div class="flex flex-col">
-    <h1 class="text-lg font-bold">Quick Actions</h1>
+    <h1 class="text-sm md:text-md font-bold">Quick Actions</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-16 lg:h-12 flex w-full overflow-x-auto mt-2 gap-2"
     >
       {#each quickActions as item}
         <div
           on:click={item.handler}
-          class="flex justify-center items-center px-4 bg-neutral-800 text-sm rounded-md border border-neutral-700 snap-center h-12 text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
+          class="flex justify-center items-center px-4 bg-neutral-800 rounded-md border border-neutral-700 snap-center h-12 text-xs md:text-sm text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
         >
           {item.name}
         </div>
@@ -60,7 +60,7 @@
   <Analytics />
 
   <div class="flex flex-col">
-    <h1 class="text-lg font-bold">Learn More</h1>
+    <h1 class="text-sm md:text-md font-bold">Learn More</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-full md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
     >
@@ -74,7 +74,7 @@
           >
             <div class="Image" style={`background-image:url(${content.bg})`} />
             <h1 class="font-bold text-md my-2">{content.title}</h1>
-            <p class="text-neutral-400 text-sm">{content.desc}</p>
+            <p class="text-neutral-400 text-xs md:text-sm">{content.desc}</p>
           </div>
         </div>
       {/each}

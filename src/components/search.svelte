@@ -10,7 +10,7 @@
   const selectHandler = (item) => dispatch('select', item);
 </script>
 
-<div class="flex w-full md:w-auto px-2 md:px-0">
+<div class="flex w-full text-xs md:text-sm md:w-auto px-2 md:px-0">
   <input
     type="text"
     class="w-full rounded-md md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700
@@ -19,7 +19,7 @@
     bind:value
   />
   <Menu as="div" class="mx-2" let:open>
-    <DropdownButton class="w-28" label={label ?? 'Name'} />
+    <DropdownButton class="w-28 text-xs md:text-sm" label={label ?? 'Name'} />
     {#if open}
       <div>
         <MenuItems
@@ -27,7 +27,7 @@
         >
           {#each searchMenu as item}
             <MenuItem
-              class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer"
+              class="flex hover:bg-neutral-700 text-xs md:text-sm px-2 py-2 rounded-md cursor-pointer"
               on:click={() => {
                 selectHandler(item);
                 open = false;

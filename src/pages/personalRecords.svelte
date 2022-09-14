@@ -275,7 +275,7 @@
   >
 </div>
 <div
-  class="w-full md:w-3/4 ml-16 md:ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
+  class="w-full md:w-3/4 ml-12 md:ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
 >
   <table class="snap-center text-black w-full">
     <thead class="text-left text-neutral-400 bg-black/70">

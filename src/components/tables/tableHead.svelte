@@ -10,7 +10,7 @@
 
 {#each data as item}
   <th class={`pl-4 p-2 ${$$props.class}`}>
-    <div class="flex justify-between">
+    <div class="flex justify-between text-sm">
       <p>{item.name}</p>
       {#if item.id !== 'actions' && item.id !== 'type' && item.name !== 'Company'}
         <img

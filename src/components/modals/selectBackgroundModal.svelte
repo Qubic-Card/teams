@@ -221,7 +221,7 @@
 
 <button
   on:click={() => (showModal = true)}
-  class="w-full text-neutral-700 bg-neutral-200 rounded-md p-5 h-16"
+  class="w-full text-neutral-700 bg-neutral-200 rounded-md p-5 text-xs md:text-sm h-16"
   >Select Background</button
 >
 

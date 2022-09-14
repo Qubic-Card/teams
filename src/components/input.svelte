@@ -57,7 +57,7 @@
   $: value && isPhoneInput;
 </script>
 
-<div class={`flex flex-col md:text-base text-sm ${$$props.class}`}>
+<div class={`flex flex-col md:text-base text-xs md:text-sm ${$$props.class}`}>
   <h1
     in:fade|local={{ duration: 500 }}
     class={`text-gray-400 after:content-['*'] after:ml-0.5 ${

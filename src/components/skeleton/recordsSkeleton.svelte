@@ -2,7 +2,7 @@
   export let permissions;
 </script>
 
-<div class="animate-pulse gap-2 flex flex-col h-full pl-20 mt-4 pr-4">
+<div class="animate-pulse gap-2 flex flex-col h-full pl-16 md:pl-20 mt-4 pr-4">
   {#if permissions.writeRecords}
     <div class="h-16 w-full bg-neutral-800 rounded-md" />
   {/if}

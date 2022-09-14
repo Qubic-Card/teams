@@ -332,7 +332,7 @@
         currentPageRows={userLogs}
       />
     </div>
-    <div class="flex lg:hidden w-full justify-center mt-8">
+    <div class="flex text-xs md:text-sm lg:hidden w-full justify-center mt-8">
       View more on desktop
     </div>
   </div>

@@ -165,27 +165,27 @@
     }
   };
 
-  const getTeamsDetail = async () => {
-    const { data, error } = await supabase
-      .from('teams')
-      .select('*')
-      .eq('id', teamId);
+  // const getTeamsDetail = async () => {
+  //   const { data, error } = await supabase
+  //     .from('teams')
+  //     .select('*')
+  //     .eq('id', teamId);
 
-    if (error) console.log(error);
+  //   if (error) console.log(error);
 
-    if (data) {
-      const team = data[0].metadata;
-      $teamData = { ...team };
-      $teamSocials = team['socials'];
-      $teamLinks = team['links'];
-      // teamId = team['id'];
-      $teamSocials.map((social) => {
-        if (social.type === 'phone') $teamData.phone = social.data;
-        if (social.type === 'email') $teamData.email = social.data;
-      });
-    }
-    return data;
-  };
+  //   if (data) {
+  //     const team = data[0].metadata;
+  //     $teamData = { ...team };
+  //     $teamSocials = team['socials'];
+  //     $teamLinks = team['links'];
+  //     // teamId = team['id'];
+  //     $teamSocials.map((social) => {
+  //       if (social.type === 'phone') $teamData.phone = social.data;
+  //       if (social.type === 'email') $teamData.email = social.data;
+  //     });
+  //   }
+  //   return data;
+  // };
 
   const setDisplayPersonal = async () => {
     const { data, error } = await supabase
@@ -289,9 +289,7 @@
 </Dialog>
 
 <div class="flex justify-center">
-  {#await getTeamsDetail()}
-    <TeamEditorSkeleton />
-  {:then}
+  {#if $teamData}
     <div class="w-full" in:fade|local={{ duration: 200 }}>
       <div class="text-black">
         <div class="flex flex-col w-full">
@@ -302,19 +300,22 @@
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2'
-                    : 'text-white p-2 rounded-l-md'}>Team Profile</Tab
-              >
-              <Tab
-                class={({ selected }) =>
-                  selected ? 'bg-neutral-700 text-white p-2' : 'text-white p-2'}
-                >Socials</Tab
+                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    : 'text-white p-2 text-xs md:text-sm rounded-l-md'}
+                >Team Profile</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2'
-                    : 'text-white p-2 rounded-r-md'}>Links</Tab
+                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    : 'text-white p-2 text-xs md:text-sm'}>Socials</Tab
+              >
+              <Tab
+                class={({ selected }) =>
+                  selected
+                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    : 'text-white p-2 rounded-r-md text-xs md:text-sm'}
+                >Links</Tab
               >
             </TabList>
             <TabPanels class="mt-4">
@@ -358,7 +359,7 @@
 
                   {#if permissions.writeTeam}
                     <div
-                      class="flex justify-between items-center p-2 bg-neutral-500 mx-3 rounded-md my-2"
+                      class="flex justify-between text-xs md:text-sm items-center p-2 bg-neutral-500 mx-3 rounded-md my-2"
                     >
                       <h1 class="text-white">Show personal profile</h1>
                       <SwitchButton
@@ -382,7 +383,7 @@
                         />
                       {:else}
                         <div
-                          class="bg-neutral-100 rounded-lg h-[76px] p-2 gap-2 flex items-center justify-between"
+                          class="bg-neutral-100 rounded-lg text-xs md:text-sm h-[76px] p-2 gap-2 flex items-center justify-between"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -731,14 +732,7 @@
         </div>
       </div>
     </div>
-  {:catch}
-    <div>
-      <h1 class="text-xl text-white text-center w-full mt-8">
-        Some error occurred. Please reload the page and try again <br /> or
-        <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
-      </h1>
-    </div>
-  {/await}
+  {/if}
 </div>
 
 <style global>

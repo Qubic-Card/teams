@@ -21,7 +21,7 @@
   let isSidebarOpened = false;
   let isMenuOpened = false;
   let member = [];
-  let subscription = {};
+  let subscription;
   let loading = true;
   let permissions = {
     readAnalytics: false,
@@ -95,9 +95,12 @@
       });
 
     if (subscription) {
-      if (subscription.isActive) {
+      if (subscription?.isActive) {
         // console.log('active');
-      } else if (subscription.isActive === false && subscription.isAfter7Days) {
+      } else if (
+        subscription?.isActive === false &&
+        subscription?.isAfter7Days
+      ) {
         if (member?.role?.role_name !== 'superadmin') {
           $userData = ['inactive'];
         } else {
@@ -111,7 +114,7 @@
             'inactive',
           ];
         }
-      } else if (!subscription.isActive && !subscription.isAfter7Days) {
+      } else if (!subscription?.isActive && !subscription?.isAfter7Days) {
         // if hari ini lebih besar daripada 7 hari setelah end date
         if (member?.role?.role_name !== 'superadmin') {
           $userData = ['will_expired'];
@@ -138,8 +141,10 @@
 <AuthWrapper>
   <div class="relative min-h-screen">
     {#if sevenDaysAfterEndDate}
-      {#if !subscription.isActive && !subscription.isAfter7Days}
-        <div class="bg-red-600 text-white text-center p-2 text-sm sticky">
+      {#if !subscription?.isActive && !subscription?.isAfter7Days}
+        <div
+          class="bg-red-600 text-white text-center p-2 text-xs md:text-sm sticky"
+        >
           Your access to Qubic Teams will be terminated completely on {new Date(
             sevenDaysAfterEndDate
           ).toLocaleDateString()}. Please renew your subscription to continue.
@@ -148,7 +153,7 @@
     {/if}
 
     <div
-      class="flex justify-center items-center md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-sm"
+      class="flex justify-center top-0 items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
     >
       Please Sign-in on Desktop
     </div>
@@ -157,7 +162,7 @@
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
-        {#if subscription.isActive || (!subscription.isActive && !subscription.isAfter7Days)}
+        {#if subscription?.isActive || (!subscription?.isActive && !subscription?.isAfter7Days)}
           {#if $teamData.name}
             {#if isSidebarOpened}
               <img
@@ -214,14 +219,14 @@
       {/if}
     </div>
 
-    {#if subscription.isActive === false && subscription.isAfter7Days}
+    {#if subscription?.isActive === false && subscription?.isAfter7Days}
       <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
-        class={`border-r border-neutral-700 bg-black w-16 fixed ${
+        class={`border-r border-neutral-700 bg-black w-12 md:w-16 fixed ${
           sevenDaysAfterEndDate
-            ? !subscription.isActive && !subscription.isAfter7Days
-              ? 'top-24'
+            ? !subscription?.isActive && !subscription?.isAfter7Days
+              ? 'top-36 md:top-24'
               : 'top-[100px] md:top-16'
             : 'top-16'
         } bottom-0 left-0 z-50 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
@@ -252,7 +257,11 @@
                     {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                   </p>
                 {/if}
-                <img src={item.urldefault} alt={item.title} class="w-5" />
+                <img
+                  src={item.urldefault}
+                  alt={item.title}
+                  class="w-4 md:w-5"
+                />
               </div>
             {:else}
               <div class="animate-pulse gap-5">
@@ -266,8 +275,8 @@
       <div
         class={`absolute ${
           sevenDaysAfterEndDate
-            ? !subscription.isActive && !subscription.isAfter7Days
-              ? 'top-24'
+            ? !subscription?.isActive && !subscription?.isAfter7Days
+              ? 'top-36 md:top-24'
               : 'top-[100px] md:top-16'
             : 'top-16'
         } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
@@ -292,7 +301,7 @@
               >
                 <button
                   on:click={() => goto(`/${$teamData?.id}/dashboard`)}
-                  class={`pb-2 w-1/5 text-md ${
+                  class={`pb-2 w-1/5 text-xs md:text-sm ${
                     $page.routeId === '[slug]/dashboard@teams'
                       ? 'border-b-2 border-neutral-200 font-bold'
                       : 'text-neutral-300'
@@ -300,7 +309,7 @@
                 >
                 <button
                   on:click={() => goto(`/${$teamData?.id}/dashboard/team`)}
-                  class={`pb-2 w-1/5 text-md ${
+                  class={`pb-2 w-1/5 text-xs md:text-sm ${
                     $page.routeId === '[slug]/dashboard/team@teams'
                       ? 'border-b-2 border-neutral-200 font-bold'
                       : 'text-neutral-300'

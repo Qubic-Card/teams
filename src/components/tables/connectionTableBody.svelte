@@ -17,7 +17,7 @@
 </script>
 
 <tr
-  class="h-12 text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
+  class="h-12 text-sm text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
 >
   <td
     on:click={modalHandler}
@@ -73,7 +73,7 @@
             <img
               src="/download-icon.svg"
               alt=""
-              class="w-6 h-6 cursor-pointer"
+              class="w-5 h-5 md:w-6 md:h-6 cursor-pointer"
               on:click={async () => {
                 download(
                   await genvcard(connection?.profileData, {
@@ -90,7 +90,7 @@
         <img
           src="/download-icon.svg"
           alt=""
-          class="w-6 h-6 cursor-pointer"
+          class="w-5 h-5 md:w-6 md:h-6 cursor-pointer"
           on:click={async () => {
             download(
               await genvcard(connection?.profileData, {
