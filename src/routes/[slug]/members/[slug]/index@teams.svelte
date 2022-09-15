@@ -60,6 +60,7 @@
   });
 
   const checkIsConfirmedEmail = async (uid) => {
+    console.log('query');
     const { data, error } = await supabase.functions.invoke('getUserEmail', {
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +71,6 @@
     });
 
     if (error) console.log(error);
-
     if (data) {
       member.email = data.user;
 
@@ -166,20 +166,6 @@
     {/if}
   {/if}
 
-  {#if member.isDone}
-    {#if !member.isActivated && $selectedTab === 'personal'}
-      <div
-        class="flex flex-col md:flex-row justify-between bg-yellow-600/70 border border-yellow-400 text-white p-2 text-sm ml-12 md:ml-16"
-      >
-        <p>
-          Warning! The member you are about to edit hasn't confirmed his/her
-          email.
-        </p>
-        <p class="font-bold">{member.email}</p>
-      </div>
-    {/if}
-  {/if}
-
   <div class="min-h-screen flex justify-center pl-12">
     <div class="md:px-20 px-4 w-full bg-black">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
@@ -204,6 +190,20 @@
                   } text-xs md:text-sm p-2 w-1/2 text-white`}>Team</button
                 >
               </div>
+              {#if member.isDone}
+                {#if !member.isActivated && $selectedTab === 'personal'}
+                  <div
+                    class="flex justify-between bg-yellow-600/70 border border-yellow-400 text-white p-2 text-sm mb-2"
+                  >
+                    <p>
+                      Warning! The member you are about to edit hasn't confirmed
+                      his/her email. <strong>
+                        {member.email}
+                      </strong>
+                    </p>
+                  </div>
+                {/if}
+              {/if}
             {/if}
 
             {#if $selectedTab === 'personal'}
