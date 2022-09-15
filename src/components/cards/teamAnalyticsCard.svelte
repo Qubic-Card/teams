@@ -7,7 +7,7 @@
   class="flex flex-col justify-between w-full h-32 bg-neutral-800 border border-neutral-700 rounded-lg p-6"
 >
   <div class="flex justify-between items-center">
-    <h1 class="text-xl">{item.data} <span>{item.type}</span></h1>
+    <h1 class="text-md md:text-xl">{item.data} <span>{item.type}</span></h1>
     <div
       class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
     >
@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="flex justify-between items-center text-sm">
-    <h2 class="text-neutral-400">{selectedDays}</h2>
+    <h2 class="text-neutral-400 text-xs md:text-sm">{selectedDays}</h2>
     {#if item.percentage >= 0}
       <p class="text-green-600 flex gap-1">
         <svg

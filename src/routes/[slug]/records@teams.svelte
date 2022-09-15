@@ -102,7 +102,7 @@
   <RecordsSkeleton {permissions} />
 {:then name}
   <div
-    class={`flex flex-col w-full pl-216 ${
+    class={`flex flex-col w-full ${
       permissions.writeRecords ? 'h-[95%] pt-4' : 'h-full pt-0'
     }`}
   >
@@ -115,14 +115,14 @@
             <Tab
               class={({ selected }) =>
                 selected
-                  ? 'text-white font-bold border-b-2 border-white pb-2'
-                  : 'text-white pb-2'}>Personal</Tab
+                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2'
+                  : 'text-white text-xs md:text-sm pb-2'}>Personal</Tab
             >
             <Tab
               class={({ selected }) =>
                 selected
-                  ? 'text-white font-bold border-b-2 border-white pb-2'
-                  : 'text-white pb-2'}>Team</Tab
+                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2'
+                  : 'text-white text-xs md:text-sm pb-2'}>Team</Tab
             >
           </div>
         </TabList>

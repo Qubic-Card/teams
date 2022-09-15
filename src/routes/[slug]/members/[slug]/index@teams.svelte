@@ -28,6 +28,11 @@
   let isCheckRoleDone = false;
   let isTeamInactive = false;
   let memberId = null;
+  let member = {
+    email: null,
+    isDone: false,
+    isActivated: false,
+  };
   let companyNickname;
 
   $: $userData?.filter((item) => {
@@ -54,6 +59,30 @@
     if (item === 'will_expired') permissions.will_expire = true;
   });
 
+  const checkIsConfirmedEmail = async (uid) => {
+    console.log('query');
+    const { data, error } = await supabase.functions.invoke('getUserEmail', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uid: uid,
+      }),
+    });
+
+    if (error) console.log(error);
+    if (data) {
+      member.email = data.user;
+
+      if (data.isActivated) {
+        member.isActivated = true;
+      } else {
+        member.isActivated = false;
+        member.isDone = true;
+      }
+    }
+  };
+
   const getTeams = async () => {
     const { data, error } = await supabase
       .from('teams')
@@ -67,6 +96,11 @@
       $teamSocials = teamProfile['socials'];
       $teamLinks = teamProfile['links'];
       companyNickname = data[0]['nickname'];
+
+      $teamSocials.map((social) => {
+        if (social.type === 'phone') $teamData.phone = social.data;
+        if (social.type === 'email') $teamData.email = social.data;
+      });
       return data;
     }
   };
@@ -85,7 +119,8 @@
       $profileData = { ...profile };
       $socials = profile['socials'];
       $links = profile['links'];
-      memberId = data[0]['id'];
+      member.uid = data[0]['uid'];
+      await checkIsConfirmedEmail(data[0]['uid']);
 
       $isDisplayPersonal = data[0].team_cardcon[0].display_personal;
       if (!data[0].team_cardcon[0].display_personal) $selectedTab = 'team';
@@ -104,30 +139,34 @@
       {#if $page.params.slug === $user?.id}
         {#if !permissions.writeProfile && $selectedTab === 'personal'}
           <div
-            class="flex justify-center bg-blue-600 text-white p-2 rounded-lg"
+            class="flex justify-center bg-blue-600 text-white pl-20 text-sm p-2"
           >
             You don't have permission to edit your profile
           </div>
         {:else if !permissions.writeTeam && $selectedTab === 'team'}
           <div
-            class="flex justify-center bg-blue-600 text-white p-2 rounded-lg"
+            class="flex justify-center bg-blue-600 text-white pl-20 text-sm p-2"
           >
             You dont have permission to edit this team's profile
           </div>
         {/if}
       {:else if !permissions.writeMembers && $selectedTab === 'personal'}
-        <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
+        <div
+          class="flex justify-center bg-blue-600 text-white pl-20 text-sm p-2"
+        >
           You don't have permission to edit this member's profile
         </div>
       {:else if !permissions.writeTeam && $selectedTab === 'team'}
-        <div class="flex justify-center bg-blue-600 text-white p-2 rounded-lg">
+        <div
+          class="flex justify-center bg-blue-600 text-white pl-20 text-sm p-2"
+        >
           You dont have permission to edit this team's profile
         </div>
       {/if}
     {/if}
   {/if}
 
-  <div class="min-h-screen flex justify-center pl-16">
+  <div class="min-h-screen flex justify-center pl-12">
     <div class="md:px-20 px-4 w-full bg-black">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
@@ -140,7 +179,7 @@
                     $selectedTab === 'personal'
                       ? 'border-b-2 border-white'
                       : 'border-b-2 border-neutral-700'
-                  } p-2 w-1/2 text-white`}>Personal</button
+                  } text-xs md:text-sm p-2 w-1/2 text-white`}>Personal</button
                 >
                 <button
                   on:click={() => ($selectedTab = 'team')}
@@ -148,9 +187,23 @@
                     $selectedTab === 'team'
                       ? 'border-b-2 border-white'
                       : 'border-b-2 border-neutral-700'
-                  } p-2 w-1/2 text-white`}>Team</button
+                  } text-xs md:text-sm p-2 w-1/2 text-white`}>Team</button
                 >
               </div>
+              {#if member.isDone}
+                {#if !member.isActivated && $selectedTab === 'personal'}
+                  <div
+                    class="flex justify-between bg-yellow-600/70 border border-yellow-400 text-white p-2 text-sm mb-2"
+                  >
+                    <p>
+                      Warning! The member you are about to edit hasn't confirmed
+                      his/her email. <strong>
+                        {member.email}
+                      </strong>
+                    </p>
+                  </div>
+                {/if}
+              {/if}
             {/if}
 
             {#if $selectedTab === 'personal'}

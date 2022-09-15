@@ -11,8 +11,8 @@
       <div class="w-12 bg-neutral-700 rounded-md h-8" />
     </div>
   {:else}
-    <p class="text-sm text-neutral-300">{label}</p>
-    <p class="font-bold text-4xl">
+    <p class="text-neutral-300 text-xs md:text-sm">{label}</p>
+    <p class="font-bold text-xl md:text-3xl">
       {count}
     </p>
   {/if}

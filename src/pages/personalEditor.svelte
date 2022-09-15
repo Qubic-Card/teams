@@ -124,25 +124,25 @@
   let unsplashDatas;
   let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
-  const getProfile = async () => {
-    let { data, error } = await supabase
-      .from('team_members')
-      .select('team_profile, uid, team_id')
-      .eq('uid', $page.params.slug)
-      .eq('team_id', teamID);
+  // const getProfile = async () => {
+  //   let { data, error } = await supabase
+  //     .from('team_members')
+  //     .select('team_profile, uid, team_id')
+  //     .eq('uid', $page.params.slug)
+  //     .eq('team_id', teamID);
 
-    if (data) {
-      const profile = data[0]['team_profile'];
-      $profileData = { ...profile };
-      $socials = profile['socials'];
-      $links = profile['links'];
-      profileId = data[0]['id'];
-      teamId = data[0]['team_id'];
-    }
-    if (error) console.log(error);
+  //   if (data) {
+  //     const profile = data[0]['team_profile'];
+  //     $profileData = { ...profile };
+  //     $socials = profile['socials'];
+  //     $links = profile['links'];
+  //     profileId = data[0]['id'];
+  //     teamId = data[0]['team_id'];
+  //   }
+  //   if (error) console.log(error);
 
-    return data;
-  };
+  //   return data;
+  // };
 
   const searchQuery = (val) => (query = val.detail);
   const getUnsplash = async () => {
@@ -243,9 +243,7 @@
   </div>
 </Dialog>
 
-{#await getProfile()}
-  <ProfileEditorSkeleton />
-{:then}
+{#if $profileData}
   <div class="flex justify-center" in:fade|local={{ duration: 200 }}>
     <div class="w-full bg-black">
       <div class="gap-2 text-black">
@@ -258,20 +256,22 @@
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2'
-                    : 'text-white p-2 rounded-l-md'}>Bio</Tab
+                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    : 'text-white p-2 rounded-l-md text-xs md:text-sm'}>Bio</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2'
-                    : 'text-white p-2 rounded-l-md'}>Socials</Tab
+                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    : 'text-white p-2 rounded-l-md text-xs md:text-sm'}
+                >Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2'
-                    : 'text-white p-2 rounded-l-md'}>Links</Tab
+                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    : 'text-white p-2 rounded-l-md text-xs md:text-sm'}
+                >Links</Tab
               >
             </TabList>
             <TabPanels class="mt-4">
@@ -663,14 +663,7 @@
       </div>
     </div>
   </div>
-{:catch}
-  <div>
-    <h1 class="text-xl text-white text-center w-full mt-8">
-      Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
-    </h1>
-  </div>
-{/await}
+{/if}
 
 <style global>
   @import 'filepond/dist/filepond.css';

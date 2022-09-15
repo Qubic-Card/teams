@@ -176,7 +176,7 @@
 {#if memberProfile?.uid}
   {#if !permissions.readMembers}
     {#if $user?.id === memberProfile.uid}
-      <div class="flex flex-col justify-between">
+      <div class="flex flex-col justify-between text-sm">
         <div
           class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
         >
@@ -249,7 +249,7 @@
       </div>
     {/if}
   {:else}
-    <div class="flex flex-col justify-between">
+    <div class="flex flex-col justify-between text-sm">
       <div
         class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
       >
@@ -448,7 +448,7 @@
     </div>
   {/if}
 {:else if permissions.readMembers}
-  <div class="flex flex-col justify-between">
+  <div class="flex flex-col justify-between text-sm">
     <div
       class="flex flex-col justify-between w-full h-64 bg-neutral-800 rounded-md"
     >

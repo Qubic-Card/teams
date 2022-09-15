@@ -186,7 +186,7 @@
 </script>
 
 <svelte:window bind:innerWidth />
-<div class="flex flex-col md:pt-4 pl-16">
+<div class="flex flex-col md:pt-4 pl-12 md:pl-16">
   {#if permissions.readConnection === true}
     {#await getUserConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
@@ -198,7 +198,7 @@
           <button
             class={`${
               tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-16`}
+            } w-full md:w-1/2 h-16 text-xs md:text-sm`}
             on:click={async () => {
               setTabs('user');
               searchQuery = '';
@@ -210,7 +210,7 @@
           <button
             class={`${
               tabs === 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-16`}
+            } w-full md:w-1/2 h-16 text-xs md:text-sm`}
             on:click={async () => {
               setTabs('all');
               searchQuery = '';
@@ -301,15 +301,21 @@
           </table>
 
           {#if searchNotFoundMsg !== ''}
-            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+            <h1
+              class="text-sm md:text-xl font-bold text-white text-center w-full mt-8"
+            >
               {searchNotFoundMsg}
             </h1>
           {:else if tabs === 'all' && teamConnections.length === 0}
-            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+            <h1
+              class="text-sm md:text-xl font-bold text-white text-center w-full mt-8"
+            >
               No connection found.
             </h1>
           {:else if tabs !== 'all' && userConnections.length === 0}
-            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+            <h1
+              class="text-sm md:text-xl font-bold text-white text-center w-full mt-8"
+            >
               No connection found.
             </h1>
           {/if}

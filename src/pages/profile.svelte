@@ -53,26 +53,26 @@
   <div
     class=" justify-center items-center flex flex-col pt-6 {currentTheme.text}"
   >
-    <h1 class="text-lg font-bold">
+    <h1 class="text-sm md:text-lg font-bold">
       {data?.firstname ?? ''}
       {data?.lastname ?? ''}
     </h1>
-    <h1 class="text-sm opacity-80">
+    <h1 class="text-xs md:text-sm opacity-80">
       {data?.job ?? ''}
     </h1>
-    <h1 class="text-md opacity-90">
+    <h1 class="text-sm md:text-md opacity-90">
       {data?.company ?? ''}
     </h1>
   </div>
   <div class="flex gap-2 px-8 md:px-16 text-white my-4">
     <BorderButton
-      class="w-full h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
+      class="w-full text-xs md:text-sm h-12 {currentTheme.border} {currentTheme.secondary} rounded-md"
       on:click={popup}
     >
       Connect with Me
     </BorderButton>
     <BorderButton
-      class="w-full h-12  {currentTheme.border} {currentTheme.secondary} rounded-md"
+      class="w-full text-xs md:text-sm h-12  {currentTheme.border} {currentTheme.secondary} rounded-md"
       on:click={async () =>
         download(
           await genvcard(
@@ -95,7 +95,7 @@
           $selectedTab === 'team'
             ? 'border-b-2 border-white'
             : 'border-b-2 border-neutral-700'
-        } p-2 w-1/2 text-white`}>Team</button
+        } p-2 w-1/2 text-xs md:text-sm text-white`}>Team</button
       >
       <button
         on:click={() => ($selectedTab = 'personal')}
@@ -103,7 +103,7 @@
           $selectedTab === 'personal'
             ? 'border-b-2 border-white'
             : 'border-b-2 border-neutral-700'
-        } p-2 w-1/2 text-white`}>Personal</button
+        } p-2 w-1/2 text-xs md:text-sm text-white`}>Personal</button
       >
     {/if}
   </div>
@@ -172,7 +172,7 @@
         {#if $teamData?.brochure?.url}
           <div
             on:click={downloadHandler}
-            class="w-full border-2 border-neutral-700 rounded-lg p-4 cursor-pointer"
+            class="w-full border-2 text-xs md:text-sm border-neutral-700 rounded-lg p-4 cursor-pointer"
           >
             <h1>{$teamData?.brochure?.title}</h1>
             <p class="text-xs text-neutral-400">

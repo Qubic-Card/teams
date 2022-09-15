@@ -131,7 +131,7 @@
             await genvcard(connection.profileData, { display_personal: true }),
             'contact'
           )}
-        class="w-full bg-blue-600 rounded-md hover:font-bold text-white mx-auto p-3 mb-4"
+        class="w-full bg-blue-600 rounded-md hover:font-bold text-white text-xs md:text-sm mx-auto p-3 mb-4"
       >
         Save to Contacts
       </button>

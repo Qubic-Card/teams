@@ -382,7 +382,7 @@
 </script>
 
 <div
-  class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-20 md:pl-24 pr-4"
+  class="min-h-screen flex flex-col text-white gap-4 mb-8 pt-4 pl-16 md:pl-24 pr-4"
 >
   <div class="flex justify-between gap-4">
     {#if loading}
@@ -399,7 +399,7 @@
     {/if}
   </div>
 
-  <div class="flex lg:hidden w-full justify-center mt-8">
+  <div class="flex lg:hidden text-xs md:text-sm w-full justify-center mt-8">
     View more on desktop
   </div>
 

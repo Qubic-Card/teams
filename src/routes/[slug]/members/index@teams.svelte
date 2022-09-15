@@ -113,7 +113,7 @@
 
 <svelte:window bind:innerWidth />
 
-<div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-20 md:pl-24 pr-4">
+<div class="flex flex-col pb-20 bg-black min-h-screen pt-2 pl-16 md:pl-24 pr-4">
   {#await getTeamCard()}
     <MemberSkeleton {allMember} {innerWidth} {permissions} />
   {:then}
