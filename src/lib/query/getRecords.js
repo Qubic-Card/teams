@@ -152,10 +152,10 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
       } else {
         let logs = data.map((log) => {
           return {
-            Created_at: convertToGMT7(log?.created_at),
+            'Created at': convertToGMT7(log?.created_at),
             Team: log?.team?.name,
             Company: log?.team?.company,
-            Message: log?.data?.message?.includes('removed')
+            Interactions: log?.data?.message?.includes('removed')
               ? log?.data?.message.split(' ')[0] + ' ' + 'has been removed'
               : log?.data?.message?.includes('activated') ||
                 log?.type === 'WARN'
@@ -165,11 +165,11 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
               : log?.data?.message?.includes('NFCtap')
               ? msgFormatter(log?.data?.message.split(' '), 'profile', 'NFC')
               : msgFormatter(log?.data?.message.split(' ')),
-            Holder: log?.card_holder ?? '',
-            cardId: log?.data?.card?.slice(-6) ?? '',
+            'Card Holder': log?.card_holder ?? '',
+            'Card ID': log?.data?.card?.slice(-6) ?? '',
             Platform: log?.platform ?? '',
-            latitude: log?.data?.position?.lat ?? '',
-            longitude: log?.data?.position?.long ?? '' ?? '',
+            Latitude: log?.data?.position?.lat ?? '',
+            Longitude: log?.data?.position?.long ?? '' ?? '',
           };
         });
 
