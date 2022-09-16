@@ -103,7 +103,7 @@
 {:then name}
   <div
     class={`flex flex-col w-full ${
-      permissions.writeRecords ? 'h-[95%] pt-4' : 'h-full pt-0'
+      permissions.writeRecords ? 'h-[96%] pt-4' : 'h-full pt-0'
     }`}
   >
     {#if permissions.writeRecords}
@@ -132,7 +132,6 @@
           </TabPanel>
           <TabPanel class="flex h-full">
             <TeamRecords
-              loading={isLoading}
               {isTeamInactive}
               {holder}
               {getAllStorage}

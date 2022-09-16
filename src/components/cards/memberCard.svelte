@@ -259,7 +259,9 @@
         >
           <div class="hidden md:flex flex-row-reverse relative">
             <img
-              src={memberProfile?.team_profile?.avatar ?? '/favicon.svg'}
+              src={memberProfile?.team_profile?.avatar !== ''
+                ? memberProfile?.team_profile?.avatar
+                : '/favicon.svg'}
               alt="Profile"
               class={`w-32 lg:w-36 h-32 lg:h-36 rounded-md ${
                 $user.id === memberProfile?.uid

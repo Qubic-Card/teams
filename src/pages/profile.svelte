@@ -138,7 +138,7 @@
               class="w-full {currentTheme.border} {currentTheme.secondary} rounded-md"
             >
               <LinkPreview
-                isShowMetaImage={data.isShowMetaImage}
+                isShowMetaImage={data?.isShowMetaImage}
                 title={item.title}
                 url={item.link}
                 className={currentTheme.secondary}

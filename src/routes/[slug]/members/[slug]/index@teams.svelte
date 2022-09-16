@@ -60,7 +60,6 @@
   });
 
   const checkIsConfirmedEmail = async (uid) => {
-    console.log('query');
     const { data, error } = await supabase.functions.invoke('getUserEmail', {
       headers: {
         'Content-Type': 'application/json',
