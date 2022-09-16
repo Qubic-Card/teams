@@ -1,5 +1,6 @@
 import convertToGMT7 from '@lib/utils/convertToGMT7';
 import getSocialMediaCsv from '@lib/utils/getSocialMediaCsv';
+import { socialIcons } from '@lib/constants';
 import supabase from '@lib/db';
 import { toastFailed } from '@lib/utils/toast';
 
@@ -13,11 +14,57 @@ const convertToCSV = (arr) => {
     .join('\n');
 };
 
-const removeByName = (arr) => {
-  let idxBy = arr.findIndex((item) => item === 'by');
-  let newArr = arr.slice(0, idxBy);
+const socials = Object.keys(socialIcons);
 
-  return newArr;
+const checker = (val) => {
+  for (let idx in socials) {
+    if (val.indexOf(socials[idx]) > -1) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const msgFormatter = (arr, first, sec) => {
+  let res;
+
+  if (sec) {
+    let index = arr.findIndex((item) => item === first);
+    let index2 = arr.findIndex((item) => item === sec);
+
+    res = arr
+      .slice(index, index + 1)
+      .concat(arr.slice(index2))
+      .join(' ');
+
+    res = res.charAt(0).toUpperCase() + res.slice(1);
+  } else if (first) {
+    let index = arr.findIndex((item) => item === first);
+
+    res = arr.slice(0, index).join(' ');
+  } else {
+    if (arr.includes('joined')) {
+      res = arr.slice(1).join(' ');
+    } else {
+      let socialArr = arr.pop();
+      socialArr = arr.filter(checker);
+      if (socialArr.length > 0) {
+        res = socialArr[0].charAt(0).toUpperCase() + socialArr[0].slice(1);
+      } else {
+        if (arr.includes('link')) {
+          res = arr[2];
+        } else if (arr.includes('contact')) {
+          res = 'Add to ' + arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
+        } else if (arr.includes('brochure')) {
+          res = arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
+        } else {
+          res = arr.join(' ');
+        }
+      }
+    }
+  }
+
+  return res;
 };
 
 export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
@@ -34,7 +81,8 @@ export const getConnectionsRecords = async (col, id, fromDate, toDate) => {
     )
     .eq(col, id)
     .gte('dateConnected', fromDate)
-    .lt('dateConnected', toDate);
+    .lt('dateConnected', toDate)
+    .order('dateConnected', { ascending: false });
 
   if (error) {
     console.log(error);
@@ -91,8 +139,8 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
     )
     .eq(col, id)
     .gte('created_at', fromDate)
-    .lt('created_at', toDate);
-  // .csv();
+    .lt('created_at', toDate)
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.log(error);
@@ -108,18 +156,20 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
             Team: log?.team?.name,
             Company: log?.team?.company,
             Message: log?.data?.message?.includes('removed')
-              ? log?.data?.message.split(' ')[0] +
-                ' ' +
-                'has been removed from team'
+              ? log?.data?.message.split(' ')[0] + ' ' + 'has been removed'
               : log?.data?.message?.includes('activated') ||
                 log?.type === 'WARN'
-              ? removeByName(log?.data?.message.split(' ')).join(' ')
-              : log?.data?.message.slice(5).charAt(0).toUpperCase() +
-                log?.data?.message.slice(6),
-            Holder: log.card_holder ?? '',
-            position: `latitude: ${
-              log?.data?.position?.lat ?? ''
-            }, longitude: ${log?.data?.position?.long ?? ''}`,
+              ? msgFormatter(log?.data?.message.split(' '), 'by')
+              : log?.data?.message?.includes('QRScan')
+              ? msgFormatter(log?.data?.message.split(' '), 'profile', 'QRScan')
+              : log?.data?.message?.includes('NFCtap')
+              ? msgFormatter(log?.data?.message.split(' '), 'profile', 'NFC')
+              : msgFormatter(log?.data?.message.split(' ')),
+            Holder: log?.card_holder ?? '',
+            cardId: log?.data?.card?.slice(-6) ?? '',
+            Platform: log?.platform ?? '',
+            latitude: log?.data?.position?.lat ?? '',
+            longitude: log?.data?.position?.long ?? '' ?? '',
           };
         });
 

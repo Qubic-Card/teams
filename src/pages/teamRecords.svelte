@@ -1,5 +1,4 @@
 <script>
-  import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import Input from '@comp/input.svelte';
   import { recordsTableTeam, recordsTableTeamMobile } from '@lib/constants';
   import RecordsTableBody from '@comp/tables/recordsTableBody.svelte';
@@ -24,8 +23,7 @@
     setPage,
     page,
     totalTeamRecords,
-    toItem,
-    loading;
+    toItem;
 
   const teamId = getContext('teamId');
   let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
@@ -181,11 +179,11 @@
     }
 
     if (noErr && !error) {
+      isLoading = false;
       toastSuccess(`${record.filename} deleted successfully`);
       await getAllStorage();
       $personal = $personal.filter((item) => item.id !== record.id);
       $team = $team.filter((item) => item.id !== record.id);
-      isLoading = false;
     }
   };
 
@@ -260,57 +258,53 @@
 <div
   class="w-full md:w-3/4 ml-12 md:ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
 >
-  {#if loading}
-    <ConnectionsSkeletion items={$team} />
-  {:else}
-    <table class="snap-center text-black w-full">
-      <thead class="text-left text-neutral-400 bg-black/70">
-        <tr>
-          {#if innerWidth > 640}
-            <TableHead
-              class="w-1/7"
-              data={recordsTableTeam}
-              on:sort={async (e) => {
-                asc = !asc;
-                await sortHandler(e.detail ?? 'name');
-              }}
-            />
-          {:else}
-            <TableHead
-              class="w-1/6"
-              data={recordsTableTeamMobile}
-              on:sort={async (e) => {
-                asc = !asc;
-                await sortHandler(e.detail ?? 'name');
-              }}
-            />
-          {/if}
-        </tr>
-      </thead>
-      <tbody>
-        {#if $team}
-          {#if $team.length > 0}
-            {#each $team as record, i}
-              <RecordsTableBody
-                {innerWidth}
-                {record}
-                {teamId}
-                {deleteHandler}
-                {isLoading}
-                isTeam
-              />
-            {/each}
-          {:else}
-            <tr>
-              <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
-                No records found
-              </td>
-            </tr>
-          {/if}
+  <table class="snap-center text-black w-full">
+    <thead class="text-left text-neutral-400 bg-black/70">
+      <tr>
+        {#if innerWidth > 640}
+          <TableHead
+            class="w-1/7"
+            data={recordsTableTeam}
+            on:sort={async (e) => {
+              asc = !asc;
+              await sortHandler(e.detail ?? 'name');
+            }}
+          />
+        {:else}
+          <TableHead
+            class="w-1/6"
+            data={recordsTableTeamMobile}
+            on:sort={async (e) => {
+              asc = !asc;
+              await sortHandler(e.detail ?? 'name');
+            }}
+          />
         {/if}
-      </tbody>
-    </table>
-  {/if}
+      </tr>
+    </thead>
+    <tbody>
+      {#if $team}
+        {#if $team.length > 0}
+          {#each $team as record, i}
+            <RecordsTableBody
+              {innerWidth}
+              {record}
+              {teamId}
+              {deleteHandler}
+              {isLoading}
+              isTeam
+            />
+          {/each}
+        {:else}
+          <tr>
+            <td class="text-center text-xl pt-4 text-neutral-400" colspan="4">
+              No records found
+            </td>
+          </tr>
+        {/if}
+      {/if}
+    </tbody>
+  </table>
 
   {#if totalTeamRecords > toItem}
     <PaginationButton {setPage} {page} {maxPage} />

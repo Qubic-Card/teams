@@ -27,18 +27,28 @@
         <div class="flex flex-col pl-7">
           {#each log.logs as item}
             <div
-              class={`text-sm flex mb-1 rounded-md justify-between p-1 hover:bg-neutral-800 hover:p-1 ${
+              class={`text-sm flex mb-1 rounded-md justify-between p-1 hover:p-1 ${
                 item.type === 'DANGER'
-                  ? 'bg-red-500/30'
+                  ? 'bg-red-600/30 border-2 border-red-400/30 hover:bg-red-800'
                   : item.type === 'SUCCESS'
-                  ? 'bg-green-500/30'
+                  ? 'bg-green-600/30 border-2 border-green-400/30 hover:bg-green-800'
                   : item.type === 'WARN'
-                  ? 'bg-yellow-500/30'
-                  : 'bg-transparent'
+                  ? 'bg-yellow-600/30 border-2 border-yellow-400/30 hover:bg-yellow-800'
+                  : 'bg-transparent hover:bg-neutral-800'
               }`}
             >
               {#if item.type === 'DANGER' || item.type === 'SUCCESS' || item.type === 'WARN'}
-                <h1 class="text-white">
+                <h1
+                  class={`${
+                    item.type === 'DANGER'
+                      ? 'text-red-200'
+                      : item.type === 'SUCCESS'
+                      ? 'text-green-200'
+                      : item.type === 'WARN'
+                      ? 'text-yellow-200'
+                      : 'text-neutral-500'
+                  }`}
+                >
                   {item?.message}
                 </h1>
               {:else}
@@ -47,7 +57,17 @@
                     item?.message?.slice(4)}
                 </h1>
               {/if}
-              <p class="text-neutral-500">
+              <p
+                class={`${
+                  item.type === 'DANGER'
+                    ? 'text-red-200'
+                    : item.type === 'SUCCESS'
+                    ? 'text-green-200'
+                    : item.type === 'WARN'
+                    ? 'text-yellow-200'
+                    : 'text-neutral-500'
+                }`}
+              >
                 {setHours4Digit(
                   convertToGMT7(item.created_at).getHours(),
                   convertToGMT7(item.created_at).getMinutes()
