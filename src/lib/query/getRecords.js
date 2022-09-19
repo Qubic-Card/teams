@@ -16,15 +16,6 @@ const convertToCSV = (arr) => {
 
 const socials = Object.keys(socialIcons);
 
-const checker = (val) => {
-  for (let idx in socials) {
-    if (val.indexOf(socials[idx]) > -1) {
-      return true;
-    }
-  }
-  return false;
-};
-
 const msgFormatter = (arr, first, sec) => {
   let res;
 
@@ -46,19 +37,26 @@ const msgFormatter = (arr, first, sec) => {
     if (arr.includes('joined')) {
       res = arr.slice(1).join(' ');
     } else {
-      let socialArr = arr.pop();
-      socialArr = arr.filter(checker);
-      if (socialArr.length > 0) {
-        res = socialArr[0].charAt(0).toUpperCase() + socialArr[0].slice(1);
+      arr.pop();
+
+      if (arr.includes('link')) {
+        res = arr[2];
+      } else if (arr.includes('contact')) {
+        res = 'Add to ' + arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
+      } else if (arr.includes('brochure')) {
+        res = arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
       } else {
-        if (arr.includes('link')) {
-          res = arr[2];
-        } else if (arr.includes('contact')) {
-          res = 'Add to ' + arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
-        } else if (arr.includes('brochure')) {
-          res = arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
+        res = arr.join(' ');
+      }
+
+      if (socials.some((v) => arr.join(' ').includes(v))) {
+        if (arr.includes('company')) {
+          res = arr
+            .slice(1, arr.indexOf('was'))
+            .map((str) => str.charAt(0).toUpperCase() + str.slice(1))
+            .join(' ');
         } else {
-          res = arr.join(' ');
+          res = arr[1].charAt(0).toUpperCase() + arr[1].slice(1);
         }
       }
     }
