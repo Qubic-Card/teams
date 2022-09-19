@@ -76,9 +76,13 @@
               class="w-5 h-5 md:w-6 md:h-6 cursor-pointer"
               on:click={async () => {
                 download(
-                  await genvcard(connection?.profileData, {
-                    display_personal: true,
-                  }),
+                  await genvcard(
+                    connection?.profileData,
+                    {
+                      display_personal: true,
+                    },
+                    connection.dateConnected
+                  ),
                   'contact'
                 );
               }}
