@@ -22,7 +22,6 @@ const formatter = (vcard) => {
   let socialsFormatted = vcard
     .split('\n')
     .filter((e) => e.includes('X-SOCIALPROFILE'));
-  socialsFormatted = socialsFormatted.sort((a, b) => a.localeCompare(b));
 
   for (let idx in socialsFormatted) {
     let username = socialsFormatted[idx].split(':')[1];
@@ -67,7 +66,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'Facebook Company',
+            'Company Facebook',
             'Facebook',
             `https://facebook.com/${username}`,
             idx
@@ -79,7 +78,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'Instagram Company',
+            'Company Instagram',
             'Instagram',
             `https://instagram.com/${username}`,
             idx
@@ -91,7 +90,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'Twitter Company',
+            'Company Twitter',
             'Twitter',
             `https://twitter.com/${username}`,
             idx
@@ -103,7 +102,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'LinkedIn Company',
+            'Company LinkedIn',
             'LinkedIn',
             `https://linkedin.com/in/${username}`,
             idx
@@ -115,7 +114,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'YouTube Company',
+            'Company YouTube',
             'YouTube',
             `https://youtube.com/${username}`,
             idx
@@ -127,7 +126,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'WhatsApp Company',
+            'Company WhatsApp',
             'WhatsApp',
             `https://wa.me/${username.replace('+', '')}`,
             idx
@@ -139,7 +138,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'GitHub Company',
+            'Company GitHub',
             'GitHub',
             `https://github.com/${username}`,
             idx
@@ -151,7 +150,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'TikTok Company',
+            'Company TikTok',
             'TikTok',
             `https://tiktok.com/${username}`,
             idx
@@ -163,7 +162,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = iOSSocialFormatter(
             socialsFormatted[idx],
-            'Line Company',
+            'Company Line',
             'Line',
             `https://line.me/R/ti/p/~${username}`,
             idx
@@ -181,7 +180,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'Facebook Company',
+            'Company Facebook',
             'Facebook',
             `https://facebook.com/${username}`
           );
@@ -192,7 +191,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'Instagram Company',
+            'Company Instagram',
             'Instagram',
             `https://instagram.com/${username}`
           );
@@ -203,7 +202,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'Twitter Company',
+            'Company Twitter',
             'Twitter',
             `https://twitter.com/${username}`
           );
@@ -214,7 +213,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'LinkedIn Company',
+            'Company LinkedIn',
             'LinkedIn',
             `https://linkedin.com/${username}`
           );
@@ -225,7 +224,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'YouTube Company',
+            'Company YouTube',
             'YouTube',
             `https://youtube.com/${username}`
           );
@@ -236,7 +235,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'WhatsApp Company',
+            'Company WhatsApp',
             'WhatsApp',
             `https://wa.me/${username.replace('+', '')}`
           );
@@ -247,7 +246,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'Github Company',
+            'Company Github',
             'Github',
             `https://github.com/${username}`
           );
@@ -258,7 +257,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'TikTok Company',
+            'Company TikTok',
             'TikTok',
             `https://tiktok.com/${username}`
           );
@@ -269,7 +268,7 @@ const formatter = (vcard) => {
         } else {
           socialsFormatted[idx] = socialFormatter(
             socialsFormatted[idx],
-            'Line Company',
+            'Company Line',
             'Line',
             `https://line.me/R/ti/p/~${username}`
           );
@@ -281,6 +280,8 @@ const formatter = (vcard) => {
       }
     }
   }
+
+  socialsFormatted = socialsFormatted.sort((a, b) => a.localeCompare(b));
 
   const formatted = [
     ...startVcard,

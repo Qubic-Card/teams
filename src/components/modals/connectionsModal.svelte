@@ -128,7 +128,11 @@
       <button
         on:click={async () =>
           download(
-            await genvcard(connection.profileData, { display_personal: true }),
+            await genvcard(
+              connection.profileData,
+              { display_personal: true },
+              connection.dateConnected
+            ),
             'contact'
           )}
         class="w-full bg-blue-600 rounded-md hover:font-bold text-white text-xs md:text-sm mx-auto p-3 mb-4"
