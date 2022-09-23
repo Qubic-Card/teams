@@ -1,3 +1,4 @@
+import { theme } from '@lib/profileTheme';
 import { writable } from 'svelte/store';
 
 export const socials = writable([]);
@@ -7,6 +8,8 @@ export const teamSocials = writable([]);
 export const teamLinks = writable([]);
 
 export const isDisplayPersonal = writable(false);
+export const profileTheme = writable('dark');
+export const currentTheme = writable(theme['dark']);
 
 export const setSocials = (updatedSocials) => socials.set(updatedSocials);
 export const setLinks = (updatedLinks) => links.set(updatedLinks);

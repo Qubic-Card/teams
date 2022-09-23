@@ -77,11 +77,12 @@
       isEmptyChecking={true}
     />
     <button
+      disabled={loading}
       on:click={async () => await updateRoleName()}
-      class="flex justify-center items-center p-3 w-full bg-blue-600 hover:bg-blue-600/90 rounded-md"
+      class="flex justify-center items-center gap-2 p-3 w-full bg-blue-600 hover:bg-blue-600/60 disabled:bg-blue-600/60 rounded-md"
     >
       {#if loading}
-        <Spinner class="w-7 h-7" />
+        <Spinner bg="#1f4496" size={16} />
       {/if}
       Apply changes
     </button>

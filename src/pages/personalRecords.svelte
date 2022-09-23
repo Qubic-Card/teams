@@ -25,6 +25,7 @@
   let fromDateValue = new Date();
   let toDateValue = new Date();
   let isLoading = false;
+  let isCreateRecordLoading = false;
   let asc = false;
   let innerWidth;
 
@@ -89,7 +90,7 @@
     }
 
     if (logsCsv.length !== 0 || connectionsCsv.length !== 0) {
-      isLoading = true;
+      isCreateRecordLoading = true;
       const { data, error } = await supabase.storage
         .from('records')
         .upload(
@@ -113,7 +114,7 @@
         } else {
           toastFailed(error.message);
         }
-        isLoading = false;
+        isCreateRecordLoading = false;
       }
 
       if (data) {
@@ -124,7 +125,7 @@
         );
         await createTeamStorage(data.Key);
         await getAllStorage();
-        isLoading = false;
+        isCreateRecordLoading = false;
       }
 
       fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
@@ -132,7 +133,7 @@
       toDateValue = new Date(today);
       fromDateValue = new Date(today);
       toDateOptions.maxDate = new Date(today);
-      isLoading = false;
+      isCreateRecordLoading = false;
     } else {
       console.log('No records found');
     }
@@ -260,7 +261,7 @@
     class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
     disabled={fileName.includes('.') || fileName.length < 4
       ? true
-      : false || $userData.includes('inactive') || isLoading}
+      : false || $userData.includes('inactive') || isCreateRecordLoading}
     on:click={async () => {
       if (selectedType === 'Choose Type') {
         toastFailed('Please select a type');
@@ -269,8 +270,8 @@
       }
     }}
   >
-    {#if isLoading}
-      <Spinner class="w-8 h-8" />
+    {#if isCreateRecordLoading}
+      <Spinner bg="#1f4496" />
     {/if} <span>Create record -></span></button
   >
 </div>

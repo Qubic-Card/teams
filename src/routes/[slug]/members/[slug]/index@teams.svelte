@@ -1,4 +1,5 @@
 <script>
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Profile from '@pages/profile.svelte';
   import {
     socials,
@@ -6,6 +7,8 @@
     teamSocials,
     teamLinks,
     isDisplayPersonal,
+    profileTheme,
+    currentTheme,
   } from '@lib/stores/editorStore';
   import EditorSkeleton from '@comp/skeleton/editorSkeleton.svelte';
   import supabase from '@lib/db';
@@ -16,6 +19,8 @@
   import { profileData, teamData } from '@lib/stores/profileData';
   import { selectedTab } from '@lib/stores/selectedTab';
   import { getContext } from 'svelte';
+  import SelectTheme from '@comp/modals/selectTheme.svelte';
+  import { theme } from '@lib/profileTheme';
 
   let permissions = {
     writeProfile: false,
@@ -118,6 +123,8 @@
       $profileData = { ...profile };
       $socials = profile['socials'];
       $links = profile['links'];
+      $profileTheme = profile['design']['theme'];
+      $currentTheme = theme[profile['design']['theme']];
       member.uid = data[0]['uid'];
       await checkIsConfirmedEmail(data[0]['uid']);
 
@@ -127,6 +134,23 @@
     if (error) console.log(error);
 
     return data;
+  };
+
+  const handleSave = async () => {
+    $profileData.socials = $socials;
+    $profileData.links = $links;
+    $profileData.design.theme = $profileTheme;
+    const { error } = await supabase
+      .from('team_members')
+      .update({ team_profile: $profileData }, { returning: 'minimal' })
+      .eq('uid', $page.params.slug)
+      .eq('team_id', teamId);
+    if (error) {
+      toastFailed();
+      console.log(error);
+    } else {
+      toastSuccess('Changes saved');
+    }
   };
 </script>
 
@@ -166,7 +190,7 @@
   {/if}
 
   <div class="min-h-screen flex justify-center pl-12">
-    <div class="md:px-20 px-4 w-full bg-black">
+    <div class="md:px-20 px-4 w-full">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           {#if permissions.readTeam}
@@ -206,20 +230,21 @@
             {/if}
 
             {#if $selectedTab === 'personal'}
-              <PersonalEditor {permissions} {isTeamInactive} />
+              <PersonalEditor {permissions} {isTeamInactive} {handleSave} />
             {:else}
               <TeamEditor {permissions} {isTeamInactive} {memberId} />
             {/if}
           {:else if !permissions.readTeam}
             <PersonalEditor {permissions} {isTeamInactive} />
           {/if}
+          <SelectTheme {handleSave} {getProfile} />
         </div>
         <div
           class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
         >
           <Profile
             {selectedTab}
-            class="min-h-screen"
+            class="min-h-screen border-8 border-black rounded-3xl"
             isEditorMode={true}
             data={$profileData}
             {teamId}
@@ -244,7 +269,7 @@
 
   /* width */
   ::-webkit-scrollbar {
-    width: 10px;
+    display: none;
   }
 
   /* Track */

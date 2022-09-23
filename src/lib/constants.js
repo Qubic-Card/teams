@@ -12,6 +12,8 @@ export const socialIcons = {
   phone: 'https://img.icons8.com/fluency/96/000000/phone.png',
   line: 'https://img.icons8.com/fluency/96/000000/line-me.png',
   github: 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png',
+  telegram: 'https://img.icons8.com/fluency/48/000000/telegram-app.png',
+  discord: 'https://img.icons8.com/fluency/48/000000/discord-new-logo.png',
 };
 
 export const cartImage = {

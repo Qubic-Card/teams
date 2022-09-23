@@ -47,7 +47,7 @@
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import { getContext } from 'svelte';
 
-  export let permissions, isTeamInactive;
+  export let permissions, isTeamInactive, handleSave;
 
   // Register the plugins
   registerPlugin(
@@ -124,26 +124,6 @@
   let unsplashDatas;
   let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 
-  // const getProfile = async () => {
-  //   let { data, error } = await supabase
-  //     .from('team_members')
-  //     .select('team_profile, uid, team_id')
-  //     .eq('uid', $page.params.slug)
-  //     .eq('team_id', teamID);
-
-  //   if (data) {
-  //     const profile = data[0]['team_profile'];
-  //     $profileData = { ...profile };
-  //     $socials = profile['socials'];
-  //     $links = profile['links'];
-  //     profileId = data[0]['id'];
-  //     teamId = data[0]['team_id'];
-  //   }
-  //   if (error) console.log(error);
-
-  //   return data;
-  // };
-
   const searchQuery = (val) => (query = val.detail);
   const getUnsplash = async () => {
     try {
@@ -160,23 +140,6 @@
   };
 
   $: query, getUnsplash();
-
-  const handleSave = async () => {
-    $profileData.socials = $socials;
-    $profileData.links = $links;
-    const { error } = await supabase
-      .from('team_members')
-      .update({ team_profile: $profileData }, { returning: 'minimal' })
-      .eq('uid', $page.params.slug)
-      .eq('team_id', teamID);
-    if (error) {
-      toastFailed();
-      console.log(error);
-    } else {
-      query = 'background';
-      toastSuccess('Changes saved');
-    }
-  };
 </script>
 
 <ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
@@ -224,11 +187,11 @@
         in:fade|local={{ duration: 300 }}
         disabled={isLoading}
         type="button"
-        class="bg-blue-600 p-2 w-1/2 text-white rounded-md h-12 shadow-md flex justify-center items-center gap-2"
+        class="bg-blue-600 p-2 w-1/2 text-white disabled:bg-blue-600/60 rounded-md h-12 shadow-md flex justify-center items-center gap-2"
         on:click={async () => await handleAddFile()}
       >
         {#if isLoading}
-          <Spinner class="w-6 h-6" />
+          <Spinner bg="#1f4496" />
         {/if}
         Save
       </button>
@@ -247,11 +210,13 @@
   <div class="flex justify-center" in:fade|local={{ duration: 200 }}>
     <div class="w-full bg-black">
       <div class="gap-2 text-black">
-        <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
+        <div
+          class="flex flex-col w-full md:col-span-1 col-span-2 bg-neutral-900"
+        >
           <!-- <ProfileEditorSkeleton /> -->
           <TabGroup>
             <TabList
-              class="w-full grid grid-cols-3 border-2 border-neutral-700 p-2"
+              class="w-full grid grid-cols-3 border-2 border-neutral-700  p-2"
             >
               <Tab
                 class={({ selected }) =>
@@ -278,7 +243,9 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div class="border-neutral-700 border-2 mb-4 pb-2">
-                  <div class="px-3 pt-3 grid grid-cols-2 space-x-5">
+                  <div
+                    class="px-3 pt-3 grid grid-cols-2 space-x-5 bg-neutral-900"
+                  >
                     <Input
                       on:change={handleSave}
                       placeholder="Hello"
@@ -302,7 +269,7 @@
                         : true}
                     />
                   </div>
-                  <div class="px-3">
+                  <div class="px-3 bg-neutral-900">
                     <Input
                       on:change={handleSave}
                       placeholder="example company"
@@ -338,7 +305,7 @@
                     />
                   </div>
                   <div
-                    class={`p-3 ${
+                    class={`p-3 bg-neutral-900 ${
                       permissions.writeProfile || permissions.writeMembers
                         ? ''
                         : 'hidden'
@@ -357,6 +324,7 @@
                       beforeAddFile={handleCrop}
                     />
                     <SelectBackgroundModal
+                      on:pick={(e) => (query = e.detail)}
                       on:searchQuery={searchQuery}
                       {unsplashDatas}
                       {handleSave}
@@ -410,8 +378,10 @@
                             ? 'Username'
                             : item.type === 'line'
                             ? 'Line ID'
-                            : item.type === 'github'
+                            : item.type === 'github' || item.type === 'telegram'
                             ? 'Username'
+                            : item.type === 'discord'
+                            ? 'User ID'
                             : item.type}
                           bind:value={$socials[i].data}
                           on:change={handleSave}
@@ -540,7 +510,7 @@
               <TabPanel>
                 <!-- Link Editor -->
 
-                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-20">
+                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img

@@ -1,4 +1,6 @@
 <script>
+  import { currentTheme } from '@lib/stores/editorStore';
+
   export let background;
 </script>
 
@@ -6,7 +8,7 @@
   <img
     width={`${$$props.width}`}
     height={`${$$props.height}`}
-    class={`rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover`}
+    class={`rounded-2xl aspect-square bg-black mx-auto border-8 ${$currentTheme.avatarBorder} object-cover`}
     alt="A"
     src={background}
   />

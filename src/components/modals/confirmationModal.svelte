@@ -76,12 +76,12 @@
             isDispatch ? action() : await deleteRoleHandler(id)}
           class={`text-sm md:text-lg font-semibold ${
             isDelete
-              ? 'bg-red-600 hover:bg-red-600/80'
-              : 'bg-blue-600 hover:bg-blue-600/80'
+              ? 'bg-red-600 hover:bg-red-600/60'
+              : 'bg-blue-600 hover:bg-blue-600/60'
           } p-2 rounded-md border-2 text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800 flex justify-center items-center gap-2`}
         >
           {#if isLoading}
-            <Spinner class="w-6 h-6" />
+            <Spinner bg={isDelete ? '#8d2020' : '#1f4496'} class="w-6 h-6" />
           {/if}
           {buttonLabel ?? 'Action'}
         </button>

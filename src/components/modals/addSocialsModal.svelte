@@ -50,9 +50,26 @@
       showModal ? 'translate-x-0' : 'translate-x-[900px]'
     } transition-all duration-300 ease-in-out flex flex-col h-screen w-[320px] z-50 p-4 gap-4 bottom-0 right-0 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   >
-    <div class="flex w-full justify-between border-b-2 border-neutral-700">
-      <DialogTitle class="text-xl pb-2 z-30">Add Social Media</DialogTitle>
-      <p on:click={toggleModal} class="cursor-pointer">x</p>
+    <div
+      class="flex w-full items-center justify-between border-b-2 border-neutral-700"
+    >
+      <DialogTitle class="text-lg pb-2 z-30">Add Social Media</DialogTitle>
+      <button on:click={toggleModal} class="cursor-pointer">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg></button
+      >
     </div>
 
     <div

@@ -143,7 +143,7 @@
                 <button
                   disabled={loading}
                   on:click={async () => await handleLogin()}
-                  class="block w-56 md:w-full px-4 py-3 mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                  class="block disabled:bg-blue-600/60 w-56 md:w-full px-4 py-3 mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                   >Log In</button
                 >
               {/if}
