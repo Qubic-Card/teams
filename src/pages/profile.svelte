@@ -56,7 +56,7 @@
 
 <div
   bind:this={profile}
-  class={`${$currentTheme.pageBackground} ${$$props.class}  relative transition-colors duration-500 ease-in text-sm`}
+  class={`${$currentTheme.pageBackground} ${$$props.class} relative transition-colors duration-500 ease-in text-sm`}
   class:bg-image-profile={$currentTheme?.backgroundImage}
   style={`--bg-img-profile: url('${$currentTheme?.backgroundImage}')`}
 >
@@ -68,11 +68,7 @@
   >
     <div
       class="rounded-2xl h-32"
-      style={`background: url(${
-        data?.isBusiness
-          ? data?.design?.backgroundBusiness ?? Dummy.design?.background
-          : data?.design?.background ?? Dummy.design?.background
-      });
+      style={`background: url(${data?.design?.background ?? ''});
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;`}
@@ -121,26 +117,27 @@
                   profile.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-12 md:w-16 p-1 text-xs rounded-md {$inView
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-neutral-100 text-black'}">Bio</button
+                class="w-12 md:w-16 p-1 text-xs rounded-md ${$currentTheme?.buttonText} {$inView
+                  ? `${$currentTheme?.button}`
+                  : `${$currentTheme?.secondary}`}">Bio</button
               >
+
               <button
                 on:click={() =>
                   forScrollToSocialsSection.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-12 md:w-16 p-1 text-xs rounded-md {$socialsInView
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-neutral-100 text-black'}">Socials</button
+                class="w-12 md:w-16 p-1 text-xs rounded-md ${$currentTheme?.buttonText} {$socialsInView
+                  ? `${$currentTheme?.button}`
+                  : `${$currentTheme?.secondary}`}">Socials</button
               >
 
               <a
                 on:click|preventDefault={scrollIntoView}
                 href={`#links`}
-                class="text-center transition-colors duration-300 w-12 md:w-16 p-1 text-xs rounded-md {$linksInView
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-neutral-100 text-black'}">Links</a
+                class="text-center transition-colors duration-300 w-12 md:w-16 p-1 text-xs rounded-md ${$currentTheme?.buttonText} {$linksInView
+                  ? `${$currentTheme?.button}`
+                  : `${$currentTheme?.secondary}`}">Links</a
               >
             </div>
           </div>
