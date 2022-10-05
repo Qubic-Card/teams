@@ -75,6 +75,7 @@
     >
       <div class={$inView ? '' : 'gap-5 flex'}>
         <AvatarCard
+          theme={$currentTheme}
           class="antialiased z-50 relative appBar flex {$inView
             ? 'pt-6'
             : 'pb-2'}"

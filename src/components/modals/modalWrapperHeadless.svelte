@@ -9,6 +9,7 @@
   export let isOpen = false;
   export let initialFocus = null;
   export let bg = 'bg-neutral-800';
+  export let text = 'text-white';
   export let mobileHeight = 'h-[80%]';
   export let desktopHeight = 'md:h-[90%]';
   export let desktopWidth = 'md:w-1/3';
@@ -34,7 +35,7 @@
     isOpen
       ? `${mobileHeight} ${desktopHeight}`
       : 'h-0 translate-y-10 md:opacity-0'
-  } flex flex-col ml-0 lg:ml-12 w-full text-white ${desktopWidth} md:max-w-md px-4 pb-4 gap-4 bottom-0 fixed ${desktopTop} ${desktopRight} lg:left-1/3 z-50  border-0 shadow-lg rounded-lg ${bg} outline-none focus:outline-none overflow-y-auto`}
+  } flex flex-col ml-0 lg:ml-12 w-full ${text} ${desktopWidth} md:max-w-md px-4 pb-4 gap-4 bottom-0 fixed ${desktopTop} ${desktopRight} lg:left-1/3 z-50  border-0 shadow-lg rounded-lg ${bg} outline-none focus:outline-none overflow-y-auto`}
 >
   <slot />
 </Dialog>

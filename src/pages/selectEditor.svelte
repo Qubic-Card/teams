@@ -1,9 +1,11 @@
 <script>
+  import { toastFailed } from '@lib/utils/toast';
   import { goto } from '$app/navigation';
   import supabase from '@lib/db';
   import { fade, fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
-  import SelectTeamsSkeleton from '@comp/skeleton/selectTeamsSkeleton.svelte';
+  import SelectEditorSkeleton from '@comp/skeleton/selectEditorSkeleton.svelte';
+  import { cards } from '@lib/stores/cardsStore';
 
   let teams = [];
   // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
@@ -37,38 +39,44 @@
 </script>
 
 <section class="text-white overflow-hidden">
-  <div class="border-b border-neutral-700 absolute w-screen top-10 md:top-16" />
-  <div
-    class="border-t border-neutral-700 absolute w-screen bottom-10 md:bottom-16"
-  />
-  <div
-    class="border-r border-neutral-700 absolute h-screen right-10 md:right-16"
-  />
-  <div
-    class="border-l border-neutral-700 h-screen absolute left-10 md:left-16"
-  />
   {#await getTeamsList()}
-    <SelectTeamsSkeleton />
+    <!-- <SelectEditorSkeleton /> -->
   {:then}
-    <div class="flex justify-around items-center h-screen p-10 md:p-24">
+    <div
+      class="flex justify-around items-center h-screen p-10 md:p-24 text-black"
+    >
       <div
-        class="flex flex-col h-full w-[50%] pr-32 py-16 gap-2"
+        class="flex flex-col h-full w-full p-4 lg:w-1/2 py-12 md:py-16  gap-2 bg-white rounded-2xl"
         in:fly|local={{ y: 5000, duration: 1000 }}
       >
-        <h1 class="text-xl mb-4">Choose team</h1>
+        <h1 class="text-xl md:text-2xl font-bold mb-4">Select Editor</h1>
+        {#if $cards}
+          <div
+            on:click={() => {
+              if ($user?.confirmed_at) goto('/basic');
+              else toastFailed('Please confirm your email first');
+            }}
+            transition:slide|local={{ duration: 500 }}
+            class="flex items-center justify-between p-3 md:p-4 mb-3 border border-neutral-300 rounded-md w-full cursor-pointer bg-black text-white transition-colors duration-200"
+          >
+            <p>Basic Editor</p>
+          </div>
+        {/if}
+
+        <h2>Teams</h2>
         {#if teams}
           {#if teams.length > 0}
             {#each teams as item}
               <div
                 on:click={() => chooseTeam(item.id)}
                 transition:slide|local={{ duration: 500 }}
-                class="flex items-center justify-between p-4 rounded-md w-56 md:w-96 cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
+                class="flex items-center justify-between p-3 md:p-4 border border-neutral-300 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
               >
                 <p>
                   {item.name.charAt(0).toUpperCase() + item.name.slice(1) ??
                     'No team name'}
                 </p>
-                ->
+                <!-- -> -->
               </div>
             {/each}
           {:else}
@@ -77,14 +85,9 @@
             </div>
           {/if}
         {/if}
-        <!-- <AddTeamModal /> -->
       </div>
 
-      <div
-        in:fade|local
-        class="md:w-[40%] h-full rounded-md bg-cover"
-        style={`background-image:url(${'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80'})`}
-      />
+      <div class="bg-black md:w-full" />
     </div>
   {:catch}
     <div>

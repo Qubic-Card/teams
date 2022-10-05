@@ -25,7 +25,7 @@
       </p>
       <button
         class="border-2 border-neutral-900 p-4 w-64 rounded-lg mt-8"
-        on:click={() => goto($user ? '/select-teams' : '/')}
+        on:click={() => goto('/')}
       >
         Go to login page
       </button>

@@ -1,9 +1,15 @@
 <script>
   import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
   import { theme } from '@lib/profileTheme';
-  import { currentTheme, profileTheme } from '@lib/stores/editorStore';
+  import {
+    currentTheme,
+    profileTheme,
+    basicCurrentTheme,
+    basicProfileTheme,
+  } from '@lib/stores/editorStore';
 
   export let handleSave, getProfile;
+  export let editor = 'team';
   // export let profile, deleteConnectionHandler, isLoading;
   let title;
   let isOpen = false;
@@ -16,16 +22,31 @@
     await handleSave();
     await getProfile();
   };
+
+  const selectBasicThemeHandler = async (t) => {
+    $basicProfileTheme = t;
+    $basicCurrentTheme = theme[t];
+    await handleSave();
+  };
 </script>
 
 <div
   on:click={modalHandler}
-  class="flex justify-between items-center hover:bg-neutral-800 transition-color duration-300 h-20 px-8 p-2 bg-neutral-900 text-neutral-100 border-neutral-700 border-2 cursor-pointer"
+  class="flex justify-between items-center  transition-color duration-300 h-20 px-8 p-2 {editor ===
+  'team'
+    ? 'bg-neutral-900 text-neutral-100 border-neutral-700 hover:bg-neutral-800'
+    : 'bg-neutral-100 text-neutral-900'} border-2 cursor-pointer"
 >
   <h1>Set theme</h1>
-  <h1>
-    {$profileTheme.charAt(0).toUpperCase() + $profileTheme.slice(1)}
-  </h1>
+  {#if editor == 'team'}
+    <h1>
+      {$profileTheme.charAt(0).toUpperCase() + $profileTheme.slice(1)}
+    </h1>
+  {:else}
+    <h1>
+      {$basicProfileTheme.charAt(0).toUpperCase() + $basicProfileTheme.slice(1)}
+    </h1>
+  {/if}
 </div>
 
 {#if isOpen}
@@ -36,9 +57,13 @@
     {isOpen}
     on:modalHandler={(e) => (isOpen = e.detail)}
     initialFocus={title}
+    bg={editor === 'team' ? 'bg-neutral-900' : 'bg-neutral-100'}
   >
     <div
-      class="flex justify-between items-center fixed z-50 w-full md:w-[425px] bg-neutral-800 pr-8 md:pr-2 h-12"
+      class="flex justify-between items-center fixed z-50 w-full md:w-[425px] {editor ===
+      'team'
+        ? 'bg-neutral-900 text-neutral-100'
+        : 'bg-neutral-100 text-neutral-900'}  pr-8 md:pr-2 h-12"
     >
       <h1 class="font-bold" bind:this={title}>Select Theme</h1>
       <button on:click={modalHandler}>
@@ -61,13 +86,23 @@
     <div class="grid grid-cols-2 grid-flow-row gap-2 pt-16">
       {#each Object.keys(theme) as key}
         <div
-          class={`flex flex-col ${
-            $profileTheme !== key
+          class="flex flex-col {editor == 'team'
+            ? $profileTheme !== key
               ? 'cursor-pointer hover:brightness-50'
               : 'cursor-default brightness-50'
-          }`}
+            : $basicProfileTheme !== key
+            ? 'cursor-pointer hover:brightness-50'
+            : 'cursor-default brightness-50'}"
           on:click={() => {
-            if ($profileTheme !== key) selectThemeHandler(key);
+            if (editor === 'team') {
+              if ($profileTheme !== key) {
+                selectThemeHandler(key);
+              }
+            } else {
+              if ($basicProfileTheme !== key) {
+                selectBasicThemeHandler(key);
+              }
+            }
           }}
         >
           <div
@@ -82,9 +117,6 @@
                 class={`w-12 h-12 rounded-lg translate-y-4 border-4 ${theme[key].border} ${theme[key].pageBackground}`}
               />
             </div>
-            <!-- <div class={`h-3 w-3/4 ${theme[key].secondary} rounded-sm mt-5`} />
-          <div class={`h-3 w-16 ${theme[key].secondary} rounded-sm`} />
-          <div class={`h-3 w-16 ${theme[key].secondary} rounded-sm`} /> -->
             <div
               class={`h-20 w-full ${
                 key !== 'light' ? theme[key].secondary : 'bg-neutral-200'

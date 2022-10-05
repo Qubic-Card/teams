@@ -1,8 +1,7 @@
 <script>
-  import { currentTheme } from '@lib/stores/editorStore';
   import { inView } from '@lib/stores/intersectingStore';
 
-  export let background;
+  export let background, theme;
 </script>
 
 <div class={`flex text-xl rounded-full text-white ${$$props.class}`}>
@@ -10,7 +9,7 @@
     width={`${$$props.width}`}
     height={`${$$props.height}`}
     class={`rounded-3xl aspect-square ${
-      $currentTheme?.avatarBorder
+      theme?.avatarBorder ?? 'border-white'
     } bg-black -translate-x-0 duration-1000 ${
       $inView ? 'mx-auto' : 'mt-2 ml-4'
     } transitions-all transform border-8 object-cover`}

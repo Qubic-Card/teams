@@ -4,24 +4,40 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    location.reload();
-  };
+  export let editor = 'team';
+
+  const handleLogout = async () => await supabase.auth.signOut();
 </script>
 
 <div
-  class="z-50 absolute border shadow-xl text-sm right-4 flex flex-col md:right-2 top-[70px] w-2/3 md:w-[300px] sm:mx-2 md:mx-0 p-2 bg-neutral-900 text-white h-auto gap-2"
+  class="z-50 absolute border shadow-xl text-sm right-4 flex flex-col md:right-2 top-[50px] w-2/3 md:w-[300px] sm:mx-2 md:mx-0 p-2 {editor ===
+  'team'
+    ? 'bg-neutral-900 text-white'
+    : 'bg-white text-black'} h-auto gap-2"
 >
-  <h1>Logged-in as <strong>{$user?.email}</strong></h1>
+  {#if editor === 'team'}
+    <h1>Logged-in as <strong>{$user?.email}</strong></h1>
+  {/if}
+
+  {#if editor === 'basic'}
+    <a class="p-2 border-b hover:font-bold" href="/pages/contactus"
+      >Contact Support</a
+    >
+    <a class="p-2 hover:font-bold" href="/products#howitworks">Tutorial</a>
+  {/if}
+
   <button
-    class="text-black bg-gray-100 p-1 w-full flex justify-center text-xs md:text-sm"
-    on:click={() => goto('/select-teams')}
+    class="{editor === 'team'
+      ? 'text-black bg-gray-100'
+      : 'border hover:bg-black hover:text-white border-black'} p-1 w-full flex justify-center text-xs md:text-sm"
+    on:click={() => goto('/')}
   >
-    Change team
+    Change Editor
   </button>
   <button
-    class="text-xs md:text-sm text-black bg-gray-100 p-1 w-full"
+    class="{editor === 'team'
+      ? 'text-black bg-gray-100'
+      : 'text-white bg-black'} text-xs md:text-sm text-black p-2 w-full"
     on:click={handleLogout}>Log Out</button
   >
 </div>

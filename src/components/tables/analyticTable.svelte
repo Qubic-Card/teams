@@ -1,6 +1,5 @@
 <script>
   import TableSkeleton from '@comp/skeleton/tableSkeleton.svelte';
-  import { createEventDispatcher } from 'svelte';
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
   import { fade } from 'svelte/transition';
 
@@ -62,19 +61,6 @@
       {/if}
     {/if}
   </table>
-  {#if !loading}
-    {#if !isAlreadySeeMore && currentPageRows?.length !== 0 && currentPageRows?.length > 4}
-      <button
-        class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
-        on:click>See more</button
-      >
-      <!-- {:else if isAlreadySeeMore && active == 0}
-      <button
-        class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
-        on:click={() => dispatch('hide')}>Hide</button
-      > -->
-    {/if}
-  {/if}
 
   {#if currentPageRows?.length === 0 && !loading}
     <div class="text-center">

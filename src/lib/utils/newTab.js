@@ -1,7 +1,7 @@
 const toNewTab = async (type, data) => {
   switch (type) {
     case 'discord':
-      return window.open(`https://discord.com/users/${data}`, '_blank');
+      return window.open(`https://discord.gg/${data}`, '_blank');
       break;
     case 'telegram':
       return window.open(`https://t.me/${data}`, '_blank').focus();
