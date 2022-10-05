@@ -2,14 +2,12 @@
   import { toastFailed } from '@lib/utils/toast';
   import { goto } from '$app/navigation';
   import supabase from '@lib/db';
-  import { fade, fly, slide } from 'svelte/transition';
+  import { fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
-  import SelectEditorSkeleton from '@comp/skeleton/selectEditorSkeleton.svelte';
   import { cards } from '@lib/stores/cardsStore';
 
   let teams = [];
-  // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
-  // 59
+
   const getTeamsList = async () => {
     const { data, error } = await supabase
       .from('team_members')
@@ -39,9 +37,7 @@
 </script>
 
 <section class="text-white overflow-hidden">
-  {#await getTeamsList()}
-    <!-- <SelectEditorSkeleton /> -->
-  {:then}
+  {#await getTeamsList() then}
     <div
       class="flex justify-around items-center h-screen p-10 md:p-24 text-black"
     >
@@ -63,9 +59,9 @@
           </div>
         {/if}
 
-        <h2>Teams</h2>
         {#if teams}
           {#if teams.length > 0}
+            <h2>Teams</h2>
             {#each teams as item}
               <div
                 on:click={() => chooseTeam(item.id)}
@@ -80,7 +76,7 @@
               </div>
             {/each}
           {:else}
-            <div class="text-center">
+            <div class="text-left">
               <p class="text-lg">You don't have any team yet</p>
             </div>
           {/if}
