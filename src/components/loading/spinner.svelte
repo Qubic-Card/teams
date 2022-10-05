@@ -4,7 +4,7 @@
   export let size = 18;
 </script>
 
-{#if type === 'qbc'}
+{#if type !== 'qbc'}
   <div
     style={`--border-color: #dedede; --bg: ${bg}; --size: ${size}px;`}
     class={`rounded-xl ${$$props.class}  box`}

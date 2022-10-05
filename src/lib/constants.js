@@ -141,15 +141,20 @@ export const connectionsTableMobile = [
 ];
 
 export const connectionSearchMenu = [
-  { name: 'Name', col: 'profileData->>firstname' },
-  { name: 'Job', col: 'profileData->>job' },
-  { name: 'Company', col: 'profileData->>company' },
+  { label: 'Name', col: 'profileData->>firstname' },
+  { label: 'Job', col: 'profileData->>job' },
+  { label: 'Company', col: 'profileData->>company' },
 ];
 
 export const memberSearchMenu = [
-  { name: 'Name', col: 'team_profile->>firstname' },
-  { name: 'Job', col: 'team_profile->>job' },
-  { name: 'Company', col: 'team_profile->>company' },
+  { label: 'Name', col: 'team_profile->>firstname' },
+  { label: 'Job', col: 'team_profile->>job' },
+  { label: 'Company', col: 'team_profile->>company' },
+];
+
+export const basicSearchMenu = [
+  { id: 1, label: 'Name', col: 'profileData->>firstname' },
+  { id: 2, label: 'Job', col: 'profileData->>job' },
 ];
 
 export const doughnutChartBgColor = [
