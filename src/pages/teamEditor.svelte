@@ -4,7 +4,6 @@
   import Input from '@comp/input.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import TeamEditorSkeleton from '@comp/skeleton/teamEditorSkeleton.svelte';
 
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
@@ -165,28 +164,6 @@
     }
   };
 
-  // const getTeamsDetail = async () => {
-  //   const { data, error } = await supabase
-  //     .from('teams')
-  //     .select('*')
-  //     .eq('id', teamId);
-
-  //   if (error) console.log(error);
-
-  //   if (data) {
-  //     const team = data[0].metadata;
-  //     $teamData = { ...team };
-  //     $teamSocials = team['socials'];
-  //     $teamLinks = team['links'];
-  //     // teamId = team['id'];
-  //     $teamSocials.map((social) => {
-  //       if (social.type === 'phone') $teamData.phone = social.data;
-  //       if (social.type === 'email') $teamData.email = social.data;
-  //     });
-  //   }
-  //   return data;
-  // };
-
   const setDisplayPersonal = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
@@ -195,13 +172,14 @@
         { returning: 'minimal' }
       )
       .eq('team_member_id', memberId)
-      .eq('card_id', history.state.id);
+      .eq('card_id', history.state.card);
 
     if (error) {
       toastFailed();
       console.log(error);
+    } else {
+      toastSuccess('Changes saved');
     }
-    if (data) toastSuccess('Changes saved');
   };
 </script>
 

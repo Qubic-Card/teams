@@ -19,8 +19,8 @@
       socialType.length >= 2
         ? toastFailed('You can only add two of each social media')
         : teamSocials.set([
-            ...$teamSocials,
             { type: item, data: '', isActive: true },
+            ...$teamSocials,
           ]);
       if (socialType.length < 2) toastSuccess(`${item} successfully added`);
     } else {
@@ -30,7 +30,7 @@
 
       socialType.length >= 2
         ? toastFailed('You can only add two of each social media')
-        : socials.set([...$socials, { type: item, data: '', isActive: true }]);
+        : socials.set([{ type: item, data: '', isActive: true }, ...$socials]);
       if (socialType.length < 2) toastSuccess(`${item} successfully added`);
     }
   };

@@ -66,7 +66,9 @@
               height="64"
               class="m-1 p-2 border rounded bg-white"
               on:click={() => addSocial(item)}
-              src={socialIcons[item]}
+              src={item.includes('github')
+                ? 'https://img.icons8.com/fluency/48/FA5252/github.png'
+                : socialIcons[item]}
               alt={item}
             />
           {/each}

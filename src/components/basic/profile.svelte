@@ -266,22 +266,6 @@
               transition:slide|local
               class="flex flex-wrap justify-between w-full items-start"
             >
-              {#if data?.isBusiness}
-                {#if $basicSocials?.filter( (s) => s.type.includes('business') ).length < 1 || $basicSocials
-                    ?.filter((s) => s.type.includes('business'))
-                    ?.every((s) => s.isActive === false)}
-                  <p class="text-center ml-2 {$basicCurrentTheme?.text}">
-                    No socials added
-                  </p>
-                {/if}
-              {:else if $basicSocials?.filter((s) => !s.type.includes('business')).length < 1 || $basicSocials
-                  ?.filter((s) => !s.type.includes('business'))
-                  ?.every((s) => s.isActive === false)}
-                <p class="text-center ml-2 {$basicCurrentTheme?.text}">
-                  No socials added
-                </p>
-              {/if}
-
               {#if $basicSocials.filter.length > 0}
                 {#each $basicSocials as item, i}
                   {#if item.isActive}
@@ -341,22 +325,6 @@
               transition:slide|local
               class="flex flex-col justify-center items-center"
             >
-              {#if data.isBusiness}
-                {#if $basicLinks?.filter((l) => l.isPersonal === false).length < 1 || $basicLinks
-                    ?.filter((l) => l.isPersonal === false)
-                    .every((l) => l.isActive === false)}
-                  <p class="self-start ml-2 {$basicCurrentTheme?.text}">
-                    No links added
-                  </p>
-                {/if}
-              {:else if $basicLinks?.filter((l) => l.isPersonal !== false).length < 1 || $basicLinks
-                  ?.filter((l) => l.isPersonal !== false)
-                  .every((l) => l.isActive === false)}
-                <p class="self-start ml-2 {$basicCurrentTheme?.text}">
-                  No links added
-                </p>
-              {/if}
-
               {#if $basicLinks?.length > 0}
                 {#each $basicLinks as item, i}
                   {#if item.isActive}

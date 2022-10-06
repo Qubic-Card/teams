@@ -126,6 +126,8 @@
       $profileTheme = profile['design']['theme'];
       $currentTheme = theme[profile['design']['theme']];
       member.uid = data[0]['uid'];
+      memberId = data[0]['id'];
+
       await checkIsConfirmedEmail(data[0]['uid']);
 
       $isDisplayPersonal = data[0].team_cardcon[0].display_personal;
@@ -245,7 +247,6 @@
           <Profile
             {selectedTab}
             class="min-h-screen border-8 border-black rounded-3xl"
-            isEditorMode={true}
             data={$profileData}
             {teamId}
             {companyNickname}

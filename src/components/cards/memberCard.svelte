@@ -30,7 +30,6 @@
   let showModal = false;
   let roleID = null;
   let roleName = null;
-  let card = member?.card_id;
   let isLoading = false;
   let memberProfile = member?.team_cardcon[0]?.team_member_id;
   let role = member?.team_cardcon[0]?.team_member_id.role;
@@ -40,7 +39,9 @@
   const toggleModal = () => (showModal = !showModal);
 
   const toProfileEditor = (slug) =>
-    goto(`/${$page.params.slug}/members/${slug}`, { state: card });
+    goto(`/${$page.params.slug}/members/${slug}`, {
+      state: { card: member?.id },
+    });
 
   const selectRole = (role) => (selectedRole = role);
 

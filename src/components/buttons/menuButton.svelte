@@ -10,13 +10,15 @@
 </script>
 
 <div
-  class="z-50 absolute border shadow-xl text-sm right-4 flex flex-col md:right-2 top-[50px] w-2/3 md:w-[300px] sm:mx-2 md:mx-0 p-2 {editor ===
+  class="z-50 absolute border shadow-xl text-sm right-4 flex flex-col md:right-2 w-2/3 md:w-[300px] sm:mx-2 md:mx-0 p-2 {editor ===
   'team'
-    ? 'bg-neutral-900 text-white'
-    : 'bg-white text-black'} h-auto gap-2"
+    ? 'bg-neutral-900 text-white top-[70px]'
+    : 'bg-white text-black'} h-auto gap-2 top-[50px]"
 >
   {#if editor === 'team'}
-    <h1>Logged-in as <strong>{$user?.email}</strong></h1>
+    {#if $user}
+      <h1>Logged-in as <strong>{$user?.email ?? ''}</strong></h1>
+    {/if}
   {/if}
 
   {#if editor === 'basic'}
