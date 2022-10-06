@@ -61,9 +61,7 @@
 >
   <!-- HEAD -->
   <div
-    class="w-full p-2 sticky top-0 z-10 {data?.design?.background
-      ? ''
-      : $currentTheme?.pageBackground}"
+    class="w-full p-2 sticky top-0 z-10 {$currentTheme?.pageBackground} rounded-3xl"
   >
     <div
       class="rounded-2xl h-32"
@@ -86,7 +84,7 @@
         />
         {#if !$inView}
           <div
-            in:fly|local={{ x: -400, duration: 1000 }}
+            in:fly|local={{ x: -200, duration: 1000 }}
             class="flex z-40 flex-col gap-1 pt-2 {$currentTheme?.text}"
           >
             <!-- {currentTheme?.pageBackground} {currentTheme?.text} rounded-md p-1 -->

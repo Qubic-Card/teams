@@ -31,22 +31,23 @@
     if (browser) {
       function handleIntersect(entries, observer) {
         entries.forEach((entry) => {
-          if (section === 'socials') {
-            // console.log('socials in view', entry.intersectionRatio);
-            if (entry.intersectionRatio > 0.9 && entry.intersectionRatio < 0.95)
+          if (section === 'links') {
+            if (entry.intersectionRatio < 0.5) {
               $socialsInView = true;
-            else $socialsInView = false;
-          } else if (section === 'links') {
-            // console.log('links in view', entry.intersectionRatio);
-            if (entry.intersectionRatio > 0.8 && entry.intersectionRatio < 0.95)
-              $socialsInView = true;
-            else $socialsInView = false;
+            } else {
+              $socialsInView = false;
+            }
 
-            if (entry.intersectionRatio > 0.95) $linksInView = true;
-            else $linksInView = false;
+            if (entry.intersectionRatio > 0.5) {
+              $linksInView = true;
+              // $socialsInView = false;
+            } else {
+              // $socialsInView = true;
+              $linksInView = false;
+            }
           } else if (section === 'bio') {
             // console.log('bio in view', entry.intersectionRatio);
-            if (entry.intersectionRatio > 0.95) $inView = true;
+            if (entry.intersectionRatio === 1) $inView = true;
             else $inView = false;
           }
 
