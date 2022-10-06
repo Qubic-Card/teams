@@ -41,8 +41,7 @@
               class="flex items-center justify-between p-3 md:p-4 border border-neutral-300 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
             >
               <p>
-                {item.name.charAt(0).toUpperCase() + item.name.slice(1) ??
-                  'No team name'}
+                {item.name.charAt(0).toUpperCase() + item.name.slice(1) ?? ''}
               </p>
               <!-- -> -->
             </div>
