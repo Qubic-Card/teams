@@ -272,7 +272,7 @@
   >
     {#if isCreateRecordLoading}
       <Spinner bg="#1f4496" />
-    {/if} <span>Create record -></span></button
+    {/if} <span>Create record &#8594;</span></button
   >
 </div>
 <div

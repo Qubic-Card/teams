@@ -28,7 +28,6 @@
   } from '@lib/stores/intersectingStore';
 
   export let data;
-  export let isEditorMode = false;
 
   const popup = () => toastFailed(`You can't connect to this profile`);
 
@@ -62,9 +61,7 @@
 >
   <!-- HEAD -->
   <div
-    class="w-full p-2 sticky top-0 z-30 {data?.design?.background
-      ? ''
-      : $currentTheme?.pageBackground}"
+    class="w-full p-2 sticky top-0 z-10 {$currentTheme?.pageBackground} rounded-3xl"
   >
     <div
       class="rounded-2xl h-32"
@@ -87,7 +84,7 @@
         />
         {#if !$inView}
           <div
-            in:fly|local={{ x: -400, duration: 1000 }}
+            in:fly|local={{ x: -200, duration: 1000 }}
             class="flex z-40 flex-col gap-1 pt-2 {$currentTheme?.text}"
           >
             <!-- {currentTheme?.pageBackground} {currentTheme?.text} rounded-md p-1 -->
@@ -251,7 +248,7 @@
               transition:slide|local
               class="flex justify-between flex-wrap items-start"
             >
-              {#each isEditorMode ? $socials : data.socials as item, i}
+              {#each $socials as item, i}
                 {#if item.isActive}
                   <BorderButton
                     on:click={() => toNewTab(item.type, item.data)}
@@ -287,7 +284,7 @@
               transition:slide|local
               class="flex flex-col justify-center items-center pb-5"
             >
-              {#each isEditorMode ? $links : data.links as item, i}
+              {#each $links as item, i}
                 {#if item.isActive}
                   <BorderButton
                     order={i}
@@ -358,7 +355,7 @@
                 transition:slide|local
                 class="flex justify-between flex-wrap items-start"
               >
-                {#each isEditorMode ? $teamSocials : data.socials as item, i}
+                {#each $teamSocials as item, i}
                   {#if item.isActive}
                     <BorderButton
                       on:click={() => toNewTab(item.type, item.data)}
@@ -394,7 +391,7 @@
                 transition:slide|local
                 class="gap-2 flex flex-col justify-center items-center pb-5"
               >
-                {#each isEditorMode ? $teamLinks : data.links as item, i}
+                {#each $teamLinks as item, i}
                   {#if item.isActive}
                     <BorderButton
                       order={i}

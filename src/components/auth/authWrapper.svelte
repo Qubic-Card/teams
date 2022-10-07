@@ -6,6 +6,7 @@
   import { browser } from '$app/env';
   import { cards } from '@lib/stores/cardsStore';
   import Cookies from 'js-cookie';
+  import { teams } from '@lib/stores/teamStore';
 
   $user = supabase.auth.user();
   const getBusinessCards = async (uid) => {
@@ -47,9 +48,11 @@
       }
     }
   };
+
   const redirect = async () => {
     if (await checkIsActiveMember()) {
       if ($user && $page.url.pathname === '/') goto('/');
+      // if ($user && $teams.isTeamMember === false) goto('/basic');
     } else {
       $user = null;
     }
