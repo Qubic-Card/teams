@@ -10,6 +10,6 @@
 
 <tr class="animate-pulse">
   {#each totalCol as item}
-    <td class="{index % 2 === 0 ? 'bg-neutral-200' : 'bg-neutral-300'} h-10" />
+    <td class="{index % 2 === 0 ? 'bg-neutral-200' : 'bg-neutral-100'} h-10" />
   {/each}
 </tr>

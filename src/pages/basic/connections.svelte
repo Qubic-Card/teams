@@ -167,9 +167,11 @@
           </div>
         {/each}
         <div
-          class="aspect-[8/5] bg-neutral-50 h-auto rounded-lg border justify-center items-center flex"
+          on:click={() =>
+            window.open('https://qubic.id/shop', '_blank').focus()}
+          class="aspect-[8/5] bg-neutral-50 h-auto rounded-lg border justify-center items-center cursor-pointer flex"
         >
-          <a class="text-neutral-400 text-6xl" href="/shop">+</a>
+          <p class="text-neutral-400 text-6xl">+</p>
         </div>
       </div>
 

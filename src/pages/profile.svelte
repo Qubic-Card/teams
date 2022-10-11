@@ -317,10 +317,11 @@
             alt=""
             class="rounded-lg w-16 h-16 mr-2"
           />
-          <h1>{$teamData.company ?? ''}</h1>
+          <p class="break-all">{$teamData.company ?? ''}</p>
         </div>
-        <p class="text-xs">{$teamData.address ?? ''}</p>
-        <p class="text-xs {$currentTheme.text} opacity-50">
+
+        <p class="text-xs break-words">{$teamData.address ?? ''}</p>
+        <p class="text-xs {$currentTheme.text} opacity-50 break-words">
           {$teamData.description ?? ''}
         </p>
       </div>
@@ -330,8 +331,10 @@
             on:click={downloadHandler}
             class="w-full {$currentTheme.text} text-xs md:text-sm outline outline-2 {$currentTheme?.outline} rounded-lg p-4 cursor-pointer animation-profile"
           >
-            <h1>{$teamData?.brochure?.title}</h1>
-            <p class="text-xs text-neutral-400">
+            <h1 class="break-all">
+              {$teamData?.brochure?.title}
+            </h1>
+            <p class="text-xs text-neutral-400 break-all">
               Know more about {$teamData.company}
             </p>
           </div>
