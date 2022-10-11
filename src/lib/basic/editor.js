@@ -7,25 +7,25 @@ export const addLink = (isBusiness, links) => {
   if (isBusiness) {
     links.filter((link) => link.isPersonal === false).length < 5
       ? basicLinks.set([
-          ...links,
           {
             title: 'My Website',
             link: 'https://qubic.id',
             isActive: true,
             isPersonal: false,
           },
+          ...links,
         ])
       : toastFailed('Only 5 link allowed for free members');
   } else {
     links.filter((link) => link.isPersonal !== false).length < 5
       ? basicLinks.set([
-          ...links,
           {
             title: 'My Website',
             link: 'https://qubic.id',
             isActive: true,
             isPersonal: true,
           },
+          ...links,
         ])
       : toastFailed('Only 5 link allowed for free members');
   }
@@ -42,25 +42,31 @@ export const handleUpSocial = async (item, i, socials, isBusiness) => {
     socialsBusiness.splice(i, 1);
     socialsBusiness.splice(i - 1, 0, item);
     socials = [...socialsBusiness, ...socialsPersonal];
+    basicSocials.set(socials);
   } else {
     socialsPersonal.splice(i, 1);
     socialsPersonal.splice(i - 1, 0, item);
     socials = [...socialsPersonal, ...socialsBusiness];
+    basicSocials.set(socials);
   }
 };
 
-export const handleUpLink = async (item, i, links, isBusiness) => {
+export const handleUpLink = async (item, i, links, isPersonal) => {
   let linksBusiness = links.filter((link) => link.isPersonal === false);
   let linksPersonal = links.filter((link) => link.isPersonal !== false);
 
-  if (isBusiness) {
-    linksBusiness.splice(i, 1);
-    linksBusiness.splice(i - 1, 0, item);
-    links = [...linksBusiness, ...linksPersonal];
-  } else {
+  if (isPersonal) {
     linksPersonal.splice(i, 1);
     linksPersonal.splice(i - 1, 0, item);
+
     links = [...linksPersonal, ...linksBusiness];
+    basicLinks.set(links);
+  } else {
+    linksBusiness.splice(i, 1);
+    linksBusiness.splice(i - 1, 0, item);
+
+    links = [...linksBusiness, ...linksPersonal];
+    basicLinks.set(links);
   }
 };
 

@@ -142,8 +142,8 @@
   const addLink = () => {
     $teamLinks.length < 5
       ? teamLinks.set([
-          ...$teamLinks,
           { title: 'My Website', link: 'https://qubic.id', isActive: true },
+          ...$teamLinks,
         ])
       : toastFailed('Only 5 link allowed for free members');
   };

@@ -19,6 +19,7 @@
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { teamProfileTemplate } from '@lib/constants';
   import { log } from '@lib/logger/logger';
+  import Cookies from 'js-cookie';
 
   export let permissions, deleteMember;
   export let roles = [];
@@ -34,6 +35,7 @@
   let memberProfile = member?.team_cardcon[0]?.team_member_id;
   let role = member?.team_cardcon[0]?.team_member_id.role;
   let teamCardCon = member?.team_cardcon[0];
+  let memberEmail = '';
 
   const setRole = (role) => dispatch('setRole', { role: role, index: i });
   const toggleModal = () => (showModal = !showModal);
@@ -65,6 +67,27 @@
     }
   };
 
+  const inOneHour = new Date(new Date().getTime() + 60 * 60 * 1000);
+
+  const getUserEmail = async (uid) => {
+    if (memberProfile?.uid !== undefined) {
+      const { data, error } = await supabase.functions.invoke('getUserEmail', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uid: uid,
+        }),
+      });
+      if (error) console.log(error);
+      if (data) {
+        if (teamCardCon?.card_id !== undefined)
+          Cookies.set(teamCardCon?.card_id, data.user);
+        memberEmail = data.user;
+      }
+    }
+  };
+  // $: console.log(teamCardCon);
   const setMemberRole = async (id) => {
     isLoading = true;
     const { data, error } = await supabase
@@ -141,6 +164,16 @@
     (showDeleteMemberModal = !showDeleteMemberModal);
 
   $: if (i === updatedRole.index) selectedRole = updatedRole.role;
+
+  onMount(async () => {
+    if (!Cookies.get(teamCardCon?.card_id)) {
+      await getUserEmail(memberProfile?.uid);
+    } else {
+      memberEmail = Cookies.get(teamCardCon?.card_id);
+    }
+    // console.log(memberEmail);
+    // await getUserEmail(memberProfile?.uid);
+  });
 </script>
 
 <ConfirmationModal
@@ -291,6 +324,7 @@
               <h2 class="text-neutral-300">
                 {memberProfile?.team_profile?.job}
               </h2>
+              <h2 class="text-neutral-300 text-xs mt-2">{memberEmail}</h2>
               <h2 class="text-neutral-300 text-xs">
                 Joined since {convertToGMT7(memberProfile?.user_change)
                   .toDateString()

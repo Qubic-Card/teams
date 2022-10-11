@@ -12,7 +12,7 @@
 <div
   class="z-50 absolute border shadow-xl text-sm right-4 flex flex-col md:right-2 w-2/3 md:w-[300px] sm:mx-2 md:mx-0 p-2 {editor ===
   'team'
-    ? 'bg-neutral-900 text-white top-[70px]'
+    ? 'bg-neutral-900 text-white top-[75px]'
     : 'bg-white text-black'} h-auto gap-2 top-[50px]"
 >
   {#if editor === 'team'}

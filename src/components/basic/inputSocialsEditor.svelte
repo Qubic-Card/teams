@@ -123,7 +123,7 @@
         </MenuItem>
         {#if i != 0}
           <MenuItem
-            class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md"
+            class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
             on:click={async () => {
               handleUpSocial(item, i, $basicSocials, isBusiness);
               await handleSave();
