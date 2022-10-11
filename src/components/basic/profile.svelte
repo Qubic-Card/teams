@@ -13,11 +13,7 @@
   import { genvcard } from '@lib/vcard/vcardgen';
   import { toastFailed } from '@lib/utils/toast';
   import IntersectionObserver from '@comp/intersectionObserver.svelte';
-  import {
-    inView,
-    linksInView,
-    socialsInView,
-  } from '@lib/stores/intersectingStore';
+  import { inView } from '@lib/stores/intersectingStore';
   import toNewTab from '@lib/utils/newTab';
 
   export let isShowMetaImage = false;
@@ -153,26 +149,23 @@
                   profile.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-16 p-1 text-xs rounded-md ${$basicCurrentTheme?.buttonText} {$inView
-                  ? `${$basicCurrentTheme?.button}`
-                  : `${$basicCurrentTheme?.secondary}`}">Bio</button
+                class="w-16 p-1 text-xs rounded-md {$basicCurrentTheme?.buttonText} {$basicCurrentTheme?.secondary}"
+                >Bio</button
               >
               <button
                 on:click={() =>
                   forScrollToSocialsSection.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-16 p-1 text-xs rounded-md {$socialsInView
-                  ? `${$basicCurrentTheme?.button}`
-                  : `${$basicCurrentTheme?.secondary}`}">Socials</button
+                class="w-16 p-1 text-xs rounded-md {$basicCurrentTheme?.buttonText} {$basicCurrentTheme?.secondary}"
+                >Socials</button
               >
 
               <a
                 on:click|preventDefault={scrollIntoView}
                 href={`#links`}
-                class="text-center transition-colors duration-300 w-16 p-1 text-xs rounded-md {$linksInView
-                  ? `${$basicCurrentTheme?.button}`
-                  : `${$basicCurrentTheme?.secondary}`}">Links</a
+                class="text-center transition-colors duration-300 w-16 p-1 text-xs rounded-md {$basicCurrentTheme?.buttonText} {$basicCurrentTheme?.secondary}"
+                >Links</a
               >
             </div>
           </div>

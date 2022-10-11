@@ -9,7 +9,7 @@
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import toNewTab from '@lib/utils/newTab';
 
-  export let profile, deleteConnectionHandler, isLoading;
+  export let profile, deleteConnectionHandler, isLoading, getConnectionsList;
   let img;
   let isOpen = false;
   let isDeleteModalOpen = false;
@@ -88,10 +88,10 @@
     on:modalHandler={(e) => (isDeleteModalOpen = e.detail)}
   >
     <div class="flex flex-col justify-between h-full">
-      <div class="flex flex-col">
+      <div class="flex flex-col pt-2">
         <img
           on:click={() => (isDeleteModalOpen = false)}
-          class="self-end cursor-pointer"
+          class="self-end cursor-pointer h-4"
           bind:this={img}
           width="16"
           height="16"
@@ -116,6 +116,7 @@
           class="flex gap-2 items-center justify-center w-1/2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
           on:click={async () => {
             await deleteConnectionHandler(profile?.id);
+            await getConnectionsList();
             isDeleteModalOpen = false;
           }}
         >

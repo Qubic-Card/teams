@@ -15,7 +15,6 @@
   let password = '';
   let isSuccessful = false;
   let isForgotPassword = false;
-  let teamsArr = [];
 
   const checkIsActiveMember = async (uid) => {
     const { data, error } = await supabase
@@ -82,48 +81,11 @@
       await handleLogin();
     }
   };
-
-  const getTeamsList = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('team_id(*)')
-      .eq('uid', $user?.id)
-      .order('id', { ascending: true });
-
-    if (error) console.log(error);
-
-    if (data) {
-      let newData = [];
-
-      let uniqueTeamId = [...new Set(data.map((t) => t.team_id.id))];
-
-      data.filter((t) => {
-        if (uniqueTeamId.includes(t.team_id.id)) {
-          newData.push(t.team_id);
-          uniqueTeamId = uniqueTeamId.filter((m) => m !== t.team_id.id);
-        }
-      });
-
-      teamsArr = newData;
-
-      // if (teamsArr.length < 0) {
-      //   $teams.isTeamMember = false;
-      // } else $teams.isTeamMember = true;
-    }
-  };
-
-  onMount(async () => {
-    await getTeamsList();
-  });
-
-  // $: getTeamsList();
 </script>
 
 <AuthWrapper>
   {#if $user}
-    <!-- {#if $teams.isTeamMember} -->
-    <SelectEditor teams={teamsArr} />
-    <!-- {/if} -->
+    <SelectEditor />
   {:else}
     <div class="text-white">
       <div class="flex justify-around items-center h-screen p-8 md:p-24">

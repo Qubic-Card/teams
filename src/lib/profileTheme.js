@@ -39,14 +39,14 @@ export const theme = {
     outline: 'outline-[#EBEBEB]',
     secondary: 'bg-[#FAFAFA]',
   },
-  ruby: {
-    pageBackground: 'bg-black',
-    backgroundImage:
-      'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/themes/ember/ember-bg.webp',
-    text: 'text-white',
-    avatarBorder: 'border-black',
-    loadingBorder: '#250000',
-    border: 'border-black',
-    secondary: 'bg-red-600/70',
-  },
+  // ruby: {
+  //   pageBackground: 'bg-black',
+  //   backgroundImage:
+  //     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/themes/ember/ember-bg.webp',
+  //   text: 'text-white',
+  //   avatarBorder: 'border-black',
+  //   loadingBorder: '#250000',
+  //   border: 'border-black',
+  //   secondary: 'bg-red-600/70',
+  // },
 };

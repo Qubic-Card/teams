@@ -1,11 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/env';
-  import {
-    inView,
-    linksInView,
-    socialsInView,
-  } from '@lib/stores/intersectingStore';
+  import { inView, isInViewTriggered } from '@lib/stores/intersectingStore';
 
   export let section = 'avatar';
   export let id = 'avatar';
@@ -31,24 +27,13 @@
     if (browser) {
       function handleIntersect(entries, observer) {
         entries.forEach((entry) => {
-          if (section === 'links') {
-            if (entry.intersectionRatio < 0.5) {
-              $socialsInView = true;
-            } else {
-              $socialsInView = false;
-            }
-
-            if (entry.intersectionRatio > 0.5) {
-              $linksInView = true;
-              // $socialsInView = false;
-            } else {
-              // $socialsInView = true;
-              $linksInView = false;
-            }
-          } else if (section === 'bio') {
+          if (section === 'bio') {
             // console.log('bio in view', entry.intersectionRatio);
             if (entry.intersectionRatio === 1) $inView = true;
-            else $inView = false;
+            else {
+              $inView = false;
+              $isInViewTriggered = true;
+            }
           }
 
           // prevRatio = entry.intersectionRatio;

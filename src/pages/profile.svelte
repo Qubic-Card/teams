@@ -21,11 +21,7 @@
   import toNewTab from '@lib/utils/newTab';
   import { selectedTab } from '@lib/stores/selectedTab';
   import IntersectionObserver from '@comp/intersectionObserver.svelte';
-  import {
-    inView,
-    linksInView,
-    socialsInView,
-  } from '@lib/stores/intersectingStore';
+  import { inView } from '@lib/stores/intersectingStore';
 
   export let data;
 
@@ -115,9 +111,8 @@
                   profile.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-12 md:w-16 p-1 text-xs rounded-md ${$currentTheme?.buttonText} {$inView
-                  ? `${$currentTheme?.button}`
-                  : `${$currentTheme?.secondary}`}">Bio</button
+                class="w-12 md:w-16 p-1 text-xs rounded-md {$currentTheme?.buttonText} {$currentTheme?.secondary}"
+                >Bio</button
               >
 
               <button
@@ -125,17 +120,15 @@
                   forScrollToSocialsSection.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-12 md:w-16 p-1 text-xs rounded-md ${$currentTheme?.buttonText} {$socialsInView
-                  ? `${$currentTheme?.button}`
-                  : `${$currentTheme?.secondary}`}">Socials</button
+                class="w-12 md:w-16 p-1 text-xs rounded-md {$currentTheme?.buttonText} {$currentTheme?.secondary}"
+                >Socials</button
               >
 
               <a
                 on:click|preventDefault={scrollIntoView}
                 href={`#links`}
-                class="text-center transition-colors duration-300 w-12 md:w-16 p-1 text-xs rounded-md ${$currentTheme?.buttonText} {$linksInView
-                  ? `${$currentTheme?.button}`
-                  : `${$currentTheme?.secondary}`}">Links</a
+                class="text-center transition-colors duration-300 w-12 md:w-16 p-1 text-xs rounded-md {$currentTheme?.buttonText} {$currentTheme?.secondary}"
+                >Links</a
               >
             </div>
           </div>
