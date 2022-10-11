@@ -60,10 +60,10 @@
     bg={editor === 'team' ? 'bg-neutral-900' : 'bg-neutral-100'}
   >
     <div
-      class="flex justify-between items-center fixed z-50 w-full md:w-[425px] {editor ===
+      class="flex justify-between items-center pt-2 z-50 w-full {editor ===
       'team'
         ? 'bg-neutral-900 text-neutral-100'
-        : 'bg-neutral-100 text-neutral-900'}  pr-8 md:pr-2 h-12"
+        : 'bg-neutral-100 text-neutral-900'} h-12"
     >
       <h1 class="font-bold" bind:this={title}>Select Theme</h1>
       <button on:click={modalHandler}>
@@ -83,7 +83,7 @@
         </svg>
       </button>
     </div>
-    <div class="grid grid-cols-2 grid-flow-row gap-2 pt-16">
+    <div class="grid grid-cols-2 grid-flow-row gap-2 overflow-y-scroll">
       {#each Object.keys(theme) as key}
         <div
           class="flex flex-col {editor == 'team'

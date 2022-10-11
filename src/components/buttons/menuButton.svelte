@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
 
   import supabase from '@lib/db';
+  import { isInViewTriggered } from '@lib/stores/intersectingStore';
   import { user } from '@lib/stores/userStore';
 
   export let editor = 'team';
@@ -31,15 +32,18 @@
   <button
     class="{editor === 'team'
       ? 'text-black bg-gray-100'
-      : 'border hover:bg-black hover:text-white border-black'} p-1 w-full flex justify-center text-xs md:text-sm"
-    on:click={() => goto('/')}
+      : 'border hover:bg-black hover:text-white border-black'} p-1 w-full flex h-8 justify-center items-center text-xs md:text-sm"
+    on:click={() => {
+      $isInViewTriggered = false;
+      goto('/');
+    }}
   >
     Change Editor
   </button>
   <button
     class="{editor === 'team'
       ? 'text-black bg-gray-100'
-      : 'text-white bg-black'} text-xs md:text-sm text-black p-2 w-full"
+      : 'text-white bg-black'} text-xs md:text-sm text-black p-2 w-full h-9"
     on:click={handleLogout}>Log Out</button
   >
 </div>

@@ -184,6 +184,7 @@
         <div class="grid grid-cols-1 gap-2 lg:grid-cols-3 mt-3 mb-6">
           {#each connections as connection}
             <ContactCard
+              {getConnectionsList}
               profile={connection}
               {deleteConnectionHandler}
               {isLoading}
