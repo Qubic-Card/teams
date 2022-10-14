@@ -111,7 +111,7 @@
                   profile.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="p-1 text-xs rounded-md {$currentTheme?.text} {$currentTheme?.secondary}"
+                class="p-1 text-xs rounded-md {$currentTheme.text} {$currentTheme.secondary}"
                 >Bio</button
               >
 
@@ -120,14 +120,14 @@
                   forScrollToSocialsSection.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="p-1 text-xs rounded-md {$currentTheme?.text} {$currentTheme?.secondary}"
+                class="p-1 text-xs rounded-md {$currentTheme.text} {$currentTheme.secondary}"
                 >Socials</button
               >
 
               <a
                 on:click|preventDefault={scrollIntoView}
                 href={`#links`}
-                class="text-center p-1 text-xs rounded-md {$currentTheme?.text} {$currentTheme?.secondary}"
+                class="text-center p-1 text-xs rounded-md {$currentTheme.text} {$currentTheme.secondary}"
                 >Links</a
               >
             </div>
