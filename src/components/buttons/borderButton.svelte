@@ -4,7 +4,7 @@
 
 <button
   on:click
-  class={`outline outline-1 subpixel-antialiased text-xs tracking-wide ${$$props.class}`}
+  class={`outline outline-1 rounded-md subpixel-antialiased text-xs tracking-wide ${$$props.class}`}
   style={`--animation-order: ${order};`}><slot /></button
 >
 

@@ -30,23 +30,22 @@ export const theme = {
     secondary: 'bg-[#656A56]',
   },
   offwhite: {
-    pageBackground: 'bg-white',
-    button: 'bg-blue-600',
-    buttonText: 'text-white',
-    text: 'text-black',
-    avatarBorder: 'border-white',
-    loadingBorder: '#F9F9F9',
+    pageBackground: 'bg-[#F5F5F5]',
+    button: 'bg-white',
+    buttonText: 'text-[#3D3D3D]',
+    text: 'text-[#2C2C2C]',
+    avatarBorder: 'border-[#F5F5F5]',
+    loadingBorder: '#F5F5F5',
     outline: 'outline-[#EBEBEB]',
-    secondary: 'bg-[#FAFAFA]',
+    secondary: 'bg-[#FCFCFC]',
   },
   // ruby: {
   //   pageBackground: 'bg-black',
-  //   backgroundImage:
-  //     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/themes/ember/ember-bg.webp',
+  //   backgroundImage: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/themes/ember/ember-bg.webp',
   //   text: 'text-white',
   //   avatarBorder: 'border-black',
   //   loadingBorder: '#250000',
   //   border: 'border-black',
   //   secondary: 'bg-red-600/70',
-  // },
+  // }
 };

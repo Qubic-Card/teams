@@ -87,7 +87,7 @@
   {#if $user}
     <SelectEditor />
   {:else}
-    <div class="text-white">
+    <div class="text-white bg-cover bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]">
       <div class="flex justify-around items-center h-screen p-8 md:p-24">
         <div
           class="flex flex-col justify-between h-full w-full lg:w-1/2 py-16 px-8 bg-white rounded-2xl text-black"
@@ -97,9 +97,10 @@
               <img
                 src="/qubic-black.svg"
                 alt=""
-                class="w-24 md:w-28 h-24 md:h-28"
+                width="40"
+                height="40"
               />
-              <span class="text-3xl md:text-4xl font-bold">Editor</span>
+              <span class="text-3xl md:text-4xl font-bold ml-2">Editor</span>
             </div>
           </div>
           {#if !isSuccessful}
