@@ -66,7 +66,7 @@
         background-repeat: no-repeat;
         background-position: center;`}
     >
-      <div class={$inView ? '' : 'gap-5 flex'}>
+      <div class={$inView ? '' : 'gap-5 flex items-center justify-center'}>
         <AvatarCard
           theme={$currentTheme}
           class="antialiased z-50 relative appBar flex {$inView
@@ -81,14 +81,14 @@
         {#if !$inView}
           <div
             in:fly|local={{ x: -200, duration: 1000 }}
-            class="flex z-40 flex-col gap-1 pt-2 {$currentTheme?.text}"
+            class="flex z-40 flex-col gap-1 pt-2 w-full pr-4 {$currentTheme?.text}"
           >
             <!-- {currentTheme?.pageBackground} {currentTheme?.text} rounded-md p-1 -->
             <div
-              class="{$currentTheme?.pageBackground} w-3/4 md:w-full p-2 rounded-md"
+              class="{$currentTheme?.pageBackground} p-2 rounded-md"
             >
               <h1
-                class="text-xs md:text-sm font-bold"
+                class="text-xs font-bold"
                 bind:this={forScrollToSocialsSection}
               >
                 {data?.firstname ?? Dummy.firstname}
@@ -105,13 +105,13 @@
                 </h1>
               {/if}
             </div>
-            <div class="flex gap-1 md:gap-2">
+            <div class="grid grid-cols-3 justify-between gap-1">
               <button
                 on:click={() =>
                   profile.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-12 md:w-16 p-1 text-xs rounded-md {$currentTheme?.buttonText} {$currentTheme?.secondary}"
+                class="p-1 text-xs rounded-md {$currentTheme?.text} {$currentTheme?.secondary}"
                 >Bio</button
               >
 
@@ -120,14 +120,14 @@
                   forScrollToSocialsSection.scrollIntoView({
                     behavior: 'smooth',
                   })}
-                class="w-12 md:w-16 p-1 text-xs rounded-md {$currentTheme?.buttonText} {$currentTheme?.secondary}"
+                class="p-1 text-xs rounded-md {$currentTheme?.text} {$currentTheme?.secondary}"
                 >Socials</button
               >
 
               <a
                 on:click|preventDefault={scrollIntoView}
                 href={`#links`}
-                class="text-center transition-colors duration-300 w-12 md:w-16 p-1 text-xs rounded-md {$currentTheme?.buttonText} {$currentTheme?.secondary}"
+                class="text-center p-1 text-xs rounded-md {$currentTheme?.text} {$currentTheme?.secondary}"
                 >Links</a
               >
             </div>

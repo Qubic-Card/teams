@@ -1,19 +1,28 @@
 export const qubicGradient = 'bg-gradient-to-tl from-blue-400 to-indigo-500';
 
 export const socialIcons = {
-  twitter: 'https://img.icons8.com/fluency/96/000000/twitter.png',
-  facebook: 'https://img.icons8.com/fluency/96/000000/facebook-new.png',
-  youtube: 'https://img.icons8.com/fluency/96/000000/youtube-play.png',
-  linkedin: 'https://img.icons8.com/fluency/96/000000/linkedin.png',
-  whatsapp: 'https://img.icons8.com/fluency/96/000000/whatsapp.png',
-  instagram: 'https://img.icons8.com/fluency/96/000000/instagram-new.png',
-  tiktok: 'https://img.icons8.com/fluency/96/000000/tiktok.png',
-  email: 'https://img.icons8.com/fluency/96/000000/new-post.png',
-  phone: 'https://img.icons8.com/fluency/96/000000/phone.png',
-  line: 'https://img.icons8.com/fluency/96/000000/line-me.png',
-  github: 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png',
-  telegram: 'https://img.icons8.com/fluency/48/000000/telegram-app.png',
-  discord: 'https://img.icons8.com/fluency/48/000000/discord-new-logo.png',
+  twitter:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-twitter.svg',
+  facebook:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-facebook.svg',
+  youtube:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-youtube.svg',
+  linkedin:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-linkedin.svg',
+  whatsapp:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-whatsapp.svg',
+  instagram:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-instagram.svg',
+  tiktok:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-tiktok.svg',
+  email:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-mail.png',
+  phone:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-phone.png',
+  line: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-line.svg',
+  github: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/github.svg',
+  telegram: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/telegram.svg',
+  discord: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/discord.svg',
 };
 
 export const cartImage = {
