@@ -28,6 +28,8 @@
   let isLoading = false;
   let loading = false;
   let activationCode = 'QUBICPASS';
+  let isTeamNameChanged = false;
+  let isActivationCodeChanged = false;
 
   const getTeamsRoleMapping = async () => {
     try {
@@ -51,54 +53,64 @@
   };
 
   const updateTeamName = async () => {
-    loading = true;
-    const { error } = await supabase
-      .from('teams')
-      .update({ name: $teamData.name }, { returning: 'minimal' })
-      .eq('id', teamId);
-
-    if (error) {
-      loading = false;
-      toastFailed();
-      console.log(error);
+    if (!isTeamNameChanged) {
+      toastFailed('Team name is not changed');
+      return;
     } else {
-      loading = false;
+      loading = true;
+      const { error } = await supabase
+        .from('teams')
+        .update({ name: $teamData.name }, { returning: 'minimal' })
+        .eq('id', teamId);
 
-      log(
-        `Team Name has been changed to ${$teamData.name} by ${$memberData.fullName}`,
-        'WARN',
-        null,
-        teamId,
-        $memberData.fullName,
-        '',
-        $memberData.id
-      );
+      if (error) {
+        loading = false;
+        toastFailed();
+        console.log(error);
+      } else {
+        loading = false;
 
-      toastSuccess('Changes saved');
+        log(
+          `Team Name has been changed to ${$teamData.name} by ${$memberData.fullName}`,
+          'WARN',
+          null,
+          teamId,
+          $memberData.fullName,
+          '',
+          $memberData.id
+        );
+
+        toastSuccess('Changes saved');
+      }
     }
   };
 
   const addActivationCode = async (newToken) => {
-    isLoading = true;
-    let hash = encryptActivationCode(newToken);
-    const { data, error } = await supabase
-      .from('teams')
-      .update(
-        {
-          team_token: hash,
-        },
-        { returning: 'minimal' }
-      )
-      .eq('id', teamId);
-
-    if (error) {
-      toastFailed('Failed to change activation code');
-      console.log(error);
-      isLoading = false;
+    if (!isActivationCodeChanged) {
+      toastFailed('Activation code is not changed');
+      return;
     } else {
-      toastSuccess('Activation code changed');
-      activationCode = 'QUBICPASS';
-      isLoading = false;
+      isLoading = true;
+      let hash = encryptActivationCode(newToken);
+      const { data, error } = await supabase
+        .from('teams')
+        .update(
+          {
+            team_token: hash,
+          },
+          { returning: 'minimal' }
+        )
+        .eq('id', teamId);
+
+      if (error) {
+        toastFailed('Failed to change activation code');
+        console.log(error);
+        isLoading = false;
+      } else {
+        toastSuccess('Activation code changed');
+        activationCode = 'QUBICPASS';
+        isLoading = false;
+      }
     }
   };
 
@@ -142,12 +154,14 @@
         {#if !permissions.isTeamInactive && !permissions.isTeamWillExpire}
           <TeamName
             {loading}
+            on:input={() => (isTeamNameChanged = true)}
             on:keypress={onTeamNameKeyPress}
             bind:value={$teamData.name}
             on:click={updateTeamName}
           />
           <Activation
             {isLoading}
+            on:input={() => (isActivationCodeChanged = true)}
             bind:value={activationCode}
             on:keypress={onKeyPress}
             on:click={async () => addActivationCode(activationCode)}

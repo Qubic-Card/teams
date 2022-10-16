@@ -1,43 +1,71 @@
 <script>
-  import { Menu, MenuItems, MenuItem } from '@rgossiaux/svelte-headlessui';
-  import DropdownButton from '@comp/buttons/dropdownButton.svelte';
+  import { fade } from 'svelte/transition';
+  import Input from '@comp/input.svelte';
+  import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+  } from '@rgossiaux/svelte-headlessui';
   import { createEventDispatcher } from 'svelte';
 
-  export let value, label, searchMenu;
+  export let value, searchMenu;
+  export let editor = 'basic';
 
   const dispatch = createEventDispatcher();
+  const selectedMenu = (menu) => dispatch('selected', menu.col);
 
-  const selectHandler = (item) => dispatch('select', item);
+  let selected = searchMenu[0];
 </script>
 
-<div class="flex w-full text-xs md:text-sm md:w-auto px-2 md:px-0">
-  <input
-    type="text"
-    class="w-full rounded-md md:w-[300px] lg:w-[400px] h-12 p-2 mb-2 border-2 border-neutral-700
-  text-white bg-neutral-900"
+<div
+  class="flex justify-end items-center gap-2 {editor !== 'basic'
+    ? 'w-1/3 mr-4'
+    : ''}"
+>
+  <Input
+    class={editor === 'basic' ? 'w-full md:w-1/2 lg:w-1/4' : 'w-full'}
     placeholder="Search"
+    title=""
     bind:value
+    inputbg={editor === 'basic' ? 'bg-white' : 'bg-neutral-800'}
+    inputText={editor === 'basic' ? 'text-black' : 'text-white'}
   />
-  <Menu as="div" class="mx-2" let:open>
-    <DropdownButton class="w-28 text-xs md:text-sm" label={label ?? 'Name'} />
+  <Listbox value={selected} on:change={(e) => (selected = e.detail)} let:open>
+    <ListboxButton
+      class="{editor === 'basic'
+        ? 'bg-black'
+        : 'bg-neutral-800 border-2 border-neutral-700'} text-sm text-white rounded-md p-2 w-20"
+      >{selected.label}</ListboxButton
+    >
     {#if open}
-      <div>
-        <MenuItems
-          class={`${$$props.class} z-50 absolute rounded-md flex flex-col bg-neutral-900 -translate-y-5 translate-x-4 shadow-md border border-neutral-700 p-2 w-40`}
+      <div transition:fade|local={{ duration: 100 }}>
+        <ListboxOptions
+          class="absolute {editor === 'basic'
+            ? 'bg-white -translate-x-24'
+            : 'bg-neutral-900 -translate-x-20'} p-2 w-40 mt-2 shadow-md z-50"
         >
-          {#each searchMenu as item}
-            <MenuItem
-              class="flex hover:bg-neutral-700 text-xs md:text-sm px-2 py-2 rounded-md cursor-pointer"
-              on:click={() => {
-                selectHandler(item);
-                open = false;
-              }}
+          {#each searchMenu as menu}
+            <ListboxOption
+              value={menu}
+              on:click={() => selectedMenu(menu)}
+              class={`cursor-pointer my-1 text-sm ${
+                editor === 'basic' ? 'hover:bg-black' : 'hover:bg-neutral-600'
+              } hover:text-white p-2 rounded-md ${
+                selected.label === menu.label
+                  ? `${
+                      editor === 'basic'
+                        ? 'bg-black text-white'
+                        : 'bg-neutral-600 text-white'
+                    }`
+                  : ''
+              }`}
             >
-              {item.name}
-            </MenuItem>
+              {menu.label}
+            </ListboxOption>
           {/each}
-        </MenuItems>
+        </ListboxOptions>
       </div>
     {/if}
-  </Menu>
+  </Listbox>
 </div>

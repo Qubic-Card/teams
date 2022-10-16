@@ -28,7 +28,7 @@
   };
   let teamConnections = [];
   let userConnections = [];
-  let selectedSearchMenu = { name: 'Name', col: 'profileData->>firstname' };
+  let selectedSearchMenu = 'profileData->>firstname';
   let isLoading = false;
   let tabs = 'user';
   let maxPage = 0;
@@ -68,7 +68,7 @@
       .eq('team_id', teamId)
       .order('dateConnected', { ascending: false })
       .range(from, to)
-      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
+      .ilike(selectedSearchMenu, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 
     if (error) {
@@ -94,7 +94,7 @@
       .eq('by', $memberData?.id)
       .order('dateConnected', { ascending: false })
       .range(from, to)
-      .ilike(selectedSearchMenu?.col, `%${searchQuery}%`)
+      .ilike(selectedSearchMenu, `%${searchQuery}%`)
       .order('dateConnected', { ascending: false });
 
     if (error) {
@@ -221,12 +221,12 @@
           </button>
         </div>
         <Search
+          editor="team"
           searchMenu={connectionSearchMenu}
           {loading}
           class="top-40 md:top-24 right-7"
           bind:value={searchQuery}
-          on:select={selectMenu}
-          label={selectedSearchMenu?.name}
+          on:selected={selectMenu}
         />
       </div>
       {#if loading}
@@ -344,12 +344,12 @@
     {:then}
       <div class="flex justify-end items-center mt-1 gap-2">
         <Search
+          editor="team"
           searchMenu={connectionSearchMenu}
           {loading}
           class="top-40 md:top-24 right-7"
           bind:value={searchQuery}
-          on:select={selectMenu}
-          label={selectedSearchMenu?.name}
+          on:selected={selectMenu}
         />
       </div>
       {#if loading}

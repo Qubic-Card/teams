@@ -28,44 +28,48 @@
   };
 
   const addRoleHandler = async () => {
-    loading = true;
-    try {
-      const { data, error } = await supabase
-        .from('team_roles')
-        .insert({
-          role_maps: checkedRole,
-          role_name: roleName,
-          team_id: teamId,
-        })
-        .eq('id', teamId);
+    if (roleName === '') {
+      toastFailed('Role name cannot be empty');
+    } else {
+      loading = true;
+      try {
+        const { data, error } = await supabase
+          .from('team_roles')
+          .insert({
+            role_maps: checkedRole,
+            role_name: roleName,
+            team_id: teamId,
+          })
+          .eq('id', teamId);
 
-      if (error) {
+        if (error) {
+          loading = false;
+          throw new Error(error.message);
+        } else {
+          loading = false;
+          toastSuccess('Role added successfully');
+          toggleModal();
+          $teamRoles = [
+            ...$teamRoles,
+            {
+              role_name: data[0].role_name,
+              role_maps: data[0].role_maps,
+              id: data[0].id,
+            },
+          ];
+          roleName = '';
+          checkedRole = [];
+        }
+      } catch (error) {
         loading = false;
-        throw new Error(error.message);
-      } else {
-        loading = false;
-        toastSuccess('Role added successfully');
-        toggleModal();
-        $teamRoles = [
-          ...$teamRoles,
-          {
-            role_name: data[0].role_name,
-            role_maps: data[0].role_maps,
-            id: data[0].id,
-          },
-        ];
-        roleName = '';
-        checkedRole = [];
+        console.log(error);
       }
-    } catch (error) {
-      loading = false;
-      console.log(error);
     }
   };
 </script>
 
 <button
-  class="p-2 mt-2 md:mt-0 w-40 bg-blue-600 text-white rounded-md"
+  class="p-2 mt-2 md:mt-0 w-40 hover:bg-blue-600/60 bg-blue-600 text-white rounded-md"
   on:click={toggleModal}
 >
   + Add new role
@@ -93,12 +97,12 @@
       bg="bg-neutral-800"
     />
     <button
-      disabled={roleName === '' || loading}
-      class="flex gap-2 justify-center items-center p-4 w-full bg-blue-600 text-white rounded-lg disabled:bg-blue-600/60"
+      disabled={loading}
+      class="flex gap-2 justify-center items-center p-4 w-full bg-blue-600 text-white rounded-lg hover:bg-blue-600/60 disabled:bg-blue-600/60"
       on:click={async () => await addRoleHandler()}
     >
       {#if loading}
-        <Spinner class="w-7 h-7" />
+        <Spinner bg="#1f4496" />
       {/if}
 
       Add role

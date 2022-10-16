@@ -4,7 +4,6 @@
   import Input from '@comp/input.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import TeamEditorSkeleton from '@comp/skeleton/teamEditorSkeleton.svelte';
 
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
@@ -143,8 +142,8 @@
   const addLink = () => {
     $teamLinks.length < 5
       ? teamLinks.set([
-          ...$teamLinks,
           { title: 'My Website', link: 'https://qubic.id', isActive: true },
+          ...$teamLinks,
         ])
       : toastFailed('Only 5 link allowed for free members');
   };
@@ -165,28 +164,6 @@
     }
   };
 
-  // const getTeamsDetail = async () => {
-  //   const { data, error } = await supabase
-  //     .from('teams')
-  //     .select('*')
-  //     .eq('id', teamId);
-
-  //   if (error) console.log(error);
-
-  //   if (data) {
-  //     const team = data[0].metadata;
-  //     $teamData = { ...team };
-  //     $teamSocials = team['socials'];
-  //     $teamLinks = team['links'];
-  //     // teamId = team['id'];
-  //     $teamSocials.map((social) => {
-  //       if (social.type === 'phone') $teamData.phone = social.data;
-  //       if (social.type === 'email') $teamData.email = social.data;
-  //     });
-  //   }
-  //   return data;
-  // };
-
   const setDisplayPersonal = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
@@ -195,13 +172,14 @@
         { returning: 'minimal' }
       )
       .eq('team_member_id', memberId)
-      .eq('card_id', history.state.id);
+      .eq('card_id', history.state.card);
 
     if (error) {
       toastFailed();
       console.log(error);
+    } else {
+      toastSuccess('Changes saved');
     }
-    if (data) toastSuccess('Changes saved');
   };
 </script>
 
@@ -269,11 +247,11 @@
         in:fade|local={{ duration: 300 }}
         disabled={isLoading}
         type="button"
-        class="bg-blue-600 p-2 w-1/2 text-white rounded-md h-12 shadow-md flex justify-center items-center gap-2"
+        class="bg-blue-600 p-2 w-1/2 text-white rounded-md h-12 disabled:bg-blue-600/60 shadow-md flex justify-center items-center gap-2"
         on:click={async () => await handleAddFile()}
       >
         {#if isLoading}
-          <Spinner class="w-6 h-6" />
+          <Spinner bg="#1f4496" />
         {/if}
         Save
       </button>
@@ -479,10 +457,14 @@
                             ? 'support@qubic.id'
                             : item.type === 'phone'
                             ? '+62 / 081'
-                            : item.type === 'facebook'
+                            : item.type === 'facebook' ||
+                              item.type === 'telegram' ||
+                              item.type === 'github'
                             ? 'Username'
                             : item.type === 'line'
                             ? 'Line ID'
+                            : item.type === 'discord'
+                            ? 'User ID'
                             : item.type}
                           bind:value={$teamSocials[i].data}
                           on:change={handleSave}
@@ -622,7 +604,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- Link Editor -->
-                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-20">
+                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img

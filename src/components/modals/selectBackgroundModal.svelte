@@ -82,6 +82,7 @@
     showModal = false;
     searchQuery = '';
 
+    dispatch('pick', 'background');
     toggleModal();
   };
 
@@ -199,11 +200,11 @@
           in:fade|local={{ duration: 300 }}
           disabled={isLoading}
           type="button"
-          class="bg-blue-600 p-2 w-1/2 text-white rounded-md h-12 shadow-md flex justify-center items-center gap-2"
+          class="bg-blue-600 p-2 w-1/2 text-white rounded-md disabled:bg-blue-600/60 h-12 shadow-md flex justify-center items-center gap-2"
           on:click={async () => await handleAddFile()}
         >
           {#if isLoading}
-            <Spinner class="w-6 h-6" />
+            <Spinner bg="#1f4496" />
           {/if}
           Save
         </button>

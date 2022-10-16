@@ -251,8 +251,8 @@
     }}
   >
     {#if isLoading}
-      <Spinner class="w-8 h-8" />
-    {/if} <span>Create record -></span></button
+      <Spinner bg="#1f4496" />
+    {/if} <span>Create record &#8594;</span></button
   >
 </div>
 <div

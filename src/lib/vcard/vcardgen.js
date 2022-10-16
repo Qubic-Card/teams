@@ -38,6 +38,69 @@ export const genvcard = async (prop, team, dateConnected) => {
       new Date(new Date().setUTCHours(7)).toDateString().slice(4);
   }
 
+  if (team?.display_personal || !team) {
+    if (prop.company) vCard.organization = prop.company;
+    if (prop.job) vCard.title = prop.job;
+    if (prop.address) {
+      vCard.workAddress.label = 'Work Address';
+      vCard.workAddress.street = prop.address;
+    }
+
+    if (prop.socials) {
+      prop.socials.map((e, i) => {
+        if (e.isActive) {
+          if (e.type.includes('whatsapp'))
+            wa = e.data.startsWith('+') ? e.data : '+' + e.data;
+
+          if (
+            (e.type.includes('phone') && e.data.length > 0) ||
+            e.type.includes('email')
+          ) {
+            return '';
+          }
+
+          return (vCard.socialUrls[e.type + i] = e.data);
+        }
+      });
+
+      vCard.email = email;
+
+      let phone = prop.socials
+        .filter((s) => s.type.includes('phone') && s.isActive)
+        .map((s) => {
+          s.data = s.data;
+          if (s.data.startsWith('62')) s.data = '+' + s.data;
+          if (s.data.startsWith('08')) {
+            s.data = s.data.slice(1);
+            s.data = '+62' + s.data;
+          }
+
+          return s.data;
+        });
+
+      if (phone.length > 0) {
+        phone.forEach((p) => {
+          if (wa !== p) {
+            if (wa) {
+              vCard.cellPhone = phone.concat(wa);
+            } else vCard.cellPhone = phone.length > 1 ? phone : p;
+          } else {
+            vCard.cellPhone = phone;
+          }
+        });
+      } else {
+        if (wa) vCard.cellPhone = wa;
+      }
+    }
+
+    if (prop.links) {
+      prop.links.map((e, i) => {
+        if (e.isActive && e?.link?.length > 0)
+          return (vCard.socialUrls[e.title + i] = e.link);
+      });
+    }
+  }
+
   //set URL where the vCard can be found
   vCard.source = 'https://qubic.id';
   //set email addresses

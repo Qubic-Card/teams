@@ -10,6 +10,7 @@
     <div class="flex flex-col gap-2 w-full md:w-auto">
       <h1 class="font-bold text-sm md:text-xl">Activation Code</h1>
       <input
+        on:input
         on:keypress
         type="password"
         bind:value
@@ -18,10 +19,11 @@
       />
     </div>
     <button
-      class="bg-blue-600 text-white rounded-md p-2 w-full mt-2 md:mt-0 md:w-40 flex justify-center items-center gap-2 self-end"
+      disabled={isLoading}
+      class="bg-blue-600 text-white hover:bg-blue-600/60 disabled:bg-blue-600/60 rounded-md p-2 w-full mt-2 md:mt-0 md:w-40 flex justify-center items-center gap-2 self-end"
       on:click
       >{#if isLoading}
-        <Spinner class="w-4 h-4" />
+        <Spinner bg="#1f4496" size={10} />
       {/if} Submit</button
     >
   </div>

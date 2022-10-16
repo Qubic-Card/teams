@@ -26,12 +26,25 @@
     showModal ? 'translate-x-0' : 'translate-x-[1000px]'
   } transition-all duration-300 ease-in-out min-w-full md:min-w-[360px] flex flex-col h-full md:h-screen p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto`}
 >
-  <p
+  <button
     class="self-end text-lg cursor-pointer block md:hidden mt-12 md:mt-3"
     on:click={modalHandler}
   >
-    x
-  </p>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-6 h-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
+  </button>
 
   <div class="flex w-full justify-between items-center text-white md:mt-4">
     <div class="flex flex-col w-full">
