@@ -50,12 +50,12 @@
   };
 
   const redirect = async () => {
-    if (await checkIsActiveMember()) {
-      if ($user && $page.url.pathname === '/') goto('/');
-      // if ($user && $teams.isTeamMember === false) goto('/basic');
-    } else {
-      $user = null;
-    }
+    // if (await checkIsActiveMember()) {
+    //   if ($user && $page.url.pathname === '/') goto('/');
+    //   // if ($user && $teams.isTeamMember === false) goto('/basic');
+    // } else {
+    //   $user = null;
+    // }
 
     if (!$user) goto('/');
   };
