@@ -47,7 +47,7 @@
         isSuccessful = true;
         if ($teams.isTeamMember === false) goto('/basic');
       } else {
-        toastFailed('You are not a member of any team.');
+        // toastFailed('You are not a member of any team.');
         loading = false;
         isSuccessful = false;
         // location.reload();
