@@ -23,3 +23,52 @@ export const teamData = writable({
     background: '',
   },
 });
+
+export const basicProfile = writable({
+  firstname: '',
+  lastname: '',
+  firstnameBusiness: '',
+  lastnameBusiness: '',
+  job: '',
+  jobBusiness: '',
+  company: '',
+  companyBusiness: '',
+  avatar: '',
+  address: '',
+  addressBusiness: '',
+  socials: [],
+  links: [],
+  isShowMetaImage: null,
+  isBusiness: false,
+  design: {
+    theme: 'dark',
+    background: '',
+    backgroundBusiness: '',
+  },
+});
+
+export const basicPersonalVcard = writable({
+  firstname: '',
+  lastname: '',
+  address: '',
+  company: '',
+  job: '',
+  avatar: '',
+  design: {},
+  socials: [],
+  links: [],
+  isBusiness: false,
+});
+
+export const basicBusinessVcard = writable({
+  firstname: '',
+  lastname: '',
+  address: '',
+  company: '',
+  job: '',
+  avatar: '',
+  design: {},
+  socials: [],
+  links: [],
+  isBusiness: false,
+});

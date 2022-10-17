@@ -1,7 +1,7 @@
 <script>
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
-  import { toastSuccess } from '@lib/utils/toast';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
@@ -17,6 +17,51 @@
   const toWhatsApp = () =>
     window.open('https://wa.me/628113087599', '_blank').focus();
 
+  const uniqueByKeepFirst = (a, key) => {
+    let seen = new Set();
+    return a?.filter((item) => {
+      let k = key(item);
+      return seen.has(k) ? false : seen.add(k);
+    });
+  };
+
+  const updateBasicProfile = async () => {
+    if (teamMembersProfile) {
+      teamMembersProfile.forEach(async (member) => {
+        const { data, error } = await supabase
+          .from('profile')
+          .update(
+            {
+              uid: member.team_member_id.uid,
+              metadata: {
+                avatar: member?.team_member_id?.team_profile?.avatar,
+                address: member?.team_member_id?.team_profile?.address,
+                company: member?.team_member_id?.team_profile?.company,
+                design: member?.team_member_id?.team_profile?.design,
+                firstname: member?.team_member_id?.team_profile?.firstname,
+                lastname: member?.team_member_id?.team_profile?.lastname,
+                job: member?.team_member_id?.team_profile?.job,
+                isShowMetaImage:
+                  member?.team_member_id?.team_profile?.isShowMetaImage,
+                socials: uniqueByKeepFirst(
+                  member?.team_member_id?.team_profile?.socials,
+                  (social) => social.type
+                ),
+                links: member?.team_member_id?.team_profile?.links,
+              },
+            },
+            { returning: 'minimal' }
+          )
+          .eq('uid', member.team_member_id.uid);
+
+        if (error) {
+          console.log(error);
+          toastFailed('Something went wrong, please contact us');
+        }
+      });
+    }
+  };
+
   const createCardConnection = async (member) => {
     const { data, error } = await supabase.from('card_connection').insert(
       {
@@ -26,7 +71,10 @@
       { returning: 'minimal' }
     );
 
-    if (error) console.log(error);
+    if (error) {
+      console.log(error);
+      toastFailed('Something went wrong, please contact us');
+    }
   };
 
   // 39ba7789-537c-4b0f-a8a7-c8a8345838f3 1
@@ -39,7 +87,10 @@
       .delete()
       .eq('card_id', userCardId);
 
-    if (error) console.log(error);
+    if (error) {
+      console.log(error);
+      toastFailed('Something went wrong, please contact us');
+    }
   };
 
   const cardConnectionHandler = async () => {
@@ -57,17 +108,17 @@
           ? (alreadyActivatedMemberBasic = data)
           : (neverActivatedMemberBasic = member);
 
-        if (alreadyActivatedMemberBasic) {
-          alreadyActivatedMemberBasic.filter(async (user) => {
-            if (
-              user.card_id === member.card_id &&
-              user.uid !== member.team_member_id.uid
-            ) {
-              await deleteCardConnection(user.card_id);
-              await createCardConnection(member);
-            }
-          });
-        }
+        // if (alreadyActivatedMemberBasic) {
+        //   alreadyActivatedMemberBasic.filter(async (user) => {
+        //     if (
+        //       user.card_id === member.card_id &&
+        //       user.uid !== member.team_member_id.uid
+        //     ) {
+        //       await deleteCardConnection(user.card_id);
+        //       await createCardConnection(member);
+        //     }
+        //   });
+        // }
 
         if (neverActivatedMemberBasic) {
           await createCardConnection(neverActivatedMemberBasic);
@@ -111,7 +162,10 @@
       )
       .match({ team_id: teamId });
 
-    if (error) console.log(error);
+    if (error) {
+      console.log(error);
+      toastFailed('Something went wrong, please contact us');
+    }
   };
 
   const setNullTeamMemberUid = async () => {
@@ -124,7 +178,11 @@
         { returning: 'minimal' }
       )
       .match({ team_id: teamId });
-    if (error) console.log(error);
+
+    if (error) {
+      console.log(error);
+      toastFailed('Something went wrong, please contact us');
+    }
   };
 
   const transferBulkCardHandler = async () => {
@@ -132,9 +190,14 @@
     await setNullTeamMemberUid();
     await changeCardMode();
     await cardConnectionHandler();
+    await updateBasicProfile();
     toastSuccess('All cards transferred to basic');
-    setTimeout(() => (isLoading = false), 4000);
+    setTimeout(async () => {
+      isLoading = false;
+      await handleLogout();
+    }, 4000);
     setInterval(() => (isSuccess = true), 3000);
+    showModal = false;
   };
 
   onMount(async () => await getMemberData());
@@ -149,11 +212,7 @@
   buttonLabel="Yes, i am sure."
   {showModal}
   {toggleModal}
-  on:action={async () => {
-    await transferBulkCardHandler();
-    setTimeout(async () => await handleLogout(), 4000);
-    showModal = false;
-  }}
+  on:action={async () => await transferBulkCardHandler()}
 />
 
 <div

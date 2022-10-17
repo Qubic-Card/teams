@@ -128,8 +128,17 @@
               } rounded-lg`}
             />
           </div>
-          <h1 class={`mt-2 ${$profileTheme === key ? 'font-bold' : ''}`}>
-            {key.charAt(0).toUpperCase() + key.slice(1)}
+          <h1
+            class="mt-2 {$profileTheme === key ? 'font-bold' : ''} {editor ==
+            'team'
+              ? 'text-white'
+              : 'text-black'}"
+          >
+            {#if key === 'offwhite'}
+              Off White
+            {:else}
+              {key.charAt(0).toUpperCase() + key.slice(1)}
+            {/if}
           </h1>
         </div>
       {/each}

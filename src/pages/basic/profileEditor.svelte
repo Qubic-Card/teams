@@ -41,6 +41,11 @@
     handleDeleteLink,
   } from '@lib/basic/editor';
   import { theme } from '@lib/profileTheme';
+  import {
+    basicBusinessVcard,
+    basicPersonalVcard,
+    basicProfile,
+  } from '@lib/stores/profileData';
 
   // Register the plugins
   registerPlugin(
@@ -59,28 +64,7 @@
   let isBannerOpen = false;
   let fileName;
   let image;
-  let profileData = {
-    firstname: '',
-    lastname: '',
-    firstnameBusiness: '',
-    lastnameBusiness: '',
-    job: '',
-    jobBusiness: '',
-    company: '',
-    companyBusiness: '',
-    avatar: '',
-    address: '',
-    addressBusiness: '',
-    socials: $basicSocials,
-    links: $basicLinks,
-    isShowMetaImage: null,
-    isBusiness: false,
-    design: {
-      theme: 'dark',
-      background: '',
-      backgroundBusiness: '',
-    },
-  };
+
   let profileId = null;
   let query = 'background';
   let url;
@@ -103,16 +87,16 @@
 
   const updateData = (e) => {
     if (e.detail.isBanner) {
-      if (profileData.isBusiness) {
-        profileData.design.backgroundBusiness = e.detail.url;
+      if ($basicProfile.isBusiness) {
+        $basicProfile.design.backgroundBusiness = e.detail.url;
       } else {
-        profileData.design.background = e.detail.url;
+        $basicProfile.design.background = e.detail.url;
       }
       query = 'background';
       fileName = '';
       image = '';
     } else {
-      profileData.avatar = e.detail.url;
+      $basicProfile.avatar = e.detail.url;
     }
 
     isOpen = false;
@@ -153,12 +137,47 @@
 
     if (data) {
       const profile = data[0]['metadata'];
-      profileData = { ...profile };
+      // profileData = { ...profile };
+      $basicProfile = { ...profile };
       $basicSocials = profile['socials'];
       $basicLinks = profile['links'];
       $basicProfileTheme = profile['design']['theme'];
       $basicCurrentTheme = theme[profile['design']['theme']];
       profileId = data[0]['id'];
+
+      $basicPersonalVcard = {
+        firstname: $basicProfile?.firstname ?? '',
+        lastname: $basicProfile?.lastname ?? '',
+        address: $basicProfile?.address ?? '',
+        company: $basicProfile?.company ?? '',
+        job: $basicProfile?.job ?? '',
+        avatar: $basicProfile?.avatar,
+        design: $basicProfile?.design,
+        socials: $basicProfile?.socials?.filter(
+          (social) => !social.type.includes('business')
+        ),
+        links: $basicProfile?.links?.filter(
+          (link) => link.isPersonal !== false
+        ),
+        isBusiness: $basicProfile?.isBusiness,
+      };
+
+      $basicBusinessVcard = {
+        firstname: $basicProfile?.firstnameBusiness ?? '',
+        lastname: $basicProfile?.lastnameBusiness ?? '',
+        address: $basicProfile?.addressBusiness ?? '',
+        company: $basicProfile?.companyBusiness ?? '',
+        job: $basicProfile?.jobBusiness ?? '',
+        avatar: $basicProfile?.avatar ?? '',
+        design: $basicProfile?.design,
+        socials: $basicProfile?.socials?.filter((social) =>
+          social.type.includes('business')
+        ),
+        links: $basicProfile?.links?.filter(
+          (link) => link.isPersonal === false
+        ),
+        isBusiness: $basicProfile?.isBusiness,
+      };
     }
     if (error) console.log(error);
     setTimeout(() => {}, 200);
@@ -166,13 +185,43 @@
   };
 
   const handleSave = async (isNeedToast = true) => {
-    profileData.socials = $basicSocials;
-    profileData.links = $basicLinks;
-    profileData.design.theme = $basicProfileTheme;
+    $basicProfile.socials = $basicSocials;
+    $basicProfile.links = $basicLinks;
+    $basicProfile.design.theme = $basicProfileTheme;
+
+    $basicPersonalVcard = {
+      firstname: $basicProfile?.firstname ?? '',
+      lastname: $basicProfile?.lastname ?? '',
+      address: $basicProfile?.address ?? '',
+      company: $basicProfile?.company ?? '',
+      job: $basicProfile?.job ?? '',
+      avatar: $basicProfile?.avatar,
+      design: $basicProfile?.design,
+      socials: $basicProfile?.socials?.filter(
+        (social) => !social.type.includes('business')
+      ),
+      links: $basicProfile?.links?.filter((link) => link.isPersonal !== false),
+      isBusiness: $basicProfile?.isBusiness,
+    };
+
+    $basicBusinessVcard = {
+      firstname: $basicProfile?.firstnameBusiness ?? '',
+      lastname: $basicProfile?.lastnameBusiness ?? '',
+      address: $basicProfile?.addressBusiness ?? '',
+      company: $basicProfile?.companyBusiness ?? '',
+      job: $basicProfile?.jobBusiness ?? '',
+      avatar: $basicProfile?.avatar ?? '',
+      design: $basicProfile?.design,
+      socials: $basicProfile?.socials?.filter((social) =>
+        social.type.includes('business')
+      ),
+      links: $basicProfile?.links?.filter((link) => link.isPersonal === false),
+      isBusiness: $basicProfile?.isBusiness,
+    };
 
     const { error } = await supabase
       .from('profile')
-      .update({ metadata: profileData }, { returning: 'minimal' })
+      .update({ metadata: $basicProfile }, { returning: 'minimal' })
       .eq('uid', $user.id);
     if (error) {
       toastFailed();
@@ -197,15 +246,15 @@
     );
 
     if (isPersonal) {
-      profileData.isBusiness = false;
+      $basicProfile.isBusiness = false;
     } else {
-      profileData.isBusiness = true;
+      $basicProfile.isBusiness = true;
 
-      if (!profileData.firstnameBusiness)
-        profileData.firstnameBusiness = profileData.firstname;
+      if (!$basicProfile.firstnameBusiness)
+        $basicProfile.firstnameBusiness = $basicProfile.firstname;
 
-      if (!profileData.lastnameBusiness)
-        profileData.lastnameBusiness = profileData.lastname;
+      if (!$basicProfile.lastnameBusiness)
+        $basicProfile.lastnameBusiness = $basicProfile.lastname;
 
       if (filteredLinksBusiness.length === 0) {
         filteredLinksBusiness = [
@@ -223,13 +272,11 @@
     $basicLinks = [...filteredLinksBusiness, ...filteredLinksPersonal];
     toastSuccess(
       `Switched to ${
-        profileData.isBusiness ? 'Business Mode' : 'Personal Mode'
+        $basicProfile.isBusiness ? 'Business Mode' : 'Personal Mode'
       }`
     );
     await handleSave(false);
   };
-
-  // $: getProfile();
 </script>
 
 <div class="min-h-screen bg-gray-100 flex justify-center">
@@ -244,16 +291,16 @@
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           <div class="flex mb-2 border-b-2 border-neutral-300">
             <button
-              disabled={!profileData.isBusiness}
+              disabled={!$basicProfile.isBusiness}
               on:click={async () => await switchProfile()}
               class={`${
-                !profileData.isBusiness ? 'border-neutral-700 border-b-2' : ''
+                !$basicProfile.isBusiness ? 'border-neutral-700 border-b-2' : ''
               } w-1/2 p-2`}>Personal Mode</button
             >
             <button
-              disabled={profileData.isBusiness}
+              disabled={$basicProfile.isBusiness}
               class={`${
-                profileData.isBusiness ? 'border-neutral-700 border-b-2' : ''
+                $basicProfile.isBusiness ? 'border-neutral-700 border-b-2' : ''
               } w-1/2 p-2`}
               on:click={async () => await switchProfile(false)}
               >Business Mode</button
@@ -285,13 +332,13 @@
             <TabPanels class="mt-4 bg-white rounded-lg">
               <TabPanel>
                 <div class="border-b-zinc-300 border rounded-lg p-4 mb-4">
-                  {#if profileData.isBusiness}
+                  {#if $basicProfile.isBusiness}
                     <div class="px-3 bg-white grid grid-cols-2 space-x-5">
                       <Input
                         on:change={handleSave}
                         placeholder="Hello"
                         title="First Name"
-                        bind:value={profileData.firstnameBusiness}
+                        bind:value={$basicProfile.firstnameBusiness}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -299,7 +346,7 @@
                         on:change={handleSave}
                         placeholder="World"
                         title="Last Name"
-                        bind:value={profileData.lastnameBusiness}
+                        bind:value={$basicProfile.lastnameBusiness}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -310,7 +357,7 @@
                         on:change={handleSave}
                         placeholder="example company"
                         title="Company"
-                        bind:value={profileData.companyBusiness}
+                        bind:value={$basicProfile.companyBusiness}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -318,7 +365,7 @@
                         on:change={handleSave}
                         placeholder="Hiring Manager"
                         title="Job"
-                        bind:value={profileData.jobBusiness}
+                        bind:value={$basicProfile.jobBusiness}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -326,7 +373,7 @@
                         on:change={handleSave}
                         placeholder="Address"
                         title="Address"
-                        bind:value={profileData.addressBusiness}
+                        bind:value={$basicProfile.addressBusiness}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -337,7 +384,7 @@
                         on:change={handleSave}
                         placeholder="Hello"
                         title="First Name"
-                        bind:value={profileData.firstname}
+                        bind:value={$basicProfile.firstname}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -345,7 +392,7 @@
                         on:change={handleSave}
                         placeholder="World"
                         title="Last Name"
-                        bind:value={profileData.lastname}
+                        bind:value={$basicProfile.lastname}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -356,7 +403,7 @@
                         on:change={handleSave}
                         placeholder="example company"
                         title="Company"
-                        bind:value={profileData.company}
+                        bind:value={$basicProfile.company}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -364,7 +411,7 @@
                         on:change={handleSave}
                         placeholder="Hiring Manager"
                         title="Job"
-                        bind:value={profileData.job}
+                        bind:value={$basicProfile.job}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -372,7 +419,7 @@
                         on:change={handleSave}
                         placeholder="Address"
                         title="Address"
-                        bind:value={profileData.address}
+                        bind:value={$basicProfile.address}
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
@@ -428,9 +475,9 @@
                 <div class="border mb-4 rounded-lg p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg">Socials</h1>
-                    <AddSocialsModal {profileData} />
+                    <AddSocialsModal profileData={$basicProfile} />
                   </div>
-                  {#if profileData.isBusiness}
+                  {#if $basicProfile.isBusiness}
                     {#if $basicSocials.filter( (social) => social.type.includes('business') ).length > 0}
                       {#each $basicSocials.filter( (social) => social.type.includes('business') ) as item, i}
                         <InputSocialsEditor
@@ -450,7 +497,7 @@
                         No socials added yet
                       </div>
                     {/if}
-                  {:else if !profileData.isBusiness}
+                  {:else if !$basicProfile.isBusiness}
                     {#if $basicSocials.filter((social) => !social.type.includes('business')).length > 0}
                       {#each $basicSocials.filter((social) => !social.type.includes('business')) as item, i}
                         <InputSocialsEditor
@@ -479,7 +526,7 @@
                     <img
                       class="h-10 w-10 cursor-pointer"
                       on:click={() =>
-                        addLink(profileData.isBusiness, $basicLinks)}
+                        addLink($basicProfile.isBusiness, $basicLinks)}
                       src="https://img.icons8.com/external-royyan-wijaya-detailed-outline-royyan-wijaya/48/000000/external-add-interface-royyan-wijaya-detailed-outline-royyan-wijaya.png"
                       alt="add"
                     />
@@ -489,17 +536,17 @@
                     class="flex items-center cursor-pointer gap-2 ml-2"
                   >
                     <input
-                      bind:checked={profileData.isShowMetaImage}
+                      bind:checked={$basicProfile.isShowMetaImage}
                       id="links"
                       type="checkbox"
                       class="w-5 h-5 cursor-pointer disabled:cursor-default"
-                      value={profileData?.isShowMetaImage}
+                      value={$basicProfile?.isShowMetaImage}
                       on:change={handleSave}
                     />
 
                     <p>Show URL image if available.</p>
                   </label>
-                  {#if profileData.isBusiness}
+                  {#if $basicProfile.isBusiness}
                     {#each $basicLinks.filter((link) => link.isPersonal === false) as item, i}
                       <InputLinksEditor
                         {item}
@@ -530,12 +577,7 @@
         <div
           class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
         >
-          <Profile
-            isShowMetaImage={profileData.isShowMetaImage}
-            class="min-h-screen rounded-3xl border-8 border-black"
-            data={profileData}
-            id={profileId}
-          />
+          <Profile class="min-h-screen rounded-3xl border-8 border-black" />
         </div>
       </div>
     </div>
