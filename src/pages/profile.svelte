@@ -21,7 +21,8 @@
   import toNewTab from '@lib/utils/newTab';
   import { selectedTab } from '@lib/stores/selectedTab';
   import IntersectionObserver from '@comp/intersectionObserver.svelte';
-  import { inView } from '@lib/stores/intersectingStore';
+  import { inView, isInViewTriggered } from '@lib/stores/intersectingStore';
+  import { onMount } from 'svelte';
 
   export let data;
 
@@ -40,6 +41,10 @@
       behavior: 'smooth',
     });
   }
+
+  // onMount(() => {
+  //   $isInViewTriggered = false;
+  // });
 
   let showSocialsPersonal = true;
   let showSocialsTeam = true;
@@ -84,9 +89,7 @@
             class="flex z-40 flex-col gap-1 pt-2 w-full pr-4 {$currentTheme?.text}"
           >
             <!-- {currentTheme?.pageBackground} {currentTheme?.text} rounded-md p-1 -->
-            <div
-              class="{$currentTheme?.pageBackground} p-2 rounded-md"
-            >
+            <div class="{$currentTheme?.pageBackground} p-2 rounded-md">
               <h1
                 class="text-xs font-bold"
                 bind:this={forScrollToSocialsSection}
@@ -197,8 +200,7 @@
                   ? 'border-neutral-900'
                   : 'border-neutral-300'
               }`
-        } p-2 w-1/2 ${$currentTheme.text} text-xs md:text-sm text-white`}
-        >Team</button
+        } p-2 w-1/2 ${$currentTheme.text} text-xs md:text-sm`}>Team</button
       >
       <button
         on:click={() => ($selectedTab = 'personal')}
@@ -216,8 +218,7 @@
                   ? 'border-neutral-900'
                   : 'border-neutral-300'
               }`
-        } p-2 w-1/2 ${$currentTheme.text} text-xs md:text-sm text-white`}
-        >Personal</button
+        } p-2 w-1/2 ${$currentTheme.text} text-xs md:text-sm`}>Personal</button
       >
     {/if}
   </div>

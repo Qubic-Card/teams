@@ -41,12 +41,14 @@
 </script>
 
 {#await getTeamsList() then name}
-  <section class="text-white overflow-hidden">
+  <section
+    class="text-white overflow-hidden bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
+  >
     <div
       class="flex justify-around items-center h-screen p-10 md:p-24 text-black"
     >
       <div
-        class="flex flex-col h-full w-full p-4 lg:w-1/2 py-12 md:py-16  gap-2 bg-white rounded-2xl"
+        class="flex flex-col h-full w-full p-4 2xl:w-1/2 py-12 md:py-16 gap-2 bg-white rounded-2xl"
         in:fly|local={{ y: 5000, duration: 1000 }}
       >
         <h1 class="text-xl md:text-2xl font-bold mb-4">Select Editor</h1>

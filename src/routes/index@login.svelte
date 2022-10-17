@@ -16,22 +16,6 @@
   let isSuccessful = false;
   let isForgotPassword = false;
 
-  const checkIsActiveMember = async (uid) => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('uid')
-      .eq('uid', uid);
-
-    if (error) console.log(error);
-    if (data) {
-      if (data.length > 0) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  };
-
   const handleLogin = async () => {
     try {
       loading = true;
@@ -39,18 +23,11 @@
         email: email,
         password: password,
       });
-      if (error) throw error;
-
-      if (await checkIsActiveMember(user.id)) {
-        // toastSuccess('Hello!');
+      if (error) {
+        throw error;
+      } else {
         loading = false;
         isSuccessful = true;
-        if ($teams.isTeamMember === false) goto('/basic');
-      } else {
-        // toastFailed('You are not a member of any team.');
-        loading = false;
-        isSuccessful = false;
-        // location.reload();
       }
     } catch (error) {
       console.log(error);
@@ -87,19 +64,16 @@
   {#if $user}
     <SelectEditor />
   {:else}
-    <div class="text-white bg-cover bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]">
-      <div class="flex justify-around items-center h-screen p-8 md:p-24">
+    <div
+      class="text-white bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
+    >
+      <div class="flex justify-start items-center h-screen p-8 md:p-24">
         <div
-          class="flex flex-col justify-between h-full w-full lg:w-1/2 py-16 px-8 bg-white rounded-2xl text-black"
+          class="flex flex-col justify-between h-full w-full 2xl:w-1/2 py-16 px-8 bg-white rounded-2xl text-black"
         >
           <div class="text-xl">
             <div class="flex items-center">
-              <img
-                src="/qubic-black.svg"
-                alt=""
-                width="40"
-                height="40"
-              />
+              <img src="/qubic-black.svg" alt="" width="40" height="40" />
               <span class="text-3xl md:text-4xl font-bold ml-2">Editor</span>
             </div>
           </div>
