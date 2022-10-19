@@ -9,9 +9,7 @@
   let btnText = editor === 'team' ? 'text-white' : 'text-black';
   let btnActive = editor === 'team' ? 'text-black' : 'text-white';
   let btnDisabled =
-    editor === 'team'
-      ? 'text-neutral-200 bg-black/50'
-      : 'bg-black/80 text-white';
+    editor === 'team' ? 'text-neutral-200 bg-black' : 'bg-black/50 text-black';
 </script>
 
 {#if maxPage > 0}

@@ -575,7 +575,7 @@
           <SelectTheme {handleSave} editor="basic" />
         </div>
         <div
-          class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll mb-10"
+          class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll snap-container mb-10"
         >
           <Profile class="min-h-screen rounded-3xl border-8 border-black" />
         </div>
@@ -598,22 +598,22 @@
   @import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
   /* width */
-  ::-webkit-scrollbar {
-    display: none;
+  .snap-container::-webkit-scrollbar {
+    width: 0px;
   }
 
   /* Track */
-  ::-webkit-scrollbar-track {
+  .snap-container::-webkit-scrollbar-track {
     background: transparent;
   }
 
   /* Handle */
-  ::-webkit-scrollbar-thumb {
+  .snap-container::-webkit-scrollbar-thumb {
     background: rgb(218, 218, 218);
   }
 
   /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+  .snap-container::-webkit-scrollbar-thumb:hover {
     background: rgb(163, 163, 163);
   }
 </style>

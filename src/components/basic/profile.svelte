@@ -47,6 +47,7 @@
 </script>
 
 <div
+  on:scroll={(e) => console.log(e.target)}
   bind:this={profile}
   class={`${$basicCurrentTheme?.pageBackground} ${$$props.class} relative transition-colors duration-500 ease-in text-sm`}
   class:bg-image-profile={$basicCurrentTheme?.backgroundImage}
@@ -218,100 +219,86 @@
 
     <!-- BASIC SOCIALS -->
 
-    <IntersectionObserver id="socials" section="socials">
-      <div
-        class="my-4 overflow-clip rounded-md outline-1 outline {$basicCurrentTheme?.outline}"
-      >
-        <div class="flex flex-row px-2 py-3 items-center justify-center">
-          <p class="text-xs font-medium flex-grow">My Socials</p>
-          <button
-            on:click={() => (showSocials = !showSocials)}
-            class="{$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
-            >{showSocials ? '-' : '+'}</button
-          >
-        </div>
-        {#if showSocials}
-          <div
-            transition:slide|local
-            class="flex flex-wrap justify-between w-full items-start"
-          >
-            {#if $basicSocials.filter.length > 0}
-              {#each $basicSocials as item, i}
-                {#if item.isActive}
-                  {#if $basicProfile.isBusiness}
-                    {#if item.type.includes('business')}
-                      <BorderButton
-                        order={i}
-                        on:click={() => toNewTab(item.type, item.data)}
-                        class="py-2 px-8 flex-grow flex justify-center rounded-md items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
-                        ><img
-                          src={item.type.includes('github')
-                            ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
-                            : socialIcons[item.type.split('-')[0]]}
-                          class="w-[42px]"
-                          alt={item.type}
-                        />
-                      </BorderButton>
-                    {/if}
-                  {:else if !item.type.includes('business')}
+    <div
+      class="my-4 overflow-clip rounded-md outline-1 outline {$basicCurrentTheme?.outline}"
+    >
+      <div class="flex flex-row px-2 py-3 items-center justify-center">
+        <p class="text-xs font-medium flex-grow">My Socials</p>
+        <button
+          on:click={() => (showSocials = !showSocials)}
+          class="{$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
+          >{showSocials ? '-' : '+'}</button
+        >
+      </div>
+      {#if showSocials}
+        <div
+          transition:slide|local
+          class="flex flex-wrap justify-between w-full items-start"
+        >
+          {#if $basicSocials.filter.length > 0}
+            {#each $basicSocials as item, i}
+              {#if item.isActive}
+                {#if $basicProfile.isBusiness}
+                  {#if item.type.includes('business')}
                     <BorderButton
                       order={i}
                       on:click={() => toNewTab(item.type, item.data)}
-                      class="py-2 px-8 flex-grow flex justify-center items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
+                      class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center rounded-md items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
                       ><img
-                        src={item.type.includes('github') &&
-                        $basicProfile?.design?.theme?.toString() !== 'light'
+                        src={item.type.includes('github')
                           ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
-                          : socialIcons[item.type]}
-                        class="w-[42px]"
+                          : socialIcons[item.type.split('-')[0]]}
+                        class="w-[41px] sm:w-[49px] md:w-[42px]"
                         alt={item.type}
-                      /></BorderButton
-                    >
+                      />
+                    </BorderButton>
                   {/if}
+                {:else if !item.type.includes('business')}
+                  <BorderButton
+                    order={i}
+                    on:click={() => toNewTab(item.type, item.data)}
+                    class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
+                    ><img
+                      src={item.type.includes('github') &&
+                      $basicProfile?.design?.theme?.toString() !== 'light'
+                        ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
+                        : socialIcons[item.type]}
+                      class="w-[41px] sm:w-[49px] md:w-[42px]"
+                      alt={item.type}
+                    /></BorderButton
+                  >
                 {/if}
-              {/each}
-            {/if}
-          </div>
-        {/if}
-      </div>
-    </IntersectionObserver>
+              {/if}
+            {/each}
+          {/if}
+        </div>
+      {/if}
+    </div>
 
     <!-- BASIC LINKS -->
-    <IntersectionObserver id="links" section="links">
-      <div
-        class="my-4 overflow-clip rounded-md outline-1 outline {$basicCurrentTheme?.outline} mb-20"
-      >
-        <div class="flex flex-row px-2 py-3 items-center justify-center">
-          <p class="text-xs font-medium flex-grow">My Links</p>
-          <button
-            on:click={() => (showLinks = !showLinks)}
-            class="{$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
-            >{showLinks ? '-' : '+'}</button
-          >
-        </div>
-        {#if showLinks}
-          <div
-            transition:slide|local
-            class="flex flex-col justify-center items-center"
-          >
-            {#if $basicLinks?.length > 0}
-              {#each $basicLinks as item, i}
-                {#if item.isActive}
-                  {#if $basicProfile.isBusiness}
-                    {#if item.isPersonal === false}
-                      <BorderButton
-                        order={i}
-                        class="w-full {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
-                      >
-                        <LinkPreview
-                          isShowMetaImage={$basicProfile?.isShowMetaImage}
-                          title={item.title}
-                          url={item.link}
-                          className={$basicCurrentTheme?.secondary}
-                        />
-                      </BorderButton>
-                    {/if}
-                  {:else if item.isPersonal !== false}
+
+    <div
+      id="links"
+      class="my-4 overflow-clip rounded-md outline-1 outline {$basicCurrentTheme?.outline} mb-20"
+    >
+      <div class="flex flex-row px-2 py-3 items-center justify-center">
+        <p class="text-xs font-medium flex-grow">My Links</p>
+        <button
+          on:click={() => (showLinks = !showLinks)}
+          class="{$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
+          >{showLinks ? '-' : '+'}</button
+        >
+      </div>
+      {#if showLinks}
+        <div
+          transition:slide|local
+          class="flex flex-col justify-center items-center"
+        >
+          {#if $basicLinks?.length > 0}
+            {#each $basicLinks as item, i}
+              {#if item.isActive}
+                {#if $basicProfile.isBusiness}
+                  {#if item.isPersonal === false}
                     <BorderButton
                       order={i}
                       class="w-full {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
@@ -324,13 +311,25 @@
                       />
                     </BorderButton>
                   {/if}
+                {:else if item.isPersonal !== false}
+                  <BorderButton
+                    order={i}
+                    class="w-full {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
+                  >
+                    <LinkPreview
+                      isShowMetaImage={$basicProfile?.isShowMetaImage}
+                      title={item.title}
+                      url={item.link}
+                      className={$basicCurrentTheme?.secondary}
+                    />
+                  </BorderButton>
                 {/if}
-              {/each}
-            {/if}
-          </div>
-        {/if}
-      </div>
-    </IntersectionObserver>
+              {/if}
+            {/each}
+          {/if}
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
 

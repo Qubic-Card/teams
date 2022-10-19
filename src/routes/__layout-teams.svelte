@@ -265,7 +265,9 @@
               </div>
             {:else}
               <div class="animate-pulse gap-5">
-                <p class="text-5xl h-16 w-16 text-neutral-800 bg-neutral-800" />
+                <p
+                  class="text-5xl h-12 md:h-16 w-12 md:w-16 text-neutral-800 bg-neutral-800"
+                />
               </div>
             {/if}
           {/each}

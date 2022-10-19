@@ -9,28 +9,31 @@
   let container;
   let observer;
 
-  onMount(() => {
-    function buildThresholdList() {
-      let thresholds = [];
-      let numSteps = 20;
+  const buildThresholdList = () => {
+    let thresholds = [];
+    let numSteps = 20;
 
-      for (let i = 1.0; i <= numSteps; i++) {
-        let ratio = i / numSteps;
-        thresholds.push(ratio);
-      }
-
-      thresholds.push(0);
-
-      return thresholds;
+    for (let i = 1.0; i <= numSteps; i++) {
+      let ratio = i / numSteps;
+      thresholds.push(ratio);
     }
 
+    thresholds.push(0);
+
+    return thresholds;
+  };
+  onMount(() => {
     if (browser) {
-      function handleIntersect(entries, observer) {
+      const handleIntersect = (entries, observer) => {
         entries.forEach((entry) => {
+          // console.log(entries);
           if (section === 'bio') {
+            // console.log(entry);
             // console.log('bio in view', entry.intersectionRatio);
-            if (entry.intersectionRatio === 1) $inView = true;
-            else {
+            if (entry.intersectionRatio === 1) {
+              $inView = true;
+              // $isInViewTriggered = false;
+            } else {
               $inView = false;
               $isInViewTriggered = true;
             }
@@ -38,7 +41,7 @@
 
           // prevRatio = entry.intersectionRatio;
         });
-      }
+      };
 
       const options = {
         root: null,

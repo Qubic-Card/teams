@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.snap-container::-webkit-scrollbar {
+/* .snap-container::-webkit-scrollbar {
   height: 5px;
 }
 .snap-container::-webkit-scrollbar-track {
@@ -11,7 +11,7 @@
 }
 .snap-container::-webkit-scrollbar-thumb {
   background-color: #71717a;
-}
+} */
 
 /* *::-webkit-scrollbar {
   height: 5px;

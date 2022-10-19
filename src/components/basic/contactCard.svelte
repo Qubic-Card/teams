@@ -172,6 +172,7 @@
             <AvatarCard
               background={profile?.profileData?.avatar}
               class="w-24 md:w-32 lg:w-36"
+              isProfile={false}
             />
           {/if}
           <div class="flex flex-col text-center">
@@ -294,12 +295,16 @@
             {#if profile.profileData.links}
               {#each profile.profileData.links.filter((link) => link.isPersonal !== true) as item}
                 {#if item.isActive}
-                  <p
-                    class="p-4 flex-grow flex justify-center bg-white rounded-md border border-neutral-200 items-center hover:font-semibold cursor-pointer"
-                    on:click={() => window.open(item.link, '_blank').focus()}
+                  <div
+                    class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-200 items-center bg-white hover:font-semibold"
                   >
-                    {item.title ?? ''}
-                  </p>
+                    <p
+                      class="break-all"
+                      on:click={() => window.open(item.link, '_blank').focus()}
+                    >
+                      {item.title ?? ''}
+                    </p>
+                  </div>
                 {/if}
               {/each}
             {:else}
@@ -311,12 +316,16 @@
             {#if profile.profileData.links.filter((link) => link.isPersonal !== false).length > 0}
               {#each profile.profileData.links.filter((link) => link.isPersonal !== false) as item}
                 {#if item.isActive}
-                  <p
-                    class="p-4 flex-grow flex justify-center bg-white rounded-md border border-neutral-200 items-center hover:font-semibold cursor-pointer"
-                    on:click={() => window.open(item.link, '_blank').focus()}
+                  <div
+                    class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-200 items-center bg-white hover:font-semibold"
                   >
-                    {item.title ?? ''}
-                  </p>
+                    <p
+                      class="break-all"
+                      on:click={() => window.open(item.link, '_blank').focus()}
+                    >
+                      {item.title ?? ''}
+                    </p>
+                  </div>
                 {/if}
               {/each}
             {:else}
