@@ -251,7 +251,7 @@
                     ? 'px-3'
                     : clientWidth < 415
                     ? 'px-6'
-                    : 'px-7'} flex-grow flex justify-center rounded-md items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
+                    : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                   order={i}
                   ><img
                     src={socialIcons[item.type]}
@@ -286,7 +286,7 @@
               {#if item.isActive}
                 <BorderButton
                   order={i}
-                  class="w-full {$currentTheme?.outline} {$currentTheme?.secondary} rounded-md"
+                  class="w-full {$currentTheme?.outline} {$currentTheme?.secondary}"
                 >
                   <LinkPreview
                     isShowMetaImage={data?.isShowMetaImage}
@@ -363,7 +363,7 @@
                       ? 'px-3'
                       : clientWidth < 415
                       ? 'px-6'
-                      : 'px-7'} flex-grow flex justify-center rounded-md items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
+                      : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                     ><img
                       src={socialIcons[item.type]}
                       class="w-[45px] sm:w-[49px] md:w-[40px]"
@@ -397,7 +397,7 @@
                 {#if item.isActive}
                   <BorderButton
                     order={i}
-                    class="w-full {$currentTheme?.outline} {$currentTheme?.secondary} rounded-md"
+                    class="w-full {$currentTheme?.outline} {$currentTheme?.secondary}"
                   >
                     <LinkPreview
                       isShowMetaImage={$teamData.isShowMetaImage}

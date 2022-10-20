@@ -17,7 +17,7 @@ export const setTeamSocials = (updatedSocials) =>
   teamSocials.set(updatedSocials);
 export const setTeamLinks = (updatedLinks) => teamLinks.set(updatedLinks);
 
-export const basicSocials = writable([]);
-export const basicLinks = writable([]);
+export const basicSocials = writable(['']);
+export const basicLinks = writable(['']);
 export const basicProfileTheme = writable('dark');
 export const basicCurrentTheme = writable(theme['dark']);
