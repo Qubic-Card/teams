@@ -60,6 +60,8 @@
             <AvatarCard
               background={connection.profileData.avatar}
               class="w-24 md:w-32 lg:w-36"
+              editor="team"
+              isProfile={false}
             />
           {/if}
         {:else}
@@ -190,12 +192,16 @@
           {#if connection?.profileData?.links.length > 0}
             {#each connection?.profileData?.links as item}
               {#if item.isActive}
-                <p
-                  class="cursor-pointer border border-neutral-600 rounded p-3 hover:font-bold"
-                  on:click={() => window.open(item.link, '_blank').focus()}
+                <div
+                  class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-600 items-center hover:font-semibold"
                 >
-                  {item.title}
-                </p>
+                  <p
+                    class="break-all"
+                    on:click={() => window.open(item.link, '_blank').focus()}
+                  >
+                    {item.title ?? ''}
+                  </p>
+                </div>
               {/if}
             {/each}
           {/if}

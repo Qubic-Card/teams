@@ -64,7 +64,7 @@
   title="Rename role"
   {showModal}
   on:showModal={toggleModal}
-  class="w-1/2"
+  class=" w-3/4 md:w-1/2"
 >
   <div
     class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"

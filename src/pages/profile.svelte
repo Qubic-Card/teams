@@ -52,11 +52,13 @@
   let showLinksTeam = true;
   let forScrollToSocialsSection;
   let profile;
+  let clientWidth;
 </script>
 
 <div
+  bind:clientWidth
   bind:this={profile}
-  class={`${$currentTheme.pageBackground} ${$$props.class} relative transition-colors duration-500 ease-in text-sm`}
+  class="{$currentTheme.pageBackground} {$$props.class} relative transition-colors rounded-3xl duration-500 ease-in text-sm"
   class:bg-image-profile={$currentTheme?.backgroundImage}
   style={`--bg-img-profile: url('${$currentTheme?.backgroundImage}')`}
 >
@@ -224,79 +226,80 @@
   </div>
 
   {#if $selectedTab === 'personal'}
-    <div class="px-8 md:px-16 mt-4 {$currentTheme.text}">
-      <IntersectionObserver id="socials" section="socials">
-        <div
-          class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
-        >
-          <div class="flex flex-row px-2 py-3 items-center justify-center">
-            <p class="text-xs font-medium flex-grow">My Socials</p>
-            <button
-              on:click={() => (showSocialsPersonal = !showSocialsPersonal)}
-              class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
-              >{showSocialsPersonal ? '-' : '+'}</button
-            >
-          </div>
-          {#if showSocialsPersonal}
-            <div
-              transition:slide|local
-              class="flex justify-between flex-wrap items-start"
-            >
-              {#each $socials as item, i}
-                {#if item.isActive}
-                  <BorderButton
-                    on:click={() => toNewTab(item.type, item.data)}
-                    class="py-2 px-7 flex-grow flex justify-center rounded-md items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
-                    order={i}
-                    ><img
-                      src={socialIcons[item.type]}
-                      class="w-[40px]"
-                      alt=""
-                    /></BorderButton
-                  >
-                {/if}
-              {/each}
-            </div>
-          {/if}
+    <div class="px-8 lg:px-16 mt-4 {$currentTheme.text}">
+      <div
+        class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
+      >
+        <div class="flex flex-row px-2 py-3 items-center justify-center">
+          <p class="text-xs font-medium flex-grow">My Socials</p>
+          <button
+            on:click={() => (showSocialsPersonal = !showSocialsPersonal)}
+            class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
+            >{showSocialsPersonal ? '-' : '+'}</button
+          >
         </div>
-      </IntersectionObserver>
+        {#if showSocialsPersonal}
+          <div
+            transition:slide|local
+            class="flex justify-between flex-wrap items-start"
+          >
+            {#each $socials as item, i}
+              {#if item.isActive}
+                <BorderButton
+                  on:click={() => toNewTab(item.type, item.data)}
+                  class="py-2 {clientWidth < 320
+                    ? 'px-3'
+                    : clientWidth < 415
+                    ? 'px-6'
+                    : 'px-7'} flex-grow flex justify-center rounded-md items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
+                  order={i}
+                  ><img
+                    src={socialIcons[item.type]}
+                    class="w-[40px] sm:w-[49px] md:w-[40px]"
+                    alt=""
+                  /></BorderButton
+                >
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
 
-      <IntersectionObserver id="links" section="links">
-        <div
-          class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
-        >
-          <div class="flex flex-row px-2 py-3 items-center justify-center">
-            <p class="text-xs font-medium flex-grow">My Links</p>
-            <button
-              on:click={() => (showLinksPersonal = !showLinksPersonal)}
-              class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
-              >{showLinksPersonal ? '-' : '+'}</button
-            >
-          </div>
-          {#if showLinksPersonal}
-            <div
-              transition:slide|local
-              class="flex flex-col justify-center items-center pb-5"
-            >
-              {#each $links as item, i}
-                {#if item.isActive}
-                  <BorderButton
-                    order={i}
-                    class="w-full {$currentTheme?.outline} {$currentTheme?.secondary} rounded-md"
-                  >
-                    <LinkPreview
-                      isShowMetaImage={data?.isShowMetaImage}
-                      title={item.title}
-                      url={item.link}
-                      className={$currentTheme.secondary}
-                    />
-                  </BorderButton>
-                {/if}
-              {/each}
-            </div>
-          {/if}
+      <div
+        id="links"
+        class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
+      >
+        <div class="flex flex-row px-2 py-3 items-center justify-center">
+          <p class="text-xs font-medium flex-grow">My Links</p>
+          <button
+            on:click={() => (showLinksPersonal = !showLinksPersonal)}
+            class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
+            >{showLinksPersonal ? '-' : '+'}</button
+          >
         </div>
-      </IntersectionObserver>
+        {#if showLinksPersonal}
+          <div
+            transition:slide|local
+            class="flex flex-col justify-center items-center pb-5"
+          >
+            {#each $links as item, i}
+              {#if item.isActive}
+                <BorderButton
+                  order={i}
+                  class="w-full {$currentTheme?.outline} {$currentTheme?.secondary} rounded-md"
+                >
+                  <LinkPreview
+                    isShowMetaImage={data?.isShowMetaImage}
+                    title={item.title}
+                    url={item.link}
+                    className={$currentTheme.secondary}
+                  />
+                </BorderButton>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
     </div>
   {:else if $selectedTab === 'team'}
     <div
@@ -335,78 +338,79 @@
         {/if}
       {/if}
       <div class={`${$currentTheme.text} w-full`}>
-        <IntersectionObserver id="socials" section="socials">
-          <div
-            class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
-          >
-            <div class="flex flex-row px-2 py-3 items-center justify-center">
-              <p class="text-xs font-medium flex-grow">My Socials</p>
-              <button
-                on:click={() => (showSocialsTeam = !showSocialsTeam)}
-                class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
-                >{showSocialsTeam ? '-' : '+'}</button
-              >
-            </div>
-            {#if showSocialsTeam}
-              <div
-                transition:slide|local
-                class="flex justify-between flex-wrap items-start"
-              >
-                {#each $teamSocials as item, i}
-                  {#if item.isActive}
-                    <BorderButton
-                      on:click={() => toNewTab(item.type, item.data)}
-                      order={i}
-                      class="py-2 px-7 flex-grow flex justify-center rounded-md items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
-                      ><img
-                        src={socialIcons[item.type]}
-                        class="w-[40px]"
-                        alt=""
-                      /></BorderButton
-                    >
-                  {/if}
-                {/each}
-              </div>
-            {/if}
+        <div
+          class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
+        >
+          <div class="flex flex-row px-2 py-3 items-center justify-center">
+            <p class="text-xs font-medium flex-grow">My Socials</p>
+            <button
+              on:click={() => (showSocialsTeam = !showSocialsTeam)}
+              class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
+              >{showSocialsTeam ? '-' : '+'}</button
+            >
           </div>
-        </IntersectionObserver>
+          {#if showSocialsTeam}
+            <div
+              transition:slide|local
+              class="flex justify-between flex-wrap items-start"
+            >
+              {#each $teamSocials as item, i}
+                {#if item.isActive}
+                  <BorderButton
+                    on:click={() => toNewTab(item.type, item.data)}
+                    order={i}
+                    class="py-2 {clientWidth < 320
+                      ? 'px-3'
+                      : clientWidth < 415
+                      ? 'px-6'
+                      : 'px-7'} flex-grow flex justify-center rounded-md items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
+                    ><img
+                      src={socialIcons[item.type]}
+                      class="w-[45px] sm:w-[49px] md:w-[40px]"
+                      alt=""
+                    /></BorderButton
+                  >
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        </div>
 
-        <IntersectionObserver id="links" section="links">
-          <div
-            class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline} mb-20"
-          >
-            <div class="flex flex-row px-2 py-3 items-center justify-center">
-              <p class="text-xs font-medium flex-grow">My Links</p>
-              <button
-                on:click={() => (showLinksTeam = !showLinksTeam)}
-                class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
-                >{showLinksTeam ? '-' : '+'}</button
-              >
-            </div>
-            {#if showLinksTeam}
-              <div
-                transition:slide|local
-                class="gap-2 flex flex-col justify-center items-center pb-5"
-              >
-                {#each $teamLinks as item, i}
-                  {#if item.isActive}
-                    <BorderButton
-                      order={i}
-                      class="w-full {$currentTheme?.outline} {$currentTheme?.secondary} rounded-md"
-                    >
-                      <LinkPreview
-                        isShowMetaImage={$teamData.isShowMetaImage}
-                        title={item.title}
-                        url={item.link}
-                        className={$currentTheme.secondary}
-                      />
-                    </BorderButton>
-                  {/if}
-                {/each}
-              </div>
-            {/if}
+        <div
+          id="links"
+          class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline} mb-20"
+        >
+          <div class="flex flex-row px-2 py-3 items-center justify-center">
+            <p class="text-xs font-medium flex-grow">My Links</p>
+            <button
+              on:click={() => (showLinksTeam = !showLinksTeam)}
+              class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
+              >{showLinksTeam ? '-' : '+'}</button
+            >
           </div>
-        </IntersectionObserver>
+          {#if showLinksTeam}
+            <div
+              transition:slide|local
+              class="gap-2 flex flex-col justify-center items-center pb-5"
+            >
+              {#each $teamLinks as item, i}
+                {#if item.isActive}
+                  <BorderButton
+                    order={i}
+                    class="w-full {$currentTheme?.outline} {$currentTheme?.secondary} rounded-md"
+                  >
+                    <LinkPreview
+                      isShowMetaImage={$teamData.isShowMetaImage}
+                      title={item.title}
+                      url={item.link}
+                      className={$currentTheme.secondary}
+                    />
+                  </BorderButton>
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        </div>
       </div>
     </div>
   {/if}

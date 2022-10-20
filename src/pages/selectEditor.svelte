@@ -3,12 +3,32 @@
   import { goto } from '$app/navigation';
   import { fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
-  import { cards } from '@lib/stores/cardsStore';
   import supabase from '@lib/db';
 
   let teams = [];
+  let isHasBasic = false;
 
   const chooseTeam = (tid) => goto(`/${tid}/dashboard`);
+
+  const getBusinessCards = async (uid) => {
+    try {
+      let { data, error } = await supabase
+        .from('card_connection')
+        .select('card_id(mode)')
+        .eq('uid', uid);
+
+      if (error) throw error;
+
+      if (data?.length > 0) {
+        let basicCards = data.filter((card) => card.card_id.mode === 'basic');
+        if (basicCards.length !== 0) {
+          isHasBasic = true;
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getTeamsList = async () => {
     const { data, error } = await supabase
@@ -40,7 +60,7 @@
   };
 </script>
 
-{#await getTeamsList() then name}
+{#await (getTeamsList(), getBusinessCards($user?.id)) then name}
   <section
     class="text-white overflow-hidden bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
   >
@@ -52,7 +72,7 @@
         in:fly|local={{ y: 5000, duration: 1000 }}
       >
         <h1 class="text-xl md:text-2xl font-bold mb-4">Select Editor</h1>
-        {#if $cards}
+        {#if isHasBasic}
           <div
             on:click={() => {
               if ($user?.confirmed_at) goto('/basic');
@@ -65,7 +85,7 @@
           </div>
         {/if}
 
-        <h2>Teams</h2>
+        <h2 class="font-medium">Teams</h2>
         {#if teams}
           {#if teams.length > 0}
             {#each teams as item}
@@ -81,7 +101,7 @@
               </div>
             {/each}
           {:else}
-            <p>You don't have any teams yet.</p>
+            <p class="text-neutral-600">You don't have any teams yet.</p>
             <p class="text-sm">
               Contact us <span
                 class="cursor-pointer font-bold underline"

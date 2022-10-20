@@ -1,8 +1,9 @@
 <script>
+  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
+  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
   import Spinner from '@comp/loading/spinner.svelte';
   import { fade } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
-  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
@@ -16,12 +17,9 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { profileData } from '@lib/stores/profileData';
   import CropModal from '@comp/modals/cropModal.svelte';
-  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import supabase from '@lib/db';
-  import { links, socials } from '@lib/stores/editorStore';
   import { user } from '@lib/stores/userStore';
-  import { page } from '$app/stores';
 
   // Register the plugins
   registerPlugin(
@@ -78,8 +76,8 @@
     image = img.urls.regular;
     fileName = img.id.trim();
     unsplashImageId = img.id;
-    isOpen = true;
-    showModal = false;
+    showModal = true;
+    isOpen = false;
     searchQuery = '';
 
     dispatch('pick', 'background');
@@ -93,6 +91,8 @@
   const cropImage = async () => {
     croppedImage = await getCroppedImg(image, pixelCrop);
     fileImage = getFileFromBase64(croppedImage, fileName);
+
+    pond.removeFile();
   };
 
   const previewCrop = (e) => {
@@ -104,7 +104,7 @@
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
     fileName = item.id.trim();
-    isOpen = true;
+    isOpen = false;
     showModal = !showModal;
     return true;
   };
@@ -136,6 +136,7 @@
 
     await handleSave();
     isLoading = false;
+    image = undefined;
   };
 
   const onKeyPress = (e) => {
@@ -145,23 +146,17 @@
   };
 </script>
 
-<ModalOverlay
-  {isOpen}
-  on:click={() => {
-    isOpen = false;
-    setState('idle');
-  }}
-/>
+<ModalOverlay isOpen={showModal} on:click={() => (showModal = false)} />
 
 {#if image !== undefined}
   <Dialog
     static
     class={`${
-      isOpen ? 'translate-x-0' : 'translate-x-[900px]'
-    } transition-all duration-300 ease-in-out justify-between flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
-    open={isOpen}
+      showModal ? 'translate-x-0' : 'translate-x-[900px]'
+    } transition-all duration-300 ease-in-out justify-between flex flex-col h-screen w-3/4 md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+    open={showModal}
     on:close={() => {
-      isOpen = false;
+      showModal = false;
       setState('idle');
     }}
   >
@@ -204,7 +199,7 @@
           on:click={async () => await handleAddFile()}
         >
           {#if isLoading}
-            <Spinner bg="#1f4496" />
+            <Spinner bg="#1f4496" class="w-6 h-6" />
           {/if}
           Save
         </button>
@@ -221,23 +216,48 @@
 {/if}
 
 <button
-  on:click={() => (showModal = true)}
+  on:click={() => (isOpen = true)}
   class="w-full text-neutral-700 bg-neutral-200 rounded-md p-5 text-xs md:text-sm h-16"
   >Select Background</button
 >
 
-<ModalWrapper
-  isUnsplash={state === 'unsplash'}
-  title="Select background image"
-  class="w-[90%] md:w-1/2"
-  {showModal}
-  on:showModal={() => {
-    showModal = !showModal;
-    isOpen = false;
+<ModalWrapperHeadless
+  desktopWidth="md:w-1/2 lg:w-1/3"
+  desktopRight="md:right-1/4"
+  desktopTop={state === 'idle' ? 'md:top-[35%]' : 'md:top-0'}
+  desktopHeight={state === 'idle' ? 'md:h-[29%]' : 'h-screen'}
+  mobileHeight={state === 'idle' ? 'h-[40%]' : 'h-screen'}
+  {isOpen}
+  on:modalHandler={(e) => {
+    isOpen = e.detail;
     setState('idle');
   }}
 >
   {#if state === 'idle'}
+    <div class="p-2 flex justify-between">
+      <h1 class="font-bold">Select background image</h1>
+      <button
+        on:click={() => {
+          isOpen = false;
+          setState('idle');
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
     <button
       on:click={() => setState('unsplash')}
       class="bg-blue-600 text-white mx-8 h-20 rounded-md mb-2"
@@ -258,6 +278,37 @@
       />
     </div>
   {:else if state === 'unsplash'}
+    <div class="flex items-center justify-between p-2">
+      <div class="flex">
+        <p class="text-center translate-y-1">Powered By</p>
+        <img
+          src="/unsplash.svg"
+          alt=""
+          class="w-32 ml-2 bg-white p-2 rounded-md"
+        />
+      </div>
+      <button
+        on:click={() => {
+          isOpen = false;
+          setState('idle');
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
     <div class="flex flex-col" in:fade|local>
       <div class="p-2 w-full flex flex-row-reverse shadow-md">
         <button
@@ -269,7 +320,7 @@
           on:keypress={onKeyPress}
           bind:value={searchQuery}
           type="text"
-          placeholder="Search for images..."
+          placeholder="Search for more images..."
           class="p-2 bg-neutral-700 text-white rounded-lg w-full"
         />
       </div>
@@ -281,7 +332,7 @@
         {#if unsplashDatas}
           {#if unsplashDatas.length > 0}
             {#each unsplashDatas as item}
-              <div class="m-1 bg-black mt-2">
+              <div class="m-1 bg-black mt-2 flex flex-col">
                 <div
                   on:click={() => pickHandler(item)}
                   class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
@@ -295,18 +346,20 @@
                     {item.alt_description === null ? '' : item.alt_description}
                   </h1>
                 </div>
-                <div class="flex items-center bg-white pt-2">
-                  By
+                <div
+                  class="flex items-center justify-around md:justify-between bg-neutral-800 pt-2 text-xs md:text-sm flex-grow"
+                >
                   <p
                     on:click={() => toAuthorProfile(item.user.portfolio_url)}
-                    class="underline cursor-pointer ml-2"
+                    class="underline cursor-pointer ml-2 text-white"
                   >
-                    {item.user.name}
+                    By {item.user.name}
                   </p>
                   <img
-                    src="https://img.icons8.com/material-outlined/48/000000/external-link.png"
+                    on:click={() => toAuthorProfile(item.user.portfolio_url)}
+                    src="https://img.icons8.com/ios/100/FFFFFF/external-link-squared.png"
                     alt="external link"
-                    class="w-4 h-4"
+                    class="w-4 h-4 cursor-pointer"
                   />
                 </div>
               </div>
@@ -320,15 +373,16 @@
       </div>
     </div>
   {/if}
-</ModalWrapper>
+</ModalWrapperHeadless>
 
 <style>
   .snap-container::-webkit-scrollbar {
     height: 10px;
+    width: 8px;
   }
 
   .snap-container::-webkit-scrollbar-track {
-    background-color: #d6d6d6;
+    background-color: #171717;
   }
 
   .snap-container::-webkit-scrollbar-thumb {

@@ -3,9 +3,11 @@
   import { onMount } from 'svelte';
 
   export let background, theme;
+  export let editor = 'basic';
+  export let isProfile = true;
 
   // $: console.log($isInViewTriggered);
-
+  // $: console.log(theme);
   // $: if (!$inView) $isInViewTriggered = true;
 </script>
 
@@ -15,10 +17,10 @@
     height={$$props.height}
     class="flex justify-items-center items-center aspect-square {$inView
       ? 'mx-auto rounded-3xl border-8'
-      : 'mt-2 ml-4 rounded-2xl border-4'} {theme === undefined
-      ? ''
+      : `${isProfile && 'mt-2 ml-4'} rounded-2xl border-4`} {theme === undefined
+      ? `${editor === 'basic' ? 'border-white' : 'border-neutral-800'}`
       : `${theme?.avatarBorder}`} object-cover"
-    class:growup={$inView}
+    class:growup={$inView && $isInViewTriggered}
     class:shrink={!$inView}
     alt="Avatar"
     src={background ?? '/favicon.svg'}

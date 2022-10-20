@@ -1,4 +1,5 @@
 <script>
+  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
   import { createEventDispatcher } from 'svelte';
   import CropModal from '@comp/modals/cropModal.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
@@ -23,13 +24,14 @@
   let pond;
   let name = 'filepond';
 
-  let showModal;
+  let showModal = false;
   let searchQuery = '';
   let selectedImage;
   let downloadLocation = '';
   // INFO: state idle untuk memunculkan pilihan button upload from local atau unsplash
   let state = 'unsplash';
   let isBannerOpen = false;
+  let isOpen = false;
 
   let image;
   let fileName;
@@ -102,142 +104,143 @@
   >Select Background</button
 >
 
-{#if showModal}
-  <div
-    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
-  >
-    <div
-      class="relative w-full h-full md:h-auto my-6 mx-auto md:max-w-3xl max-w-md"
-    >
-      <!--content-->
-      <div
-        class="border-0 shadow-lg relative flex flex-col w-full rounded-lg bg-white outline-none focus:outline-none"
-      >
-        <!--header-->
-        <div class="border-b border-solid rounded-t">
-          <div class="flex w-full h-16 px-4 justify-between items-center">
-            <div class="flex">
-              <p class="text-center translate-y-1">Powered By</p>
-              <img src="/unsplash.png" alt="" class="w-32 ml-2" />
-            </div>
-            <p
-              on:click={toggleModal}
-              class="cursor-pointer text-3xl pr-4 text-black"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </p>
-          </div>
-        </div>
-        <div class="flex flex-col">
-          {#if state === 'idle'}
-            <div class="flexflex-col p-2 w-full gap-2">
-              <button
-                on:click={() => (state = 'unsplash')}
-                class="w-full bg-blue-600 p-4 rounded-md text-white h-16 mb-2"
-                >Unsplash</button
-              >
-              <FilePond
-                bind:this={pond}
-                {name}
-                credits=""
-                allowProcess={false}
-                class="cursor-pointer"
-                acceptedFileTypes={['image/png', 'image/jpeg']}
-                instantUpload={false}
-                imageCropAspectRatio={1 / 1}
-                labelIdle="Add Background Image"
-                allowMultiple={false}
-                beforeAddFile={handleCrop}
-              />
-            </div>
-          {:else if state === 'unsplash'}
-            <div class="px-12 mt-4 pb-4 w-full flex flex-row-reverse shadow-md">
-              <button
-                on:click={searchHandler}
-                class="bg-neutral-100 w-32 mx-4 hover:bg-neutral-200 transition-colors duration-400 rounded-md"
-                >Search</button
-              >
-              <input
-                on:keypress={onKeyPress}
-                bind:value={searchQuery}
-                type="text"
-                placeholder="Search for images..."
-                class="p-4 bg-neutral-100 rounded-lg w-full"
-              />
-            </div>
-            <div
-              class="grid grid-cols-2 grid-flow-row p-8 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto"
-            >
-              {#if unsplashDatas === 0}
-                <h1>No image to display</h1>
-              {:else}
-                {#each unsplashDatas as item}
-                  <div class="m-1 bg-black mt-2">
-                    <div
-                      on:click={() => pickHandler(item)}
-                      class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
-                        item.urls.regular === selectedImage
-                          ? 'border-4 border-black'
-                          : ''
-                      }`}
-                      style={`background-image: url('${item.urls.regular}')`}
-                    >
-                      <h1 class="uppercase text-center text-3xl">
-                        {item.alt_description === null
-                          ? ''
-                          : item.alt_description}
-                      </h1>
-                    </div>
-                    <div class="flex items-center bg-white pt-2">
-                      By
-                      <p
-                        on:click={() =>
-                          toAuthorProfile(item.user.portfolio_url)}
-                        class="underline cursor-pointer ml-2"
-                      >
-                        {item.user.name}
-                      </p>
-                      <img
-                        src="https://img.icons8.com/material-outlined/48/000000/external-link.png"
-                        alt="external link"
-                        class="w-4 h-4"
-                      />
-                    </div>
-                  </div>
-                {/each}
-              {/if}
-            </div>
-          {/if}
-        </div>
+<ModalWrapperHeadless
+  desktopWidth="md:w-1/2 lg:w-1/3"
+  desktopRight="md:right-1/4"
+  desktopTop={state === 'idle' ? 'md:top-[35%]' : 'md:top-0'}
+  desktopHeight={state === 'idle' ? 'md:h-[29%]' : 'h-screen'}
+  mobileHeight={state === 'idle' ? 'h-[40%]' : 'h-screen'}
+  bg="bg-white"
+  isOpen={showModal}
+  on:modalHandler={(e) => {
+    showModal = e.detail;
+  }}
+>
+  <div class="flex flex-col">
+    {#if state === 'idle'}
+      <div class="flexflex-col p-2 w-full gap-2">
+        <button
+          on:click={() => (state = 'unsplash')}
+          class="w-full bg-blue-600 p-4 rounded-md text-white h-16 mb-2"
+          >Unsplash</button
+        >
+        <FilePond
+          bind:this={pond}
+          {name}
+          credits=""
+          allowProcess={false}
+          class="cursor-pointer"
+          acceptedFileTypes={['image/png', 'image/jpeg']}
+          instantUpload={false}
+          imageCropAspectRatio={1 / 1}
+          labelIdle="Add Background Image"
+          allowMultiple={false}
+          beforeAddFile={handleCrop}
+        />
       </div>
-    </div>
+    {:else if state === 'unsplash'}
+      <div class="flex items-center justify-between p-2 text-black">
+        <div class="flex justify-center items-center">
+          <p class="text-center translate-y-1">Powered By</p>
+          <img
+            src="/unsplash.svg"
+            alt=""
+            class="w-32 ml-2 bg-white p-2 rounded-md"
+          />
+        </div>
+        <button on:click={() => (isOpen = false)}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        class="px-4 md:px-6 mt-4 pb-4 w-full flex flex-row-reverse shadow-md"
+      >
+        <button
+          on:click={searchHandler}
+          class="bg-neutral-100 w-32 mx-4 border border-neutral-300 hover:bg-neutral-200 text-black transition-colors duration-400 rounded-md"
+          >Search</button
+        >
+        <input
+          on:keypress={onKeyPress}
+          bind:value={searchQuery}
+          type="text"
+          placeholder="Search for more images..."
+          class="p-2 bg-neutral-100 rounded-lg w-full border text-black border-neutral-300"
+        />
+      </div>
+      <div
+        class="grid grid-cols-2 grid-flow-row p-4 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto"
+      >
+        {#if unsplashDatas === 0}
+          <h1>No image to display</h1>
+        {:else}
+          {#each unsplashDatas as item}
+            <div class="m-1 bg-black mt-2 flex flex-col">
+              <div
+                on:click={() => pickHandler(item)}
+                class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
+                  item.urls.regular === selectedImage
+                    ? 'border-4 border-black'
+                    : ''
+                }`}
+                style={`background-image: url('${item.urls.regular}')`}
+              >
+                <h1
+                  class="uppercase text-center text-lg md:text-3xl breaks-all"
+                >
+                  {item.alt_description === null ? '' : item.alt_description}
+                </h1>
+              </div>
+              <div
+                class="flex items-center justify-around md:justify-between bg-white pt-2 text-xs md:text-sm flex-grow"
+              >
+                <p
+                  on:click={() => toAuthorProfile(item.user.portfolio_url)}
+                  class="underline cursor-pointer ml-2"
+                >
+                  By {item.user.name}
+                </p>
+                <img
+                  on:click={() => toAuthorProfile(item.user.portfolio_url)}
+                  src="https://img.icons8.com/material-outlined/48/000000/external-link.png"
+                  alt="external link"
+                  class="w-4 h-4 cursor-pointer"
+                />
+              </div>
+            </div>
+          {/each}
+        {/if}
+      </div>
+    {/if}
   </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
-{/if}
+</ModalWrapperHeadless>
 
+<!-- <div class="opacity-25 fixed inset-0 z-40 bg-black" /> -->
 <style>
   .snap-container::-webkit-scrollbar {
     height: 10px;
-  }
-
-  .snap-container::-webkit-scrollbar-track {
-    background-color: #d6d6d6;
+    width: 8px;
   }
 
   .snap-container::-webkit-scrollbar-thumb {
-    background-color: #a8a8a8;
+    background: rgb(170, 170, 170);
+  }
+
+  /* Handle on hover */
+  .snap-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(163, 163, 163);
   }
 </style>

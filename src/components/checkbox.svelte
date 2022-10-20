@@ -3,6 +3,7 @@
   import { createEventDispatcher } from 'svelte';
   export let checkboxes, checked, permissions, isDefault;
   export let bg = 'bg-neutral-900';
+  export let mode = 'edit';
   let isSuperAdmin = false;
   let selectAll = false;
 
@@ -99,7 +100,7 @@
   ];
 </script>
 
-<div class="border border-neutral-600 mt-3 p-2 rounded">
+<div class="border border-neutral-600 mt-3 p-2 w-full rounded">
   {#if !isDefault}
     <button
       disabled={permissions.isTeamInactive ||
@@ -110,7 +111,7 @@
         clicked();
         selectAll = true;
       }}
-      class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300"
+      class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300 md:text-sm text-xs"
     >
       Select all
     </button>
@@ -147,7 +148,7 @@
                 isDefault}
             />
 
-            <p class="ml-4 w-72">
+            <p class="ml-4 {mode === 'edit' ? 'w-72' : 'w-48'}">
               {role.name.split('_')[0].charAt(0).toUpperCase() +
                 role.name.split('_')[0].slice(1)}
               {role.name.split('_')[1]}
@@ -155,8 +156,13 @@
             </p>
           </label>
         </div>
-        <p class="w-1/2 hidden md:block">
-          {role.desc}
+        <p class="hidden md:block text-sm">
+          {#if mode === 'add'}
+            {role.desc.split(' ').slice(3).join(' ').charAt(0).toUpperCase() +
+              role.desc.split(' ').slice(3).join(' ').slice(1)}
+          {:else}
+            {role.desc}
+          {/if}
         </p>
       </div>
     {/each}

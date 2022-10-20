@@ -1,4 +1,5 @@
 <script>
+  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
   import roleMapping from '@lib/role';
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -6,7 +7,6 @@
   import Input from '@comp/input.svelte';
   import Cookies from 'js-cookie';
   import Checkboxes from '@comp/checkbox.svelte';
-  import ModalWrapper from '@comp/modals/modalWrapper.svelte';
   import { teamRoles } from '@lib/stores/roleStore';
   import { getContext } from 'svelte';
 
@@ -74,12 +74,36 @@
 >
   + Add new role
 </button>
-<ModalWrapper
-  title="Add role"
-  {showModal}
-  on:showModal={toggleModal}
-  class="w-[90%] md:w-1/2 h-[80%]"
+<ModalWrapperHeadless
+  desktopWidth="md:w-1/2 lg:w-1/3"
+  desktopRight="md:right-1/4"
+  desktopTop="md:top-5"
+  desktopHeight="h-screen"
+  mobileHeight="h-screen"
+  isOpen={showModal}
+  on:modalHandler={(e) => {
+    showModal = e.detail;
+  }}
 >
+  <div class="p-2 pt-4 md:0 flex justify-between">
+    <h1 class="font-bold">Add new role</h1>
+    <button on:click={() => (showModal = false)}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+  </div>
   <div
     class="flex flex-col h-82 justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
   >
@@ -95,6 +119,7 @@
       bind:checked={checkedRole}
       {permissions}
       bg="bg-neutral-800"
+      mode="add"
     />
     <button
       disabled={loading}
@@ -108,4 +133,4 @@
       Add role
     </button>
   </div>
-</ModalWrapper>
+</ModalWrapperHeadless>

@@ -2,12 +2,11 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import { fade } from 'svelte/transition';
   import Input from '@comp/input.svelte';
-  import Profile from '@pages/profile.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import { socials, links } from '@lib/stores/editorStore';
   import SelectBackgroundModal from '@comp/modals/selectBackgroundModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import ProfileEditorSkeleton from '@comp/skeleton/profileEditorSkeleton.svelte';
+
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import Cropper from 'svelte-easy-crop';
   import getCroppedImg from '@lib/utils/canvas';
@@ -148,7 +147,7 @@
   static
   class={`${
     isOpen ? 'translate-x-0' : 'translate-x-[900px]'
-  } transition-all duration-300 justify-between ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+  } transition-all duration-300 justify-between ease-in-out flex flex-col h-screen w-3/4 md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   open={isOpen}
   on:close={() => (isOpen = false)}
 >
@@ -638,24 +637,4 @@
 <style global>
   @import 'filepond/dist/filepond.css';
   @import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
-
-  /* width */
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: rgb(218, 218, 218);
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(163, 163, 163);
-  }
 </style>
