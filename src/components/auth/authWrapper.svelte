@@ -26,7 +26,7 @@
   };
 
   const redirect = async () => {
-    if ($page.routeId.includes('slug')) {
+    if ($page?.routeId?.includes('slug')) {
       if (!(await checkIsActiveMember())) {
         $user = null;
       }
