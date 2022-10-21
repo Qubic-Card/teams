@@ -104,6 +104,7 @@
   >Select Background</button
 >
 
+<!-- {#if showModal} -->
 <ModalWrapperHeadless
   desktopWidth="md:w-1/2 lg:w-1/3"
   desktopRight="md:right-1/4"
@@ -116,7 +117,7 @@
     showModal = e.detail;
   }}
 >
-  <div class="flex flex-col">
+  <div class="flex flex-col h-full">
     {#if state === 'idle'}
       <div class="flexflex-col p-2 w-full gap-2">
         <button
@@ -148,7 +149,7 @@
             class="w-32 ml-2 bg-white p-2 rounded-md"
           />
         </div>
-        <button on:click={() => (isOpen = false)}>
+        <button on:click={() => (showModal = false)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -182,7 +183,7 @@
         />
       </div>
       <div
-        class="grid grid-cols-2 grid-flow-row p-4 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto"
+        class="grid grid-cols-2 grid-flow-row p-4 text-black h-full snap-container snap-y snap-mandatory overflow-y-auto"
       >
         {#if unsplashDatas === 0}
           <h1>No image to display</h1>
@@ -227,6 +228,7 @@
     {/if}
   </div>
 </ModalWrapperHeadless>
+<!-- {/if} -->
 
 <!-- <div class="opacity-25 fixed inset-0 z-40 bg-black" /> -->
 <style>
