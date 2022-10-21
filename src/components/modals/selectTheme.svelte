@@ -40,11 +40,20 @@
   <h1>Set theme</h1>
   {#if editor == 'team'}
     <h1>
-      {$profileTheme.charAt(0).toUpperCase() + $profileTheme.slice(1)}
+      {#if $profileTheme === 'offwhite'}
+        Off White
+      {:else}
+        {$profileTheme.charAt(0).toUpperCase() + $profileTheme.slice(1)}
+      {/if}
     </h1>
   {:else}
     <h1>
-      {$basicProfileTheme.charAt(0).toUpperCase() + $basicProfileTheme.slice(1)}
+      {#if $basicProfileTheme === 'offwhite'}
+        Off White
+      {:else}
+        {$basicProfileTheme.charAt(0).toUpperCase() +
+          $basicProfileTheme.slice(1)}
+      {/if}
     </h1>
   {/if}
 </div>
