@@ -6,7 +6,6 @@
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { userData } from '@lib/stores/userStore';
-  import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount, setContext } from 'svelte';
   import { sidebarItems } from '@lib/constants';
   import getTeamData from '@lib/query/getTeamData';
@@ -17,9 +16,9 @@
   import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
   import { teams } from '@lib/stores/teamStore';
   import { teamData } from '@lib/stores/teamStore';
+  import MenuButtonModal from '@comp/modals/menuButtonModal.svelte';
 
   let isSidebarOpened = false;
-  let isMenuOpened = false;
   let member = [];
   let subscription;
   let loading = true;
@@ -31,7 +30,6 @@
   let teamId = '';
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
-  const menuHandler = () => (isMenuOpened = !isMenuOpened);
   const handler = (id, title) => {
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
@@ -197,26 +195,8 @@
           </div>
         {/if}
       </div>
-      {#if $teamData.logo}
-        <img
-          on:click={menuHandler}
-          src={$teamData.logo}
-          alt="avatar"
-          class="rounded-full w-10 h-10 cursor-pointer"
-        />
-      {:else if $teamData.logo === ''}
-        <div
-          on:click={menuHandler}
-          class="bg-neutral-800 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
-        />
-      {:else}
-        <div class="animate-pulse p-4">
-          <div class="text-5xl w-12 h-12 bg-neutral-800 rounded-full" />
-        </div>
-      {/if}
-      {#if isMenuOpened}
-        <MenuButton />
-      {/if}
+
+      <MenuButtonModal logo={$teamData.logo} />
     </div>
 
     {#if subscription?.isActive === false && subscription?.isAfter7Days}
@@ -299,7 +279,7 @@
           {#if permissions.readAnalytics}
             {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
               <div
-                class="border-b-2 border-neutral-700 pl-20 md:pl-24 mt-4 gap-4 flex"
+                class="border-b-2 border-neutral-700 pl-20 md:pl-24 gap-4 flex fixed w-full z-10 h-12 bg-neutral-900"
               >
                 <button
                   on:click={() => goto(`/${$teamData?.id}/dashboard`)}

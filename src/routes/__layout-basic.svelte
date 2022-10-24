@@ -2,15 +2,12 @@
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { goto } from '$app/navigation';
   import { user } from '@lib/stores/userStore.js';
-  import MenuButton from '@comp/buttons/menuButton.svelte';
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import { onMount } from 'svelte';
+  import MenuButtonModal from '@comp/modals/menuButtonModal.svelte';
 
   let showMenu = false;
 
-  const handleClick = () => {
-    showMenu = !showMenu;
-  };
   let isMounted = false;
   onMount(() => (isMounted = true));
 
@@ -33,16 +30,7 @@
         {back}
       </button>
       {#if $user != null}
-        <button
-          on:click|preventDefault={handleClick}
-          class="p-3 bg-black rounded-full h-10 flex items-center justify-center mx-2 w-10"
-        >
-          {$user.email.charAt(0).toUpperCase()}
-        </button>
-
-        {#if showMenu}
-          <MenuButton editor="basic" />
-        {/if}
+        <MenuButtonModal editor="basic" />
       {/if}
     </div>
   {/if}

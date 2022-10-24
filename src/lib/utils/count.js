@@ -18,14 +18,12 @@ export const tapCount = (socials, rawData) => {
   for (let i = 0; i < socials.length; i++) {
     let count = 0;
     for (let j = 0; j < rawData.length; j++) {
-      for (let k = 0; k < rawData[j].logs.length; k++) {
-        if (rawData[j].logs[k].message.includes(socials[i])) {
-          count++;
-        }
+      if (rawData[j].message.includes(socials[i])) {
+        count++;
       }
     }
 
-    result.push(count);
+    result.push({ name: socials[i], value: count });
   }
   return result;
 };

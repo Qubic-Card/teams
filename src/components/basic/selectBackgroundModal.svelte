@@ -185,7 +185,7 @@
       <div
         class="grid grid-cols-2 grid-flow-row p-4 text-black h-full snap-container snap-y snap-mandatory overflow-y-auto"
       >
-        {#if unsplashDatas === 0}
+        {#if unsplashDatas?.length === 0}
           <h1>No image to display</h1>
         {:else}
           {#each unsplashDatas as item}

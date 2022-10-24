@@ -1,9 +1,9 @@
 <script>
-  export let searchSkeletonVisible, items;
+  export let searchSkeletonVisible, items, personalOnly;
 </script>
 
 <div class="animate-pulse">
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 {!personalOnly && 'mt-20'}">
     {#if searchSkeletonVisible}
       <div class="w-full h-12 flex md:hidden mt-2 gap-2 self-end mr-2">
         <div class="bg-neutral-800 w-full h-full rounded-md" />
