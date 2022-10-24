@@ -192,7 +192,7 @@
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
-        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 border-neutral-700"
+        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-16 border-neutral-700 fixed bg-neutral-900 w-full"
       >
         <div class="flex w-full md:w-48 text-white gap-1">
           <button
@@ -237,7 +237,7 @@
         />
       {:else}
         <div
-          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
+          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-20"
         >
           <table class="snap-center text-black w-full">
             <thead class="text-left text-neutral-400 bg-black/60">
@@ -340,7 +340,7 @@
     {/await}
   {:else}
     {#await getUserConnectionsList()}
-      <ConnectionsSkeletion searchSkeletonVisible />
+      <ConnectionsSkeletion personalOnly searchSkeletonVisible />
     {:then}
       <div class="flex justify-end items-center mt-1 gap-2">
         <Search
@@ -353,7 +353,7 @@
         />
       </div>
       {#if loading}
-        <ConnectionsSkeletion items={userConnections.length} />
+        <ConnectionsSkeletion personalOnly items={userConnections.length} />
       {:else}
         <div
           class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8"
