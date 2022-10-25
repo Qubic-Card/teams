@@ -4,6 +4,13 @@
 
   export let arr = [];
   export let teamMembersLength, memberCountPercentage, socialsCount;
+
+  const checkDataAvailability = (arr) => {
+    let count = arr.map((item) => item.value);
+    let isAvailable = !count.every((item) => item === 0);
+
+    return isAvailable;
+  };
 </script>
 
 <div class="flex flex-col gap-2 w-full md:w-1/3 h-32">
@@ -94,14 +101,22 @@
 >
   <h1 class="text-lg">Most Interactions</h1>
   <div class="bg-neutral-600 w-full h-8 flex items-center p-1 rounded-md">
-    <!-- <div class="bg-green-600 w-[{socialsCount[0]}%] h-6 rounded-md" /> -->
-    {#each socialsCount as item}
-      <div
-        data-tooltip={item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-        style="--width: {item.value}%;"
-        class="{colorMapping(item.name)} h-6 box"
-      />
-    {/each}
+    {#if checkDataAvailability(socialsCount)}
+      {#each socialsCount as item}
+        {#if item.value !== 0}
+          <div
+            data-tooltip={item.name.charAt(0).toUpperCase() +
+              item.name.slice(1)}
+            style="--width: {item.value}%;"
+            class="{colorMapping(
+              item.name
+            )} h-6 box first:rounded-l-md last:rounded-r-md"
+          />
+        {/if}
+      {/each}
+    {:else}
+      <p class="pl-1">No data available</p>
+    {/if}
   </div>
 </div>
 

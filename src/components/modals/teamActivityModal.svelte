@@ -6,7 +6,7 @@
   import supabase from '@lib/db';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
-  import 'flatpickr/dist/flatpickr.css';
+  import { last7Days } from '@lib/utils/getDates';
 
   export let isOpen = false;
   export let member;
@@ -14,20 +14,37 @@
   let maxPage = 0;
   let page = 0;
   let toItem = 15;
+  let memberLogs = [];
+  let loading = false;
+  let fromDateValue = new Date(new Date(last7Days[0]));
+  let toDateValue = new Date();
 
-  // let date = new Date();
   const options = {
+    // clickOpens: false,
+    maxDate: 'today',
+    static: true,
     mode: 'range',
-    enableTime: true,
     onChange(selectedDates, dateStr) {
-      console.log('flatpickr hook', selectedDates, dateStr);
+      fromDateValue = new Date(selectedDates[0]);
+      toDateValue =
+        selectedDates.length > 1
+          ? new Date(selectedDates[1])
+          : new Date(selectedDates[0]);
+
+      if (selectedDates.length === 1) {
+        page = 0;
+      }
     },
   };
+
   const dispatch = createEventDispatcher();
 
   const closeModal = () => {
     isOpen = false;
     dispatch('close');
+    page = 0;
+    fromDateValue = new Date(new Date(last7Days[0]));
+    toDateValue = new Date();
   };
 
   const setPage = (type) => {
@@ -56,11 +73,14 @@
     return hours + ':' + minute;
   };
 
-  let memberLogs = [];
-
-  let loading = false;
-
   const getMemberLogs = async () => {
+    let fromDate = new Date(
+      new Date(fromDateValue).setHours(0, 0, 0, 0)
+    ).toUTCString();
+    let toDate = new Date(
+      new Date(toDateValue).setHours(23, 59, 59, 999)
+    ).toUTCString();
+
     loading = true;
     const { from, to } = getPagination(page, toItem);
     const { data, error, count } = await supabase
@@ -68,6 +88,8 @@
       .select('data, type, created_at, card_holder', { count: 'estimated' })
       .eq('team_member', member.id)
       .range(from, to)
+      .gte('created_at', new Date(fromDate).toISOString())
+      .lte('created_at', new Date(toDate).toISOString())
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -76,13 +98,41 @@
     }
 
     if (data) {
+      let groupedLogs = [];
+
+      groupedLogs = data.filter(
+        (log) => !log.data.message.includes('QRScan' || 'QRShare' || 'NFC')
+      );
+
+      // Grouping by date
+      groupedLogs = groupedLogs.reduce((acc, log) => {
+        const date = new Date(log.created_at).toDateString().slice(4);
+
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(log);
+
+        return acc;
+      }, {});
+
+      groupedLogs = Object.keys(groupedLogs).map((date) => {
+        return {
+          date,
+          logs: groupedLogs[date],
+        };
+      });
+
+      // console.log(groupedLogs);
+      // console.log(data);
+
       memberLogs = data;
       maxPage = Math.ceil(count / toItem);
       loading = false;
     }
   };
 
-  $: if (isOpen) page, getMemberLogs();
+  $: if (isOpen) toDateValue, page, getMemberLogs();
 </script>
 
 {#if isOpen}
@@ -93,11 +143,6 @@
     on:click={closeModal}
   />
 {/if}
-<!-- <Flatpickr
-  {options}
-  name="date"
-  class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
-/> -->
 
 {#if isOpen}
   <Dialog
@@ -129,12 +174,20 @@
         <div class="flex bg-neutral-800 h-10 p-2 rounded-md w-1/2">
           Most Recent
         </div>
+        <div
+          class="flex bg-neutral-800 h-10 pl-2 py-2 rounded-md w-1/2 items-center justify-between"
+        >
+          Period:
 
-        <!-- <Flatpickr
-          {options}
-          name="date"
-          class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
-        /> -->
+          <Flatpickr
+            placeholder={new Date(fromDateValue).toDateString().slice(4) +
+              ' to ' +
+              new Date(toDateValue).toDateString().slice(4)}
+            {options}
+            name="date"
+            class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
+          />
+        </div>
         <button on:click={closeModal} class="self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -155,9 +208,9 @@
     </div>
     <div class="p-2 bg-neutral-800 rounded-lg h-full">
       {#if loading}
-        {#each Array(memberLogs.length ?? 15) as item}
+        <!-- {#each Array(memberLogs.length ?? 15) as item}
           <div class="bg-neutral-900 w-full h-8 rounded-md mb-1" />
-        {/each}
+        {/each} -->
       {:else if memberLogs.length > 0}
         {#each memberLogs as log}
           <div
@@ -209,6 +262,59 @@
             </p>
           </div>
         {/each}
+        <!-- {#each memberLogs as item}
+          <h1>{item.date}</h1>
+          {#each item.logs as log}
+            <div
+              class={`text-sm flex mb-1 rounded-md justify-between p-1 hover:p-1 ${
+                log.type === 'DANGER'
+                  ? 'bg-red-600/30 border-2 border-red-400/30 hover:bg-red-800'
+                  : log.type === 'SUCCESS'
+                  ? 'bg-green-600/30 border-2 border-green-400/30 hover:bg-green-800'
+                  : log.type === 'WARN'
+                  ? 'bg-yellow-600/30 border-2 border-yellow-400/30 hover:bg-yellow-800'
+                  : 'bg-transparent hover:bg-neutral-700'
+              }`}
+            >
+              {#if log.type === 'DANGER' || log.type === 'SUCCESS' || log.type === 'WARN'}
+                <h1
+                  class={`${
+                    log.type === 'DANGER'
+                      ? 'text-red-200'
+                      : log.type === 'SUCCESS'
+                      ? 'text-green-200'
+                      : log.type === 'WARN'
+                      ? 'text-yellow-200'
+                      : 'text-neutral-100'
+                  }`}
+                >
+                  {log?.data?.message}
+                </h1>
+              {:else}
+                <h1 class="text-white">
+                  {`${log?.card_holder ?? 'Member'}'s` +
+                    log?.data?.message?.slice(4)}
+                </h1>
+              {/if}
+              <p
+                class={`${
+                  log.type === 'DANGER'
+                    ? 'text-red-200'
+                    : log.type === 'SUCCESS'
+                    ? 'text-green-200'
+                    : log.type === 'WARN'
+                    ? 'text-yellow-200'
+                    : 'text-neutral-500'
+                }`}
+              >
+                {setHours4Digit(
+                  convertToGMT7(log.created_at).getHours(),
+                  convertToGMT7(log.created_at).getMinutes()
+                )}
+              </p>
+            </div>
+          {/each}
+        {/each} -->
       {:else}
         <div class="flex justify-center items-center">
           <h1 class="text-center">No log found</h1>

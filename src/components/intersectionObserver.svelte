@@ -22,6 +22,7 @@
 
     return thresholds;
   };
+
   onMount(() => {
     if (browser) {
       const handleIntersect = (entries, observer) => {

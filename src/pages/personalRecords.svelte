@@ -6,6 +6,7 @@
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
+  // import 'flatpickr/dist/flatpickr.css';
   import supabase from '@lib/db';
   import { memberData, user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';

@@ -109,20 +109,22 @@
     {#if permissions.writeRecords}
       <TabGroup class="h-full">
         <TabList
-          class="w-full flex justify-between pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
+          class="w-full flex justify-between pl-12 md:pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
         >
-          <div class="flex gap-8">
+          <div class="flex gap-8 w-full md:w-1/5">
             <Tab
               class={({ selected }) =>
                 selected
-                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2'
-                  : 'text-white text-xs md:text-sm pb-2'}>Personal</Tab
+                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2 w-full md:w-1/5 h-full'
+                  : 'text-white text-xs md:text-sm pb-2 w-full md:w-1/5 h-full'}
+              >Personal</Tab
             >
             <Tab
               class={({ selected }) =>
                 selected
-                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2'
-                  : 'text-white text-xs md:text-sm pb-2'}>Team</Tab
+                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2 w-full md:w-1/5 h-full'
+                  : 'text-white text-xs md:text-sm pb-2 w-full md:w-1/5 h-full'}
+              >Team</Tab
             >
           </div>
         </TabList>

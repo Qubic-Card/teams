@@ -1,5 +1,5 @@
 <script>
-  import { sevenDays } from '@lib/utils/getDates';
+  import { last7Days, sevenDays } from '@lib/utils/getDates';
   import supabase from '@lib/db';
   import TeamAnalyticsCard from '@comp/cards/teamAnalyticsCard.svelte';
   import { tapCount } from '@lib/utils/count';
@@ -103,7 +103,7 @@
       .from('team_connection_acc')
       .select('profileData->socials', { count: 'estimated' })
       .eq('team_id', teamId)
-      .gte('dateConnected', new Date(new Date(sevenDays[0])).toUTCString())
+      .gte('dateConnected', new Date(new Date(last7Days[0])).toUTCString())
       // .rangeLt('dateConnected', [a, b])
       .order('dateConnected', { ascending: false });
 
@@ -130,7 +130,8 @@
           { count: 'estimated' }
         )
         .eq('team', teamId)
-        .gte('created_at', new Date(new Date(sevenDays[0])).toISOString())
+
+        .gte('created_at', new Date(new Date(last7Days[0])).toISOString())
         .order('created_at', { ascending: false });
 
       if (logs) {
@@ -208,10 +209,11 @@
       teamMembers = res;
       maxPage = Math.ceil(count / toItem);
       loading = false;
-      console.log(error);
     }
     if (data) {
       // order sort member data
+    }
+  };
 
   const getAll = async () => {
     await getTeamWeeklyLogsActivity();

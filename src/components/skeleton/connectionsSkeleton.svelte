@@ -3,7 +3,7 @@
 </script>
 
 <div class="animate-pulse">
-  <div class="flex flex-col gap-4 {!personalOnly && 'mt-20'}">
+  <div class="flex flex-col gap-4">
     {#if searchSkeletonVisible}
       <div class="w-full h-12 flex md:hidden mt-2 gap-2 self-end mr-2">
         <div class="bg-neutral-800 w-full h-full rounded-md" />
@@ -15,7 +15,9 @@
       </div>
     {/if}
     <div
-      class="flex flex-col {!personalOnly && !searchSkeletonVisible && 'mt-20'}"
+      class="flex flex-col {!personalOnly &&
+        !searchSkeletonVisible &&
+        'mt-36 md:mt-20'}"
     >
       <div class="bg-black/70 w-full h-12" />
       {#if items > 0}

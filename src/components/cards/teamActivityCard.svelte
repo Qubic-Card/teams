@@ -35,7 +35,6 @@
     <div class="flex flex-col">
       <h1 class="font-semibold text-neutral-400">Most Recent Activity</h1>
       {#if member.team_logs.length > 0}
-<<<<<<< HEAD
         {#if member.team_logs[0].type === 'DANGER' || member.team_logs[0].type === 'SUCCESS' || member.team_logs[0].type === 'WARN'}
           <p
             class={`${
@@ -56,42 +55,6 @@
               member.team_logs[0]?.data?.message?.slice(4)}
           </p>
         {/if}
-
-        <!-- {#if log.type === 'DANGER' || log.type === 'SUCCESS' || log.type === 'WARN'}
-              <h1
-                class={`${
-                  log.type === 'DANGER'
-                    ? 'text-red-200'
-                    : log.type === 'SUCCESS'
-                    ? 'text-green-200'
-                    : log.type === 'WARN'
-                    ? 'text-yellow-200'
-                    : 'text-neutral-100'
-                }`}
-              >
-                {log?.data?.message}
-              </h1>
-            {:else}
-              <h1 class="text-white">
-                {`${log?.card_holder ?? 'Member'}'s` +
-                  log?.data?.message?.slice(4)}
-              </h1>
-            {/if} -->
-=======
-        <p
-          class={`${
-            member.team_logs[0].type === 'DANGER'
-              ? 'text-red-600'
-              : member.team_logs[0].type === 'SUCCESS'
-              ? 'text-green-600'
-              : member.team_logs[0].type === 'WARN'
-              ? 'text-yellow-600'
-              : 'text-neutral-100'
-          }`}
-        >
-          {member.team_logs[0].data.message}
-        </p>
->>>>>>> 2391c3013282c3b31a6a0c30f69ba7903147c9cf
       {:else}
         <p class="text-neutral-100">No activity yet</p>
       {/if}

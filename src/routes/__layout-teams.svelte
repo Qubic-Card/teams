@@ -261,7 +261,7 @@
               ? 'top-36 md:top-24'
               : 'top-[100px] md:top-16'
             : 'top-16'
-        } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
+        } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full overflow-x-hidden`}
       >
         <SvelteToast />
 
@@ -279,11 +279,11 @@
           {#if permissions.readAnalytics}
             {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
               <div
-                class="border-b-2 border-neutral-700 pl-20 md:pl-24 gap-4 flex fixed w-full z-10 h-12 bg-neutral-900"
+                class="border-b-2 border-neutral-700 pl-12 md:pl-24 gap-4 flex fixed w-full z-10 h-12 bg-neutral-900"
               >
                 <button
                   on:click={() => goto(`/${$teamData?.id}/dashboard`)}
-                  class={`pb-2 w-1/5 text-xs md:text-sm ${
+                  class={`pb-2 w-full md:w-1/5 text-xs md:text-sm ${
                     $page.routeId === '[slug]/dashboard@teams'
                       ? 'border-b-2 border-neutral-200 font-bold'
                       : 'text-neutral-300'
@@ -291,7 +291,7 @@
                 >
                 <button
                   on:click={() => goto(`/${$teamData?.id}/dashboard/team`)}
-                  class={`pb-2 w-1/5 text-xs md:text-sm ${
+                  class={`pb-2 w-full md:w-1/5 text-xs md:text-sm ${
                     $page.routeId === '[slug]/dashboard/team@teams'
                       ? 'border-b-2 border-neutral-200 font-bold'
                       : 'text-neutral-300'

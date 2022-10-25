@@ -62,6 +62,15 @@
     {/if}
   </table>
 
+  {#if !loading}
+    {#if !isAlreadySeeMore && currentPageRows?.length !== 0 && currentPageRows?.length > 4}
+      <button
+        class="self-center w-full mt-3 p-2 h-12 bg-neutral-900 hover:bg-neutral-900/80"
+        on:click>See more</button
+      >
+    {/if}
+  {/if}
+
   {#if currentPageRows?.length === 0 && !loading}
     <div class="text-center">
       <h1 class="text-xl my-4">No activity found</h1>

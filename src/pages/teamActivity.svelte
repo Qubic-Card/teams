@@ -10,8 +10,8 @@
 <div class="hidden md:flex flex-col gap-2">
   <div class="flex justify-between mb-2">
     <h1 class="text-2xl font-bold">Team Activity</h1>
-    <div class="flex gap-2 w-1/2 justify-end items-end">
-      <div class="bg-neutral-800 p-2 w-1/3 h-11 mb-1 text-center rounded-md">
+    <div class="flex gap-2 w-1/2 justify-end items-center">
+      <div class="bg-neutral-800 p-2 w-1/3 h-11 text-center rounded-md">
         Most Recent
       </div>
       <Input

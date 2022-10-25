@@ -20,7 +20,7 @@
 
 <div
   class="flex justify-end items-center gap-2 {editor !== 'basic'
-    ? 'w-1/3 mr-4'
+    ? 'w-full md:w-1/3 md:mr-4 md:ml-0 ml-4'
     : ''}"
 >
   <Input

@@ -6,6 +6,7 @@
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
+  // import 'flatpickr/dist/flatpickr.css';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -251,7 +252,7 @@
     }}
   >
     {#if isLoading}
-      <Spinner bg="#1f4496" />
+      <Spinner bg="#1f4496" class="w-6 h-6" />
     {/if} <span>Create record &#8594;</span></button
   >
 </div>

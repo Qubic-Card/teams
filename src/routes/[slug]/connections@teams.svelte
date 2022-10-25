@@ -195,7 +195,9 @@
       <div
         class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-16 border-neutral-700 fixed bg-neutral-900 w-full"
       >
-        <div class="flex w-full md:w-48 text-white gap-1">
+        <div
+          class="flex w-full md:w-48 text-white gap-1 border-b border-neutral-700"
+        >
           <button
             class={`${
               tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
@@ -238,7 +240,7 @@
         />
       {:else}
         <div
-          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-20"
+          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-36 md:mt-20"
         >
           <table class="snap-center text-black w-full">
             <thead class="text-left text-neutral-400 bg-black/60">
@@ -376,7 +378,7 @@
                 {:else}
                   <TableHead
                     class="w-1/4"
-                    data={connectionsTable}
+                    data={connectionsTableMobile}
                     on:sort={async (e) => {
                       if (userConnections.length > 1) {
                         asc = !asc;

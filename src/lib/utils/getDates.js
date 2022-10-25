@@ -43,7 +43,7 @@ export const last28Days = getDates(
 );
 
 export const last30Days = getDates(
-  new Date(new Date().setDate(new Date().getDate() - 29)),
+  new Date(new Date().setDate(new Date().getDate() - 30)),
   today
 );
 
