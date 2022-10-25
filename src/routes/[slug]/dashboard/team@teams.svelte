@@ -208,8 +208,10 @@
       teamMembers = res;
       maxPage = Math.ceil(count / toItem);
       loading = false;
+      console.log(error);
     }
-  };
+    if (data) {
+      // order sort member data
 
   const getAll = async () => {
     await getTeamWeeklyLogsActivity();
@@ -249,6 +251,7 @@
             {socialsCount}
           />
         </div>
+        <!-- <AnalyticsDropdownButton on:select={selectDaysHandler} /> -->
       </div>
     </div>
 

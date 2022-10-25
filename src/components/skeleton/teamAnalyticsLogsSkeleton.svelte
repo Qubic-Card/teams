@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <script>
   export let all, search;
   export let length = 5;
@@ -52,4 +53,12 @@
   {#each Array(length) as item}
     <div class="bg-neutral-800 rounded-md h-20 w-full md:flex hidden" />
   {/each}
+=======
+<div class="animate-pulse w-full flex flex-col gap-2">
+  <div class="bg-neutral-800 rounded-md h-20 w-full" />
+  <div class="bg-neutral-800 rounded-md h-20 w-full" />
+  <div class="bg-neutral-800 rounded-md h-20 w-full" />
+  <div class="bg-neutral-800 rounded-md h-20 w-full" />
+  <div class="bg-neutral-800 rounded-md h-20 w-full" />
+>>>>>>> 2391c3013282c3b31a6a0c30f69ba7903147c9cf
 </div>

@@ -23,7 +23,6 @@
       console.log('flatpickr hook', selectedDates, dateStr);
     },
   };
-
   const dispatch = createEventDispatcher();
 
   const closeModal = () => {
