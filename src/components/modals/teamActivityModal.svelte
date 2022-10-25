@@ -6,6 +6,7 @@
   import supabase from '@lib/db';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
+  import 'flatpickr/dist/flatpickr.css';
 
   export let isOpen = false;
   export let member;
@@ -16,11 +17,13 @@
 
   // let date = new Date();
   const options = {
+    mode: 'range',
     enableTime: true,
     onChange(selectedDates, dateStr) {
       console.log('flatpickr hook', selectedDates, dateStr);
     },
   };
+
   const dispatch = createEventDispatcher();
 
   const closeModal = () => {
@@ -56,7 +59,10 @@
 
   let memberLogs = [];
 
+  let loading = false;
+
   const getMemberLogs = async () => {
+    loading = true;
     const { from, to } = getPagination(page, toItem);
     const { data, error, count } = await supabase
       .from('team_logs')
@@ -65,11 +71,15 @@
       .range(from, to)
       .order('created_at', { ascending: false });
 
-    if (error) console.log(error);
+    if (error) {
+      console.log(error);
+      loading = false;
+    }
 
     if (data) {
       memberLogs = data;
       maxPage = Math.ceil(count / toItem);
+      loading = false;
     }
   };
 
@@ -84,6 +94,11 @@
     on:click={closeModal}
   />
 {/if}
+<!-- <Flatpickr
+  {options}
+  name="date"
+  class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
+/> -->
 
 {#if isOpen}
   <Dialog
@@ -91,11 +106,11 @@
     on:close={closeModal}
     class="transition-all md:transition-none duration-300 ease-in-out {isOpen
       ? 'h-[70%]'
-      : 'h-0 translate-y-10 md:opacity-0'} text-xs md:text-sm bg-neutral-900 text-white border-2 border-neutral-700 gap-4 top-28 md:top-[15%] right-0 md:right-9 flex flex-col ml-0 lg:ml-12 w-full md:w-[95%] pb-4 bottom-0 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none"
+      : 'h-0 translate-y-10 md:opacity-0'} text-xs md:text-sm bg-neutral-900 text-white border-2 border-neutral-700 gap-2 top-28 md:top-[15%] right-0 md:right-9 flex flex-col ml-0 lg:ml-12 w-full md:w-[95%] pb-2 bottom-0 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none"
   >
     <div
       on:click={() => (isOpen = true)}
-      class=" p-3 h-24 rounded-md flex justify-between gap-2"
+      class="px-3 pt-3 h-24 rounded-md flex justify-between gap-2"
     >
       <div class="flex gap-2">
         <img
@@ -111,7 +126,7 @@
           <p>{member.job}</p>
         </div>
       </div>
-      <div class="flex gap-2 w-1/2">
+      <div class="flex justify-end gap-2 w-1/2">
         <div class="flex bg-neutral-800 h-10 p-2 rounded-md w-1/2">
           Most Recent
         </div>
@@ -140,7 +155,11 @@
       </div>
     </div>
     <div class="p-2 bg-neutral-800 rounded-lg h-full">
-      {#if memberLogs.length > 0}
+      {#if loading}
+        {#each Array(memberLogs.length ?? 15) as item}
+          <div class="bg-neutral-900 w-full h-8 rounded-md mb-1" />
+        {/each}
+      {:else if memberLogs.length > 0}
         {#each memberLogs as log}
           <div
             class={`text-sm flex mb-1 rounded-md justify-between p-1 hover:p-1 ${

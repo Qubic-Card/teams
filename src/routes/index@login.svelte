@@ -67,9 +67,9 @@
     <div
       class="text-white bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
     >
-      <div class="flex justify-start items-center h-screen p-8 md:p-24">
+      <div class="flex justify-start items-center h-screen p-6 md:p-24">
         <div
-          class="flex flex-col justify-between h-full w-full 2xl:w-1/2 py-16 px-8 bg-white rounded-2xl text-black"
+          class="flex flex-col justify-between h-full w-full 2xl:w-1/2 py-16 px-8 bg-white rounded-md md:rounded-xl text-black"
         >
           <div class="text-xl">
             <div class="flex items-center">

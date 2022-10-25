@@ -186,6 +186,7 @@
 </script>
 
 <svelte:window bind:innerWidth />
+
 <div class="flex flex-col md:pt-4 pl-12 md:pl-16">
   {#if permissions.readConnection === true}
     {#await getUserConnectionsList()}

@@ -64,14 +64,14 @@
   <section
     class="text-white overflow-hidden bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
   >
-    <div
-      class="flex justify-around items-center h-screen p-10 md:p-24 text-black"
-    >
+    <div class="flex justify-around h-screen p-6 md:p-24 text-black">
       <div
-        class="flex flex-col h-full w-full p-4 2xl:w-1/2 py-12 md:py-16 gap-2 bg-white rounded-2xl"
+        class="flex flex-col h-[90%] w-full p-4 2xl:w-1/2 py-6 md:py-16 gap-2 bg-white rounded-md md:rounded-xl"
         in:fly|local={{ y: 5000, duration: 1000 }}
       >
-        <h1 class="text-xl md:text-2xl font-bold mb-4">Select Editor</h1>
+        <h1 class="text-xl md:text-2xl font-bold mb-2 md:mb-4">
+          Select Editor
+        </h1>
         {#if isHasBasic}
           <div
             on:click={() => {
@@ -114,7 +114,7 @@
         {/if}
       </div>
 
-      <div class="bg-black md:w-full" />
+      <div class="bg-transparant md:w-full" />
     </div>
   </section>
 {:catch name}
