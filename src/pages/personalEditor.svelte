@@ -141,7 +141,14 @@
   $: query, getUnsplash();
 </script>
 
-<ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
+<ModalOverlay
+  {isOpen}
+  on:click={() => {
+    isOpen = false;
+    croppedImage = '';
+    pond.removeFile();
+  }}
+/>
 
 <Dialog
   static
@@ -149,7 +156,11 @@
     isOpen ? 'translate-x-0' : 'translate-x-[900px]'
   } transition-all duration-300 justify-between ease-in-out flex flex-col h-screen w-3/4 md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   open={isOpen}
-  on:close={() => (isOpen = false)}
+  on:close={() => {
+    isOpen = false;
+    croppedImage = '';
+    pond.removeFile();
+  }}
 >
   <div class="h-full flex flex-col gap-2">
     <h2>Crop image</h2>
