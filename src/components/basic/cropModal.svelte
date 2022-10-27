@@ -21,7 +21,10 @@
   const dispatch = createEventDispatcher();
 
   const updatedData = (data) => dispatch('updatedData', data);
-  const closeModal = () => dispatch('closeModal', false);
+  const closeModal = () => {
+    dispatch('closeModal', false);
+    croppedImage = '';
+  };
 
   const cropImage = async () => {
     croppedImage = await getCroppedImg(image, pixelCrop);
