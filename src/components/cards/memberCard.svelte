@@ -297,15 +297,15 @@
               <p>{memberProfile?.team_profile?.job}</p>
             </div>
             <div class="flex flex-col">
-              <h1 class="font-semibold text-neutral-400">Connections</h1>
+              <h1 class="font-regular text-neutral-400">Connections</h1>
               <!-- <p>{member.connections.length}</p> -->
             </div>
             <div class="flex flex-col">
-              <h1 class="font-semibold text-neutral-400">Activity</h1>
+              <h1 class="font-regular text-neutral-400">Activity</h1>
               <!-- <p>{member.team_logs.length}</p> -->
             </div>
             <div class="flex flex-col">
-              <h1 class="font-semibold text-neutral-400">
+              <h1 class="font-regular text-neutral-400">
                 Most Recent Activity
               </h1>
               <!-- {#if member.team_logs.length > 0}
@@ -410,10 +410,11 @@
     {/if}
   {:else}
     <div
-      class="flex bg-neutral-900 border border-neutral-800 p-3 rounded-md h-auto gap-8 items-center"
+      class="flex md:flex-row flex-col bg-neutral-900 border border-neutral-800 p-3 rounded-md h-auto gap-8 items-center"
     >
       <img
-        class="w-16 h-16 rounded-full {$user?.id === memberProfile.uid
+        class="hidden md:block w-16 h-16 rounded-full {$user?.id ===
+        memberProfile.uid
           ? 'border-2 border-blue-600'
           : ''}"
         src={memberProfile?.team_profile?.avatar}
@@ -428,18 +429,28 @@
       {/if} -->
       <div class="flex flex-col w-full gap-2">
         <div class="flex justify-between items-center">
-          <div class="flex gap-4 md:text-sm text-xs">
-            <h1>Card ****{member?.id.slice(-6)}</h1>
-            <h1>
-              Joined since {convertToGMT7(memberProfile?.user_change)
-                .toDateString()
-                .slice(4)}
-            </h1>
+          <div class="flex justify-between w-full gap-4 md:text-sm text-xs">
+            <div class="flex gap-2">
+              <h1>Card ****{member?.id.slice(-6)}</h1>
+              <h1>
+                Joined since {convertToGMT7(memberProfile?.user_change)
+                  .toDateString()
+                  .slice(4)}
+              </h1>
+            </div>
+            {#if permissions.writeMembers}
+              <MemberMenuDropdown
+                class="block md:hidden"
+                on:remove={() => toggleDeleteMemberModal()}
+                on:go={toProfileEditor}
+              />
+            {/if}
           </div>
           <div class="hidden md:flex gap-2 items-center">
             <MemberAnalyticsModal member={memberProfile} />
             {#if permissions.readRoles}
               <MemberRoleDropdown
+                class="w-40"
                 {roles}
                 {role}
                 {permissions}
@@ -468,6 +479,7 @@
 
             {#if permissions.writeMembers}
               <SwitchButton
+                mode="member"
                 on:change={async () => await setStatus()}
                 checked={teamCardCon?.status}
               />
@@ -505,20 +517,18 @@
             {#if recentLog.length > 0}
               {#if recentLog[0].type === 'DANGER' || recentLog[0].type === 'SUCCESS' || recentLog[0].type === 'WARN'}
                 <p
-                  class={`${
-                    recentLog[0].type === 'DANGER'
-                      ? 'text-red-600'
-                      : recentLog[0].type === 'SUCCESS'
-                      ? 'text-green-600'
-                      : recentLog[0].type === 'WARN'
-                      ? 'text-yellow-600'
-                      : 'text-neutral-100'
-                  }`}
+                  class="break-all {recentLog[0].type === 'DANGER'
+                    ? 'text-red-600'
+                    : recentLog[0].type === 'SUCCESS'
+                    ? 'text-green-600'
+                    : recentLog[0].type === 'WARN'
+                    ? 'text-yellow-600'
+                    : 'text-neutral-100'}"
                 >
                   {recentLog[0].data.message}
                 </p>
               {:else}
-                <p class="text-neutral-100">
+                <p class="text-neutral-100 break-all">
                   {`${recentLog[0]?.card_holder ?? 'Member'}'s` +
                     recentLog[0]?.data?.message?.slice(4)}
                 </p>
@@ -530,10 +540,11 @@
         </div>
       </div>
 
-      <div class="flex md:hidden gap-2 items-center">
+      <div class="flex md:hidden gap-1 items-center w-full">
         <MemberAnalyticsModal member={memberProfile} />
         {#if permissions.readRoles}
           <MemberRoleDropdown
+            class="w-28"
             {roles}
             {role}
             {permissions}
@@ -561,15 +572,9 @@
 
         {#if permissions.writeMembers}
           <SwitchButton
+            mode="member"
             on:change={async () => await setStatus()}
             checked={teamCardCon?.status}
-          />
-        {/if}
-
-        {#if permissions.writeMembers}
-          <MemberMenuDropdown
-            on:remove={() => toggleDeleteMemberModal()}
-            on:go={toProfileEditor}
           />
         {/if}
       </div>
@@ -578,7 +583,7 @@
 {:else if permissions.readMembers}
   <div class="flex flex-col justify-between text-sm">
     <div
-      class="flex flex-col justify-between w-full h-44 bg-neutral-800 rounded-md"
+      class="flex flex-col justify-between w-full h-44 bg-neutral-900 rounded-md"
     >
       <div class="flex h-64 gap-4 p-4">
         <img

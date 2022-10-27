@@ -143,7 +143,7 @@
     >
       <div class="flex gap-2">
         <div
-          class="flex p-2 gap-2 flex-1 bg-neutral-800 border border-neutral-700 rounded-md"
+          class="flex p-2 gap-2 flex-1 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-md"
         >
           <img
             class="w-24 h-24 rounded-full"
@@ -215,7 +215,7 @@
         {/each} -->
       {:else if memberLogs.length > 0}
         {#each memberLogs as item}
-          <h1 class="font-semibold text-sm">{item.date}</h1>
+          <h1 class="font-regular text-sm">{item.date}</h1>
           {#each item.logs as log}
             <div
               class={`text-sm pl-2 flex mb-1 rounded-md justify-between p-1 ${

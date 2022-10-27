@@ -44,7 +44,7 @@
                 />
               </div>
             {:else}
-              <h3 class="text-md md:text-lg font-semibold">{title ?? ''}</h3>
+              <h3 class="text-md md:text-lg font-regular">{title ?? ''}</h3>
             {/if}
             <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
               x

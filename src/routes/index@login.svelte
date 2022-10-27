@@ -81,7 +81,7 @@
             <div>
               {#if isForgotPassword}
                 <h1
-                  class="mt-6 text-2xl mb-4 font-semibold tracking-tighter text-left sm:text-3xl title-font"
+                  class="mt-6 text-2xl mb-4 font-regular tracking-tighter text-left sm:text-3xl title-font"
                 >
                   We got you!
                 </h1>
@@ -111,14 +111,14 @@
                   <button
                     disabled={loading}
                     on:click={async () => await handleForgotPassword()}
-                    class="block w-full px-4 py-3 md:mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                    class="block w-full px-4 py-3 md:mt-6 font-regular rounded-md text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                     >Send Email</button
                   >
                 {:else}
                   <button
                     disabled={loading}
                     on:click={async () => await handleLogin()}
-                    class="block disabled:bg-blue-600/60 w-full px-4 py-3 md:mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                    class="block disabled:bg-blue-600/60 w-full px-4 py-3 md:mt-6 font-regular rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                     >Log In</button
                   >
                 {/if}

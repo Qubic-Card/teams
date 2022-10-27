@@ -16,7 +16,12 @@
   const go = () => dispatch('go');
 </script>
 
-<Listbox value={selected} on:change={(e) => (selected = e.detail)} let:open>
+<Listbox
+  class={$$props.class}
+  value={selected}
+  on:change={(e) => (selected = e.detail)}
+  let:open
+>
   {#if open}
     <div
       transition:fade|local={{ duration: 200 }}

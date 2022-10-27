@@ -195,14 +195,14 @@
     <div class="grid grid-cols-1 gap-1 mb-1">
       <BorderButton
         order={1}
-        class="w-full font-semibold h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-md"
+        class="w-full font-regular h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-md"
         on:click={() => toastFailed("You are can't connect to yourself.")}
       >
         Connect With Me
       </BorderButton>
       <BorderButton
         order={1}
-        class="w-full font-semibold h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary} rounded-md"
+        class="w-full font-regular h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary} rounded-md"
         on:click={async () =>
           download(
             await genvcard(

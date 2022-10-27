@@ -19,7 +19,7 @@
   let selected = selectedRole;
 </script>
 
-<div class="flex justify-end items-center gap-2 ">
+<div class="flex justify-end items-center gap-2">
   <Listbox value={selected} on:change={(e) => (selected = e.detail)} let:open>
     {#if open}
       <div
@@ -31,7 +31,7 @@
     {#if permissions.writeRoles}
       {#if role?.role_name}
         <ListboxButton
-          class="bg-neutral-800 border-2 border-neutral-700 text-xs text-white rounded-md p-2 w-40"
+          class="bg-neutral-800 border-2 break-all border-neutral-700 text-xs text-white rounded-md p-2 h-7 {$$props.class} flex justify-center items-center"
         >
           {#if selected === 'Superadmin'}
             Super Admin
@@ -42,7 +42,7 @@
       {/if}
     {:else}
       <p
-        class="text-white border-2 border-neutral-700 flex justify-between items-center h-12 p-2 gap-2 rounded-md w-60 text-sm"
+        class="text-white border-2 border-neutral-700 flex justify-between items-center h-7 p-2 gap-2 rounded-md {$$props.class} text-sm"
       >
         {selected}
       </p>

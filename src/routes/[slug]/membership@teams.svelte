@@ -15,7 +15,7 @@
   class="flex flex-col pb-20 bg-black min-h-screen pl-10 md:pl-16 pr-4 gap-2"
 >
   <div
-    class="border-b border-neutral-700 h-12 text-lg font-semibold pt-2 z-40 fixed w-full bg-black pl-6"
+    class="border-b border-neutral-700 h-12 text-lg font-regular pt-2 z-40 fixed w-full bg-black pl-6"
   >
     Membership
   </div>
@@ -30,7 +30,7 @@
   <div class="flex flex-col gap-2 my-2 pl-6">
     <div class="flex md:flex-row flex-col justify-between md:items-center mb-4">
       <div class="flex justify-between items-center">
-        <h1 class="text-lg font-semibold">Members</h1>
+        <h1 class="text-lg font-regular">Members</h1>
         <div
           class="bg-neutral-800 p-2 w-1/2 md:w-1/3 h-11 md:text-sm text-xs flex md:hidden justify-center items-center text-center rounded-md"
         >

@@ -167,7 +167,8 @@
       >
         <div class="flex justify-between items-center">
           <h1 class="text-sm md:text-md font-bold">
-            {item.data} <span class="text-sm text-neutral-400">{item.type}</span>
+            {item.data}
+            <span class="text-sm text-neutral-400">{item.type}</span>
           </h1>
           <div
             class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
@@ -217,13 +218,17 @@
     <div
       class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-4 h-24 md:h-32 rounded-md flex flex-col justify-between "
     >
-      <h1 class="text-lg">Members Efficiency</h1>
+      <h1 class="text-md md:text-lg">Members Efficiency</h1>
 
       <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
         <div
-          data-tooltip="{active} / {memberCount} members"
+          data-tooltip="{active} / {memberCount} members - {memberCountPercentage}%"
           style="--width: {memberCountPercentage}%;"
-          class="bg-green-400 box h-full rounded-sm"
+          class="{memberCountPercentage >= 50
+            ? 'bg-green-400'
+            : memberCountPercentage < 25
+            ? 'bg-red-400'
+            : 'bg-orange-400'} box h-full rounded-sm"
         />
       </div>
     </div>
@@ -236,14 +241,17 @@
   <div
     class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-4 h-24 md:h-32 rounded-md flex flex-col justify-between"
   >
-    <h1 class="text-lg">Social Media Effectiveness</h1>
+    <h1 class="text-md md:text-lg">Social Media Effectiveness</h1>
     <div class="bg-neutral-600 w-full h-4 flex items-center  rounded-sm">
       {#if checkDataAvailability(socialsCount)}
         {#each socialsCount as item}
           {#if item.value !== 0}
             <div
               data-tooltip={item.name.charAt(0).toUpperCase() +
-                item.name.slice(1)}
+                item.name.slice(1) +
+                ' - ' +
+                item.value +
+                '%'}
               style="--width: {item.value}%;"
               class="{colorMapping(
                 item.name
@@ -252,7 +260,7 @@
           {/if}
         {/each}
       {:else}
-        <p class="pl-1">No data available</p>
+        <p class="pl-1 text-xs">No data available</p>
       {/if}
     </div>
   </div>

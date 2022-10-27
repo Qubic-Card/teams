@@ -163,7 +163,7 @@
 
   <div class="flex flex-col gap-1 px-8 md:px-16 text-white my-4">
     <BorderButton
-      class="w-full font-semibold h-12 {$currentTheme?.outline} {$currentTheme?.button} {$currentTheme?.buttonText} rounded-md"
+      class="w-full font-regular h-12 {$currentTheme?.outline} {$currentTheme?.button} {$currentTheme?.buttonText} rounded-md"
       on:click={popup}
     >
       Connect with Me

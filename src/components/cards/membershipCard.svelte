@@ -22,17 +22,17 @@
       <p class="break-all">memberProfile?.team_profile?.job</p>
     </div>
     <div class="flex flex-col">
-      <h1 class="font-semibold text-neutral-400">Joined At</h1>
+      <h1 class="font-regular text-neutral-400">Joined At</h1>
       <p>
         {new Date().toLocaleDateString()} - {new Date().getHours()}:{new Date().getMinutes()}
       </p>
     </div>
     <div class="flex flex-col">
-      <h1 class="font-semibold text-neutral-400">Points</h1>
+      <h1 class="font-regular text-neutral-400">Points</h1>
       <p>10</p>
     </div>
     <div class="flex flex-col">
-      <h1 class="font-semibold text-neutral-400">Added By</h1>
+      <h1 class="font-regular text-neutral-400">Added By</h1>
       <p>Galih</p>
     </div>
   </div>

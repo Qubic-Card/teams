@@ -110,7 +110,7 @@
               alt=""
             />
             <p
-              class={`cursor-pointer underline hover:font-semibold ${
+              class={`cursor-pointer underline hover:font-regular ${
                 connection.link === '' ? 'hidden' : ''
               }`}
               on:click={() => window.open(connection.link, '_blank').focus()}
@@ -193,7 +193,7 @@
             {#each connection?.profileData?.links as item}
               {#if item.isActive}
                 <div
-                  class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-600 items-center hover:font-semibold"
+                  class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-600 items-center hover:font-regular"
                 >
                   <p
                     class="break-all"

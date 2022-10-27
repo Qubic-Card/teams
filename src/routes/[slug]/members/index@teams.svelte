@@ -56,7 +56,6 @@
 
     if (error) console.log(error);
     if (data) {
-      console.log(data);
       activeMembers = data.filter(
         (c) => c.team_cardcon[0]?.team_member_id?.uid
       );
@@ -122,14 +121,12 @@
 
 <svelte:window bind:innerWidth />
 
-<div
-  class="flex flex-col pb-20 bg-black min-h-screen pl-10 md:pl-16  gap-2"
->
+<div class="flex flex-col pb-20 bg-black min-h-screen pl-10 md:pl-16  gap-2">
   {#await getAll()}
     <TeamAnalyticsLogsSkeleton all />
   {:then}
     <div
-      class="border-b border-neutral-700 h-12 text-lg font-semibold pt-2 top-0 sticky w-full bg-black pl-6"
+      class="border-b border-neutral-700 h-12 text-lg font-regular pt-2 top-0 sticky w-full bg-black pl-6"
     >
       Team Performance
     </div>
@@ -142,48 +139,48 @@
       </div>
     </div>
     <div class="flex flex-col my-2">
-      <div class="flex px-6 flex-row items-center gap-2 py-3 border-b mb-2 z-10 sticky top-0 border-neutral-700 bg-black">
-        <h1 class="text-xl font-bold flex-grow">Team Members</h1>
-        <div
-        class={`items-center  rounded-md gap-2 ${
-          permissions.readMembers ? 'flex' : 'hidden'
-        }`}
+      <div
+        class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 py-3 border-b mb-2 z-10 sticky top-0 border-neutral-700 bg-black"
       >
-        <button
-          class={`p-2 w-20 rounded-md text-xs ${
-            state === 'all'
-              ? 'bg-neutral-200 text-black'
-              : 'outline outline-neutral-600 outline-1 text-neutral-400'
+        <h1 class="text-xl font-bold flex-grow w-full">Team Members</h1>
+        <div
+          class={`items-center justify-end rounded-md gap-2 w-full ${
+            permissions.readMembers ? 'flex' : 'hidden'
           }`}
-          on:click={() => setState('all')}>All</button
         >
-        <button
-          class={`p-2 w-20 rounded-md text-xs ${
-            state === 'active'
-              ? 'bg-neutral-200 text-black'
-              : 'outline outline-neutral-600 outline-1 text-neutral-400'
-          }`}
-          on:click={() => setState('active')}>Active</button
-        >
-        <button
-          class={`p-2 w-20 rounded-md text-xs ${
-            state === 'inactive'
-              ? 'bg-neutral-200 text-black'
-              : 'outline outline-neutral-600 outline-1 text-neutral-400'
-          }`}
-          on:click={() => setState('inactive')}>Inactive</button
-        >
-      </div>
-        <div class="flex gap-2  items-center">
+          <button
+            class={`p-2 md:w-20 w-full rounded-md text-xs ${
+              state === 'all'
+                ? 'bg-neutral-200 text-black'
+                : 'outline outline-neutral-600 outline-1 text-neutral-400'
+            }`}
+            on:click={() => setState('all')}>All</button
+          >
+          <button
+            class={`p-2 md:w-20 w-full rounded-md text-xs ${
+              state === 'active'
+                ? 'bg-neutral-200 text-black'
+                : 'outline outline-neutral-600 outline-1 text-neutral-400'
+            }`}
+            on:click={() => setState('active')}>Active</button
+          >
+          <button
+            class={`p-2 md:w-20 w-full rounded-md text-xs ${
+              state === 'inactive'
+                ? 'bg-neutral-200 text-black'
+                : 'outline outline-neutral-600 outline-1 text-neutral-400'
+            }`}
+            on:click={() => setState('inactive')}>Inactive</button
+          >
+        </div>
+        <div class="flex gap-2 md:w-32 w-full items-center">
           <div
-            class="bg-neutral-800 p-2 w-32 text-xs flex justify-center items-center text-center rounded-md"
+            class="bg-neutral-800 p-2 w-full md:w-32 text-xs flex justify-center items-center text-center rounded-md"
           >
             Most Recent
           </div>
-          
         </div>
       </div>
-      
 
       {#if state === 'inactive'}
         {#if inactiveCards.length === 0}

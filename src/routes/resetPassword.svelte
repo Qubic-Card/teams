@@ -62,7 +62,7 @@
       <img src="/qubic.svg" alt="" />
     </a>
     <h1
-      class="mt-6 text-2xl font-semibold text-white tracking-tighter text-left sm:text-3xl title-font"
+      class="mt-6 text-2xl font-regular text-white tracking-tighter text-left sm:text-3xl title-font"
     >
       Get a new password
     </h1>
@@ -86,7 +86,7 @@
       {#if !loading}
         <button
           on:click={async () => await handleResetPassword()}
-          class="block w-full px-4 py-3 mt-6 font-semibold text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+          class="block w-full px-4 py-3 mt-6 font-regular text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
           >Reset Password</button
         >
       {/if}

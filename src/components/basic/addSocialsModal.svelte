@@ -45,7 +45,7 @@
         <!--header-->
         <div class="p-5 border-b border-solid rounded-t">
           <div class="flex w-full justify-between items-center">
-            <h3 class="text-xl font-semibold">Add Socials</h3>
+            <h3 class="text-xl font-regular">Add Socials</h3>
             <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
               <img
                 width="20"
