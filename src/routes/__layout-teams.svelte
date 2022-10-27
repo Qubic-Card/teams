@@ -261,7 +261,7 @@
               ? 'top-36 md:top-24'
               : 'top-[100px] md:top-16'
             : 'top-16'
-        } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full overflow-x-hidden`}
+        } bottom-0  text-white overflow-y-auto w-full overflow-x-hidden`}
       >
         <SvelteToast />
 

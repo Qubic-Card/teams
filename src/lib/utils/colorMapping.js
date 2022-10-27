@@ -3,47 +3,47 @@ const colorMapping = (social) => {
 
   switch (social) {
     case 'instagram':
-      color = 'bg-red-600';
+      color = 'bg-red-500';
       break;
     case 'twitter':
-      color = 'bg-blue-800';
+      color = 'bg-blue-500';
       break;
     case 'facebook':
-      color = 'bg-emerald-700';
+      color = 'bg-emerald-500';
       break;
     case 'youtube':
-      color = 'bg-orange-600';
+      color = 'bg-orange-500';
       break;
     case 'linkedin':
       color = 'bg-cyan-500';
       break;
     case 'whatsapp':
-      color = 'bg-green-900';
+      color = 'bg-green-500';
       break;
     case 'tiktok':
-      color = 'bg-neutral-700';
+      color = 'bg-amber-500';
       break;
     case 'email':
-      color = 'bg-fuchsia-600';
+      color = 'bg-fuchsia-500';
       break;
     case 'phone':
-      color = 'bg-blue-500';
+      color = 'bg-purple-500';
       break;
     case 'line':
-      color = 'bg-lime-600';
+      color = 'bg-lime-500';
       break;
     case 'github':
-      color = 'bg-stone-800';
+      color = 'bg-stone-500';
       break;
     case 'telegram':
-      color = 'bg-cyan-700';
+      color = 'bg-sky-500';
       break;
     case 'discord':
-      color = 'bg-indigo-900';
+      color = 'bg-indigo-500';
       break;
 
     default:
-      color = 'bg-black';
+      color = 'bg-white';
       break;
   }
 

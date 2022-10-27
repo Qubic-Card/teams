@@ -52,33 +52,33 @@
     class="w-[90%] md:w-1/2"
   >
     <div
-      class="flex flex-col w-full justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
+      class="flex flex-col w-full justify-center items-center p-4 rounded-lg gap-3"
     >
       <h1
-        class="text-sm md:text-xl text-white font-bold text-center w-96 truncate"
+        class="text-white text-center w-96"
       >
         {heading ?? ''} <br />{text ?? ''}
       </h1>
       {#if isDelete}
-        <p class="text-xs md:text-sm text-neutral-100 font-semibold">
+        <p class="text-xs text-neutral-100 font-light">
           This action cannot be undone.
         </p>
       {/if}
       <div class="flex gap-2 w-full">
         <button
           on:click={toggleModal}
-          class="text-sm md:text-lg font-semibold text-white p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800"
+          class="text-sm text-white p-2 rounded-md border-2 border-neutral-700 w-full mt-6 hover:bg-neutral-800"
           >Cancel</button
         >
         <button
           disabled={isLoading}
           on:click={async () =>
             isDispatch ? action() : await deleteRoleHandler(id)}
-          class={`text-sm md:text-lg font-semibold ${
+          class={`text-sm   ${
             isDelete
               ? 'bg-red-600 hover:bg-red-600/60'
               : 'bg-blue-600 hover:bg-blue-600/60'
-          } p-2 rounded-md border-2 text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800 flex justify-center items-center gap-2`}
+          } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800 flex justify-center items-center gap-2`}
         >
           {#if isLoading}
             <Spinner bg={isDelete ? '#8d2020' : '#1f4496'} class="w-6 h-6" />

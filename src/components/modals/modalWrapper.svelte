@@ -17,10 +17,10 @@
     >
       <!--content-->
       <div
-        class="border-0 rounded-lg shadow-lg relative flex flex-col overflow-x-hidden w-full {editor ===
+        class=" border  rounded-lg shadow-lg relative flex flex-col overflow-x-hidden w-full {editor ===
         'team'
-          ? 'bg-neutral-900'
-          : 'bg-white'} outline-none focus:outline-none h-full"
+          ? 'bg-neutral-800 border-neutral-700'
+          : 'bg-white border-neutral-200'} outline-none focus:outline-none h-full"
       >
         <!--header-->
         <div

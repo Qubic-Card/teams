@@ -232,8 +232,8 @@
 <ConfirmationModal
   {isLoading}
   isDispatch
-  heading="Are you sure to change your role?"
-  buttonLabel="Yes, i am sure."
+  heading="Are you sure you want to change your role?"
+  buttonLabel="Yes"
   {showModal}
   {toggleModal}
   on:action={async () => {
@@ -264,7 +264,7 @@
   {#if !permissions.readMembers}
     {#if $user?.id === memberProfile.uid}
       <div
-        class="flex bg-neutral-800 border border-neutral-700 p-3 rounded-md h-auto gap-8 items-center"
+        class="flex bg-neutral-900 border border-neutral-800 p-3 rounded-md h-auto gap-8 items-center"
       >
         <img
           class="w-16 h-16 rounded-full"
@@ -273,7 +273,7 @@
         />
         <div class="flex flex-col w-full gap-2">
           <div class="flex justify-between">
-            <div class="flex gap-2 text-sm">
+            <div class="flex gap-4 text-sm">
               <h1>Card ****{member?.id.slice(-6)}</h1>
               <h1>
                 Joined since {convertToGMT7(memberProfile?.user_change)
@@ -410,7 +410,7 @@
     {/if}
   {:else}
     <div
-      class="flex bg-neutral-800 border border-neutral-700 p-3 rounded-md h-auto gap-8 items-center"
+      class="flex bg-neutral-900 border border-neutral-800 p-3 rounded-md h-auto gap-8 items-center"
     >
       <img
         class="w-16 h-16 rounded-full {$user?.id === memberProfile.uid
@@ -428,7 +428,7 @@
       {/if} -->
       <div class="flex flex-col w-full gap-2">
         <div class="flex justify-between items-center">
-          <div class="flex gap-2 md:text-sm text-xs">
+          <div class="flex gap-4 md:text-sm text-xs">
             <h1>Card ****{member?.id.slice(-6)}</h1>
             <h1>
               Joined since {convertToGMT7(memberProfile?.user_change)
@@ -493,15 +493,15 @@
             <p>{memberProfile?.team_profile?.job}</p>
           </div>
           <div class="hidden md:flex flex-col">
-            <h1 class="font-semibold text-neutral-400">Connections</h1>
+            <h1 class=" text-neutral-400">Connections</h1>
             <p>{connectionsCount}</p>
           </div>
           <div class="hidden md:flex flex-col">
-            <h1 class="font-semibold text-neutral-400">Activity</h1>
+            <h1 class=" text-neutral-400">Activity</h1>
             <p>{logsCount}</p>
           </div>
           <div class="hidden md:flex flex-col">
-            <h1 class="font-semibold text-neutral-400">Most Recent Activity</h1>
+            <h1 class="text-neutral-400">Most Recent Activity</h1>
             {#if recentLog.length > 0}
               {#if recentLog[0].type === 'DANGER' || recentLog[0].type === 'SUCCESS' || recentLog[0].type === 'WARN'}
                 <p

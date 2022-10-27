@@ -14,12 +14,12 @@
     {
       percentage: 0,
       data: 0,
-      type: 'Contacts',
+      type: 'New Contacts',
     },
     {
       percentage: 0,
       data: 0,
-      type: 'Taps',
+      type: 'New Taps',
     },
   ];
 
@@ -163,11 +163,11 @@
   <div class="flex flex-col gap-2 w-full md:w-1/3 h-32">
     {#each analyticsData as item}
       <div
-        class="flex justify-between w-full h-1/2 bg-neutral-800 border border-neutral-700 rounded-lg p-3"
+        class="flex justify-between w-full h-1/2 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-lg p-3"
       >
         <div class="flex justify-between items-center">
-          <h1 class="text-sm md:text-md">
-            {item.data} <span>{item.type}</span>
+          <h1 class="text-sm md:text-md font-bold">
+            {item.data} <span class="text-sm text-neutral-400">{item.type}</span>
           </h1>
           <div
             class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
@@ -190,39 +190,13 @@
         </div>
         <div class="flex justify-between items-center text-sm">
           {#if item.percentage >= 0}
-            <p class="text-green-600 flex gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M5 15l7-7 7 7"
-                />
-              </svg>
+            <p class="text-green-400 flex gap-1">
+              ▲
               {item.percentage}%
             </p>
           {:else}
-            <p class="text-red-600 flex gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+            <p class="text-red-400 flex gap-1">
+              ▼
               {item.percentage}%
             </p>
           {/if}
@@ -237,19 +211,19 @@
 {#if teams}
   {#await getTeamMemberActivities()}
     <div
-      class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-800 rounded-md border border-neutral-700"
+      class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse outline outline-1 outline-neutral-800 bg-neutral-900 rounded-md"
     />
   {:then name}
     <div
-      class="w-full md:w-1/3 border border-neutral-700 bg-neutral-800 p-2 h-24 md:h-32 rounded-md flex flex-col justify-between "
+      class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-4 h-24 md:h-32 rounded-md flex flex-col justify-between "
     >
       <h1 class="text-lg">Members Efficiency</h1>
 
-      <div class="bg-neutral-600 w-full h-8 flex items-center p-1 rounded-md">
+      <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
         <div
           data-tooltip="{active} / {memberCount} members"
           style="--width: {memberCountPercentage}%;"
-          class="bg-green-600 box h-6 rounded-md"
+          class="bg-green-400 box h-full rounded-sm"
         />
       </div>
     </div>
@@ -260,10 +234,10 @@
 
 {#if socialsCount}
   <div
-    class="w-full md:w-1/3 border border-neutral-700 bg-neutral-800 p-2 h-24 md:h-32 rounded-md flex flex-col justify-between"
+    class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-4 h-24 md:h-32 rounded-md flex flex-col justify-between"
   >
-    <h1 class="text-lg">Most Interactions</h1>
-    <div class="bg-neutral-600 w-full h-8 flex items-center p-1 rounded-md">
+    <h1 class="text-lg">Social Media Effectiveness</h1>
+    <div class="bg-neutral-600 w-full h-4 flex items-center  rounded-sm">
       {#if checkDataAvailability(socialsCount)}
         {#each socialsCount as item}
           {#if item.value !== 0}
@@ -273,7 +247,7 @@
               style="--width: {item.value}%;"
               class="{colorMapping(
                 item.name
-              )} h-6 box first:rounded-l-md last:rounded-r-md"
+              )} h-full box first:rounded-l-sm last:rounded-r-sm"
             />
           {/if}
         {/each}
