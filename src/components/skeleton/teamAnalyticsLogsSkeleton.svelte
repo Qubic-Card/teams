@@ -1,10 +1,10 @@
 <script>
-  export let all, search;
+  export let all, search, card;
   export let length = 5;
 </script>
 
 <div class="animate-pulse w-full flex flex-col gap-2">
-  {#if all}
+  {#if all || card}
     <div class="w-40 bg-neutral-800 rounded-md h-8" />
     <div class="flex md:flex-row flex-col w-full gap-2 mb-4">
       <div class="flex flex-col h-32 w-full md:w-1/3 gap-2">
@@ -50,6 +50,6 @@
   {/if}
 
   {#each Array(length) as item}
-    <div class="bg-neutral-800 rounded-md h-20 w-full md:flex hidden" />
+    <div class="bg-neutral-800 rounded-md h-24 w-full md:flex hidden" />
   {/each}
 </div>

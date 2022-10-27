@@ -39,7 +39,7 @@
 </script>
 
 <div
-  class="flex flex-col justify-between text-white gap-4 mb-8 pt-16 pl-16 md:pl-24 pr-4"
+  class="flex flex-col justify-between text-white gap-4 mb-8 pt-6 pl-16 md:pl-24 pr-4"
 >
   <div class="flex flex-col">
     <h1 class="text-sm md:text-md font-bold">Quick Actions</h1>

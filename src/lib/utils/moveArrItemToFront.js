@@ -18,7 +18,7 @@ const moveArrItemToFront = (data = [], matchingId) => {
       return 0;
     });
 
-  const unmatchedData = data
+  let unmatchedData = data
     .filter((item) => item?.team_cardcon[0]?.team_member_id?.uid !== matchingId)
     .sort((a, b) => {
       if (
@@ -35,6 +35,30 @@ const moveArrItemToFront = (data = [], matchingId) => {
       }
       return 0;
     });
+
+  // let emptyLogs = [];
+  // let nonEmptyLogs = [];
+
+  // unmatchedData.map((member) => {
+  //   if (member.team_logs.length > 0) {
+  //     nonEmptyLogs.push(member);
+  //   } else {
+  //     emptyLogs.push(member);
+  //   }
+  // });
+
+  // let sortedDate = nonEmptyLogs
+  //   .map((m) => m.team_logs[0].created_at)
+  //   .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+  // let sortedMembers = [];
+
+  // sortedDate.map((date) => {
+  //   let member = nonEmptyLogs.find((m) => m.team_logs[0].created_at === date);
+  //   sortedMembers.push(member);
+  // });
+
+  console.log(unmatchedData);
 
   let newData = [...matchedData, ...unmatchedData];
 

@@ -32,6 +32,13 @@
     inputText={editor === 'basic' ? 'text-black' : 'text-white'}
   />
   <Listbox value={selected} on:change={(e) => (selected = e.detail)} let:open>
+    {#if open}
+      <div
+        transition:fade|local={{ duration: 200 }}
+        class="fixed inset-0 bg-black/50 z-50"
+        aria-hidden="true"
+      />
+    {/if}
     <ListboxButton
       class="{editor === 'basic'
         ? 'bg-black'
@@ -43,7 +50,7 @@
         <ListboxOptions
           class="absolute {editor === 'basic'
             ? 'bg-white -translate-x-24'
-            : 'bg-neutral-900 -translate-x-20'} p-2 w-40 mt-2 shadow-md z-50"
+            : 'bg-neutral-900 -translate-x-20'} border border-neutral-700 p-2 w-40 mt-2 shadow-md z-50 rounded-md"
         >
           {#each searchMenu as menu}
             <ListboxOption

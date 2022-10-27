@@ -488,7 +488,15 @@
                           <div class="flex items-center h-[6.3rem]">
                             <Menu
                               class="bg-neutral-100 h-8 mx-2 relative rounded-md"
+                              let:open
                             >
+                              {#if open}
+                                <div
+                                  transition:fade|local={{ duration: 200 }}
+                                  class="fixed inset-0 bg-black/50 z-20"
+                                  aria-hidden="true"
+                                />
+                              {/if}
                               <MenuButton
                                 class="w-8 h-auto flex justify-center items-center pt-1"
                                 ><svg
