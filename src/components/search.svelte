@@ -28,7 +28,7 @@
     placeholder="Search"
     title=""
     bind:value
-    inputbg={editor === 'basic' ? 'bg-white' : 'bg-neutral-800'}
+    inputbg={editor === 'basic' ? 'bg-white' : 'bg-neutral-900'}
     inputText={editor === 'basic' ? 'text-black' : 'text-white'}
   />
   <Listbox value={selected} on:change={(e) => (selected = e.detail)} let:open>
@@ -42,7 +42,7 @@
     <ListboxButton
       class="{editor === 'basic'
         ? 'bg-black'
-        : 'bg-neutral-800 border-2 border-neutral-700'} text-sm text-white rounded-md p-2 w-20"
+        : 'bg-black outline outline-1 outline-neutral-800'} text-sm text-white rounded-md p-2 w-20"
       >{selected.label}</ListboxButton
     >
     {#if open}
@@ -50,20 +50,20 @@
         <ListboxOptions
           class="absolute {editor === 'basic'
             ? 'bg-white -translate-x-24'
-            : 'bg-neutral-900 -translate-x-20'} border border-neutral-700 p-2 w-40 mt-2 shadow-md z-50 rounded-md"
+            : 'bg-neutral-900 -translate-x-20'} outline outline-1 outline-neutral-800 p-2 w-40 mt-2 shadow-md z-50 rounded-md"
         >
           {#each searchMenu as menu}
             <ListboxOption
               value={menu}
               on:click={() => selectedMenu(menu)}
               class={`cursor-pointer my-1 text-sm ${
-                editor === 'basic' ? 'hover:bg-black' : 'hover:bg-neutral-600'
+                editor === 'basic' ? 'hover:bg-black' : 'hover:bg-neutral-800'
               } hover:text-white p-2 rounded-md ${
                 selected.label === menu.label
                   ? `${
                       editor === 'basic'
                         ? 'bg-black text-white'
-                        : 'bg-neutral-600 text-white'
+                        : 'bg-neutral-800 text-white'
                     }`
                   : ''
               }`}

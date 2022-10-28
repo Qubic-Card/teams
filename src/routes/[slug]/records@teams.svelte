@@ -102,14 +102,14 @@
   <RecordsSkeleton {permissions} />
 {:then name}
   <div
-    class={`flex flex-col w-full ${
+    class={`flex flex-col w-full mb-20 md:mb-0 ${
       permissions.writeRecords ? 'h-[96%] pt-4' : 'h-full pt-0'
     }`}
   >
     {#if permissions.writeRecords}
       <TabGroup class="h-full">
         <TabList
-          class="w-full flex justify-between pl-12 md:pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
+          class="w-full flex justify-between pl-0 md:pl-20 border-b-2 border-neutral-700 pr-4 text-lg"
         >
           <div class="flex gap-8 w-full md:w-1/5">
             <Tab

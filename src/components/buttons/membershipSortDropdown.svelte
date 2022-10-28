@@ -32,20 +32,20 @@
     />
   {/if}
   <ListboxButton
-    class="bg-neutral-800 p-2 w-full h-11 md:text-sm text-xs flex items-center rounded-md"
+    class="bg-neutral-800 p-2 w-full h-8 md:text-sm text-xs flex items-center rounded-md"
   >
     <span class="text-neutral-400 mr-2">Added by:</span>
     {selected}</ListboxButton
   >
 
   <ListboxOptions
-    class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-72 mt-2 shadow-md z-50 rounded-md"
+    class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-52 mt-2 shadow-md z-50 rounded-md"
   >
     {#each sortOptions as item}
       <ListboxOption
         on:click={go}
         value={item}
-        class="flex hover:bg-neutral-700 text-white px-2 py-2 rounded-md cursor-pointer"
+        class="flex hover:bg-neutral-700 text-white px-2 py-2 rounded-md cursor-pointer md:text-sm text-xs"
         >{item}</ListboxOption
       >
     {/each}

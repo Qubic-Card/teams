@@ -230,7 +230,7 @@
           options={fromDateOptions}
           bind:value={fromDateValue}
           name="date"
-          class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
+          class="w-full bg-neutral-800 rounded-md p-2 cursor-pointer"
         />
       </div>
       <div class="flex flex-col gap-2">
@@ -239,7 +239,7 @@
           options={toDateOptions}
           bind:value={toDateValue}
           name="date"
-          class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer disabled:cursor-default"
+          class="w-full bg-neutral-800 rounded-md p-2 cursor-pointer disabled:cursor-default"
         />
       </div>
     {/if}
@@ -277,7 +277,7 @@
   >
 </div>
 <div
-  class="w-full md:w-3/4 ml-12 md:ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
+  class="w-full md:w-3/4 ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
 >
   <table class="snap-center text-black w-full">
     <thead class="text-left text-neutral-400 bg-black/70">

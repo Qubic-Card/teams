@@ -17,7 +17,7 @@
 </script>
 
 <tr
-  class="h-12 text-sm text-left py-6 px-4 mb-2 bg-neutral-800 text-neutral-300 border-b border-neutral-700"
+  class="h-12 text-sm text-left py-6 px-4 mb-2 bg-neutral-900 text-neutral-300 border-b border-neutral-800"
 >
   <td
     on:click={modalHandler}

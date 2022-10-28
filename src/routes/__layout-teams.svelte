@@ -1,5 +1,5 @@
 <script>
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
   import '../app.css';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -130,6 +130,8 @@
       }
     }
   }
+
+  let isBannerOpen = true; // Banner view on desktop
 </script>
 
 <svelte:head>
@@ -150,11 +152,30 @@
       {/if}
     {/if}
 
-    <div
-      class="flex justify-center top-0 items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
-    >
-      Please Sign-in on Desktop
-    </div>
+    {#if isBannerOpen}
+      <div
+        out:slide|local
+        class="flex justify-evenly items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
+      >
+        View on desktop for better experience
+        <button on:click={() => (isBannerOpen = false)} class="self-start">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="white"
+            class="w-4 h-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    {/if}
 
     <div
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
@@ -203,7 +224,7 @@
       <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
-        class={`border-r border-neutral-700 bg-black w-12 md:w-16 fixed ${
+        class={`border-r border-neutral-700 bg-black w-12 md:w-16 hidden md:block fixed ${
           sevenDaysAfterEndDate
             ? !subscription?.isActive && !subscription?.isAfter7Days
               ? 'top-36 md:top-24'
@@ -255,25 +276,62 @@
       </div>
 
       <div
+        class="w-full h-16 z-50 md:hidden fixed bottom-0 bg-black outline outline-1 outline-neutral-800"
+      >
+        <nav class="w-full flex justify-center items-center overflow-x-auto">
+          {#each sidebarItems as item}
+            {#if $teamData.name}
+              <div
+                class={`flex cursor-pointer justify-center items-center w-16 h-16 ${
+                  $page.routeId === '[slug]/dashboard/team@teams'
+                    ? 'first:bg-neutral-900'
+                    : ''
+                }  ${
+                  $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
+                } ${
+                  isSidebarOpened && $page.routeId === item.routeId
+                    ? 'bg-neutral-900'
+                    : ''
+                }`}
+                on:click={() => handler($teamData?.id, item.title)}
+              >
+                <img
+                  src={item.urldefault}
+                  alt={item.title}
+                  class="w-6 md:w-5"
+                />
+              </div>
+            {:else}
+              <div
+                class="animate-pulse flex justify-between items-center bg-neutral-800 w-full h-16"
+              />
+            {/if}
+          {/each}
+        </nav>
+      </div>
+
+      <div
         class={`absolute ${
           sevenDaysAfterEndDate
             ? !subscription?.isActive && !subscription?.isAfter7Days
               ? 'top-36 md:top-24'
-              : 'top-[100px] md:top-16'
+              : `${isBannerOpen ? 'top-[100px]' : 'top-[60px]'} md:top-16`
             : 'top-16'
-        } bottom-0  text-white overflow-y-auto w-full overflow-x-hidden`}
+        } bottom-0 text-white overflow-y-auto w-full overflow-x-hidden`}
       >
         <SvelteToast />
 
         {#if loading}
           <div
             transition:fade|local
-            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40"
+            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40 px-4 md:px-0"
           >
-            <small class="text-left w-1/2 mb-2">
+            <small class="text-left w-full md:w-1/2 mb-2">
               Secondary security authenticating user access ...
             </small>
-            <div class="h-6 w-1/2 rounded-md shim-red bg-neutral-700" />
+            <div
+              class="h-6 w-full md:w-1/2 rounded-md shim-red bg-neutral-700"
+            />
           </div>
         {:else}
           <slot />

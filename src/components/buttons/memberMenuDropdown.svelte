@@ -29,36 +29,36 @@
       aria-hidden="true"
     />
   {/if}
-  <ListboxButton>
+  <ListboxButton class="flex justify-center items-center">
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="white"
-      stroke-width="2"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-6 h-6"
     >
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
-        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+        d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
       />
-    </svg></ListboxButton
-  >
+    </svg>
+  </ListboxButton>
 
   <ListboxOptions
-    class="absolute bg-neutral-900 -translate-x-44 border border-neutral-700 p-2 w-48 mt-2 shadow-md z-50 rounded-md"
+    class="absolute bg-neutral-900 -translate-x-44 border border-neutral-800 p-2 w-48 mt-2 shadow-md z-50 rounded-md"
   >
     <ListboxOption
       on:click={go}
       value="profile"
-      class="flex hover:bg-neutral-700 text-white px-2 py-2 rounded-md cursor-pointer"
+      class="flex hover:bg-neutral-800 text-white px-2 py-2 rounded-md cursor-pointer"
       >Edit user</ListboxOption
     >
     <ListboxOption
       value="remove"
       on:click={remove}
-      class="flex hover:bg-neutral-700 text-red-600 px-2 py-2 rounded-md cursor-pointer"
+      class="flex hover:bg-neutral-800 text-red-600 px-2 py-2 rounded-md cursor-pointer"
       >Remove Member</ListboxOption
     >
   </ListboxOptions>

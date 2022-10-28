@@ -1,66 +1,51 @@
-const moveArrItemToFront = (data = [], matchingId) => {
+const moveArrItemToFront = (data = [], uidTarget) => {
   const matchedData = data
-    .filter((item) => item?.team_cardcon[0]?.team_member_id?.uid === matchingId)
-
+    .filter((item) => item?.uid === uidTarget)
     .sort((a, b) => {
-      if (
-        a.team_cardcon[0]?.team_member_id.id >
-        b.team_cardcon[0]?.team_member_id.id
-      ) {
+      if (a.member_id > b.member_id) {
         return 1;
       }
-      if (
-        a.team_cardcon[0]?.team_member_id.id <
-        b.team_cardcon[0]?.team_member_id.id
-      ) {
+      if (a.member_id < b.member_id) {
         return -1;
       }
       return 0;
     });
 
   let unmatchedData = data
-    .filter((item) => item?.team_cardcon[0]?.team_member_id?.uid !== matchingId)
+    .filter((item) => item?.uid !== uidTarget)
     .sort((a, b) => {
-      if (
-        a.team_cardcon[0]?.team_member_id.id >
-        b.team_cardcon[0]?.team_member_id.id
-      ) {
+      if (a.member_id > b.member_id) {
         return 1;
       }
-      if (
-        a.team_cardcon[0]?.team_member_id.id <
-        b.team_cardcon[0]?.team_member_id.id
-      ) {
+      if (a.member_id < b.member_id) {
         return -1;
       }
       return 0;
     });
 
-  // let emptyLogs = [];
-  // let nonEmptyLogs = [];
+  let emptyLogs = [];
+  let nonEmptyLogs = [];
 
-  // unmatchedData.map((member) => {
-  //   if (member.team_logs.length > 0) {
-  //     nonEmptyLogs.push(member);
-  //   } else {
-  //     emptyLogs.push(member);
-  //   }
-  // });
+  unmatchedData.map((member) => {
+    if (member.log_data) {
+      nonEmptyLogs.push(member);
+    } else {
+      emptyLogs.push(member);
+    }
+  });
 
-  // let sortedDate = nonEmptyLogs
-  //   .map((m) => m.team_logs[0].created_at)
-  //   .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  let sortedDate = nonEmptyLogs
+    .map((m) => m.created_at)
+    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-  // let sortedMembers = [];
+  let sortedMembers = [];
 
-  // sortedDate.map((date) => {
-  //   let member = nonEmptyLogs.find((m) => m.team_logs[0].created_at === date);
-  //   sortedMembers.push(member);
-  // });
+  sortedDate.map((date) => {
+    let member = nonEmptyLogs.find((m) => m.created_at === date);
+    sortedMembers.push(member);
+  });
 
-  console.log(unmatchedData);
-
-  let newData = [...matchedData, ...unmatchedData];
+  let newData = [...matchedData, ...sortedMembers];
 
   return newData;
 };

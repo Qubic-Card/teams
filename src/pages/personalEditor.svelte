@@ -220,31 +220,29 @@
   <div class="flex justify-center" in:fade|local={{ duration: 200 }}>
     <div class="w-full bg-black">
       <div class="gap-2 text-black">
-        <div
-          class="flex flex-col w-full md:col-span-1 col-span-2 bg-neutral-900"
-        >
+        <div class="flex flex-col w-full md:col-span-1 col-span-2 bg-black">
           <!-- <ProfileEditorSkeleton /> -->
           <TabGroup>
             <TabList
-              class="w-full grid grid-cols-3 border-2 border-neutral-700  p-2"
+              class="w-full grid grid-cols-3 outline-1 outline outline-neutral-700  p-2"
             >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-l-md text-xs md:text-sm'}>Bio</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-l-md text-xs md:text-sm'}
                 >Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-l-md text-xs md:text-sm'}
                 >Links</Tab
               >
@@ -252,10 +250,8 @@
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="border-neutral-700 border-2 mb-4 pb-2">
-                  <div
-                    class="px-3 pt-3 grid grid-cols-2 space-x-5 bg-neutral-900"
-                  >
+                <div class="outline-1 outline outline-neutral-700 mb-4 pb-2">
+                  <div class="px-3 pt-3 grid grid-cols-2 space-x-5 bg-black">
                     <Input
                       on:change={handleSave}
                       placeholder="Hello"
@@ -279,7 +275,7 @@
                         : true}
                     />
                   </div>
-                  <div class="px-3 bg-neutral-900">
+                  <div class="px-3 bg-black">
                     <Input
                       on:change={handleSave}
                       placeholder="example company"
@@ -315,7 +311,7 @@
                     />
                   </div>
                   <div
-                    class={`p-3 bg-neutral-900 ${
+                    class={`p-3 bg-black ${
                       permissions.writeProfile || permissions.writeMembers
                         ? ''
                         : 'hidden'
@@ -344,7 +340,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="border-2 border-neutral-700 mb-4 p-4">
+                <div class="outline-1 outline outline-neutral-700 mb-4 p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
@@ -530,7 +526,9 @@
               <TabPanel>
                 <!-- Link Editor -->
 
-                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-4">
+                <div
+                  class="outline-1 outline outline-neutral-700 p-4 mb-0 lg:mb-4"
+                >
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img

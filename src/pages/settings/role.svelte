@@ -105,7 +105,9 @@
 />
 
 <div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-3`}>
-  <div class="bg-neutral-800 rounded-lg w-full md:w-3/4 p-4">
+  <div
+    class="bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg w-full md:w-3/4 p-4"
+  >
     <div
       class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
     >
@@ -119,7 +121,7 @@
         <div class="flex justify-between items-center">
           <DisclosureButton
             on:click={() => (isClicked = true)}
-            class="text-xs md:text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
+            class="text-xs md:text-sm w-full text-left hover:bg-neutral-800 mb-1 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
           >
             {role?.name?.charAt(0).toUpperCase() + role?.name?.slice(1)}
           </DisclosureButton>
@@ -146,7 +148,7 @@
             <div class="flex justify-between items-center">
               <DisclosureButton
                 on:click={() => (isClicked = true)}
-                class="text-xs md:text-sm w-full text-left hover:bg-neutral-900 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
+                class="text-xs md:text-sm w-full text-left hover:bg-neutral-700 bg-neutral-800 mb-1 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
               >
                 {role?.role_name?.charAt(0).toUpperCase() +
                   role?.role_name?.slice(1)}
@@ -204,7 +206,7 @@
     {/if}
   </div>
   <div
-    class="bg-neutral-800 w-1/4 h-80 p-4 rounded-lg text-md lg:text-lg hidden md:flex flex-col"
+    class="bg-neutral-900 outline outline-1 outline-neutral-800 w-1/4 h-80 p-4 rounded-lg text-md lg:text-lg hidden md:flex flex-col"
   >
     <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
     <p>Berikan permissions yang sesuai di setiap role.</p>

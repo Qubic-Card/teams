@@ -8,7 +8,7 @@
 
   export let teamId = '';
   export let id = 0;
-  export let teams;
+  export let teams, close;
 
   const analyticsData = [
     {
@@ -75,7 +75,6 @@
   };
 
   const getTeamWeeklyLogsActivity = async () => {
-    // loading = true;
     try {
       let { data: logs, error } = await supabase
         .from('team_logs')
@@ -137,6 +136,7 @@
       .from('team_logs')
       .select('team_member')
       .eq(teams ? 'team' : 'team_member', teams ? teamId : id)
+      .or('type.eq.SUCCESS,type.eq.INFO')
       .gte('created_at', new Date(new Date(last7Days[0])).toUTCString());
 
     if (error || member_error) {
@@ -157,7 +157,7 @@
 
 {#await (getTeamWeeklyLogsActivity(), getTeamConnections())}
   <div
-    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-800 rounded-md border border-neutral-700"
+    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse outline outline-1 outline-neutral-800 bg-neutral-900 rounded-md"
   />
 {:then name}
   <div class="flex flex-col gap-2 w-full md:w-1/3 h-32">
@@ -168,7 +168,7 @@
         <div class="flex justify-between items-center">
           <h1 class="text-sm md:text-md font-bold">
             {item.data}
-            <span class="text-sm text-neutral-400">{item.type}</span>
+            <span class="text-xs md:text-sm text-neutral-400">{item.type}</span>
           </h1>
           <div
             class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
@@ -206,7 +206,19 @@
     {/each}
   </div>
 {:catch name}
-  <h1>Error</h1>
+  <div
+    class="flex flex-col justify-center items-center gap-2 w-full md:w-1/3 h-32 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-md"
+  >
+    <h1 class="font-bold">Error</h1>
+    <p class="text-sm">
+      Please, reload the page or <a
+        href="https://wa.me/628113087599"
+        class="font-bold"
+      >
+        contact us!
+      </a>
+    </p>
+  </div>
 {/await}
 
 {#if teams}
@@ -222,51 +234,95 @@
 
       <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
         <div
-          data-tooltip="{active} / {memberCount} members - {memberCountPercentage}%"
-          style="--width: {memberCountPercentage}%;"
+          data-tooltip=""
+          style="--width: {memberCountPercentage}%; --visibility: hidden;"
           class="{memberCountPercentage >= 50
             ? 'bg-green-400'
             : memberCountPercentage < 25
             ? 'bg-red-400'
-            : 'bg-orange-400'} box h-full rounded-sm"
-        />
+            : 'bg-orange-400'} box group h-full rounded-sm"
+        >
+          <span
+            class="absolute hidden group-hover:flex gap-2 -top-2 -translate-y-full w-full px-2 py-1 bg-neutral-800 rounded-md text-center text-white text-sm after:content-[''] after:absolute after:left-1/2 after:top-[100%] after:-translate-x-1/2 after:border-8 after:border-x-transparent after:border-b-transparent"
+            >{active} / {memberCount} members
+            <span
+              class={memberCountPercentage >= 50
+                ? 'text-green-400'
+                : memberCountPercentage < 25
+                ? 'text-red-400'
+                : 'text-orange-400'}>{memberCountPercentage}%</span
+            ></span
+          >
+        </div>
       </div>
     </div>
   {:catch name}
-    <h1>Error</h1>
+    <div
+      class="flex flex-col justify-center items-center gap-2 w-full md:w-1/3 h-32 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-md"
+    >
+      <h1 class="font-bold">Error</h1>
+      <p class="text-sm">
+        Please, reload the page or <a
+          href="https://wa.me/628113087599"
+          class="font-bold"
+        >
+          contact us!
+        </a>
+      </p>
+    </div>
   {/await}
 {/if}
 
-{#if socialsCount}
+{#if socialsCount.length > 0}
   <div
-    class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-4 h-24 md:h-32 rounded-md flex flex-col justify-between"
+    class="flex w-full md:w-1/3 h-24 md:h-32 rounded-md outline outline-1 outline-neutral-800 bg-neutral-900 p-4"
   >
-    <h1 class="text-md md:text-lg">Social Media Effectiveness</h1>
-    <div class="bg-neutral-600 w-full h-4 flex items-center  rounded-sm">
+    <div class="w-full flex flex-col justify-between">
+      <h1 class="text-md md:text-lg">Social Media Effectiveness</h1>
       {#if checkDataAvailability(socialsCount)}
-        {#each socialsCount as item}
-          {#if item.value !== 0}
-            <div
-              data-tooltip={item.name.charAt(0).toUpperCase() +
-                item.name.slice(1) +
-                ' - ' +
-                item.value +
-                '%'}
-              style="--width: {item.value}%;"
-              class="{colorMapping(
-                item.name
-              )} h-full box first:rounded-l-sm last:rounded-r-sm"
-            />
-          {/if}
-        {/each}
+        <div class="bg-neutral-600 w-full h-4 flex items-center  rounded-sm">
+          {#each socialsCount as item}
+            {#if item.value !== 0}
+              <div
+                data-tooltip={item.name.charAt(0).toUpperCase() +
+                  item.name.slice(1) +
+                  ' ' +
+                  item.value +
+                  '%'}
+                style="--width: {item.value}%; --visibility: visible;"
+                class="{colorMapping(
+                  item.name
+                )} h-full box first:rounded-l-sm last:rounded-r-sm"
+              />
+            {/if}
+          {/each}
+        </div>
       {:else}
         <p class="pl-1 text-xs">No data available</p>
       {/if}
     </div>
+    {#if close}
+      <button on:click class="self-start">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="white"
+          class="w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    {/if}
   </div>
 {:else}
   <div
-    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-800 rounded-md border border-neutral-700"
+    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-900 rounded-md outline outline-1 outline-neutral-800"
   />
 {/if}
 
@@ -335,7 +391,7 @@
 
   [data-tooltip]:hover:before,
   [data-tooltip]:hover:after {
-    visibility: visible;
+    visibility: var(--visibility);
     opacity: 1;
     transform: translate(-50%, 0);
   }

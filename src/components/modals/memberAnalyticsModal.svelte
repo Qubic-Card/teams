@@ -23,9 +23,7 @@
   let toDateValue = new Date();
 
   const options = {
-    // wrap: true,
-    // element: '#my-picker',
-    // clickOpens: false,
+    // position: 'center',
     maxDate: 'today',
     minDate: new Date(last7Days[0]),
     static: true,
@@ -62,53 +60,55 @@
   };
 
   const getMemberLogs = async () => {
-    let fromDate = new Date(
-      new Date(fromDateValue).setHours(0, 0, 0, 0)
-    ).toUTCString();
-    let toDate = new Date(
-      new Date(toDateValue).setHours(23, 59, 59, 999)
-    ).toUTCString();
+    if (member) {
+      let fromDate = new Date(
+        new Date(fromDateValue).setHours(0, 0, 0, 0)
+      ).toUTCString();
+      let toDate = new Date(
+        new Date(toDateValue).setHours(23, 59, 59, 999)
+      ).toUTCString();
 
-    loading = true;
-    const { from, to } = getPagination(page, toItem);
-    const { data, error, count } = await supabase
-      .from('team_logs')
-      .select('data, type, created_at, card_holder', { count: 'estimated' })
-      .eq('team_member', member.id)
-      .range(from, to)
-      .gte('created_at', new Date(fromDate).toISOString())
-      .lte('created_at', new Date(toDate).toISOString())
-      .order('created_at', { ascending: false });
+      loading = true;
+      const { from, to } = getPagination(page, toItem);
+      const { data, error, count } = await supabase
+        .from('team_logs')
+        .select('data, type, created_at, card_holder', { count: 'estimated' })
+        .eq('team_member', member?.member_id)
+        .range(from, to)
+        .gte('created_at', new Date(fromDate).toISOString())
+        .lte('created_at', new Date(toDate).toISOString())
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.log(error);
-      loading = false;
-    }
+      if (error) {
+        console.log(error);
+        loading = false;
+      }
 
-    if (data) {
-      let groupedLogs = [];
+      if (data) {
+        let groupedLogs = [];
 
-      groupedLogs = data.reduce((acc, log) => {
-        const date = new Date(log.created_at).toDateString().slice(4);
+        groupedLogs = data.reduce((acc, log) => {
+          const date = new Date(log.created_at).toDateString().slice(4);
 
-        if (!acc[date]) {
-          acc[date] = [];
-        }
-        acc[date].push(log);
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push(log);
 
-        return acc;
-      }, {});
+          return acc;
+        }, {});
 
-      groupedLogs = Object.keys(groupedLogs).map((date) => {
-        return {
-          date,
-          logs: groupedLogs[date],
-        };
-      });
+        groupedLogs = Object.keys(groupedLogs).map((date) => {
+          return {
+            date,
+            logs: groupedLogs[date],
+          };
+        });
 
-      memberLogs = groupedLogs;
-      maxPage = Math.ceil(count / toItem);
-      loading = false;
+        memberLogs = groupedLogs;
+        maxPage = Math.ceil(count / toItem);
+        loading = false;
+      }
     }
   };
 
@@ -134,69 +134,67 @@
     open={isOpen}
     on:close={closeModal}
     class="transition-all md:transition-none duration-300 ease-in-out {isOpen
-      ? 'min-h-[70%]'
-      : 'h-0 translate-y-10 md:opacity-0'} text-xs md:text-sm bg-neutral-900 text-white border-2 border-neutral-700 gap-2 top-28 md:top-[10%] right-0 md:right-9 flex flex-col ml-0 lg:ml-12 w-full md:w-[95%] pb-2 bottom-20 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none"
+      ? 'h-full md:h-[80%]'
+      : 'h-0 translate-y-10 md:opacity-0'} text-xs md:text-sm bg-neutral-900 text-white outline-1 outline outline-neutral-700 gap-2 top-0 md:top-[10%] right-0 md:right-9 flex flex-col ml-0 lg:ml-12 w-full md:w-[95%] pb-2 bottom-20 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none"
   >
     <div
       on:click={() => (isOpen = true)}
-      class="px-3 pt-3 h-72 rounded-md flex flex-col gap-2"
+      class="px-3 pt-3 h-96 md:h-72 rounded-md flex flex-col gap-2"
     >
-      <div class="flex gap-2">
+      <div class="flex md:flex-row flex-col gap-2">
         <div
           class="flex p-2 gap-2 flex-1 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-md"
         >
           <img
-            class="w-24 h-24 rounded-full"
-            src={member.team_profile.avatar}
-            alt={member.team_profile.firstname + ' avatar'}
+            class="w-16 md:w-24 h-16 md:h-24 rounded-full"
+            src={member?.team_profile?.avatar}
+            alt={member?.team_profile?.firstname + ' avatar'}
           />
           <div class="flex flex-col w-full">
-            <h1 class="font-bold text-white text-lg">
-              {member.team_profile.firstname ?? ''}
-              {member.team_profile.lastname ?? ''}
+            <h1 class="font-bold text-white text-md md:text-lg">
+              {member?.team_profile?.firstname ?? ''}
+              {member?.team_profile?.lastname ?? ''}
             </h1>
-            <p>{member.team_profile.job}</p>
+            <p>{member?.team_profile?.job}</p>
           </div>
+          <button on:click={closeModal} class="md:hidden block self-start">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
-        <TeamAnalyticsCard id={member.id} />
-        <!-- <button on:click={closeModal} class="self-start">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button> -->
+        <TeamAnalyticsCard id={member?.member_id} close on:click={closeModal} />
       </div>
 
-      <div class="flex self-end gap-2 w-1/2">
-        <div class="flex bg-neutral-800 h-10 p-2 rounded-md w-1/2">
+      <div class="flex self-end gap-2 w-full md:w-1/2">
+        <div
+          class="flex justify-center items-center text-xs md:text-sm bg-neutral-800 h-10 p-2 rounded-md w-1/3 md:w-1/2"
+        >
           Most Recent
         </div>
 
-        <!-- <Flatpickr {options} element="#my-picker">
-          <div class="flatpickr" id="my-picker">
-            <input type="text" placeholder="Select Date.." data-input />
-
-            <a class="input-button" title="clear" data-clear>
-              <i class="icon-close" />
-            </a>
-          </div>
-        </Flatpickr> -->
         <div
-          class="flex bg-neutral-800 h-10 pl-2 py-2 rounded-md w-1/2 items-center justify-between"
+          class="flex bg-neutral-800 gap-3 h-10 pl-2 py-2 rounded-md w-full md:w-1/2 items-center justify-between text-xs md:text-sm"
         >
           Period:
-
+          <input
+            type="text"
+            placeholder="Select Date.."
+            data-input
+            class="w-0"
+          />
           <Flatpickr
             placeholder={new Date(fromDateValue).toDateString().slice(4) +
               ' to ' +
@@ -215,10 +213,10 @@
         {/each} -->
       {:else if memberLogs.length > 0}
         {#each memberLogs as item}
-          <h1 class="font-regular text-sm">{item.date}</h1>
+          <h1 class="font-regular text-xs md:text-sm">{item.date}</h1>
           {#each item.logs as log}
             <div
-              class={`text-sm pl-2 flex mb-1 rounded-md justify-between p-1 ${
+              class={`text-xs md:text-sm pl-2 flex mb-1 rounded-md justify-between p-1 ${
                 log.type === 'DANGER'
                   ? 'bg-red-600/30 border-2 border-red-400/30 hover:bg-red-800'
                   : log.type === 'SUCCESS'
@@ -243,7 +241,7 @@
                   {log?.data?.message}
                 </h1>
               {:else}
-                <h1 class="text-white">
+                <h1 class="text-white text-xs md:text-sm">
                   {`${log?.card_holder ?? 'Member'}'s` +
                     log?.data?.message?.slice(4)}
                 </h1>
@@ -281,12 +279,12 @@
         <button
           disabled={page === 0}
           on:click={() => setPage('prev')}
-          class="bg-neutral-800 border border-neutral-700 p-2 rounded-md w-1/6 disabled:opacity-50"
+          class="bg-neutral-800 border border-neutral-700 p-2 rounded-md w-1/3 md:w-1/6 disabled:opacity-50"
           >Previous</button
         >
         <button
           disabled={page === maxPage - 1 || maxPage < 1}
-          class="bg-blue-600 w-1/6 p-2 rounded-md disabled:opacity-50"
+          class="bg-blue-600 w-1/3 md:w-1/6 p-2 rounded-md disabled:opacity-50"
           on:click={() => setPage('next')}>Next</button
         >
       </div>

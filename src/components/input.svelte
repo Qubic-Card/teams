@@ -27,8 +27,9 @@
   export let isPhoneInput = false;
   export let isEmptyChecking = false;
   export let isTwitterInput = false;
-  export let inputbg = 'bg-neutral-700';
+  export let inputbg = 'bg-neutral-800';
   export let inputText = 'text-gray-100';
+  export let small;
   let isWhatsappInvalid = false;
   let focus = false;
 
@@ -75,7 +76,9 @@
       placeholder={`${$$props.placeholder}`}
       bind:value
       maxlength={$$props.maxlength}
-      class={`w-full rounded-md my-2 h-10 px-2 ${inputbg} ${inputText}`}
+      class="w-full rounded-md  px-2 {inputbg} {inputText} {small
+        ? 'h-8'
+        : 'my-2 h-10'}"
       disabled={$$props.disabled}
     />
   </div>

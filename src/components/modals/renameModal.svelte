@@ -67,7 +67,7 @@
   class=" w-3/4 md:w-1/2"
 >
   <div
-    class="flex flex-col justify-center bg-neutral-900 items-center p-4 rounded-lg gap-3"
+    class="flex flex-col justify-center bg-neutral-800 items-center p-4 rounded-lg gap-3"
   >
     <Input
       placeholder="Role Name"
@@ -75,6 +75,7 @@
       bind:value={roleName}
       class="w-full"
       isEmptyChecking={true}
+      inputbg="bg-neutral-900"
     />
     <button
       disabled={loading}

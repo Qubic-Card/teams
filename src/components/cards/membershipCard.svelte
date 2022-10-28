@@ -3,7 +3,7 @@
 </script>
 
 <div
-  class="flex bg-neutral-800 outline-1 outline outline-neutral-700 p-3 rounded-md h-auto gap-2 md:gap-8 items-center"
+  class="flex bg-neutral-900 outline-1 outline outline-neutral-800 p-3 rounded-md h-auto gap-2 md:gap-8 items-center"
 >
   <img
     class="w-16 h-16 rounded-full"

@@ -187,13 +187,13 @@
 
 <svelte:window bind:innerWidth />
 
-<div class="flex flex-col pl-12 md:pl-16">
+<div class="flex flex-col pl-0 md:pl-16 mb-20 md:mb-0">
   {#if permissions.readConnection === true}
     {#await getUserConnectionsList()}
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
-        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-16 border-neutral-700 fixed bg-neutral-900 w-full"
+        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-0 md:pr-16 border-neutral-700 fixed bg-black w-full"
       >
         <div
           class="flex w-full md:w-48 text-white gap-1 border-b border-neutral-700"

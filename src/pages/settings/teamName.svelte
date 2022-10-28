@@ -7,7 +7,7 @@
 
 <div class="flex gap-3">
   <div
-    class="bg-neutral-800 rounded-lg p-4 w-full md:w-3/4 flex flex-col md:flex-row justify-between items-center"
+    class="bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg p-4 w-full md:w-3/4 flex flex-col md:flex-row justify-between items-center"
   >
     <div class="flex flex-col gap-2 w-full md:w-auto">
       <h1 class="font-bold text-sm md:text-xl">Team Name</h1>
@@ -15,7 +15,7 @@
         on:input
         on:keypress
         bind:value
-        class="p-2 bg-neutral-700 rounded-md w-full"
+        class="p-2 bg-neutral-800 rounded-md w-full"
         placeholder="Enter team's activation code"
       />
     </div>
@@ -29,7 +29,7 @@
     >
   </div>
   <div
-    class="bg-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
+    class="bg-neutral-900 outline outline-1 outline-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
   >
     <p class="mb-4">
       Atur nama tim agar mudah diingat dan mudah diidentifikasi.

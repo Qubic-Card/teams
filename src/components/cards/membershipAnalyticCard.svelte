@@ -61,17 +61,18 @@
 
 {#await (getTeamWeeklyLogsActivity(), getTeamConnections())}
   <div
-    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-800 rounded-md border border-neutral-700"
+    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-900 rounded-md outline outline-1 outline-neutral-800"
   />
 {:then name}
   <div class="flex flex-col gap-2 w-full md:w-1/3 h-32">
     {#each analyticsData as item}
       <div
-        class="flex justify-between w-full h-1/2 bg-neutral-800 border border-neutral-700 rounded-md p-3"
+        class="flex justify-between w-full h-1/2 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-md p-3"
       >
         <div class="flex justify-between items-center">
-          <h1 class="text-sm md:text-md">
-            {item.data} <span>{item.type}</span>
+          <h1 class="text-sm md:text-md font-bold">
+            {item.data}
+            <span class="text-xs md:text-sm text-neutral-400">{item.type}</span>
           </h1>
           <div
             class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-md"
@@ -95,38 +96,12 @@
         <div class="flex justify-between items-center text-sm">
           {#if item.percentage >= 0}
             <p class="text-green-600 flex gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M5 15l7-7 7 7"
-                />
-              </svg>
+              ▲
               {item.percentage}%
             </p>
           {:else}
             <p class="text-red-600 flex gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              ▼
               {item.percentage}%
             </p>
           {/if}
@@ -140,19 +115,23 @@
 
 {#await getTeamMemberActivities()}
   <div
-    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-800 rounded-md border border-neutral-700"
+    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-900 rounded-md outline outline-1 outline-neutral-800"
   />
 {:then name}
   <div
-    class="w-full md:w-1/3 border border-neutral-700 bg-neutral-800 p-2 h-24 md:h-32 rounded-md flex flex-col justify-between "
+    class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-2 h-24 md:h-32 rounded-md flex flex-col justify-between "
   >
     <h1 class="text-lg">Active Members</h1>
 
-    <div class="bg-neutral-600 w-full h-8 flex items-center p-1 rounded-md">
+    <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
       <div
-        data-tooltip="{active} / {memberCount} members"
+        data-tooltip="{active} / {memberCount} members - {memberCountPercentage}%"
         style="--width: {memberCountPercentage}%;"
-        class="bg-yellow-300 box h-6 rounded-md"
+        class="{memberCountPercentage >= 50
+          ? 'bg-green-400'
+          : memberCountPercentage < 25
+          ? 'bg-red-400'
+          : 'bg-orange-400'} box h-full rounded-sm"
       />
     </div>
   </div>
@@ -162,19 +141,23 @@
 
 {#await getTeamMemberActivities()}
   <div
-    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-800 rounded-md border border-neutral-700"
+    class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-900 rounded-md outline outline-1 outline-neutral-800"
   />
 {:then name}
   <div
-    class="w-full md:w-1/3 border border-neutral-700 bg-neutral-800 p-2 h-24 md:h-32 rounded-md flex flex-col justify-between "
+    class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-2 h-24 md:h-32 rounded-md flex flex-col justify-between "
   >
     <h1 class="text-lg">Circulating Point</h1>
 
-    <div class="bg-neutral-600 w-full h-8 flex items-center p-1 rounded-md">
+    <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
       <div
-        data-tooltip="{active} / {memberCount} points"
+        data-tooltip="{active} / {memberCount} members - {memberCountPercentage}%"
         style="--width: {memberCountPercentage}%;"
-        class="bg-green-300 box h-6 rounded-md"
+        class="{memberCountPercentage >= 50
+          ? 'bg-green-400'
+          : memberCountPercentage < 25
+          ? 'bg-red-400'
+          : 'bg-orange-400'} box h-full rounded-sm"
       />
     </div>
   </div>

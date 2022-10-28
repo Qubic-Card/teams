@@ -59,7 +59,7 @@
     class="transition-all md:transition-none duration-300 ease-in-out {isOpen
       ? `${editor === 'team' ? 'h-44' : 'h-40'}`
       : 'h-0 translate-y-10 md:opacity-0'} {editor == 'team'
-      ? 'bg-neutral-800 text-white p-3 border-2 border-neutral-700 gap-4 top-28 md:top-20 right-0 md:right-6'
+      ? 'bg-neutral-900 text-white p-3 outline outline-1 outline-neutral-800 gap-4 top-28 md:top-20 right-0 md:right-6'
       : 'bg-white text-black gap-2 p-3 top-16 right-0 md:right-4'} flex flex-col ml-0 lg:ml-12 w-full md:w-96 md:max-w-md px-4 pb-4 bottom-0 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none overflow-y-auto snap-container"
   >
     {#if editor === 'team'}
@@ -82,7 +82,7 @@
 
     <button
       class="{editor === 'team'
-        ? 'text-black bg-gray-100'
+        ? 'text-white bg-neutral-700'
         : 'border hover:bg-black hover:text-white border-black'} p-1 w-full flex h-8 justify-center items-center text-xs md:text-sm"
       on:click={() => {
         $isInViewTriggered = false;
@@ -93,7 +93,7 @@
     </button>
     <button
       class="{editor === 'team'
-        ? 'text-black bg-gray-100'
+        ? 'text-white bg-neutral-700'
         : 'text-white bg-black'} text-xs md:text-sm text-black p-2 w-full h-9"
       on:click={handleLogout}>Log Out</button
     >
