@@ -6,7 +6,7 @@
   export let loading, isAlreadySeeMore, currentPageRows, setPage, page, maxPage;
 </script>
 
-<div class="bg-neutral-800 rounded-lg border border-neutral-700">
+<div class="bg-neutral-900 rounded-lg outline outline-1 outline-neutral-800">
   <!-- {#if loading}
     <div class="bg-black/90 w-full rounded-md h-12" />
   {/if} -->
@@ -61,6 +61,15 @@
       {/if}
     {/if}
   </table>
+
+  {#if !loading}
+    {#if !isAlreadySeeMore && currentPageRows?.length !== 0 && currentPageRows?.length > 4}
+      <button
+        class="self-center w-full mt-3 p-2 h-12 bg-black hover:bg-black/90"
+        on:click>See more</button
+      >
+    {/if}
+  {/if}
 
   {#if currentPageRows?.length === 0 && !loading}
     <div class="text-center">

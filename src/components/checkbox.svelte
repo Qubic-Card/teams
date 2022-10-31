@@ -100,7 +100,9 @@
   ];
 </script>
 
-<div class="border border-neutral-600 mt-3 p-2 w-full rounded">
+<div
+  class="outline outline-1 outline-neutral-800 mt-3 p-2 w-full rounded bg-neutral-800"
+>
   {#if !isDefault}
     <button
       disabled={permissions.isTeamInactive ||
@@ -111,7 +113,7 @@
         clicked();
         selectAll = true;
       }}
-      class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-700 hover:bg-neutral-900 disabled:bg-neutral-700 transition-colors duration-300 md:text-sm text-xs"
+      class="flex w-full justify-between items-center p-4 rounded-lg mb-2 first:mt-2 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-700 transition-colors duration-300 md:text-sm text-xs"
     >
       Select all
     </button>

@@ -1,14 +1,14 @@
 <script>
-  import ModalWrapperHeadless from "@comp/modals/modalWrapperHeadless.svelte";
-  import { createEventDispatcher } from "svelte";
-  import CropModal from "@comp/modals/cropModal.svelte";
-  import FilePond, { registerPlugin } from "svelte-filepond";
-  import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
-  import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-  import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-  import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-  import FilePondPluginImageCrop from "filepond-plugin-image-crop";
-  import FilePondPluginImageTransform from "filepond-plugin-image-transform";
+  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
+  import { createEventDispatcher } from 'svelte';
+  import CropModal from '@comp/modals/cropModal.svelte';
+  import FilePond, { registerPlugin } from 'svelte-filepond';
+  import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
+  import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+  import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+  import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+  import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
+  import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 
   export let unsplashDatas, handleSave, updateData;
 
@@ -22,14 +22,14 @@
   );
 
   let pond;
-  let name = "filepond";
+  let name = 'filepond';
 
   let showModal = false;
-  let searchQuery = "";
+  let searchQuery = '';
   let selectedImage;
-  let downloadLocation = "";
+  let downloadLocation = '';
   // INFO: state idle untuk memunculkan pilihan button upload from local atau unsplash
-  let state = "unsplash";
+  let state = 'unsplash';
   let isBannerOpen = false;
   let isOpen = false;
 
@@ -44,7 +44,7 @@
     pond.removeFile();
   };
 
-  const toAuthorProfile = (url) => window.open(url, "_blank");
+  const toAuthorProfile = (url) => window.open(url, '_blank');
 
   const getTrackDownloadLocation = async (id) => {
     try {
@@ -66,19 +66,19 @@
 
   const toggleModal = () => {
     showModal = !showModal;
-    state = "unsplash";
-    searchQuery = "";
+    state = 'unsplash';
+    searchQuery = '';
   };
 
   const pickHandler = (img) => {
     selectedImage = img;
 
     getTrackDownloadLocation(img.id);
-    dispatch("pickImage", img);
+    dispatch('pickImage', img);
     toggleModal();
   };
 
-  const searchHandler = () => dispatch("searchQuery", searchQuery);
+  const searchHandler = () => dispatch('searchQuery', searchQuery);
 
   const onKeyPress = (e) => {
     if (e.charCode === 13) {
@@ -100,27 +100,28 @@
 
 <button
   on:click={toggleModal}
-  class="w-full text-black bg-neutral-100 rounded-md p-5 mt-2"
+  class="w-full text-black bg-neutral-100 rounded-md p-5 mt-2 md:text-sm text-xs"
   >Select Background</button
 >
 
+<!-- {#if showModal} -->
 <ModalWrapperHeadless
   desktopWidth="md:w-1/2 lg:w-1/3"
   desktopRight="md:right-1/4"
-  desktopTop={state === "idle" ? "md:top-[35%]" : "md:top-0"}
-  desktopHeight={state === "idle" ? "md:h-[29%]" : "h-screen"}
-  mobileHeight={state === "idle" ? "h-[40%]" : "h-screen"}
+  desktopTop={state === 'idle' ? 'md:top-[35%]' : 'md:top-0'}
+  desktopHeight={state === 'idle' ? 'md:h-[29%]' : 'h-screen'}
+  mobileHeight={state === 'idle' ? 'h-[40%]' : 'h-screen'}
   bg="bg-white"
   isOpen={showModal}
   on:modalHandler={(e) => {
     showModal = e.detail;
   }}
 >
-  <div class="flex flex-col">
-    {#if state === "idle"}
+  <div class="flex flex-col h-full">
+    {#if state === 'idle'}
       <div class="flexflex-col p-2 w-full gap-2">
         <button
-          on:click={() => (state = "unsplash")}
+          on:click={() => (state = 'unsplash')}
           class="w-full bg-blue-600 p-4 rounded-md text-white h-16 mb-2"
           >Unsplash</button
         >
@@ -130,7 +131,7 @@
           credits=""
           allowProcess={false}
           class="cursor-pointer"
-          acceptedFileTypes={["image/png", "image/jpeg"]}
+          acceptedFileTypes={['image/png', 'image/jpeg']}
           instantUpload={false}
           imageCropAspectRatio={1 / 1}
           labelIdle="Add Background Image"
@@ -138,7 +139,7 @@
           beforeAddFile={handleCrop}
         />
       </div>
-    {:else if state === "unsplash"}
+    {:else if state === 'unsplash'}
       <div class="flex items-center justify-between p-2 text-black">
         <div class="flex justify-center items-center">
           <p class="text-center translate-y-1">Powered By</p>
@@ -148,7 +149,7 @@
             class="w-32 ml-2 bg-white p-2 rounded-md"
           />
         </div>
-        <button on:click={() => (isOpen = false)}>
+        <button on:click={() => (showModal = false)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -182,7 +183,7 @@
         />
       </div>
       <div
-        class="grid grid-cols-2 grid-flow-row p-4 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto"
+        class="grid grid-cols-2 grid-flow-row p-4 text-black h-full snap-container snap-y snap-mandatory overflow-y-auto"
       >
         {#if unsplashDatas}
           {#if unsplashDatas?.length === 0}
@@ -194,15 +195,15 @@
                   on:click={() => pickHandler(item)}
                   class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
                     item.urls.regular === selectedImage
-                      ? "border-4 border-black"
-                      : ""
+                      ? 'border-4 border-black'
+                      : ''
                   }`}
                   style={`background-image: url('${item.urls.regular}')`}
                 >
                   <h1
                     class="uppercase text-center text-lg md:text-3xl breaks-all"
                   >
-                    {item.alt_description === null ? "" : item.alt_description}
+                    {item.alt_description === null ? '' : item.alt_description}
                   </h1>
                 </div>
                 <div
@@ -229,6 +230,7 @@
     {/if}
   </div>
 </ModalWrapperHeadless>
+<!-- {/if} -->
 
 <!-- <div class="opacity-25 fixed inset-0 z-40 bg-black" /> -->
 <style>

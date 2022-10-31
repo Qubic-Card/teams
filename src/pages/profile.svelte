@@ -58,7 +58,7 @@
 <div
   bind:clientWidth
   bind:this={profile}
-  class="{$currentTheme.pageBackground} {$$props.class} relative transition-colors rounded-3xl duration-500 ease-in text-sm"
+  class="{$currentTheme.pageBackground} {$$props.class} relative transition-colors rounded-3xl duration-500 ease-in text-sm mb-12 md:mb-0"
   class:bg-image-profile={$currentTheme?.backgroundImage}
   style={`--bg-img-profile: url('${$currentTheme?.backgroundImage}')`}
 >
@@ -163,7 +163,7 @@
 
   <div class="flex flex-col gap-1 px-8 md:px-16 text-white my-4">
     <BorderButton
-      class="w-full font-semibold h-12 {$currentTheme?.outline} {$currentTheme?.button} {$currentTheme?.buttonText} rounded-md"
+      class="w-full font-regular h-12 {$currentTheme?.outline} {$currentTheme?.button} {$currentTheme?.buttonText} rounded-md"
       on:click={popup}
     >
       Connect with Me
@@ -254,7 +254,15 @@
                     : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                   order={i}
                   ><img
-                    src={socialIcons[item.type]}
+                    src={item.type.includes('github') &&
+                    data?.design?.theme?.toString() === 'light'
+                      ? socialIcons[item.type]
+                      : item.type.includes('github') &&
+                        data?.design?.theme?.toString() === 'offwhite'
+                      ? socialIcons[item.type]
+                      : item.type.includes('github')
+                      ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
+                      : socialIcons[item.type]}
                     class="w-[40px] sm:w-[49px] md:w-[40px]"
                     alt=""
                   /></BorderButton
@@ -365,7 +373,15 @@
                       ? 'px-6'
                       : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                     ><img
-                      src={socialIcons[item.type]}
+                      src={item.type.includes('github') &&
+                      data?.design?.theme?.toString() === 'light'
+                        ? socialIcons[item.type]
+                        : item.type.includes('github') &&
+                          data?.design?.theme?.toString() === 'offwhite'
+                        ? socialIcons[item.type]
+                        : item.type.includes('github')
+                        ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
+                        : socialIcons[item.type]}
                       class="w-[45px] sm:w-[49px] md:w-[40px]"
                       alt=""
                     /></BorderButton

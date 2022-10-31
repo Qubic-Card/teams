@@ -1,10 +1,15 @@
 <script>
   export let checked = false;
+  export let mode = 'editor';
 </script>
 
-<label class="switch">
+<label class="switch {mode === 'editor' ? 'h-7' : 'h-6'}">
   <input type="checkbox" bind:checked on:change />
-  <span class="slider" />
+  <span
+    class="slider {mode === 'editor'
+      ? 'before:bottom-[5px] before:h-5 before:w-5 rounded-md'
+      : 'before:bottom-[4px] before:h-4 before:w-4 rounded-r-md'}"
+  />
 </label>
 
 <style>
@@ -12,7 +17,7 @@
     position: relative;
     display: inline-block;
     width: 65px;
-    height: 30px;
+    /* height: 25px; */
   }
 
   .switch input {
@@ -31,16 +36,16 @@
     background-color: #ccc;
     -webkit-transition: 0.4s;
     transition: 0.4s;
-    border-radius: 10px;
+    /* border-radius: 10px; */
   }
 
   .slider:before {
     position: absolute;
     content: '';
-    height: 20px;
-    width: 20px;
-    left: 15px;
-    bottom: 5px;
+    /* height: 20px;
+    width: 20px; */
+    left: 10px;
+    /* bottom: px; */
     background-color: white;
     -webkit-transition: 0.4s;
     transition: 0.4s;
@@ -58,6 +63,6 @@
   input:checked + .slider:before {
     -webkit-transform: translateX(19px);
     -ms-transform: translateX(23px);
-    transform: translateX(19px);
+    transform: translateX(27px);
   }
 </style>

@@ -195,14 +195,14 @@
     <div class="grid grid-cols-1 gap-1 mb-1">
       <BorderButton
         order={1}
-        class="w-full font-semibold h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-md"
+        class="w-full font-regular h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-md"
         on:click={() => toastFailed("You are can't connect to yourself.")}
       >
         Connect With Me
       </BorderButton>
       <BorderButton
         order={1}
-        class="w-full font-semibold h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary} rounded-md"
+        class="w-full font-regular h-12 {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary} rounded-md"
         on:click={async () =>
           download(
             await genvcard(
@@ -245,7 +245,14 @@
                       on:click={() => toNewTab(item.type, item.data)}
                       class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center rounded-md items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
                       ><img
-                        src={item.type.includes('github')
+                        src={item.type.includes('github') &&
+                        $basicProfile?.design?.theme?.toString() === 'light'
+                          ? socialIcons[item.type.split('-')[0]]
+                          : item.type.includes('github') &&
+                            $basicProfile?.design?.theme?.toString() ===
+                              'offwhite'
+                          ? socialIcons[item.type.split('-')[0]]
+                          : item.type.includes('github')
                           ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
                           : socialIcons[item.type.split('-')[0]]}
                         class="w-[41px] sm:w-[49px] md:w-[42px]"
@@ -260,7 +267,13 @@
                     class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
                     ><img
                       src={item.type.includes('github') &&
-                      $basicProfile?.design?.theme?.toString() !== 'light'
+                      $basicProfile?.design?.theme?.toString() === 'light'
+                        ? socialIcons[item.type]
+                        : item.type.includes('github') &&
+                          $basicProfile?.design?.theme?.toString() ===
+                            'offwhite'
+                        ? socialIcons[item.type]
+                        : item.type.includes('github')
                         ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
                         : socialIcons[item.type]}
                       class="w-[41px] sm:w-[49px] md:w-[42px]"

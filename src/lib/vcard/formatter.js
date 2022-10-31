@@ -38,7 +38,7 @@ const formatter = (vcard) => {
     };
 
     const linkFormatter = () => {
-      socialsFormatted[idx] = `URL;LABEL=${title}:${
+      socialsFormatted[idx] = `URL;LABEL=${title.slice(0, -1)}:${
         link.includes('http') ? http + ':' + domain : link
       }`;
     };
@@ -54,9 +54,12 @@ const formatter = (vcard) => {
     };
 
     const iOSLinkFormatter = (idx) => {
-      socialsFormatted[idx] = `item${idx - 17}.URL;LABEL=${title}:${
-        link.includes('http') ? http + ':' + domain : link
-      } ${nl()}item${idx - 17}.X-ABLabel:${title}`;
+      socialsFormatted[idx] = `item${idx - 17}.URL;LABEL=${title.slice(
+        0,
+        -1
+      )}:${link.includes('http') ? http + ':' + domain : link} ${nl()}item${
+        idx - 17
+      }.X-ABLabel:${title.slice(0, -1)}`;
     };
 
     if (isIOS()) {

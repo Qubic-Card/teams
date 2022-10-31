@@ -36,7 +36,7 @@
 
 <div class="flex items-center" transition:fade|local={{ duration: 200 }}>
   <div
-    class="w-10 h-10 font-semibold  rounded justify-center items-center flex bg-black text-white"
+    class="w-10 h-10 font-regular  rounded justify-center items-center flex bg-black text-white"
   >
     {profile?.profileData?.firstname?.slice(0, 1) ?? 'Q'}
   </div>
@@ -199,7 +199,7 @@
               }`}
             >
               <p
-                class={`text-sm cursor-pointer underline hover:font-semibold ${
+                class={`text-sm cursor-pointer underline hover:font-regular ${
                   profile?.link === '' ? 'hidden' : ''
                 }`}
                 on:click={() => window.open(profile?.link, '_blank').focus()}
@@ -296,7 +296,7 @@
               {#each profile.profileData.links.filter((link) => link.isPersonal !== true) as item}
                 {#if item.isActive}
                   <div
-                    class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-200 items-center bg-white hover:font-semibold"
+                    class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-200 items-center bg-white hover:font-regular"
                   >
                     <p
                       class="break-all"
@@ -317,7 +317,7 @@
               {#each profile.profileData.links.filter((link) => link.isPersonal !== false) as item}
                 {#if item.isActive}
                   <div
-                    class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-200 items-center bg-white hover:font-semibold"
+                    class="flex-grow flex p-4 cursor-pointer rounded-md border border-neutral-200 items-center bg-white hover:font-regular"
                   >
                     <p
                       class="break-all"

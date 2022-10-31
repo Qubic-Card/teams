@@ -13,12 +13,13 @@
   background-color: #71717a;
 } */
 
-/* *::-webkit-scrollbar {
-  height: 5px;
+*::-webkit-scrollbar {
+  width: 3px;
 }
 *::-webkit-scrollbar-track {
-  background-color: #e4e4e4;
+  background-color: #191919;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: #71717a;
-} */
+  border-radius: 30px;
+  background-color: #949494b8;
+}

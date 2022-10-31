@@ -141,7 +141,14 @@
   $: query, getUnsplash();
 </script>
 
-<ModalOverlay {isOpen} on:click={() => (isOpen = false)} />
+<ModalOverlay
+  {isOpen}
+  on:click={() => {
+    isOpen = false;
+    croppedImage = '';
+    pond.removeFile();
+  }}
+/>
 
 <Dialog
   static
@@ -149,7 +156,11 @@
     isOpen ? 'translate-x-0' : 'translate-x-[900px]'
   } transition-all duration-300 justify-between ease-in-out flex flex-col h-screen w-3/4 md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   open={isOpen}
-  on:close={() => (isOpen = false)}
+  on:close={() => {
+    isOpen = false;
+    croppedImage = '';
+    pond.removeFile();
+  }}
 >
   <div class="h-full flex flex-col gap-2">
     <h2>Crop image</h2>
@@ -190,7 +201,7 @@
         on:click={async () => await handleAddFile()}
       >
         {#if isLoading}
-          <Spinner bg="#1f4496" />
+          <Spinner bg="#1f4496" class="w-6 h-6" />
         {/if}
         Save
       </button>
@@ -209,31 +220,29 @@
   <div class="flex justify-center" in:fade|local={{ duration: 200 }}>
     <div class="w-full bg-black">
       <div class="gap-2 text-black">
-        <div
-          class="flex flex-col w-full md:col-span-1 col-span-2 bg-neutral-900"
-        >
+        <div class="flex flex-col w-full md:col-span-1 col-span-2 bg-black">
           <!-- <ProfileEditorSkeleton /> -->
           <TabGroup>
             <TabList
-              class="w-full grid grid-cols-3 border-2 border-neutral-700  p-2"
+              class="w-full grid grid-cols-3 outline-1 outline outline-neutral-700  p-2"
             >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-l-md text-xs md:text-sm'}>Bio</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-l-md text-xs md:text-sm'}
                 >Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-l-md text-xs md:text-sm'}
                 >Links</Tab
               >
@@ -241,10 +250,8 @@
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="border-neutral-700 border-2 mb-4 pb-2">
-                  <div
-                    class="px-3 pt-3 grid grid-cols-2 space-x-5 bg-neutral-900"
-                  >
+                <div class="outline-1 outline outline-neutral-700 mb-4 pb-2">
+                  <div class="px-3 pt-3 grid grid-cols-2 space-x-5 bg-black">
                     <Input
                       on:change={handleSave}
                       placeholder="Hello"
@@ -268,7 +275,7 @@
                         : true}
                     />
                   </div>
-                  <div class="px-3 bg-neutral-900">
+                  <div class="px-3 bg-black">
                     <Input
                       on:change={handleSave}
                       placeholder="example company"
@@ -304,7 +311,7 @@
                     />
                   </div>
                   <div
-                    class={`p-3 bg-neutral-900 ${
+                    class={`p-3 bg-black ${
                       permissions.writeProfile || permissions.writeMembers
                         ? ''
                         : 'hidden'
@@ -333,7 +340,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="border-2 border-neutral-700 mb-4 p-4">
+                <div class="outline-1 outline outline-neutral-700 mb-4 p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
@@ -403,7 +410,15 @@
                           <div class="flex items-center h-[6.3rem]">
                             <Menu
                               class="bg-neutral-100 relative h-8 mx-2 rounded-md"
+                              let:open
                             >
+                              {#if open}
+                                <div
+                                  transition:fade|local={{ duration: 200 }}
+                                  class="fixed inset-0 bg-black/50 z-20"
+                                  aria-hidden="true"
+                                />
+                              {/if}
                               <MenuButton
                                 class="w-8 h-auto flex justify-center items-center pt-1"
                                 ><svg
@@ -421,52 +436,29 @@
                                   />
                                 </svg></MenuButton
                               >
-                              <MenuItems
-                                class="top-10 z-40 rounded-md absolute flex flex-col bg-white shadow-md border border-neutral-300 p-2 w-40"
-                              >
-                                <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
-                                  on:click={async () =>
-                                    await toNewTab(item.type, item.data)}
+                              {#if open}
+                                <MenuItems
+                                  class="top-10 z-40 rounded-md absolute flex flex-col bg-white shadow-md border border-neutral-300 p-2 w-40"
                                 >
-                                  <img
-                                    class="cursor-pointer mr-2"
-                                    draggable="false"
-                                    width="20"
-                                    height="20"
-                                    src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
-                                    alt=""
-                                  />
-                                  <p>Test</p>
-                                </MenuItem>
-                                <MenuItem
-                                  class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
-                                  on:click={async () => {
-                                    handleDeleteSocial(item, $socials);
-                                    await handleSave();
-                                  }}
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-6 w-6 mr-2"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                  >
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                    />
-                                  </svg>
-                                  <p>Delete</p>
-                                </MenuItem>
-                                {#if i != 0}
                                   <MenuItem
-                                    class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
+                                    class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
+                                    on:click={async () =>
+                                      await toNewTab(item.type, item.data)}
+                                  >
+                                    <img
+                                      class="cursor-pointer mr-2"
+                                      draggable="false"
+                                      width="20"
+                                      height="20"
+                                      src="https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/48/000000/external-link-essentials-tanah-basah-basic-outline-tanah-basah.png"
+                                      alt=""
+                                    />
+                                    <p>Test</p>
+                                  </MenuItem>
+                                  <MenuItem
+                                    class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
                                     on:click={async () => {
-                                      handleUpSocial(item, i, $socials);
+                                      handleDeleteSocial(item, $socials);
                                       await handleSave();
                                     }}
                                   >
@@ -481,13 +473,38 @@
                                       <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        d="M7 11l5-5m0 0l5 5m-5-5v12"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                                       />
                                     </svg>
-                                    <p>Move up</p>
+                                    <p>Delete</p>
                                   </MenuItem>
-                                {/if}
-                              </MenuItems>
+                                  {#if i != 0}
+                                    <MenuItem
+                                      class="flex  hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
+                                      on:click={async () => {
+                                        handleUpSocial(item, i, $socials);
+                                        await handleSave();
+                                      }}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 mr-2"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                      >
+                                        <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M7 11l5-5m0 0l5 5m-5-5v12"
+                                        />
+                                      </svg>
+                                      <p>Move up</p>
+                                    </MenuItem>
+                                  {/if}
+                                </MenuItems>
+                              {/if}
                             </Menu>
                             <SwitchButton
                               on:change={handleSave}
@@ -509,7 +526,9 @@
               <TabPanel>
                 <!-- Link Editor -->
 
-                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-4">
+                <div
+                  class="outline-1 outline outline-neutral-700 p-4 mb-0 lg:mb-4"
+                >
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
@@ -525,7 +544,7 @@
                   </div>
                   <label
                     for="links"
-                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100"
+                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100 md:text-sm text-xs my-2"
                   >
                     <input
                       bind:checked={$profileData.isShowMetaImage}

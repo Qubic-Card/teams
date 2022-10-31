@@ -4,7 +4,7 @@
 
   let btnHover =
     editor === 'team'
-      ? 'hover:bg-black hover:text-white'
+      ? 'hover:bg-neutral-900 hover:text-white'
       : 'hover:bg-black hover:text-white';
   let btnText = editor === 'team' ? 'text-white' : 'text-black';
   let btnActive = editor === 'team' ? 'text-black' : 'text-white';
@@ -49,7 +49,7 @@
       {/if}
       {#if i === page}
         <button
-          class="text-center rounded-md cursor-pointer w-9 m-1 {btnText} {btnActive} bg-black {btnHover} border-2 border-neutral-700"
+          class="text-center rounded-md cursor-pointer w-9 m-1 {btnText} {btnActive} bg-neutral-900 {btnHover} border-2 border-neutral-700"
           on:click={() => setPage(i)}
         >
           {i + 1}

@@ -1,12 +1,11 @@
 <script>
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
   import '../app.css';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { userData } from '@lib/stores/userStore';
-  import MenuButton from '@comp/buttons/menuButton.svelte';
   import { onMount, setContext } from 'svelte';
   import { sidebarItems } from '@lib/constants';
   import getTeamData from '@lib/query/getTeamData';
@@ -17,9 +16,9 @@
   import SubscriptionEnd from '@pages/subscriptionEnd.svelte';
   import { teams } from '@lib/stores/teamStore';
   import { teamData } from '@lib/stores/teamStore';
+  import MenuButtonModal from '@comp/modals/menuButtonModal.svelte';
 
   let isSidebarOpened = false;
-  let isMenuOpened = false;
   let member = [];
   let subscription;
   let loading = true;
@@ -31,7 +30,6 @@
   let teamId = '';
 
   const sidebarHandler = () => (isSidebarOpened = !isSidebarOpened);
-  const menuHandler = () => (isMenuOpened = !isMenuOpened);
   const handler = (id, title) => {
     goto(`/${id}/${title}`);
     isSidebarOpened && sidebarHandler();
@@ -132,6 +130,8 @@
       }
     }
   }
+
+  let isBannerOpen = true; // Banner view on desktop
 </script>
 
 <svelte:head>
@@ -152,11 +152,32 @@
       {/if}
     {/if}
 
-    <div
-      class="flex justify-center top-0 items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
-    >
-      Please Sign-in on Desktop
-    </div>
+    {#if isBannerOpen}
+      <div
+        out:slide|local
+        class="flex justify-start items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
+      >
+        <h1 class="flex justify-center w-full">
+          View on desktop for better experience
+        </h1>
+        <button on:click={() => (isBannerOpen = false)} class="self-start">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="white"
+            class="w-4 h-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    {/if}
 
     <div
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
@@ -197,33 +218,15 @@
           </div>
         {/if}
       </div>
-      {#if $teamData.logo}
-        <img
-          on:click={menuHandler}
-          src={$teamData.logo}
-          alt="avatar"
-          class="rounded-full w-10 h-10 cursor-pointer"
-        />
-      {:else if $teamData.logo === ''}
-        <div
-          on:click={menuHandler}
-          class="bg-neutral-800 p-4 rounded-full w-12 h-12 cursor-pointer flex items-center justify-center"
-        />
-      {:else}
-        <div class="animate-pulse p-4">
-          <div class="text-5xl w-12 h-12 bg-neutral-800 rounded-full" />
-        </div>
-      {/if}
-      {#if isMenuOpened}
-        <MenuButton />
-      {/if}
+
+      <MenuButtonModal logo={$teamData.logo} />
     </div>
 
     {#if subscription?.isActive === false && subscription?.isAfter7Days}
       <SubscriptionEnd {subscription} {member} {teamId} />
     {:else}
       <div
-        class={`border-r border-neutral-700 bg-black w-12 md:w-16 fixed ${
+        class={`border-r border-neutral-700 bg-black w-12 md:w-16 hidden md:block fixed ${
           sevenDaysAfterEndDate
             ? !subscription?.isActive && !subscription?.isAfter7Days
               ? 'top-36 md:top-24'
@@ -275,51 +278,64 @@
       </div>
 
       <div
+        class="w-full h-16 z-50 md:hidden fixed bottom-0 bg-black outline outline-1 outline-neutral-800"
+      >
+        <nav class="w-full flex justify-center items-center overflow-x-auto">
+          {#each sidebarItems as item}
+            {#if $teamData.name}
+              <div
+                class={`flex cursor-pointer justify-center items-center w-16 h-16 ${
+                  $page.routeId === '[slug]/dashboard/team@teams'
+                    ? 'first:bg-neutral-900'
+                    : ''
+                }  ${
+                  $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
+                } ${
+                  isSidebarOpened && $page.routeId === item.routeId
+                    ? 'bg-neutral-900'
+                    : ''
+                }`}
+                on:click={() => handler($teamData?.id, item.title)}
+              >
+                <img
+                  src={item.urldefault}
+                  alt={item.title}
+                  class="w-6 md:w-5"
+                />
+              </div>
+            {:else}
+              <div
+                class="animate-pulse flex justify-between items-center bg-neutral-800 w-full h-16"
+              />
+            {/if}
+          {/each}
+        </nav>
+      </div>
+
+      <div
         class={`absolute ${
           sevenDaysAfterEndDate
             ? !subscription?.isActive && !subscription?.isAfter7Days
               ? 'top-36 md:top-24'
-              : 'top-[100px] md:top-16'
+              : `${isBannerOpen ? 'top-[100px]' : 'top-[60px]'} md:top-16`
             : 'top-16'
-        } bottom-0 bg-neutral-900 text-white overflow-y-auto w-full`}
+        } bottom-0 text-white overflow-y-auto w-full overflow-x-hidden`}
       >
         <SvelteToast />
 
         {#if loading}
           <div
             transition:fade|local
-            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40"
+            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40 px-4 md:px-0"
           >
-            <small class="text-left w-1/2 mb-2">
+            <small class="text-left w-full md:w-1/2 mb-2">
               Secondary security authenticating user access ...
             </small>
-            <div class="h-6 w-1/2 rounded-md shim-red bg-neutral-700" />
+            <div
+              class="h-6 w-full md:w-1/2 rounded-md shim-red bg-neutral-700"
+            />
           </div>
         {:else}
-          {#if permissions.readAnalytics}
-            {#if $page.routeId === '[slug]/dashboard@teams' || $page.routeId === '[slug]/dashboard/team@teams'}
-              <div
-                class="border-b-2 border-neutral-700 pl-20 md:pl-24 mt-4 gap-4 flex"
-              >
-                <button
-                  on:click={() => goto(`/${$teamData?.id}/dashboard`)}
-                  class={`pb-2 w-1/5 text-xs md:text-sm ${
-                    $page.routeId === '[slug]/dashboard@teams'
-                      ? 'border-b-2 border-neutral-200 font-bold'
-                      : 'text-neutral-300'
-                  }`}>Personal</button
-                >
-                <button
-                  on:click={() => goto(`/${$teamData?.id}/dashboard/team`)}
-                  class={`pb-2 w-1/5 text-xs md:text-sm ${
-                    $page.routeId === '[slug]/dashboard/team@teams'
-                      ? 'border-b-2 border-neutral-200 font-bold'
-                      : 'text-neutral-300'
-                  }`}>Team</button
-                >
-              </div>
-            {/if}
-          {/if}
           <slot />
         {/if}
       </div>

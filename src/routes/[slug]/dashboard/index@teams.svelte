@@ -39,7 +39,7 @@
 </script>
 
 <div
-  class="flex flex-col justify-between text-white gap-4 mb-8 pt-4 pl-16 md:pl-24 pr-4"
+  class="flex flex-col justify-between text-white gap-4 mb-20 md:mb-8 pt-6 pl-4 md:pl-24 pr-4"
 >
   <div class="flex flex-col">
     <h1 class="text-sm md:text-md font-bold">Quick Actions</h1>
@@ -49,7 +49,7 @@
       {#each quickActions as item}
         <div
           on:click={item.handler}
-          class="flex justify-center items-center px-4 bg-neutral-800 rounded-md border border-neutral-700 snap-center h-12 text-xs md:text-sm text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
+          class="flex justify-center items-center px-4 bg-neutral-900 rounded-md outline outline-1 outline-neutral-800 snap-center h-12 text-xs md:text-sm text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
         >
           {item.name}
         </div>
@@ -70,7 +70,7 @@
           on:click={() => window.open(content.url, '_blank').focus()}
         >
           <div
-            class="bg-neutral-800 w-[350px] lg:w-[450px] h-full p-3 rounded-md"
+            class="bg-neutral-900 w-[350px] lg:w-[450px] h-full p-3 rounded-md outline outline-1 outline-neutral-800"
           >
             <div class="Image" style={`background-image:url(${content.bg})`} />
             <h1 class="font-bold text-md my-2">{content.title}</h1>

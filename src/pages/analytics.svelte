@@ -93,10 +93,7 @@
       count,
     } = await supabase
       .from('team_connection_acc')
-      .select(
-        'dateConnected, profileData->firstname, profileData->lastname, profileData->company, profileData->job, profileData->avatar, profileData->links, profileData->socials, message, link, by(team_profile->firstname, team_profile->lastname)',
-        { count: 'estimated' }
-      )
+      .select('dateConnected', { count: 'estimated' })
       .eq('by', $memberData?.id)
       .gte(
         'dateConnected',
@@ -133,7 +130,9 @@
         : selectedDays === '30 Days'
         ? last30Days[0]
         : last3Days[0]
-    ).toUTCString();
+    ).toISOString();
+
+    minTime = new Date(new Date(minTime).setHours(0, 0, 0, 0)).toISOString();
 
     let {
       data: logs,
@@ -157,6 +156,7 @@
       activity = logs.map((log) =>
         convertToGMT7(log.created_at).toDateString().slice(4)
       );
+
       let newArr = [];
       logs.map((log) => {
         if (!newArr.includes(log.uniqueId)) newArr.push(log.uniqueId);
@@ -184,7 +184,9 @@
         : selectedDays === '30 Days'
         ? last30Days[0]
         : last3Days[0]
-    ).toUTCString();
+    ).toISOString();
+
+    minTime = new Date(new Date(minTime).setHours(0, 0, 0, 0)).toISOString();
 
     let {
       data: logs,

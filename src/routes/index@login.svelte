@@ -67,9 +67,9 @@
     <div
       class="text-white bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
     >
-      <div class="flex justify-start items-center h-screen p-8 md:p-24">
+      <div class="flex justify-start items-center h-screen p-6 md:p-24">
         <div
-          class="flex flex-col justify-between h-full w-full 2xl:w-1/2 py-16 px-8 bg-white rounded-2xl text-black"
+          class="flex flex-col justify-between h-full w-full 2xl:w-1/2 py-16 px-8 bg-white rounded-md md:rounded-xl text-black"
         >
           <div class="text-xl">
             <div class="flex items-center">
@@ -81,7 +81,7 @@
             <div>
               {#if isForgotPassword}
                 <h1
-                  class="mt-6 text-2xl mb-4 font-semibold tracking-tighter text-left sm:text-3xl title-font"
+                  class="mt-6 text-2xl mb-4 font-regular tracking-tighter text-left sm:text-3xl title-font"
                 >
                   We got you!
                 </h1>
@@ -111,14 +111,14 @@
                   <button
                     disabled={loading}
                     on:click={async () => await handleForgotPassword()}
-                    class="block w-full px-4 py-3 md:mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                    class="block w-full px-4 py-3 md:mt-6 font-regular rounded-md text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                     >Send Email</button
                   >
                 {:else}
                   <button
                     disabled={loading}
                     on:click={async () => await handleLogin()}
-                    class="block disabled:bg-blue-600/60 w-full px-4 py-3 md:mt-6 font-semibold rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+                    class="block disabled:bg-blue-600/60 w-full px-4 py-3 md:mt-6 font-regular rounded-md text-white transition duration-500 ease-in-out transform bg-blue-600 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
                     >Log In</button
                   >
                 {/if}

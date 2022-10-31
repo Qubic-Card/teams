@@ -1,16 +1,12 @@
 <script>
   export let colLength = 0;
-  export let bg = [
-    'bg-neutral-800/90',
-    'bg-neutral-800/90',
-    'bg-neutral-800/90',
-  ];
+  export let bg = ['bg-neutral-900', 'bg-neutral-900', 'bg-neutral-900'];
   let width = ['w-72', 'w-full', 'w-72'];
 </script>
 
 <tr class="animate-pulse">
   {#each Array(colLength) as item, i}
-    <td class={`h-11 border-b p-1 border-neutral-700 ${width[i]} ${bg[i]}`}>
+    <td class={`h-11 border-b p-1 border-neutral-800 ${width[i]} ${bg[i]}`}>
       <div class={`animate h-8 rounded-md ${width[i]}`} />
     </td>
   {/each}

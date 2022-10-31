@@ -2,6 +2,7 @@
   import { socialIcons } from '@lib/constants';
   import { basicSocials } from '@lib/stores/editorStore';
   import { toastFailed } from '@lib/utils/toast';
+  import { Dialog, DialogOverlay } from '@rgossiaux/svelte-headlessui';
 
   export let profileData;
 
@@ -34,47 +35,48 @@
   />
 </button>
 {#if showModal}
-  <div
-    class="overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex"
+  <Dialog
+    open={showModal}
+    on:close={() => (showModal = false)}
+    class="fixed inset-0 z-50 overflow-y-auto flex justify-center items-end md:items-center overflow-x-hidden"
   >
-    <div class="relative w-auto my-6 mx-auto md:max-w-3xl max-w-md">
-      <!--content-->
-      <div
-        class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none"
-      >
-        <!--header-->
-        <div class="p-5 border-b border-solid rounded-t">
-          <div class="flex w-full justify-between items-center">
-            <h3 class="text-xl font-semibold">Add Socials</h3>
-            <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
-              <img
-                width="20"
-                height="20"
-                src="/icons/icons8-close-48.png"
-                alt="close"
-              />
-            </p>
-          </div>
-        </div>
-        <!--body-->
-        <div
-          class="grid grid-cols-4 justify-center bg-gray-50 items-center p-4 rounded-lg cursor-pointer"
-        >
-          {#each Object.keys(socialIcons) as item}
+    <DialogOverlay
+      class="fixed inset-0 bg-black opacity-30 z-10"
+      on:click={toggleModal}
+    />
+    <div
+      class="flex flex-col bg-white text-black w-full md:w-96 h-auto z-40 rounded-md"
+    >
+      <div class="p-4 border-b border-solid rounded-t">
+        <div class="flex w-full justify-between items-center">
+          <h3 class="text-xl font-regular">Add Socials</h3>
+          <p on:click={toggleModal} class="cursor-pointer font-bold text-lg">
             <img
-              width="64"
-              height="64"
-              class="m-1 p-2 border rounded bg-white"
-              on:click={() => addSocial(item)}
-              src={item.includes('github')
-                ? 'https://img.icons8.com/fluency/48/FA5252/github.png'
-                : socialIcons[item]}
-              alt={item}
+              width="20"
+              height="20"
+              src="/icons/icons8-close-48.png"
+              alt="close"
             />
-          {/each}
+          </p>
         </div>
       </div>
+
+      <div
+        class="grid grid-cols-4 justify-center place-items-center bg-gray-50 items-center p-4 rounded-lg cursor-pointer"
+      >
+        {#each Object.keys(socialIcons) as item}
+          <img
+            width="64"
+            height="64"
+            class="m-1 p-2 border rounded bg-white"
+            on:click={() => addSocial(item)}
+            src={item.includes('github')
+              ? 'https://img.icons8.com/fluency/48/FA5252/github.png'
+              : socialIcons[item]}
+            alt={item}
+          />
+        {/each}
+      </div>
     </div>
-  </div>
-  <div class="opacity-25 fixed inset-0 z-40 bg-black" />
+  </Dialog>
 {/if}

@@ -221,6 +221,7 @@
   >Select Background</button
 >
 
+<!-- {#if isOpen} -->
 <ModalWrapperHeadless
   desktopWidth="md:w-1/2 lg:w-1/3"
   desktopRight="md:right-1/4"
@@ -324,13 +325,13 @@
           class="p-2 bg-neutral-700 text-white rounded-lg w-full"
         />
       </div>
-      <div
-        class={`${
-          unsplashDatas.length > 0 ? 'grid' : 'flex'
-        } grid-cols-2 grid-flow-row p-2 text-black h-[700px] snap-container snap-y snap-mandatory overflow-y-auto`}
-      >
-        {#if unsplashDatas}
-          {#if unsplashDatas.length > 0}
+      {#if unsplashDatas}
+        <div
+          class={`${
+            unsplashDatas?.length > 0 ? 'grid' : 'flex'
+          } grid-cols-2 grid-flow-row p-2 text-black h-1/2 snap-container snap-y snap-mandatory overflow-y-auto`}
+        >
+          {#if unsplashDatas?.length > 0}
             {#each unsplashDatas as item}
               <div class="m-1 bg-black mt-2 flex flex-col">
                 <div
@@ -369,12 +370,13 @@
               No image to display
             </h1>
           {/if}
-        {/if}
-      </div>
+        </div>
+      {/if}
     </div>
   {/if}
 </ModalWrapperHeadless>
 
+<!-- {/if} -->
 <style>
   .snap-container::-webkit-scrollbar {
     height: 10px;

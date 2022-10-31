@@ -9,6 +9,7 @@
     MenuItems,
     MenuItem,
   } from '@rgossiaux/svelte-headlessui';
+  import { fade } from 'svelte/transition';
 
   export let item, handleSave, i, handleDeleteSocial, handleUpSocial, socials;
   export let isBusiness = false;
@@ -70,7 +71,16 @@
     <Menu
       as="div"
       class="bg-neutral-100 inline-block relative h-8 mx-2 rounded-md"
+      let:open
     >
+      {#if open}
+        <div
+          transition:fade|local={{ duration: 200 }}
+          class="fixed inset-0 bg-black/50 z-40"
+          aria-hidden="true"
+          on:click
+        />
+      {/if}
       <MenuButton class="w-8 h-auto flex justify-center items-center pt-1"
         ><svg
           xmlns="http://www.w3.org/2000/svg"

@@ -6,7 +6,9 @@
 </script>
 
 <div class={`gap-3 ${permissions.readBilling ? 'flex' : 'hidden'}`}>
-  <div class="bg-neutral-800 rounded-lg p-4 w-full md:w-3/4">
+  <div
+    class="bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg p-4 w-full md:w-3/4"
+  >
     <div class="flex flex-col my-4">
       <div
         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-4"
@@ -58,7 +60,7 @@
     </div>
   </div>
   <div
-    class="bg-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
+    class="bg-neutral-900 outline outline-1 outline-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
   >
     <p class="mb-4">Atur subscription dalam billing</p>
   </div>

@@ -313,20 +313,20 @@
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-black text-white p-2 rounded-md'
-                    : 'bg-white p-2 rounded-l-md'}>Bio</Tab
+                    ? 'bg-black text-white text-sm p-2 rounded-md'
+                    : 'bg-white text-sm p-2 rounded-l-md'}>Bio</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-black text-white p-2 rounded-md'
-                    : 'bg-white p-2'}>Socials</Tab
+                    ? 'bg-black text-white text-sm p-2 rounded-md'
+                    : 'bg-white text-sm p-2'}>Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-black text-white p-2 rounded-md'
-                    : 'bg-white p-2 rounded-r-md'}>Links</Tab
+                    ? 'bg-black text-white text-sm p-2 rounded-md'
+                    : 'bg-white text-sm p-2 rounded-r-md'}>Links</Tab
               >
             </TabList>
             <TabPanels class="mt-4 bg-white rounded-lg">
@@ -544,7 +544,9 @@
                       on:change={handleSave}
                     />
 
-                    <p>Show URL image if available.</p>
+                    <p class="md:text-sm text-xs">
+                      Show URL image if available.
+                    </p>
                   </label>
                   {#if $basicProfile.isBusiness}
                     {#each $basicLinks.filter((link) => link.isPersonal === false) as item, i}

@@ -118,7 +118,7 @@
       checkboxes={roleMapping}
       bind:checked={checkedRole}
       {permissions}
-      bg="bg-neutral-800"
+      bg="bg-neutral-900"
       mode="add"
     />
     <button
@@ -127,7 +127,7 @@
       on:click={async () => await addRoleHandler()}
     >
       {#if loading}
-        <Spinner bg="#1f4496" />
+        <Spinner bg="#1f4496" class="w-6 h-6" />
       {/if}
 
       Add role

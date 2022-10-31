@@ -4,7 +4,7 @@
   import Input from '@comp/input.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-
+  import Confirmation from '@comp/modals/confirmation.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
@@ -19,7 +19,7 @@
     isDisplayPersonal,
   } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
-  import { memberData, user } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -34,7 +34,6 @@
     Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import toNewTab from '@lib/utils/newTab';
-  import { theme } from '@lib/profileTheme';
   import { teamData } from '@lib/stores/profileData';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import {
@@ -46,7 +45,6 @@
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import getCroppedImg from '@lib/utils/canvas';
   import Cropper from 'svelte-easy-crop';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { getContext } from 'svelte';
 
   // Register the plugins
@@ -184,7 +182,7 @@
 </script>
 
 {#if showDeleteBrochureModal}
-  <ConfirmationModal
+  <Confirmation
     isDelete
     isDispatch
     heading="Are you sure you want to delete"
@@ -251,7 +249,7 @@
         on:click={async () => await handleAddFile()}
       >
         {#if isLoading}
-          <Spinner bg="#1f4496" />
+          <Spinner bg="#1f4496" class="w-6 h-6" />
         {/if}
         Save
       </button>
@@ -273,25 +271,25 @@
         <div class="flex flex-col w-full">
           <TabGroup>
             <TabList
-              class="w-full grid grid-cols-3 border-2 border-neutral-700 p-2"
+              class="w-full grid grid-cols-3 outline-1 outline outline-neutral-700 p-2"
             >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 text-xs md:text-sm rounded-l-md'}
                 >Team Profile</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 text-xs md:text-sm'}>Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-700 text-white p-2 text-xs md:text-sm'
+                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
                     : 'text-white p-2 rounded-r-md text-xs md:text-sm'}
                 >Links</Tab
               >
@@ -299,7 +297,9 @@
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="border-2 border-neutral-700 mb-4 pt-2 pb-2">
+                <div
+                  class="outline-1 outline outline-neutral-700 mb-4 pt-2 pb-2"
+                >
                   <div class="px-3 grid grid-cols-1 space-x-5">
                     <Input
                       on:change={handleSave}
@@ -420,7 +420,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="border-2 border-neutral-700 mb-4 p-4">
+                <div class="outline-1 outline outline-neutral-700 mb-4 p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Socials</h1>
                     <AddSocialsModal
@@ -488,7 +488,15 @@
                           <div class="flex items-center h-[6.3rem]">
                             <Menu
                               class="bg-neutral-100 h-8 mx-2 relative rounded-md"
+                              let:open
                             >
+                              {#if open}
+                                <div
+                                  transition:fade|local={{ duration: 200 }}
+                                  class="fixed inset-0 bg-black/50 z-20"
+                                  aria-hidden="true"
+                                />
+                              {/if}
                               <MenuButton
                                 class="w-8 h-auto flex justify-center items-center pt-1"
                                 ><svg
@@ -604,7 +612,9 @@
               </TabPanel>
               <TabPanel>
                 <!-- Link Editor -->
-                <div class="border-2 border-neutral-700 p-4 mb-0 lg:mb-4">
+                <div
+                  class="outline-1 outline outline-neutral-700 p-4 mb-0 lg:mb-4"
+                >
                   <div class="flex justify-between items-center">
                     <h1 class="font-bold text-lg text-white">Links</h1>
                     <img
@@ -618,7 +628,7 @@
                   </div>
                   <label
                     for="links"
-                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100"
+                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100 md:text-sm text-xs my-2"
                   >
                     <input
                       bind:checked={$teamData.isShowMetaImage}
@@ -633,7 +643,7 @@
                   </label>
                   {#if $teamLinks.length > 0}
                     {#each $teamLinks as item, i}
-                      <div class="p-3 flex">
+                      <div class="flex">
                         <div class="flex flex-2 flex-col flex-grow">
                           <Input
                             on:change={handleSave}

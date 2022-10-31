@@ -21,8 +21,10 @@ export const socialIcons = {
     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-phone.png',
   line: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-line.svg',
   github: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/github.svg',
-  telegram: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/telegram.svg',
-  discord: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/discord.svg',
+  telegram:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/telegram.svg',
+  discord:
+    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/discord.svg',
 };
 
 export const cartImage = {
@@ -166,19 +168,6 @@ export const basicSearchMenu = [
   { id: 2, label: 'Job', col: 'profileData->>job' },
 ];
 
-export const doughnutChartBgColor = [
-  '#1d9bf0',
-  '#0b84ed',
-  '#ff0000',
-  '#0a66c2',
-  '#00e676',
-  '#fe079a',
-  '#000000',
-  '#fd7d00',
-  '#f0b938',
-  '#069231',
-];
-
 export const analyticsChartConfig = {
   responsive: true,
   aspectRatio: 1,
@@ -213,6 +202,12 @@ export let sidebarItems = [
     routeId: '[slug]/members@teams',
     urldefault: 'https://img.icons8.com/ios/100/FFFFFF/conference-call--v1.png',
   },
+  // {
+  //   title: 'membership',
+  //   routeId: '[slug]/membership@teams',
+  //   urldefault:
+  //     'https://img.icons8.com/ios-filled/100/FFFFFF/bank-card-front-side--v1.png',
+  // },
   {
     title: 'settings',
     routeId: '[slug]/settings@teams',

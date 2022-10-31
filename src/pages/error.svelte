@@ -1,6 +1,6 @@
 <div class="flex flex-col w-full mb-12 text-left lg:text-center">
   <h1
-    class="mx-auto mb-12 text-4xl font-semibold leading-none tracking-tighter lg:w-1/2 sm:text-6xl title-font"
+    class="mx-auto mb-12 text-4xl font-regular leading-none tracking-tighter lg:w-1/2 sm:text-6xl title-font"
   >
     Whoops!
   </h1>

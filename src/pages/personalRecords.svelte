@@ -6,6 +6,7 @@
   import RecordTypeDropdownButton from '@comp/buttons/recordTypeDropdownButton.svelte';
   import Flatpickr from 'svelte-flatpickr';
   import 'flatpickr/dist/themes/dark.css';
+  // import 'flatpickr/dist/flatpickr.css';
   import supabase from '@lib/db';
   import { memberData, user, userData } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
@@ -229,7 +230,7 @@
           options={fromDateOptions}
           bind:value={fromDateValue}
           name="date"
-          class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
+          class="w-full bg-neutral-800 rounded-md p-2 cursor-pointer"
         />
       </div>
       <div class="flex flex-col gap-2">
@@ -238,7 +239,7 @@
           options={toDateOptions}
           bind:value={toDateValue}
           name="date"
-          class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer disabled:cursor-default"
+          class="w-full bg-neutral-800 rounded-md p-2 cursor-pointer disabled:cursor-default"
         />
       </div>
     {/if}
@@ -271,12 +272,12 @@
     }}
   >
     {#if isCreateRecordLoading}
-      <Spinner bg="#1f4496" />
+      <Spinner bg="#1f4496" class="w-6 h-6" />
     {/if} <span>Create record &#8594;</span></button
   >
 </div>
 <div
-  class="w-full md:w-3/4 ml-12 md:ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
+  class="w-full md:w-3/4 ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto pb-6"
 >
   <table class="snap-center text-black w-full">
     <thead class="text-left text-neutral-400 bg-black/70">
@@ -330,7 +331,7 @@
 <style>
   .snap-container::-webkit-scrollbar {
     height: 5px;
-    width: 5px;
+    width: 0px;
   }
   .snap-container::-webkit-scrollbar-track {
     background-color: #e4e4e4;

@@ -140,14 +140,14 @@
 </script>
 
 {#await getTeamsRoleMapping()}
-  <div class="ml-16 md:ml-24 mr-4 mt-4">
+  <div class="ml-4 md:ml-24 mr-4 mt-4">
     <SettingsSkeleton
       {permissions}
       isSuperAdmin={$memberData?.roleName === 'superadmin'}
     />
   </div>
 {:then}
-  <div class="flex justify-center pt-4 pl-16 md:pl-24 pr-4">
+  <div class="flex justify-center pt-4 pl-4 md:pl-24 pr-4 mb-20 md:mb-0">
     <div class="flex flex-col w-full gap-3 text-sm pb-10">
       <Billing {permissions} />
       {#if $memberData?.roleName === 'superadmin'}
@@ -169,8 +169,10 @@
         {/if}
       {/if}
       <Role {permissions} {roles} />
-      <div class="flex flex-col p-4 bg-neutral-800 rounded-lg">
-        <h1 class="text-xl font-bold">Contact us</h1>
+      <div
+        class="flex flex-col p-4 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg"
+      >
+        <h1 class="text-sm md:text-xl font-bold">Contact us</h1>
         <a href="mailto:support@qubic.id text-xs md:text-sm"
           >Email: support@qubic.id</a
         >

@@ -39,5 +39,7 @@
       <h1 class="text-xl mt-8">No activity found</h1>
     </div>
   {/if}
-  <PaginationButton {setPage} {page} {maxPage} editor="basic" />
+  {#if maxPage > 1}
+    <PaginationButton {setPage} {page} {maxPage} editor="basic" />
+  {/if}
 </div>

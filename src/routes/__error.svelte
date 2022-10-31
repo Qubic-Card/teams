@@ -13,7 +13,7 @@
       class="flex flex-col justify-center items-center w-full mb-12 text-left lg:text-center"
     >
       <h1
-        class="mb-12 text-4xl font-semibold leading-none tracking-tighter lg:w-1/2 sm:text-6xl title-font"
+        class="mb-12 text-4xl font-regular leading-none tracking-tighter lg:w-1/2 sm:text-6xl title-font"
       >
         Whoops!
       </h1>
