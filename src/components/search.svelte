@@ -42,8 +42,8 @@
     <ListboxButton
       class="{editor === 'basic'
         ? 'bg-black'
-        : 'bg-black outline outline-1 outline-neutral-800'} text-sm text-white rounded-md p-2 w-20"
-      >{selected.label}</ListboxButton
+        : 'bg-black outline outline-1 outline-neutral-800'} flex justify-between text-sm text-white rounded-md p-2 w-24"
+      >{selected.label} <span>▼</span></ListboxButton
     >
     {#if open}
       <div transition:fade|local={{ duration: 100 }}>

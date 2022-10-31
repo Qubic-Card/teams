@@ -1,4 +1,5 @@
 <script>
+  import MemberSortDropdown from '@comp/buttons/memberSortDropdown.svelte';
   import { fade, fly } from 'svelte/transition';
   import { Dialog } from '@rgossiaux/svelte-headlessui';
   import { createEventDispatcher } from 'svelte';
@@ -21,6 +22,7 @@
   let loading = false;
   let fromDateValue = new Date(new Date(last7Days[0]));
   let toDateValue = new Date();
+  let dsc = false;
 
   const options = {
     // position: 'above center',
@@ -77,7 +79,7 @@
         .range(from, to)
         .gte('created_at', new Date(fromDate).toISOString())
         .lte('created_at', new Date(toDate).toISOString())
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: dsc });
 
       if (error) {
         console.log(error);
@@ -112,7 +114,7 @@
     }
   };
 
-  $: if (isOpen) toDateValue, page, getMemberLogs();
+  $: if (isOpen) toDateValue, page, dsc, getMemberLogs();
 </script>
 
 {#if isOpen}
@@ -197,11 +199,12 @@
             class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
           />
         </div>
-        <div
-          class="flex justify-center items-center text-xs md:text-sm bg-neutral-800 h-10 p-2 rounded-md w-1/3"
-        >
-          Most Recent
-        </div>
+
+        <MemberSortDropdown
+          mode="analytics"
+          on:asc={() => (dsc = false)}
+          on:dsc={() => (dsc = true)}
+        />
       </div>
     </div>
     <div class="p-2 bg-neutral-800 rounded-lg h-full overflow-y-auto">

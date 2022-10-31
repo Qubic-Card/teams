@@ -2,11 +2,12 @@
   import { getContext } from 'svelte';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
-  import moveArrItemToFront from '@lib/utils/moveArrItemToFront';
+  import sortMember from '@lib/utils/sortMember';
   import MemberCard from '@comp/cards/memberCard.svelte';
   import { getAllRoleByTeam } from '@lib/query/getRoleMaps';
   import TeamAnalyticsCard from '@comp/cards/teamAnalyticsCard.svelte';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
+  import MemberSortDropdown from '@comp/buttons/memberSortDropdown.svelte';
 
   let permissions = {
     readMembers: false,
@@ -53,7 +54,7 @@
       isDeleteMember = false;
     }, 500);
 
-    members = moveArrItemToFront(members, $user?.id);
+    members = sortMember(members, $user?.id);
   };
 
   const getMembers = async () => {
@@ -66,9 +67,19 @@
     if (data) {
       let active = data.filter((m) => m.uid !== null);
 
-      members = moveArrItemToFront(active, $user?.id);
+      members = sortMember(active, $user?.id, 'asc');
       activeCardsId = members.map((m) => m.card_id);
     }
+  };
+
+  let loading = false;
+
+  const sortMemberHandler = (sort) => {
+    loading = true;
+    members = sortMember(members, $user?.id, sort);
+    setTimeout(() => {
+      loading = false;
+    }, 500);
   };
 
   const getInactiveCards = async () => {
@@ -149,68 +160,70 @@
             on:click={() => setState('inactive')}>Inactive</button
           >
         </div>
-        <div class="flex gap-2 md:w-32 w-full items-center">
-          <div
-            class="bg-neutral-800 p-2 w-full md:w-32 text-xs flex justify-center items-center text-center rounded-md"
-          >
-            Most Recent
-          </div>
+        <div class="flex gap-2 md:w-72 w-full items-center">
+          <MemberSortDropdown
+            on:asc={() => sortMemberHandler('asc')}
+            on:dsc={() => sortMemberHandler('dsc')}
+          />
         </div>
       </div>
-
-      {#if state === 'inactive'}
-        {#if inactiveCards.length === 0}
-          <div>
-            <h1 class="text-sm md:text-lg text-neutral-400 text-center mt-4">
-              No inactive cards
-            </h1>
-          </div>
-        {/if}
-      {/if}
-      {#if isDeleteMember}
+      {#if loading}
         <MemberSkeleton />
       {:else}
-        <div class="flex flex-col gap-2 px-4">
-          {#if state === 'all'}
-            {#each members as member, i}
-              <MemberCard
-                {member}
-                {roles}
-                {permissions}
-                {i}
-                {updatedRole}
-                {deleteMember}
-                active
-                on:setRole={(e) => (updatedRole = e.detail)}
-              />
-            {/each}
-            {#if inactiveCards.length !== 0}
-              {#each inactiveCards as member, i}
-                <MemberCard {member} {permissions} />
+        {#if state === 'inactive'}
+          {#if inactiveCards.length === 0}
+            <div>
+              <h1 class="text-sm md:text-lg text-neutral-400 text-center mt-4">
+                No inactive cards
+              </h1>
+            </div>
+          {/if}
+        {/if}
+        {#if isDeleteMember}
+          <MemberSkeleton />
+        {:else}
+          <div class="flex flex-col gap-2 px-4">
+            {#if state === 'all'}
+              {#each members as member, i}
+                <MemberCard
+                  {member}
+                  {roles}
+                  {permissions}
+                  {i}
+                  {updatedRole}
+                  {deleteMember}
+                  active
+                  on:setRole={(e) => (updatedRole = e.detail)}
+                />
+              {/each}
+              {#if inactiveCards.length !== 0}
+                {#each inactiveCards as member, i}
+                  <MemberCard {member} {permissions} />
+                {/each}
+              {/if}
+            {/if}
+            {#if state === 'active'}
+              {#each members as member, i}
+                <MemberCard
+                  {member}
+                  {roles}
+                  {permissions}
+                  {i}
+                  {updatedRole}
+                  active
+                  on:setRole={(e) => (updatedRole = e.detail)}
+                />
               {/each}
             {/if}
-          {/if}
-          {#if state === 'active'}
-            {#each members as member, i}
-              <MemberCard
-                {member}
-                {roles}
-                {permissions}
-                {i}
-                {updatedRole}
-                active
-                on:setRole={(e) => (updatedRole = e.detail)}
-              />
-            {/each}
-          {/if}
-          {#if state === 'inactive'}
-            {#if inactiveCards.length !== 0}
-              {#each inactiveCards as member, i}
-                <MemberCard {member} {permissions} />
-              {/each}
+            {#if state === 'inactive'}
+              {#if inactiveCards.length !== 0}
+                {#each inactiveCards as member, i}
+                  <MemberCard {member} {permissions} />
+                {/each}
+              {/if}
             {/if}
-          {/if}
-        </div>
+          </div>
+        {/if}
       {/if}
     </div>
   {:catch}

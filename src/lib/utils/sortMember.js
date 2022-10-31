@@ -1,4 +1,4 @@
-const moveArrItemToFront = (data = [], uidTarget) => {
+const sortMember = (data = [], uidTarget, sort) => {
   const matchedData = data
     .filter((item) => item?.uid === uidTarget)
     .sort((a, b) => {
@@ -25,6 +25,7 @@ const moveArrItemToFront = (data = [], uidTarget) => {
 
   let emptyLogs = [];
   let nonEmptyLogs = [];
+  let sortedDate = [];
 
   unmatchedData.map((member) => {
     if (member.log_data) {
@@ -34,9 +35,15 @@ const moveArrItemToFront = (data = [], uidTarget) => {
     }
   });
 
-  let sortedDate = nonEmptyLogs
-    .map((m) => m.created_at)
-    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  if (sort === 'asc') {
+    sortedDate = nonEmptyLogs
+      .map((m) => m.created_at)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+  } else {
+    sortedDate = nonEmptyLogs
+      .map((m) => m.created_at)
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  }
 
   let sortedMembers = [];
 
@@ -50,4 +57,4 @@ const moveArrItemToFront = (data = [], uidTarget) => {
   return newData;
 };
 
-export default moveArrItemToFront;
+export default sortMember;
