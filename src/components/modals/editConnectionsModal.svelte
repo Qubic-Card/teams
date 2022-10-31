@@ -89,19 +89,28 @@
       title="Firstname"
       bind:value={data.profileData.firstname}
       on:change={updateConnectionsData}
+      inputbg="bg-neutral-900"
     />
     <Input
       placeholder="Lastname"
       title="Lastname"
       bind:value={data.profileData.lastname}
       on:change={updateConnectionsData}
+      inputbg="bg-neutral-900"
     />
-    <Input placeholder="Job" title="Job" bind:value={data.profileData.job} />
+    <Input
+      placeholder="Job"
+      title="Job"
+      bind:value={data.profileData.job}
+      on:change={updateConnectionsData}
+      inputbg="bg-neutral-900"
+    />
     <Input
       placeholder="Company"
       title="Company"
       bind:value={data.profileData.company}
       on:change={updateConnectionsData}
+      inputbg="bg-neutral-900"
     />
   </div>
   <div class="flex flex-col mb-2 z-30">
@@ -142,6 +151,7 @@
           : social.type}
         bind:value={social.data}
         on:change={updateConnectionsData}
+        inputbg="bg-neutral-900"
       />
     {/each}
   </div>
@@ -164,6 +174,7 @@
           placeholder="Website"
           bind:value={link.link}
           on:change={updateConnectionsData}
+          inputbg="bg-neutral-900"
         />
       {/each}
     {:else}

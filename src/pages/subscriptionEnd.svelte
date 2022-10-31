@@ -1,9 +1,9 @@
 <script>
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
+  import Confirmation from '@comp/modals/confirmation.svelte';
 
   export let subscription, member, teamId;
 
@@ -203,7 +203,7 @@
   onMount(async () => await getMemberData());
 </script>
 
-<ConfirmationModal
+<Confirmation
   {isLoading}
   isDispatch
   isTransfer

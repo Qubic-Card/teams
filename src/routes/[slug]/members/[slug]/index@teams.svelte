@@ -196,7 +196,7 @@
     {/if}
   {/if}
 
-  <div class="min-h-screen flex justify-center pl-12">
+  <div class="min-h-screen flex justify-center pl-2 md:pl-12">
     <div class="md:px-20 px-4 w-full">
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">

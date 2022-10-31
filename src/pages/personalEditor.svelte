@@ -201,7 +201,7 @@
         on:click={async () => await handleAddFile()}
       >
         {#if isLoading}
-          <Spinner bg="#1f4496" />
+          <Spinner bg="#1f4496" class="w-6 h-6" />
         {/if}
         Save
       </button>
@@ -544,7 +544,7 @@
                   </div>
                   <label
                     for="links"
-                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100"
+                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100 md:text-sm text-xs my-2"
                   >
                     <input
                       bind:checked={$profileData.isShowMetaImage}

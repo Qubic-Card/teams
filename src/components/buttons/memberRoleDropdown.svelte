@@ -32,25 +32,26 @@
     {#if permissions.writeRoles}
       <!-- {#if role?.role_name} -->
       <ListboxButton
-        class="bg-neutral-800 outline outline-1 break-all outline-neutral-700 text-xs text-white rounded-md p-2 h-7 {$$props.class} flex justify-center items-center"
+        class="bg-neutral-800 break-all text-xs text-white p-2 h-6 {$$props.class} flex justify-between items-center"
       >
         {#if $user?.id === memberUid}
           {#if role?.role_name === 'superadmin'}
-            Super Admin
+            Super Admin <span>▼</span>
           {:else}
             {role?.role_name.charAt(0).toUpperCase() +
-              role?.role_name?.slice(1)}
+              role?.role_name?.slice(1)} <span>▼</span>
           {/if}
         {:else if selected === 'Superadmin' || selected === 'superadmin'}
-          Super Admin
+          Super Admin <span>▼</span>
         {:else}
           {selected?.charAt(0).toUpperCase() + selected?.slice(1)}
+          <span>▼</span>
         {/if}
       </ListboxButton>
       <!-- {/if} -->
     {:else}
       <p
-        class="text-white outline outline-1 outline-neutral-700 flex justify-between items-center h-7 p-2 gap-2 rounded-md {$$props.class} text-sm"
+        class="bg-neutral-800 text-white flex justify-between items-center h-6 p-2 gap-2 rounded-md {$$props.class} text-sm"
       >
         {selected}
       </p>
@@ -63,7 +64,7 @@
           {#if roles}
             <!-- {#if selected !== '' ? selected !== 'Super Admin' : role?.role_name !== 'superadmin'} -->
             <ListboxOption
-              class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm"
+              class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm break-all"
               on:click={selectSuperAdmin}
               value="superadmin"
             >
@@ -74,7 +75,7 @@
             <!-- {#if selected !== '' ? selected !== 'Member' : role?.role_name !== 'member'} -->
             <ListboxOption
               value="member"
-              class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm"
+              class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm break-all"
               on:click={selectMember}
             >
               Member
@@ -84,7 +85,7 @@
             {#each roles as item}
               <!-- {#if selected !== '' ? selected !== item.role_name : role?.role_name !== item.role_name} -->
               <ListboxOption
-                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm"
+                class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm break-all"
                 on:click={() => selectOthers(item)}
                 value={item.role_name}
               >

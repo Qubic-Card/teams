@@ -193,7 +193,7 @@
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
-        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-0 md:pr-16 border-neutral-700 fixed bg-black w-full"
+        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-4 md:pr-16 border-neutral-700 fixed bg-black w-full"
       >
         <div
           class="flex w-full md:w-48 text-white gap-1 border-b border-neutral-700"
@@ -201,7 +201,7 @@
           <button
             class={`${
               tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-16 text-xs md:text-sm`}
+            } w-full md:w-1/2 h-10 md:h-16 text-xs md:text-sm`}
             on:click={async () => {
               setTabs('user');
               searchQuery = '';
@@ -213,7 +213,7 @@
           <button
             class={`${
               tabs === 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-16 text-xs md:text-sm`}
+            } w-full md:w-1/2 h-10 md:h-16 text-xs md:text-sm`}
             on:click={async () => {
               setTabs('all');
               searchQuery = '';
@@ -240,7 +240,7 @@
         />
       {:else}
         <div
-          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-36 md:mt-20"
+          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-28 md:mt-20"
         >
           <table class="snap-center text-black w-full">
             <thead class="text-left text-neutral-400 bg-black/60">

@@ -1,5 +1,5 @@
 <script>
-  import { fade } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import { Dialog } from '@rgossiaux/svelte-headlessui';
   import { createEventDispatcher } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
@@ -23,7 +23,7 @@
   let toDateValue = new Date();
 
   const options = {
-    // position: 'center',
+    // position: 'above center',
     maxDate: 'today',
     minDate: new Date(last7Days[0]),
     static: true,
@@ -124,9 +124,8 @@
   />
 {/if}
 
-<button
-  class="bg-blue-600 text-xs rounded-md p-1 w-20"
-  on:click={() => (isOpen = true)}>Analytic</button
+<button class="bg-neutral-800 text-xs p-1 w-20" on:click={() => (isOpen = true)}
+  >Analytic</button
 >
 
 {#if isOpen}
@@ -178,15 +177,9 @@
         <TeamAnalyticsCard id={member?.member_id} close on:click={closeModal} />
       </div>
 
-      <div class="flex self-end gap-2 w-full md:w-1/2">
+      <div class="hidden md:flex self-end gap-2 w-full md:w-1/3">
         <div
-          class="flex justify-center items-center text-xs md:text-sm bg-neutral-800 h-10 p-2 rounded-md w-1/3 md:w-1/2"
-        >
-          Most Recent
-        </div>
-
-        <div
-          class="flex bg-neutral-800 gap-3 h-10 pl-2 py-2 rounded-md w-full md:w-1/2 items-center justify-between text-xs md:text-sm"
+          class="flex bg-neutral-800 gap-3 h-10 pl-2 py-2 rounded-md w-full items-center justify-between text-xs md:text-sm"
         >
           Period:
           <input
@@ -203,6 +196,11 @@
             name="date"
             class="w-full bg-neutral-700 rounded-md p-2 cursor-pointer"
           />
+        </div>
+        <div
+          class="flex justify-center items-center text-xs md:text-sm bg-neutral-800 h-10 p-2 rounded-md w-1/3"
+        >
+          Most Recent
         </div>
       </div>
     </div>

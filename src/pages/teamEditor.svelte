@@ -4,7 +4,7 @@
   import Input from '@comp/input.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-
+  import Confirmation from '@comp/modals/confirmation.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
@@ -19,7 +19,7 @@
     isDisplayPersonal,
   } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
-  import { memberData, user } from '@lib/stores/userStore';
+  import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import {
     Menu,
@@ -34,7 +34,6 @@
     Dialog,
   } from '@rgossiaux/svelte-headlessui';
   import toNewTab from '@lib/utils/newTab';
-  import { theme } from '@lib/profileTheme';
   import { teamData } from '@lib/stores/profileData';
   import ModalOverlay from '@comp/modals/modalOverlay.svelte';
   import {
@@ -46,7 +45,6 @@
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import getCroppedImg from '@lib/utils/canvas';
   import Cropper from 'svelte-easy-crop';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { getContext } from 'svelte';
 
   // Register the plugins
@@ -184,7 +182,7 @@
 </script>
 
 {#if showDeleteBrochureModal}
-  <ConfirmationModal
+  <Confirmation
     isDelete
     isDispatch
     heading="Are you sure you want to delete"
@@ -251,7 +249,7 @@
         on:click={async () => await handleAddFile()}
       >
         {#if isLoading}
-          <Spinner bg="#1f4496" />
+          <Spinner bg="#1f4496" class="w-6 h-6" />
         {/if}
         Save
       </button>
@@ -630,7 +628,7 @@
                   </div>
                   <label
                     for="links"
-                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100"
+                    class="flex items-center cursor-pointer gap-2 ml-2 text-neutral-100 md:text-sm text-xs my-2"
                   >
                     <input
                       bind:checked={$teamData.isShowMetaImage}
@@ -645,7 +643,7 @@
                   </label>
                   {#if $teamLinks.length > 0}
                     {#each $teamLinks as item, i}
-                      <div class="p-3 flex">
+                      <div class="flex">
                         <div class="flex flex-2 flex-col flex-grow">
                           <Input
                             on:change={handleSave}

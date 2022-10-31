@@ -6,9 +6,9 @@
 <label class="switch {mode === 'editor' ? 'h-7' : 'h-6'}">
   <input type="checkbox" bind:checked on:change />
   <span
-    class="slider rounded-md {mode === 'editor'
-      ? 'before:bottom-[5px] before:h-5 before:w-5'
-      : 'before:bottom-[4px] before:h-4 before:w-4'}"
+    class="slider {mode === 'editor'
+      ? 'before:bottom-[5px] before:h-5 before:w-5 rounded-md'
+      : 'before:bottom-[4px] before:h-4 before:w-4 rounded-r-md'}"
   />
 </label>
 
@@ -63,6 +63,6 @@
   input:checked + .slider:before {
     -webkit-transform: translateX(19px);
     -ms-transform: translateX(23px);
-    transform: translateX(30px);
+    transform: translateX(27px);
   }
 </style>

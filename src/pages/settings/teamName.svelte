@@ -24,7 +24,7 @@
       class="bg-blue-600 hover:bg-blue-600/60 disabled:bg-blue-600/60 text-white rounded-md p-2 w-full mt-2 md:mt-0 md:w-40 flex justify-center items-center gap-2 self-end"
       on:click
       >{#if loading}
-        <Spinner bg="#1f4496" size={10} />
+        <Spinner bg="#1f4496" size={10} class="w-6 h-6" />
       {/if} Submit</button
     >
   </div>

@@ -155,9 +155,11 @@
     {#if isBannerOpen}
       <div
         out:slide|local
-        class="flex justify-evenly items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
+        class="flex justify-start items-center sticky md:hidden bg-blue-600 text-neutral-100 text-center p-2 text-xs"
       >
-        View on desktop for better experience
+        <h1 class="flex justify-center w-full">
+          View on desktop for better experience
+        </h1>
         <button on:click={() => (isBannerOpen = false)} class="self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"

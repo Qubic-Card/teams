@@ -105,6 +105,7 @@
   <div class="flex justify-between gap-4 px-4">
     <div class="flex flex-col w-full gap-4">
       <h1 class="text-sm text-neutral-400">Data from last 7 days</h1>
+
       <div class="flex flex-col md:flex-row gap-2 w-full">
         <TeamAnalyticsCard {teamId} teams />
       </div>

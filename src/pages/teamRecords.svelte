@@ -257,7 +257,7 @@
   >
 </div>
 <div
-  class="w-full md:w-3/4 ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto mb-8"
+  class="w-full md:w-3/4 ml-0 snap-container snap-x mx-auto h-full snap-mandatory flex flex-col overflow-x-auto pb-6"
 >
   <table class="snap-center text-black w-full">
     <thead class="text-left text-neutral-400 bg-black/70">
@@ -314,8 +314,8 @@
 
 <style>
   .snap-container::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
+    height: 0px;
+    width: 0px;
   }
   .snap-container::-webkit-scrollbar-track {
     background-color: #e4e4e4;

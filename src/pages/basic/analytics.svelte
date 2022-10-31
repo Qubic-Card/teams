@@ -205,21 +205,21 @@
     >
       <div class="rounded-lg bg-white border h-full p-8">
         <p class="">New connections this week</p>
-        <p class="font-bold text-4xl">{connectionCount}</p>
+        <p class="font-bold text-xl md:text-4xl">{connectionCount}</p>
       </div>
       <div class="rounded-lg bg-white border h-full p-8">
         <p class="">Your activity this week</p>
-        <p class="font-bold text-4xl">{activityCount}</p>
+        <p class="font-bold text-xl md:text-4xl">{activityCount}</p>
       </div>
       <div class="rounded-lg bg-white border h-full p-8">
         <p class="">Unique People this week</p>
-        <p class="font-bold text-4xl">{uniqueCount}</p>
+        <p class="font-bold text-xl md:text-4xl">{uniqueCount}</p>
       </div>
     </div>
     <div class="hidden lg:flex lg:flex-col">
       <AnalyticTable logs={logsArr} {setPage} {page} {maxPage} {loading} />
     </div>
-    <div class="flex lg:hidden w-full justify-center mt-8">
+    <div class="flex lg:hidden w-full justify-center mt-8 md:text-md text-sm">
       View more on desktop
     </div>
   </div>

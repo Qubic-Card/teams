@@ -58,7 +58,7 @@
 <div
   bind:clientWidth
   bind:this={profile}
-  class="{$currentTheme.pageBackground} {$$props.class} relative transition-colors rounded-3xl duration-500 ease-in text-sm"
+  class="{$currentTheme.pageBackground} {$$props.class} relative transition-colors rounded-3xl duration-500 ease-in text-sm mb-12 md:mb-0"
   class:bg-image-profile={$currentTheme?.backgroundImage}
   style={`--bg-img-profile: url('${$currentTheme?.backgroundImage}')`}
 >

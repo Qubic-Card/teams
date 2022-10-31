@@ -50,7 +50,7 @@
         <ListboxOptions
           class="absolute {editor === 'basic'
             ? 'bg-white -translate-x-24'
-            : 'bg-neutral-900 -translate-x-20'} outline outline-1 outline-neutral-800 p-2 w-40 mt-2 shadow-md z-50 rounded-md"
+            : 'bg-neutral-900 -translate-x-20 outline outline-1 outline-neutral-800'} p-2 w-40 mt-2 shadow-md z-50 rounded-md"
         >
           {#each searchMenu as menu}
             <ListboxOption

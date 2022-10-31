@@ -1,4 +1,4 @@
-<div class="animate-pulse min-h-screen w-full bg-black flex pl-16">
+<div class="animate-pulse min-h-screen w-full bg-black flex pl-2 md:pl-16">
   <div class="flex flex-col w-full">
     <div class="flex gap-2 h-12 mt-4 w-[545px] ml-[50px]">
       <div class="w-1/2 bg-neutral-900 rounded-md" />

@@ -1,9 +1,8 @@
 <script>
-  import MemberMenuDropdown from '@comp/buttons/memberMenuDropdown.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import MemberAnalyticsModal from '@comp/modals/memberAnalyticsModal.svelte';
   import MemberRoleDropdown from '@comp/buttons/memberRoleDropdown.svelte';
+  import Confirmation from '@comp/modals/confirmation.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
@@ -36,6 +35,7 @@
 
   const setRole = (role) => dispatch('setRole', { role_name: role, index: i });
   const toggleModal = () => (showModal = !showModal);
+
   const toggleDeleteMemberModal = () =>
     (showDeleteMemberModal = !showDeleteMemberModal);
   const toProfileEditor = () =>
@@ -202,7 +202,7 @@
   $: if (active) if (i === updatedRole.index) selectedRole = updatedRole.role;
 </script>
 
-<ConfirmationModal
+<Confirmation
   {isLoading}
   isDispatch
   heading="Are you sure you want to change your role?"
@@ -218,7 +218,7 @@
   }}
 />
 
-<ConfirmationModal
+<Confirmation
   {isLoading}
   isDelete
   isMember
@@ -314,12 +314,13 @@
     {/if}
   {:else}
     <div
-      class="flex md:flex-row flex-col bg-neutral-900 border border-neutral-800 p-3 rounded-md h-auto gap-8 items-center"
+      class="flex md:flex-row flex-col bg-neutral-900 outline outline-1 {$user?.id ===
+      member.uid
+        ? 'outline-blue-600'
+        : 'outline-neutral-800'} p-3 rounded-md h-auto gap-8 items-center"
     >
       <img
-        class="hidden md:block w-16 h-16 rounded-full {$user?.id === member.uid
-          ? 'outline-2 outline outline-blue-600'
-          : ''}"
+        class="hidden md:block w-16 h-16 rounded-full"
         src={memberProfile?.avatar}
         alt={memberProfile?.firstname + ' avatar'}
       />
@@ -337,20 +338,15 @@
                   .slice(4)}
               </h1>
             </div>
-            {#if permissions.writeMembers}
-              <MemberMenuDropdown
-                class="block md:hidden"
-                on:remove={() => toggleDeleteMemberModal()}
-                on:go={toProfileEditor}
-              />
-            {/if}
           </div>
-          <div class="hidden md:flex gap-2 items-center">
-            <MemberAnalyticsModal {member} />
+          <div
+            class="hidden md:flex items-center divide-x-2 divide-neutral-700 outline outline-1 outline-neutral-700 rounded-l-md rounded-r-md"
+          >
             <button
-              class="bg-white text-black text-xs rounded-md p-1 w-20"
+              class="bg-blue-600 text-white text-xs p-1 w-20 rounded-l-md"
               on:click={toProfileEditor}>Editor</button
             >
+            <MemberAnalyticsModal {member} />
             {#if permissions.readRoles}
               <MemberRoleDropdown
                 class="w-40"
@@ -387,12 +383,26 @@
                 on:change={async () => await setStatus()}
                 checked={member?.card_status}
               />
-
-              <MemberMenuDropdown
-                on:remove={() => toggleDeleteMemberModal()}
-                on:go={toProfileEditor}
-              />
             {/if}
+          </div>
+          <div
+            class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
+            on:click={toggleDeleteMemberModal}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#ef4444"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
           </div>
         </div>
 
@@ -444,55 +454,59 @@
         </div>
       </div>
 
-      <div class="block md:hidden w-full">
-        <div
-          class="flex justify-between md:hidden gap-1 items-center w-full mb-2"
+      <div
+        class="flex md:hidden items-center w-full divide-x-2 divide-neutral-700 outline outline-1 outline-neutral-700 rounded-l-md rounded-r-md"
+      >
+        <button
+          class="bg-blue-600 text-white text-xs p-1 w-20 rounded-l-md"
+          on:click={toProfileEditor}>Editor</button
         >
-          <MemberAnalyticsModal {member} />
+        <MemberAnalyticsModal {member} />
+        {#if permissions.readRoles}
+          <MemberRoleDropdown
+            class="w-28"
+            {roles}
+            {role}
+            {permissions}
+            memberUid={member?.uid}
+            selectedRole={selectedRole !== ''
+              ? selectedRole?.charAt(0).toUpperCase() + selectedRole?.slice(1)
+              : role?.role_name
+              ? role?.role_name?.charAt(0).toUpperCase() +
+                role?.role_name?.slice(1)
+              : 'No role'}
+            on:selectSuperAdmin={async () => await setRoleHandlers(0)}
+            on:selectMember={async () => await setRoleHandlers(1)}
+            on:selectOthers={async (e) => {
+              if ($user?.id === member.uid) {
+                roleID = e.detail.id;
+                roleName = e.detail.role_name;
+                toggleModal();
+              } else {
+                await setMemberRole(e.detail.id);
+                // selectRole(e.detail.role_name);
+                setRole(e.detail.role_name);
+              }
+            }}
+          />
+        {/if}
 
-          {#if permissions.writeMembers}
-            <SwitchButton
-              mode="member"
-              on:change={async () => await setStatus()}
-              checked={member?.card_status}
-            />
-          {/if}
-        </div>
-        <div class="flex justify-between md:hidden gap-1 items-center w-full">
-          <button
-            class="bg-white text-black text-xs rounded-md p-1 w-20"
-            on:click={toProfileEditor}>Editor</button
-          >
-          {#if permissions.readRoles}
-            <MemberRoleDropdown
-              class="w-28"
-              {roles}
-              {role}
-              {permissions}
-              selectedRole={selectedRole !== ''
-                ? selectedRole?.charAt(0).toUpperCase() + selectedRole?.slice(1)
-                : role?.role_name
-                ? role?.role_name?.charAt(0).toUpperCase() +
-                  role?.role_name?.slice(1)
-                : 'No role'}
-              on:selectSuperAdmin={async () => await setRoleHandlers(0)}
-              on:selectMember={async () => await setRoleHandlers(1)}
-              on:selectOthers={async (e) => {
-                if ($user?.id === member.uid) {
-                  roleID = e.detail.id;
-                  roleName = e.detail.role_name;
-                  toggleModal();
-                } else {
-                  await setMemberRole(e.detail.id);
-                  // selectRole(e.detail.role_name);
-                  setRole(e.detail.role_name);
-                }
-              }}
-            />
-          {/if}
-        </div>
+        {#if permissions.writeMembers}
+          <SwitchButton
+            mode="member"
+            on:change={async () => await setStatus()}
+            checked={member?.card_status}
+          />
+        {/if}
       </div>
     </div>
+    {#if $user?.id === member.uid}
+      <h1
+        class="hidden md:block absolute md:translate-y-24 lg:translate-y-20 mt-4 lg:mt-4 rounded-bl-md rounded-tr-md text-xs font-bold bg-blue-600 p-1"
+      >
+        You
+      </h1>
+    {/if}
   {/if}
 {:else if permissions.readMembers}
   <div

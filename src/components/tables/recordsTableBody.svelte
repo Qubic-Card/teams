@@ -1,9 +1,9 @@
 <script>
   import { fade } from 'svelte/transition';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import Confirmation from '@comp/modals/confirmation.svelte';
 
   export let record, teamId, isTeam, deleteHandler, isLoading, innerWidth;
   export let isTeamInactive = false;
@@ -90,7 +90,7 @@
     class="h-12 md:pl-2 lg:pl-4 md:pr-2 lg:pr-4 flex gap-1 md:gap-4 items-center w-16 md:w-24 lg:w-auto"
   >
     {#if isTeamInactive === false}
-      <ConfirmationModal
+      <Confirmation
         {isLoading}
         isDelete
         isRecord

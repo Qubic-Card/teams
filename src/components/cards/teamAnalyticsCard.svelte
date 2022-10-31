@@ -136,7 +136,8 @@
       .from('team_logs')
       .select('team_member')
       .eq(teams ? 'team' : 'team_member', teams ? teamId : id)
-      .or('type.eq.SUCCESS,type.eq.INFO')
+      // .or('type.eq.SUCCESS,type.eq.INFO')
+      .eq('type', 'INFO')
       .gte('created_at', new Date(new Date(last7Days[0])).toUTCString());
 
     if (error || member_error) {
@@ -165,29 +166,13 @@
       <div
         class="flex justify-between w-full h-1/2 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-lg p-3"
       >
-        <div class="flex justify-between items-center">
+        <div class="grid grid-cols-[70px_100px] justify-between items-center">
           <h1 class="text-sm md:text-md font-bold">
             {item.data}
-            <span class="text-xs md:text-sm text-neutral-400">{item.type}</span>
           </h1>
-          <div
-            class="bg-blue-600 hidden justify-center aspect-square items-center p-1 h-full rounded-lg"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="white"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
+          <h1 class="text-xs md:text-sm text-neutral-400 font-bold">
+            {item.type}
+          </h1>
         </div>
         <div class="flex justify-between items-center text-sm">
           {#if item.percentage >= 0}
@@ -237,20 +222,20 @@
           data-tooltip=""
           style="--width: {memberCountPercentage}%; --visibility: hidden;"
           class="{memberCountPercentage >= 50
-            ? 'bg-green-400'
+            ? 'bg-green-500'
             : memberCountPercentage < 25
-            ? 'bg-red-400'
-            : 'bg-orange-400'} box group h-full rounded-sm"
+            ? 'bg-red-500'
+            : 'bg-orange-500'} box group h-full rounded-sm"
         >
           <span
-            class="absolute hidden group-hover:flex gap-2 -top-2 -translate-y-full w-full px-2 py-1 bg-neutral-800 rounded-md text-center text-white text-sm after:content-[''] after:absolute after:left-1/2 after:top-[100%] after:-translate-x-1/2 after:border-8 after:border-x-transparent after:border-b-transparent"
+            class="absolute hidden group-hover:flex justify-between gap-2 -top-2 -translate-y-full w-full px-2 py-1 bg-neutral-800 rounded-md text-center text-white text-xs md:text-sm after:content-[''] after:absolute after:left-1/2 after:top-[100%] after:-translate-x-1/2 after:border-8 after:border-x-transparent after:border-b-transparent"
             >{active} / {memberCount} members
             <span
               class={memberCountPercentage >= 50
-                ? 'text-green-400'
+                ? 'text-green-500'
                 : memberCountPercentage < 25
-                ? 'text-red-400'
-                : 'text-orange-400'}>{memberCountPercentage}%</span
+                ? 'text-red-500'
+                : 'text-orange-500'}>{memberCountPercentage}%</span
             ></span
           >
         </div>
@@ -302,7 +287,7 @@
       {/if}
     </div>
     {#if close}
-      <button on:click class="self-start">
+      <button on:click class="self-start hidden md:block">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

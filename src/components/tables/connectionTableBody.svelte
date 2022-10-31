@@ -1,10 +1,10 @@
 <script>
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import ConnectionsModal from '@comp/modals/connectionsModal.svelte';
   import EditConnectionsModal from '@comp/modals/editConnectionsModal.svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
+  import Confirmation from '@comp/modals/confirmation.svelte';
 
   export let innerWidth, connection, tab, deleteHandler, isLoading, permissions;
 
@@ -54,7 +54,7 @@
               data={connection}
               on:sendUpdatedData={(e) => (connection = e.detail)}
             />
-            <ConfirmationModal
+            <Confirmation
               {isLoading}
               isDelete
               isIconVisible
