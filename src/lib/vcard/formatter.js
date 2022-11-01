@@ -11,13 +11,26 @@ const checkIsLink = (val) => {
 const formatter = (vcard) => {
   const startVcard = vcard.split('\n').filter((e) => e.includes('BEGIN:VCARD'));
   const endVcard = vcard.split('\n').filter((e) => e.includes('END:VCARD'));
+  let photo = vcard
+    .split('\n')
+    .filter((e) => e.includes('PHOTO;'))[0]
+    .split(',');
+
+  photo.shift();
+
+  let photoFormatter = Object.assign([], {
+    0: 'PHOTO;ENCODING=b;TYPE=JPEG:',
+    1: photo[0],
+  }).join('');
+
   const others = vcard
     .split('\n')
     .filter(
       (e) =>
         !e.includes('BEGIN:VCARD') &&
         !e.includes('END:VCARD') &&
-        !e.includes('X-SOCIALPROFILE')
+        !e.includes('X-SOCIALPROFILE') &&
+        !e.includes('PHOTO;')
     );
   let socialsFormatted = vcard
     .split('\n')
@@ -332,6 +345,7 @@ const formatter = (vcard) => {
 
   const formatted = [
     ...startVcard,
+    ...[photoFormatter],
     ...others,
     ...socialsFormatted,
     ...endVcard,

@@ -239,7 +239,7 @@
   {#if !permissions.readMembers}
     {#if $user?.id === member.uid}
       <div
-        class="flex bg-neutral-900 outline outline-1 outline-neutral-800 p-3 rounded-md h-auto gap-8 items-center"
+        class="flex bg-neutral-900 outline outline-1 outline-neutral-800 p-3 rounded-md h-auto gap-8 items-center rounded-custom"
       >
         <img
           class="hidden md:block w-16 h-16 rounded-full {$user?.id ===
@@ -254,13 +254,13 @@
             <div class="flex gap-4 text-sm">
               <h1>Card ****{member?.card_id.slice(-6)}</h1>
               <h1>
-                Joined since {convertToGMT7(memberProfile?.user_change)
+                Joined since {convertToGMT7(member?.user_change)
                   .toDateString()
                   .slice(4)}
               </h1>
             </div>
             <div class="flex gap-2 items-center">
-              <MemberAnalyticsModal member={memberProfile} />
+              <MemberAnalyticsModal {member} isRounded />
             </div>
           </div>
 
@@ -317,7 +317,7 @@
       class="flex md:flex-row flex-col bg-neutral-900 outline outline-1 {$user?.id ===
       member.uid
         ? 'outline-blue-600'
-        : 'outline-neutral-800'} p-3 rounded-md h-auto gap-8 items-center"
+        : 'outline-neutral-800'} p-3 rounded-md h-auto gap-8 items-center rounded-custom"
     >
       <img
         class="hidden md:block w-16 h-16 rounded-full"
@@ -510,7 +510,7 @@
   {/if}
 {:else if permissions.readMembers}
   <div
-    class="flex flex-col justify-between w-full h-32 md:h-24 bg-neutral-900 rounded-md outline outline-1 outline-neutral-800"
+    class="flex flex-col justify-between w-full h-32 md:h-24 bg-neutral-900 rounded-md outline outline-1 outline-neutral-800 rounded-custom"
   >
     <div class="flex h-64 gap-7 p-4 items-center">
       <img
@@ -531,3 +531,11 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .rounded-custom {
+    border-radius: 0.375rem !important;
+    -webkit-border-radius: 0.375rem !important;
+    -moz-border-radius: 0.375rem !important;
+  }
+</style>

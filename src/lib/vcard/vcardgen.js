@@ -106,18 +106,6 @@ export const genvcard = async (prop, team, dateConnected) => {
   //set email addresses
 
   if (team) {
-    if (team.logo)
-      vCard.logo.embedFromString(
-        await getBase64FromUrl(team.logo),
-        'image/png'
-      );
-
-    // if (team.contactNumber) vCard.workPhone = team.contactNumber;
-
-    // if (team.email) vCard.workEmail = team.email;
-
-    //set address information
-
     if (team.address) {
       vCard.workAddress.label = 'Work Address';
       vCard.workAddress.street = team.address;
@@ -174,9 +162,9 @@ export const genvcard = async (prop, team, dateConnected) => {
     }
 
     if (team.links) {
-      team.links.map((e) => {
+      team.links.map((e, i) => {
         if (e.isActive)
-          return (vCard.socialUrls[e.title + ' Company'] = e.link);
+          return (vCard.socialUrls[e.title + ' Company' + i] = e.link);
       });
     }
   }
@@ -238,8 +226,8 @@ export const genvcard = async (prop, team, dateConnected) => {
     }
 
     if (prop.links) {
-      prop.links.map((e) => {
-        if (e.isActive) return (vCard.socialUrls[e.title] = e.link);
+      prop.links.map((e, i) => {
+        if (e.isActive) return (vCard.socialUrls[e.title + i] = e.link);
       });
     }
   }

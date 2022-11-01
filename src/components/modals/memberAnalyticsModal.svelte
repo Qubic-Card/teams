@@ -12,7 +12,8 @@
   import getPagination from '@lib/utils/getPagination';
   import setHours4Digit from '@lib/utils/setHour4Digit';
 
-  export let member;
+  export let member,
+    isRounded = false;
 
   let isOpen = false;
   let maxPage = 0;
@@ -126,8 +127,9 @@
   />
 {/if}
 
-<button class="bg-neutral-800 text-xs p-1 w-20" on:click={() => (isOpen = true)}
-  >Analytic</button
+<button
+  class="bg-neutral-800 text-xs p-1 w-20 {isRounded ? 'rounded-md' : ''}"
+  on:click={() => (isOpen = true)}>Analytic</button
 >
 
 {#if isOpen}

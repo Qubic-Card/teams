@@ -204,7 +204,9 @@
                 </div>
               {/if}
             </Disclosure>
-            <RenameModal id={role.id} roleName={role?.role_name} />
+            {#if permissions.writeRoles}
+              <RenameModal id={role.id} roleName={role?.role_name} />
+            {/if}
           </div>
         {/each}
       {/if}
