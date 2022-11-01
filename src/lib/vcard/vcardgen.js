@@ -162,9 +162,9 @@ export const genvcard = async (prop, team, dateConnected) => {
     }
 
     if (team.links) {
-      team.links.map((e) => {
+      team.links.map((e, i) => {
         if (e.isActive)
-          return (vCard.socialUrls[e.title + ' Company'] = e.link);
+          return (vCard.socialUrls[e.title + ' Company' + i] = e.link);
       });
     }
   }
@@ -226,8 +226,8 @@ export const genvcard = async (prop, team, dateConnected) => {
     }
 
     if (prop.links) {
-      prop.links.map((e) => {
-        if (e.isActive) return (vCard.socialUrls[e.title] = e.link);
+      prop.links.map((e, i) => {
+        if (e.isActive) return (vCard.socialUrls[e.title + i] = e.link);
       });
     }
   }
