@@ -254,14 +254,8 @@
                     : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                   order={i}
                   ><img
-                    src={item.type.includes('github') &&
-                    data?.design?.theme?.toString() === 'light'
-                      ? socialIcons[item.type]
-                      : item.type.includes('github') &&
-                        data?.design?.theme?.toString() === 'offwhite'
-                      ? socialIcons[item.type]
-                      : item.type.includes('github')
-                      ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
+                    src={item.type.includes('github')
+                      ? '/icons/github-icons.svg'
                       : socialIcons[item.type]}
                     class="w-[40px] sm:w-[49px] md:w-[40px]"
                     alt=""
@@ -373,14 +367,8 @@
                       ? 'px-6'
                       : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                     ><img
-                      src={item.type.includes('github') &&
-                      data?.design?.theme?.toString() === 'light'
-                        ? socialIcons[item.type]
-                        : item.type.includes('github') &&
-                          data?.design?.theme?.toString() === 'offwhite'
-                        ? socialIcons[item.type]
-                        : item.type.includes('github')
-                        ? 'https://img.icons8.com/sf-regular-filled/96/FFFFFF/github.png'
+                      src={item.type.includes('github')
+                        ? '/icons/github-icons.svg'
                         : socialIcons[item.type]}
                       class="w-[45px] sm:w-[49px] md:w-[40px]"
                       alt=""

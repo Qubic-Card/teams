@@ -106,18 +106,6 @@ export const genvcard = async (prop, team, dateConnected) => {
   //set email addresses
 
   if (team) {
-    if (team.logo)
-      vCard.logo.embedFromString(
-        await getBase64FromUrl(team.logo),
-        'image/png'
-      );
-
-    // if (team.contactNumber) vCard.workPhone = team.contactNumber;
-
-    // if (team.email) vCard.workEmail = team.email;
-
-    //set address information
-
     if (team.address) {
       vCard.workAddress.label = 'Work Address';
       vCard.workAddress.street = team.address;
