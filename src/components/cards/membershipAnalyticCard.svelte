@@ -6,18 +6,19 @@
   import { socialIcons } from '@lib/constants';
   import getPercentage from '@lib/utils/getPercentage';
 
-  export let teamId = '';
-  export let id = 0;
+  // export let teamId = '';
+  // export let id = 0;
+  export let totalPoints, newMembers, totalMembers;
 
   const analyticsData = [
     {
       percentage: 10,
-      data: 10,
+      data: newMembers,
       type: 'New Members',
     },
     {
       percentage: 10,
-      data: 10,
+      data: totalMembers.length,
       type: 'Members Total',
     },
   ];
@@ -149,17 +150,7 @@
   >
     <h1 class="text-lg">Circulating Point</h1>
 
-    <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
-      <div
-        data-tooltip="{active} / {memberCount} members - {memberCountPercentage}%"
-        style="--width: {memberCountPercentage}%;"
-        class="{memberCountPercentage >= 50
-          ? 'bg-green-400'
-          : memberCountPercentage < 25
-          ? 'bg-red-400'
-          : 'bg-orange-400'} box h-full rounded-sm"
-      />
-    </div>
+    <h1 class="text-2xl">{totalPoints}</h1>
   </div>
 {:catch name}
   <h1>Error</h1>

@@ -30,7 +30,7 @@
     class="fixed inset-0 z-50 overflow-y-auto flex justify-center items-end md:items-center overflow-x-hidden"
   >
     <DialogOverlay
-      class="fixed inset-0 bg-black opacity-30 z-10"
+      class="fixed inset-0 bg-black opacity-50 z-10"
       on:click={toggleModal}
     />
     <div

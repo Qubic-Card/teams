@@ -34,7 +34,7 @@
   const getTeamsList = async () => {
     const { data, error } = await supabase
       .from('team_members')
-      .select('team_id(*)')
+      .select('team_id(id, name, metadata->>logo)')
       .eq('uid', $user?.id)
       .order('id', { ascending: true });
 
@@ -88,15 +88,21 @@
           </div>
         {/if}
 
-        <h2 class="font-medium">Teams</h2>
+        <h2 class="font-semibold">Teams</h2>
         {#if teams}
           {#if teams.length > 0}
             {#each teams as item}
               <div
                 on:click={() => chooseTeam(item.id)}
                 transition:slide|local={{ duration: 500 }}
-                class="flex items-center justify-between p-3 md:p-4 border border-neutral-300 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
+                class="flex items-center p-3 md:p-4 border border-neutral-300 gap-2 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
               >
+                <img
+                  src={item.logo ?? '/favicon.svg'}
+                  alt=""
+                  class="w-10 h-10 rounded-md {item.logo ? '' : 'bg-black'}"
+                />
+
                 <p>
                   {item.name.charAt(0).toUpperCase() + item.name.slice(1) ?? ''}
                 </p>

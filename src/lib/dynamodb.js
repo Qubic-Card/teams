@@ -2,5 +2,14 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 const REGION = 'ap-southeast-1';
 
-const ddbClient = new DynamoDBClient({ region: REGION });
+const accessKeyId = import.meta.env.VITE_AWS_ACCESS_KEY_ID.toString();
+const secretAccessKey = import.meta.env.VITE_AWS_SECRET_ACCESS_KEY.toString();
+
+const ddbClient = new DynamoDBClient({
+  region: REGION,
+  credentials: {
+    accessKeyId: accessKeyId,
+    secretAccessKey: secretAccessKey,
+  },
+});
 export default ddbClient;
