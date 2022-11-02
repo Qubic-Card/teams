@@ -14,6 +14,7 @@
   import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
+  import { createEventDispatcher } from 'svelte';
 
   registerPlugin(
     FilePondPluginImageExifOrientation,
@@ -33,13 +34,20 @@
   let showModal = false;
   let loading = false;
 
-  let tenantName = '';
-  let pointName = '';
-  let desc = '';
+  let input = {
+    Name: '',
+    PointName: '',
+    Desc: '',
+    Logo: 'https://placeimg.com/640/480/any',
+  };
 
   const handleCrop = () => {};
 
   const toggleModal = () => (showModal = !showModal);
+
+  const dispatch = createEventDispatcher();
+
+  const action = () => dispatch('action', input);
 </script>
 
 {#if mode === 'add'}
@@ -133,7 +141,7 @@
             placeholder="Tenant Name"
             title="Tenant Name"
             class="w-full"
-            bind:value={tenantName}
+            bind:value={input.Name}
             isEmptyChecking={true}
             inputbg="bg-neutral-900"
           />
@@ -142,7 +150,7 @@
             placeholder="Point Name"
             title="Point Name"
             class="w-full"
-            bind:value={pointName}
+            bind:value={input.PointName}
             isEmptyChecking={true}
             inputbg="bg-neutral-900"
           />
@@ -155,6 +163,7 @@
             cols="30"
             rows="10"
             class="h-24 rounded-md resize-none bg-neutral-900 outline outline-1 outline-neutral-600 p-2"
+            bind:value={input.Desc}
           />
         </div>
         <div class="flex justify-end w-full gap-2">
@@ -164,7 +173,7 @@
           >
           <button
             disabled={loading}
-            on:click={async () => {}}
+            on:click={action}
             class="flex justify-center items-center gap-2 p-2 w-40 bg-blue-600 hover:bg-blue-600/60 disabled:bg-blue-600/60 rounded-md md:text-md text-xs"
           >
             {#if loading}
