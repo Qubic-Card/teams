@@ -45,7 +45,7 @@
 {#if mode === 'add'}
   <button
     on:click={toggleModal}
-    class="flex justify-center items-center bg-blue-600 rounded-md h-7 text-sm p-2"
+    class="flex justify-center items-center bg-blue-600 rounded-md h-7 text-xs md:text-sm p-2"
     >Add new Tenant</button
   >
 {:else}
@@ -53,7 +53,7 @@
     on:click={toggleModal}
     src="/edit-icon.svg"
     alt=""
-    class="h-7 w-7 bg-blue-600 p-1 rounded-md cursor-pointer"
+    class="h-6 md:h-7 w-6 md:w-7 bg-blue-600 p-1 rounded-md cursor-pointer"
   />
 {/if}
 
@@ -68,7 +68,7 @@
       on:click={toggleModal}
     />
     <div
-      class="flex flex-col bg-neutral-900 text-white w-full md:w-[40%] h-[52%] z-40 rounded-md"
+      class="flex flex-col bg-neutral-900 text-white w-full md:w-[40%] h-[85%] md:h-[52%] z-50 rounded-md"
     >
       <div
         class="text-md md:text-lg border-b border-neutral-700 flex justify-between p-4"

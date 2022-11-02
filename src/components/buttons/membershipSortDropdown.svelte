@@ -32,7 +32,7 @@
     />
   {/if}
   <ListboxButton
-    class="bg-neutral-800 p-2 w-40 h-8 md:text-sm text-xs flex items-center justify-between rounded-md"
+    class="bg-neutral-800 p-2 w-full h-8 md:text-sm text-xs flex items-center justify-between rounded-md"
   >
     <span class="text-neutral-400 mr-2"
       >Added by: <span class="text-white">{selected}</span></span

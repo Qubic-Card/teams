@@ -29,34 +29,55 @@
     return new Date(member.Membership.JoinedAt) > new Date();
   }).length;
 
-  const params = {
-    TableName: 'Memberships-dev',
+  export const params = {
+    TableName: 'Memberships-Dev',
     Item: {
-      UID: '1',
-      Membership: {
-        TID: '1',
-        Points: 100,
-        JoinedAt: '2018-01-01',
-        AddedBy: 'galih',
-        Profile: {
-          Firstname: 'John Doe',
-          Lastname: 'John Doe',
-          Job: 'FE Developer',
-          Email: 'john@gmail.com',
-        },
-      },
+      CUSTOMER_ID: { N: '001' },
+      CUSTOMER_NAME: { S: 'Richard Roe' },
     },
   };
 
-  // const run = async () => {
-  //   try {
-  //     const data = await ddbClient.send(new PutItemCommand(params));
-  //     console.log(data);
-  //     return data;
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
+  // const params = {
+  //   TableName: 'Memberships-Dev',
+  //   // ExpressionAttributeValues: {
+  //   //   ':tid': { S: teamId },
+  //   // },
+  //   // ExpressionAttributeNames: {
+  //   //   '#tid': 'TID',
+  //   // },
+  //   // AttributeValue: {
+  //   //   S: teamId,
+  //   // },
+  //   // Key: {
+  //   //   UID: { S: '1' },
+  //   // },
+  //   Item: {
+  //     UID: {
+  //       Membership: {
+  //         TID: '1',
+  //         Points: 100,
+  //         JoinedAt: '2018-01-01',
+  //         AddedBy: 'galih',
+  //         Profile: {
+  //           Firstname: 'John Doe',
+  //           Lastname: 'John Doe',
+  //           Job: 'FE Developer',
+  //           Email: 'john@gmail.com',
+  //         },
+  //       },
+  //     },
+  //   },
   // };
+
+  const run = async () => {
+    try {
+      const data = await ddbClient.send(new PutItemCommand(params));
+      console.log(data);
+      return data;
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // $: run();
 </script>

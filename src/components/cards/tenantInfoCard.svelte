@@ -28,7 +28,7 @@
   <div class="flex flex-col gap-2 w-full md:w-2/3">
     <div class="flex gap-2 w-full md:w-1/3">
       <button
-        class="bg-blue-600 outline outline-1 outline-neutral-800 w-full rounded-md flex justify-center items-center text-sm"
+        class="bg-blue-600 outline outline-1 outline-neutral-800 w-full rounded-md flex justify-center items-center text-xs md:text-sm"
       >
         Add Promo
       </button>
