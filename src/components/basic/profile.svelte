@@ -247,7 +247,7 @@
                       ><img
                         src={item.type.includes('github')
                           ? '/icons/github-icons.svg'
-                          : socialIcons[item.type].split('-')[0]}
+                          : socialIcons[item.type.split('-')[0]]}
                         class="w-[41px] sm:w-[49px] md:w-[42px]"
                         alt={item.type}
                       />
