@@ -102,7 +102,7 @@
       >
         <MenuItem
           class="flex hover:bg-neutral-300 px-2 py-1 rounded-md cursor-pointer"
-          on:click={() => toNewTab(item.type, item.data)}
+          on:click={() => toNewTab(item.type.split('-')[0], item.data)}
         >
           <img
             class="cursor-pointer mr-2"
