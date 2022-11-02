@@ -7,15 +7,16 @@
   import TenantInfoCard from '@comp/cards/tenantInfoCard.svelte';
   import { getContext } from 'svelte';
   import { membership } from '@lib/membership';
-  import ddbClient from '@lib/dynamodb';
-  import { QueryCommand } from '@aws-sdk/client-dynamodb';
+  import ddbDocClient from '@lib/dynamodb';
+  import { GetItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
   import TenantModal from '@comp/modals/tenantModal.svelte';
   import { PutItemCommand } from '@aws-sdk/client-dynamodb';
+  import { DDB_TABLE } from '@lib/constants';
 
   const teamId = getContext('teamId');
   let searchQuery = '';
-
-  let sortOptions = ['All', 'Galih', ' Galih', 'Pangestu'];
+  let members = [];
+  let sortOptions = ['All'];
 
   const totalPoints = membership.reduce((acc, curr) => {
     return acc + curr.Membership.Points;
@@ -29,49 +30,63 @@
     return new Date(member.Membership.JoinedAt) > new Date();
   }).length;
 
-  export const params = {
-    TableName: 'Memberships-Dev',
+  const params = {
+    TableName: DDB_TABLE.M,
+    // ConditionExpression: 'attribute_exists(UID)',
     Item: {
-      CUSTOMER_ID: { N: '001' },
-      CUSTOMER_NAME: { S: 'Richard Roe' },
+      UID: '1',
+      Memberships: [
+        {
+          TID: '1',
+          Points: 100,
+          JoinedAt: '2021-09-01T00:00:00.000Z',
+          AddedBy: 'Pangestu',
+          Profile: {
+            Firstname: 'John Doe',
+            Lastname: 'John Doe',
+            Job: 'FE Developer',
+            Email: 'john@gmail.com',
+          },
+        },
+        {
+          TID: '1',
+          Points: 100,
+          JoinedAt: '2021-08-01T00:00:00.000Z',
+          AddedBy: 'galih',
+          Profile: {
+            Firstname: 'John Doe',
+            Lastname: 'John Doe',
+            Job: 'FE Developer',
+            Email: 'john@gmail.com',
+          },
+        },
+        {
+          TID: '1',
+          Points: 100,
+          JoinedAt: '2021-10-01T00:00:00.000Z',
+          AddedBy: 'galih',
+          Profile: {
+            Firstname: 'John Doe',
+            Lastname: 'John Doe',
+            Job: 'FE Developer',
+            Email: 'john@gmail.com',
+          },
+        },
+      ],
     },
   };
 
-  // const params = {
-  //   TableName: 'Memberships-Dev',
-  //   // ExpressionAttributeValues: {
-  //   //   ':tid': { S: teamId },
-  //   // },
-  //   // ExpressionAttributeNames: {
-  //   //   '#tid': 'TID',
-  //   // },
-  //   // AttributeValue: {
-  //   //   S: teamId,
-  //   // },
-  //   // Key: {
-  //   //   UID: { S: '1' },
-  //   // },
-  //   Item: {
-  //     UID: {
-  //       Membership: {
-  //         TID: '1',
-  //         Points: 100,
-  //         JoinedAt: '2018-01-01',
-  //         AddedBy: 'galih',
-  //         Profile: {
-  //           Firstname: 'John Doe',
-  //           Lastname: 'John Doe',
-  //           Job: 'FE Developer',
-  //           Email: 'john@gmail.com',
-  //         },
-  //       },
-  //     },
-  //   },
-  // };
+  const getparams = {
+    TableName: DDB_TABLE.M,
+    Key: {
+      UID: '1',
+    },
+    ProjectionExpression: 'Memberships',
+  };
 
-  const run = async () => {
+  const push = async () => {
     try {
-      const data = await ddbClient.send(new PutItemCommand(params));
+      const data = await ddbDocClient.put(params);
       console.log(data);
       return data;
     } catch (err) {
@@ -79,7 +94,23 @@
     }
   };
 
-  // $: run();
+  const getMembers = async () => {
+    try {
+      const data = await ddbDocClient.get(getparams);
+
+      members = data.Item.Memberships;
+      sortOptions = [
+        ...sortOptions,
+        ...members.map((member) => member.AddedBy),
+      ]; // Seharusnya query sendiri nama2 staffnya
+      // console.log(sortOptions);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // $: push();
+  // $: get();
 </script>
 
 <div class="flex flex-col pb-20 bg-black min-h-screen pl-0 md:pl-16 pr-4 gap-2">
@@ -128,10 +159,14 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-2 pl-4">
-      {#each membership as member}
-        <MembershipCard {member} />
-      {/each}
-    </div>
+    {#await getMembers()}
+      <h1>Loading...</h1>
+    {:then name}
+      <div class="flex flex-col gap-2 pl-4">
+        {#each members as member}
+          <MembershipCard {member} />
+        {/each}
+      </div>
+    {/await}
   </div>
 </div>

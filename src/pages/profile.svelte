@@ -254,9 +254,7 @@
                     : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                   order={i}
                   ><img
-                    src={item.type.includes('github')
-                      ? '/icons/github-icons.svg'
-                      : socialIcons[item.type]}
+                    src={socialIcons[item.type]}
                     class="w-[40px] sm:w-[49px] md:w-[40px]"
                     alt=""
                   /></BorderButton
@@ -367,9 +365,7 @@
                       ? 'px-6'
                       : 'px-7'} flex-grow flex justify-center items-center {$currentTheme?.outline} {$currentTheme?.secondary}"
                     ><img
-                      src={item.type.includes('github')
-                        ? '/icons/github-icons.svg'
-                        : socialIcons[item.type]}
+                      src={socialIcons[item.type]}
                       class="w-[45px] sm:w-[49px] md:w-[40px]"
                       alt=""
                     /></BorderButton

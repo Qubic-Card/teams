@@ -1,4 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 
 const REGION = 'ap-southeast-1';
 
@@ -12,4 +13,7 @@ const ddbClient = new DynamoDBClient({
     secretAccessKey: secretAccessKey,
   },
 });
-export default ddbClient;
+
+const ddbDocClient = DynamoDBDocument.from(ddbClient);
+
+export default ddbDocClient;

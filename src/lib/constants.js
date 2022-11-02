@@ -20,7 +20,7 @@ export const socialIcons = {
   phone:
     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-phone.png',
   line: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-line.svg',
-  github: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/github.svg',
+  github: '/icons/github-icons.svg',
   telegram:
     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/telegram.svg',
   discord:
@@ -394,4 +394,10 @@ export const teamProfileTemplate = {
   ],
   lastname: '',
   firstname: 'Qubic.id',
+};
+
+export const DDB_TABLE = {
+  M: 'Memberships-Dev',
+  TE: 'Tenants-Dev',
+  TR: 'Transactions-Dev',
 };

@@ -16,26 +16,26 @@
   >
     <div class="flex flex-col">
       <h1 class="font-bold text-white md:text-sm text-xs break-all">
-        {member.Membership.Profile.Firstname}
-        <!-- memberProfile?.team_profile?.lastname ?? '' -->
+        {member.Profile.Firstname}
+        {member.Profile.Lastname}
       </h1>
-      <p class="break-all">{member.Membership.Profile.Job}</p>
+      <p class="break-all">{member.Profile.Job}</p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Joined At</h1>
       <p>
-        {new Date(member.Membership.JoinedAt).toLocaleDateString()} - {new Date(
-          member.Membership.JoinedAt
-        ).getHours()}:{new Date(member.Membership.JoinedAt).getMinutes()}
+        {new Date(member.JoinedAt).toLocaleDateString()} - {new Date(
+          member.JoinedAt
+        ).getHours()}:{new Date(member.JoinedAt).getMinutes()}
       </p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Points</h1>
-      <p>{member.Membership.Points}</p>
+      <p>{member.Points}</p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Added By</h1>
-      <p>{member.Membership.AddedBy}</p>
+      <p>{member.AddedBy}</p>
     </div>
   </div>
 </div>

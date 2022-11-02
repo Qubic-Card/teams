@@ -246,9 +246,7 @@
                         toNewTab(item.type.split('-')[0], item.data)}
                       class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center rounded-md items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
                       ><img
-                        src={item.type.includes('github')
-                          ? '/icons/github-icons.svg'
-                          : socialIcons[item.type.split('-')[0]]}
+                        src={socialIcons[item.type.split('-')[0]]}
                         class="w-[41px] sm:w-[49px] md:w-[42px]"
                         alt={item.type}
                       />
@@ -260,9 +258,7 @@
                     on:click={() => toNewTab(item.type, item.data)}
                     class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
                     ><img
-                      src={item.type.includes('github')
-                        ? '/icons/github-icons.svg'
-                        : socialIcons[item.type]}
+                      src={socialIcons[item.type]}
                       class="w-[41px] sm:w-[49px] md:w-[42px]"
                       alt={item.type}
                     /></BorderButton

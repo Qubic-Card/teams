@@ -328,10 +328,10 @@
       {#if unsplashDatas}
         <div
           class={`${
-            unsplashDatas?.length > 0 ? 'grid' : 'flex'
+            unsplashDatas.length > 0 ? 'grid' : 'flex'
           } grid-cols-2 grid-flow-row p-2 text-black h-1/2 snap-container snap-y snap-mandatory overflow-y-auto`}
         >
-          {#if unsplashDatas?.length > 0}
+          {#if unsplashDatas.length > 0}
             {#each unsplashDatas as item}
               <div class="m-1 bg-black mt-2 flex flex-col">
                 <div

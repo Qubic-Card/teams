@@ -48,7 +48,7 @@
         on:click={go}
         value={item}
         class="flex hover:bg-neutral-700 text-white px-2 py-2 rounded-md cursor-pointer md:text-sm text-xs"
-        >{item}</ListboxOption
+        >{item.charAt(0).toUpperCase() + item.slice(1)}</ListboxOption
       >
     {/each}
   </ListboxOptions>
