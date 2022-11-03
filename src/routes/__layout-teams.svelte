@@ -189,14 +189,14 @@
               <img
                 src="/close-white.svg"
                 alt="close"
-                class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700"
+                class="cursor-pointer px-4 w-16 py-6 border-r border-neutral-700"
                 on:click={sidebarHandler}
               />
             {:else}
               <img
                 src="/menu-white.svg"
                 alt="humberger-menu"
-                class="cursor-pointer px-6 w-16 py-6 border-r border-neutral-700 hidden md:block"
+                class="cursor-pointer px-4 w-16 py-6 border-r border-neutral-700 hidden md:block"
                 on:click={sidebarHandler}
               />
             {/if}
@@ -232,11 +232,11 @@
               ? 'top-36 md:top-24'
               : 'top-[100px] md:top-16'
             : 'top-16'
-        } bottom-0 left-0 z-50 pt-4 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
+        } bottom-0 left-0 z-50 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
           isSidebarOpened ? 'w-full md:w-72' : ''
         }`}
       >
-        <nav class="space-y-2 w-full flex flex-col justify-center items-center">
+        <nav class="w-full flex flex-col justify-center items-center">
           {#each sidebarItems as item}
             {#if $teamData.name}
               <div
@@ -244,10 +244,10 @@
                   isSidebarOpened ? 'justify-between' : 'justify-center'
                 } ${isSidebarOpened && 'px-12 w-full'} ${
                   $page.routeId === '[slug]/dashboard/team@teams'
-                    ? 'first:bg-neutral-900'
+                    ? 'first:bg-neutral-900 '
                     : ''
                 }  ${
-                  $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
+                  $page.routeId === item.routeId ? 'w-full bg-neutral-700' : ''
                 } ${
                   isSidebarOpened && $page.routeId === item.routeId
                     ? 'bg-neutral-900'
@@ -260,11 +260,13 @@
                     {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                   </p>
                 {/if}
-                <img
+                <div class="rounded-lg bg-neutral-800 p-3">
+                  <img
                   src={item.urldefault}
                   alt={item.title}
-                  class="w-4 md:w-5"
+                  class="w-4 md:w-5 "
                 />
+                </div>
               </div>
             {:else}
               <div class="animate-pulse gap-5">
