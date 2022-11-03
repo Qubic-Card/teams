@@ -59,13 +59,13 @@
     class="transition-all md:transition-none duration-300 ease-in-out {isOpen
       ? `${editor === 'team' ? 'h-44' : 'h-40'}`
       : 'h-0 translate-y-10 md:opacity-0'} {editor == 'team'
-      ? 'bg-neutral-900 text-white p-3 outline outline-1 outline-neutral-700 gap-4 md:top-20 right-0 md:right-6'
-      : 'bg-white text-black gap-2 p-3 md:top-16 right-0 md:right-4'} flex flex-col ml-0 lg:ml-12 w-full md:w-96 md:max-w-md px-4 pb-4 bottom-0 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none overflow-y-auto snap-container"
+      ? 'bg-neutral-900 text-white p-3 outline outline-1 outline-neutral-700 gap-2 md:top-20 right-0 md:right-6'
+      : 'bg-white text-black gap-2 p-3 md:top-16 right-0 md:right-4'} flex flex-col ml-0 lg:ml-12 w-full md:w-96 md:max-w-xs px-4 pb-4 bottom-0 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none overflow-y-auto snap-container"
   >
     {#if editor === 'team'}
       {#if $user}
-        <h1 class="md:text-sm text-xs">
-          Logged-in as <br /><strong>{$user?.email ?? ''}</strong>
+        <h1 class="md:text-sm text-neutral-300 text-xs">
+          Logged-in as <br /><strong class="text-white text-lg">{$user?.email ?? ''}</strong>
         </h1>
       {/if}
     {/if}
@@ -83,8 +83,8 @@
 
     <button
       class="{editor === 'team'
-        ? 'text-white bg-neutral-700'
-        : 'border hover:bg-black hover:text-white border-black'} p-1 w-full flex h-8 justify-center items-center text-xs md:text-sm"
+        ? 'text-white bg-blue-600 rounded-md'
+        : ' bg-blue-600 rounded-md '} p-1 w-full flex h-8 justify-center items-center text-xs md:text-sm"
       on:click={() => {
         $isInViewTriggered = false;
         goto('/');
@@ -94,8 +94,8 @@
     </button>
     <button
       class="{editor === 'team'
-        ? 'text-white bg-neutral-700'
-        : 'text-white bg-black'} text-xs md:text-sm text-black p-2 w-full h-9"
+        ? 'text-red-300 bg-red-600/30 outline outline-red-500 outline-1 rounded-md'
+        : 'text-red-300 bg-red-600/30 outline outline-red-500 outline-1 rounded-md'} text-xs md:text-sm p-2 w-full h-9"
       on:click={handleLogout}>Log Out</button
     >
   </Dialog>
