@@ -99,10 +99,10 @@
             on:click={async () =>
               isDispatch ? action() : await deleteRoleHandler(id)}
             class={`text-sm   ${
-              isDelete
-                ? 'bg-red-600 hover:bg-red-600/60'
+              isDelete || isTransfer
+                ? 'bg-red-600/30 outline outline-1 outline-red-500 hover:bg-red-600/80'
                 : 'bg-blue-600 hover:bg-blue-600/60'
-            } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800 flex justify-center items-center gap-2`}
+            } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 flex justify-center items-center gap-2`}
           >
             {#if isLoading}
               <Spinner bg={isDelete ? '#8d2020' : '#1f4496'} class="w-6 h-6" />

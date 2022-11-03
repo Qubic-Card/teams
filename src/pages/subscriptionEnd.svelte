@@ -1,21 +1,63 @@
 <script>
   import supabase from '@lib/db';
+  import { fade } from 'svelte/transition';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
   import Confirmation from '@comp/modals/confirmation.svelte';
 
-  export let subscription, member, teamId;
+  export let teamId;
+  let expiredMembers = [];
+
+  const capitalize = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const getExpiredMembers = async () => {
+    const { data: cards, error } = await supabase
+      .from('business_cards')
+      .select('color, id, type, member: team_members(uid, id)')
+      .eq('team_id', teamId)
+      .eq('mode', 'team')
+      .order('created_at', { ascending: true });
+
+    if (error) console.log(error);
+    if (cards) {
+      for (let index in cards) {
+        if (cards[index].member[0]) {
+          const { data, error } = await supabase.functions.invoke(
+            'getUserEmail',
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                uid: cards[index].member[0].uid,
+              }),
+            }
+          );
+          if (error) console.log(error);
+          if (data) {
+            expiredMembers = [
+              ...expiredMembers,
+              {
+                ...cards[index],
+                email: data,
+              },
+            ];
+          }
+        }
+      }
+    }
+  };
 
   let isLoading = false;
   let showModal = false;
   let teamMembersProfile = null;
   let isSuccess = false;
+  let selectedMember = {};
 
   const toggleModal = () => (showModal = !showModal);
   const handleLogout = async () => await supabase.auth.signOut();
-  const toWhatsApp = () =>
-    window.open('https://wa.me/628113087599', '_blank').focus();
 
   const uniqueByKeepFirst = (a, key) => {
     let seen = new Set();
@@ -65,8 +107,8 @@
   const createCardConnection = async (member) => {
     const { data, error } = await supabase.from('card_connection').insert(
       {
-        uid: member.team_member_id.uid,
-        card_id: member.card_id,
+        uid: member.member.uid,
+        card_id: member.id,
       },
       { returning: 'minimal' }
     );
@@ -80,78 +122,19 @@
   // 39ba7789-537c-4b0f-a8a7-c8a8345838f3 1
   // eac9c236-da25-4d9c-a058-632bd92bc951 2
   // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9 3
-
-  const deleteCardConnection = async (userCardId) => {
+  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
+  const cardConnectionHandler = async (member) => {
     const { data, error } = await supabase
       .from('card_connection')
-      .delete()
-      .eq('card_id', userCardId);
+      .select('card_id, uid')
+      .eq('card_id', member.id);
 
-    if (error) {
-      console.log(error);
-      toastFailed('Something went wrong, please contact us');
+    if (data.length === 0) {
+      await createCardConnection(member);
     }
   };
 
-  const cardConnectionHandler = async () => {
-    if (teamMembersProfile) {
-      teamMembersProfile.forEach(async (member) => {
-        const { data, error } = await supabase
-          .from('card_connection')
-          .select('card_id, uid')
-          .eq('card_id', member.card_id);
-
-        let neverActivatedMemberBasic;
-        let alreadyActivatedMemberBasic;
-
-        data.length > 0
-          ? (alreadyActivatedMemberBasic = data)
-          : (neverActivatedMemberBasic = member);
-
-        // if (alreadyActivatedMemberBasic) {
-        //   alreadyActivatedMemberBasic.filter(async (user) => {
-        //     if (
-        //       user.card_id === member.card_id &&
-        //       user.uid !== member.team_member_id.uid
-        //     ) {
-        //       await deleteCardConnection(user.card_id);
-        //       await createCardConnection(member);
-        //     }
-        //   });
-        // }
-
-        if (neverActivatedMemberBasic) {
-          await createCardConnection(neverActivatedMemberBasic);
-        }
-      });
-    }
-  };
-
-  const getMemberData = async () => {
-    const { data, error } = await supabase
-      .from('business_cards')
-      .select('id')
-      .eq('mode', 'team')
-      .eq('team_id', teamId);
-    // .match({ team_id: teamId });
-
-    if (error) console.log(error);
-
-    const { data: teamcardcon, error: teamcardcon_err } = await supabase
-      .from('team_cardcon')
-      .select('card_id,team_member_id(*)')
-      .in(
-        'card_id',
-        data.map((item) => item.id)
-      );
-
-    if (error) console.log(teamcardcon_err);
-    if (teamcardcon) {
-      teamMembersProfile = teamcardcon;
-    }
-  };
-
-  const changeCardMode = async () => {
+  const changeCardMode = async (cardId) => {
     const { data, error } = await supabase
       .from('business_cards')
       .update(
@@ -160,7 +143,7 @@
         },
         { returning: 'minimal' }
       )
-      .match({ team_id: teamId });
+      .eq('id', cardId);
 
     if (error) {
       console.log(error);
@@ -168,7 +151,7 @@
     }
   };
 
-  const setNullTeamMemberUid = async () => {
+  const setNullTeamMemberUid = async (id) => {
     const { data, error } = await supabase
       .from('team_members')
       .update(
@@ -177,7 +160,7 @@
         },
         { returning: 'minimal' }
       )
-      .match({ team_id: teamId });
+      .eq('id', id);
 
     if (error) {
       console.log(error);
@@ -185,67 +168,92 @@
     }
   };
 
-  const transferBulkCardHandler = async () => {
+  const transferCardHandler = async (member) => {
+    // console.log(member);
     isLoading = true;
-    await setNullTeamMemberUid();
-    await changeCardMode();
-    await cardConnectionHandler();
-    await updateBasicProfile();
-    toastSuccess('All cards transferred to basic');
-    setTimeout(async () => {
-      isLoading = false;
-      await handleLogout();
-    }, 4000);
-    setInterval(() => (isSuccess = true), 3000);
+    await setNullTeamMemberUid(member.member[0].id);
+    await changeCardMode(member.id);
+    await cardConnectionHandler(member);
+    // await getExpiredMembers();
+    // toastSuccess('Card transfered successfully');
+    // await updateBasicProfile();
+
+    expiredMembers = expiredMembers.filter((item) => item.id !== member.id);
+
+    isLoading = false;
     showModal = false;
   };
-
-  onMount(async () => await getMemberData());
 </script>
 
 <Confirmation
   {isLoading}
   isDispatch
   isTransfer
-  heading="Are you sure to transfer everyone's"
+  heading="Are you sure to transfer this"
   text="card to basic?"
-  buttonLabel="Yes, i am sure."
+  buttonLabel="Proceed"
   {showModal}
   {toggleModal}
-  on:action={async () => await transferBulkCardHandler()}
+  on:action={async () => await transferCardHandler(selectedMember)}
 />
 
-<div
-  class="flex flex-col text-white pt-24 pl-4 w-full gap-2 text-sm"
-  transition:fade|local
->
-  <h1 class="text-lg border-b border-neutral-700 font-bold pb-2">
-    Your subscription has ended.
-  </h1>
-  <p>
-    Your membership has been expired since <span class="font-bold"
-      >{new Date(subscription?.subs_end_date).toDateString().slice(4)}</span
-    >. <br />
-    <span class={`${member?.role?.role_name !== 'superadmin' && 'hidden'}`}>
-      Here are some options you can choose:
-    </span>
-  </p>
-  {#if member?.role?.role_name === 'superadmin'}
-    {#if isLoading}
-      <h1 in:fade|local>Transfer to basic...</h1>
-      {#if isSuccess}
-        <h1 class="text-xl font-extrabold uppercase" in:fade|local>Success!</h1>
-      {/if}
-    {:else}
-      <button
-        class="rounded-md bg-blue-600 p-3 text-left w-1/4"
-        on:click={toWhatsApp}>Renew membership</button
+{#await getExpiredMembers()}
+  <div class="animate pulse w-full h-full p-2 flex flex-col gap-2">
+    <div class="bg-neutral-900 w-full rounded-md h-16" />
+    <div class="bg-neutral-900 w-full rounded-md h-12" />
+    {#each expiredMembers as item}
+      <div class="bg-neutral-900 w-full rounded-md h-12" />
+    {/each}
+  </div>
+{:then name}
+  {#if expiredMembers}
+    <div
+      class="flex flex-col text-white w-full h-screen gap-2 text-sm"
+      transition:fade|local
+    >
+      <h1
+        class="text-lg border-b pl-4 border-neutral-700 font-bold pb-2 fixed bg-black h-12 w-full flex items-center"
       >
-      <button
-        on:click={toggleModal}
-        class="rounded-md bg-neutral-100 text-left text-black p-3 w-1/4"
-        >Transfer everyone's card to basic</button
-      >
-    {/if}
+        Grace Period has Ended
+      </h1>
+      <table class="mt-12">
+        <thead>
+          <tr class="border-b border-neutral-800">
+            <th class="text-left py-3 pl-4">Cards</th>
+            <th class="text-left py-3 md:block hidden">Owner</th>
+            <th class="text-left py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each expiredMembers as member}
+            <tr>
+              <td class="py-2 pl-4"
+                >{member.type === 'pvc' ? 'PVC' : capitalize(member.type)}
+                {capitalize(member.color)} ******{member.id.slice(-6)}</td
+              >
+              <td class="py-2 md:block hidden">{member.email.user}</td>
+              <td class="py-2">
+                <button
+                  on:click={() => {
+                    toggleModal();
+                    selectedMember = member;
+                  }}
+                  class="bg-neutral-800 rounded-md text-center w-28 p-2"
+                >
+                  Transfer
+                </button>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
   {/if}
-</div>
+{:catch name}
+  <div>
+    <h1 class="text-xl text-white text-center w-full mt-8">
+      Some error occurred. Please reload the page and try again <br /> or
+      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+    </h1>
+  </div>
+{/await}
