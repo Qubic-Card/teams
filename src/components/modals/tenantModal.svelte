@@ -14,7 +14,9 @@
   import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
+  import getFileFromBase64 from '@lib/utils/getFileFromBase64';
+  import { fade } from 'svelte/transition';
 
   registerPlugin(
     FilePondPluginImageExifOrientation,
@@ -26,7 +28,8 @@
   );
 
   export let mode = 'add',
-    data;
+    data,
+    input;
 
   let pond;
   let name = 'filepond';
@@ -34,21 +37,138 @@
   let showModal = false;
   let loading = false;
 
-  let input = {
-    Name: '',
-    PointName: '',
-    Desc: '',
-    Logo: 'https://placeimg.com/640/480/any',
+  const teamID = getContext('teamId');
+  let isOpen = false;
+  let croppedImage = '';
+  let fileName = '';
+  let pixelCrop;
+  let image;
+  let fileImage;
+  let isLoading = false;
+
+  const cropImage = async () => {
+    croppedImage = await getCroppedImg(image, pixelCrop);
+    fileImage = getFileFromBase64(croppedImage, fileName);
   };
 
-  const handleCrop = () => {};
+  const previewCrop = (e) => {
+    pixelCrop = e.detail.pixels;
+    const { x, y, width } = e.detail.pixels;
+    const scale = 200 / width;
+  };
+
+  const handleCrop = async (item) => {
+    showModal = false;
+    image = URL.createObjectURL(item.file);
+    fileName = item.id.trim();
+    isOpen = true;
+    return true;
+  };
+
+  const handleAddFile = async () => {
+    isLoading = true;
+    // const { data } = await supabase.storage
+    //   .from('avatars')
+    //   .upload(`${$user?.id}/${fileName}`, fileImage, {
+    //     contentType: 'image/jpeg',
+    //   });
+
+    // const { publicURL, error } = supabase.storage
+    //   .from('avatars')
+    //   .getPublicUrl(`${$user?.id}/${fileName}`);
+
+    pond.removeFile();
+    croppedImage = '';
+    isOpen = false;
+
+    isLoading = false;
+  };
 
   const toggleModal = () => (showModal = !showModal);
 
   const dispatch = createEventDispatcher();
 
-  const action = () => dispatch('action', input);
+  const action = () => {
+    dispatch('action', input);
+    showModal = false;
+    input = {
+      Name: '',
+      PointName: '',
+      Metadata: {
+        Desc: '',
+        Logo: 'https://placeimg.com/640/480/any',
+      },
+    };
+  };
 </script>
+
+<Dialog
+  static
+  class={`${
+    isOpen ? 'translate-x-0' : 'translate-x-[900px]'
+  } transition-all duration-300 justify-between ease-in-out flex flex-col h-screen w-3/4 md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
+  open={isOpen}
+  on:close={() => {
+    isOpen = false;
+    croppedImage = '';
+    pond.removeFile();
+  }}
+>
+  <div class="h-full flex flex-col gap-2">
+    <h2>Crop image</h2>
+    {#if image}
+      <div class="relative h-1/2">
+        <Cropper
+          {image}
+          aspect={1}
+          zoom="1"
+          crop={{ x: 0, y: 0 }}
+          on:cropcomplete={previewCrop}
+        />
+      </div>
+    {/if}
+    {#if croppedImage}
+      <h2>Cropped Image</h2>
+      <img
+        transition:fade|local={{ duration: 300 }}
+        src={croppedImage}
+        alt="Cropped profile"
+        class="w-64 h-64 rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover"
+      /><br />
+    {/if}
+  </div>
+  <div class="flex w-full gap-2">
+    {#if croppedImage}
+      <button
+        in:fade|local={{ duration: 300 }}
+        type="button"
+        class="bg-black p-2 w-1/2 text-white rounded-md h-12 shadow-md"
+        on:click={() => {
+          croppedImage = null;
+        }}>Reset</button
+      >
+      <button
+        in:fade|local={{ duration: 300 }}
+        disabled={isLoading}
+        type="button"
+        class="bg-blue-600 p-2 w-1/2 text-white disabled:bg-blue-600/60 rounded-md h-12 shadow-md flex justify-center items-center gap-2"
+        on:click={async () => await handleAddFile()}
+      >
+        {#if isLoading}
+          <Spinner bg="#1f4496" class="w-6 h-6" />
+        {/if}
+        Save
+      </button>
+    {:else}
+      <button
+        in:fade|local={{ duration: 300 }}
+        type="button"
+        class="bg-blue-600 p-2 w-full text-white rounded-md h-12 shadow-md"
+        on:click={async () => await cropImage()}>Crop</button
+      >
+    {/if}
+  </div>
+</Dialog>
 
 {#if mode === 'add'}
   <button
@@ -163,7 +283,7 @@
             cols="30"
             rows="10"
             class="h-24 rounded-md resize-none bg-neutral-900 outline outline-1 outline-neutral-600 p-2"
-            bind:value={input.Desc}
+            bind:value={input.Metadata.Desc}
           />
         </div>
         <div class="flex justify-end w-full gap-2">

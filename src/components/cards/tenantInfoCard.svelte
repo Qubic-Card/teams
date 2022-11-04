@@ -1,10 +1,52 @@
 <script>
   import MemberSortDropdown from '@comp/buttons/memberSortDropdown.svelte';
   import TenantModal from '@comp/modals/tenantModal.svelte';
+  import { getContext } from 'svelte';
+  import ddbDocClient from '@lib/dynamodb';
+  import { DDB_DOC } from '@lib/constants';
+  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
+  import { user } from '@lib/stores/userStore';
+  import { UpdateCommand } from '@aws-sdk/lib-dynamodb';
+
+  const teamId = getContext('teamId');
 
   export let tenantData = {};
-
+  // $: console.log(tenantData);
   let desc = 'Lorem ipsum dolor sit amet consectetur adipisicing elit Loremd';
+
+  const editTenantData = async (input) => {
+    try {
+      const data = await ddbDocClient.update({
+        TableName: DDB_DOC.TE,
+        Key: {
+          TeamID: input.TeamID,
+          TID: input.TID,
+        },
+        UpdateExpression:
+          'set #name = :name, #pointName = :pointName, #metadata = :metadata',
+        ExpressionAttributeNames: {
+          '#name': 'Name',
+          '#pointName': 'PointName',
+          '#metadata': 'Metadata',
+        },
+        ExpressionAttributeValues: {
+          ':name': input.Name,
+          ':pointName': input.PointName,
+          ':metadata': {
+            Logo: input.Metadata.Logo,
+            Color: '#000000',
+            Desc: input.Metadata.Desc,
+          },
+        },
+      });
+      // console.log(data);
+      toastSuccess('Tenant updated successfully');
+    } catch (error) {
+      toastFailed('Failed to add tenant');
+      console.log(error);
+    }
+  };
 </script>
 
 {#if tenantData}
@@ -12,16 +54,24 @@
     <div
       class="bg-neutral-900 outline outline-1 outline-neutral-800 w-full md:w-1/3 rounded-md flex gap-2 justify-center items-center p-2"
     >
-      <img src={tenantData.Metadata.Logo} alt="" class="w-28 h-28 rounded-md" />
+      <img
+        src={tenantData?.Metadata?.Logo}
+        alt=""
+        class="w-28 h-28 rounded-md"
+      />
       <div class="flex flex-col justify-start h-full w-full">
         <div class="flex justify-between">
-          <h1 class="font-bold">{tenantData.Metadata.Name}</h1>
-          <TenantModal mode="edit" />
+          <h1 class="font-bold">{tenantData.Name}</h1>
+          <TenantModal
+            mode="edit"
+            input={tenantData}
+            on:action={async (e) => await editTenantData(e.detail)}
+          />
         </div>
         <h2 class="text-neutral-400 text-sm">
-          ${tenantData.Metadata.PointName}
+          ${tenantData.PointName}
         </h2>
-        <p class="text-xs mt-2">{tenantData.Metadata.Desc}</p>
+        <p class="text-xs mt-2">{tenantData?.Metadata?.Desc}</p>
       </div>
     </div>
     <div class="flex flex-col gap-2 w-full md:w-2/3">

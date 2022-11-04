@@ -10,16 +10,17 @@
 
   export let sortOptions = [];
 
-  let selected = sortOptions[0];
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const dispatch = createEventDispatcher();
 
-  const remove = () => dispatch('remove');
-  const go = () => dispatch('go');
+  const handleFilter = (e) => dispatch('filter', e);
+
+  let selected = sortOptions[0];
 </script>
 
 <Listbox
-  class="w-1/2"
+  class="w-full"
   value={selected}
   on:change={(e) => (selected = e.detail)}
   let:open
@@ -35,7 +36,7 @@
     class="bg-neutral-800 p-2 w-full h-8 md:text-sm text-xs flex items-center justify-between rounded-md"
   >
     <span class="text-neutral-400 mr-2"
-      >Added by: <span class="text-white">{selected}</span></span
+      >Added by: <span class="text-white">{capitalize(selected)}</span></span
     >
     <span>▼</span></ListboxButton
   >
@@ -45,10 +46,12 @@
   >
     {#each sortOptions as item}
       <ListboxOption
-        on:click={go}
+        on:click={() => handleFilter(item)}
         value={item}
-        class="flex hover:bg-neutral-700 text-white px-2 py-2 rounded-md cursor-pointer md:text-sm text-xs"
-        >{item.charAt(0).toUpperCase() + item.slice(1)}</ListboxOption
+        class="flex hover:bg-neutral-700 text-white px-2 py-2 rounded-md cursor-pointer md:text-sm text-xs {item ===
+        selected
+          ? 'bg-neutral-700'
+          : ''}">{capitalize(item)}</ListboxOption
       >
     {/each}
   </ListboxOptions>

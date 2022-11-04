@@ -1,4 +1,6 @@
 <script>
+  import setHours4Digit from '@lib/utils/setHour4Digit';
+
   export let member;
 </script>
 
@@ -16,17 +18,19 @@
   >
     <div class="flex flex-col">
       <h1 class="font-bold text-white md:text-sm text-xs break-all">
-        {member.Profile.Firstname}
-        {member.Profile.Lastname}
+        {member.Firstname}
+        {member.Lastname}
       </h1>
-      <p class="break-all">{member.Profile.Job}</p>
+      <p class="break-all">{member.Job}</p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Joined At</h1>
+
       <p>
-        {new Date(member.JoinedAt).toLocaleDateString()} - {new Date(
-          member.JoinedAt
-        ).getHours()}:{new Date(member.JoinedAt).getMinutes()}
+        {new Date(member.JoinedAt).toLocaleDateString()} - {setHours4Digit(
+          new Date(member.JoinedAt).getHours(),
+          new Date(member.JoinedAt).getMinutes()
+        )}
       </p>
     </div>
     <div class="flex flex-col">
