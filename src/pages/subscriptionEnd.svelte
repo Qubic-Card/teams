@@ -7,6 +7,9 @@
 
   export let teamId;
   let expiredMembers = [];
+  let showDeleteModal = false;
+
+  const deletModalHandler = () => (showDeleteModal = !showDeleteModal);
 
   const capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -55,9 +58,31 @@
   let teamMembersProfile = null;
   let isSuccess = false;
   let selectedMember = {};
+  let selectAll = false;
 
   const toggleModal = () => (showModal = !showModal);
-  const handleLogout = async () => await supabase.auth.signOut();
+
+  const cards = [];
+
+  let selectedCards = new Set();
+
+  const onCheckCard = (event) => {
+    if (event.target.checked) {
+      selectedCards.add(event.target.value);
+    } else {
+      selectedCards.delete(event.target.value);
+    }
+    selectedCards = selectedCards;
+  };
+
+  const onSelectAll = (event) => {
+    if (event.target.checked) {
+      selectedCards = new Set(cards);
+    } else {
+      selectedCards.clear();
+    }
+    selectedCards = selectedCards;
+  };
 
   const uniqueByKeepFirst = (a, key) => {
     let seen = new Set();
@@ -211,25 +236,53 @@
       class="flex flex-col text-white w-full h-screen gap-2 text-sm"
       transition:fade|local
     >
-      <h1
-        class="text-lg border-b pl-4 border-neutral-700 font-bold pb-2 fixed bg-black h-12 w-full flex items-center"
+      <div
+        class="text-xl border-b pl-4 p-2 border-neutral-700 font-bold pb-2 fixed bg-black h-12 w-full flex items-center justify-between"
       >
-        Grace Period has Ended
-      </h1>
+        <h1>Transfer Cards</h1>
+        <div class="mr-4">
+          <button class="text-sm bg-blue-600 p-2 rounded-md"
+            >Transfer Selected</button
+          >
+          <button
+            class="text-sm bg-red-600/30 outline outline-1 outline-red-500 p-2 rounded-md"
+            >Delete Selected</button
+          >
+        </div>
+      </div>
       <table class="mt-12">
         <thead>
           <tr class="border-b border-neutral-800">
-            <th class="text-left py-3 pl-4">Cards</th>
+            <th class="text-left py-3 pl-4">
+              <input
+                type="checkbox"
+                class="w-5 h-5 cursor-pointer disabled:cursor-default a"
+                checked={selectedCards.size === cards.length}
+                on:change={onSelectAll}
+              />
+            </th>
+            <th class="text-left py-3 pl-4">ID</th>
+            <th class="text-left py-3 pl-4">Card Type</th>
             <th class="text-left py-3 md:block hidden">Owner</th>
             <th class="text-left py-3">Actions</th>
           </tr>
         </thead>
         <tbody>
           {#each expiredMembers as member}
-            <tr>
+            <tr class="bg-neutral-900 border-b-2 border-neutral-800">
+              <td class="py-2 pl-4">
+                <input
+                  type="checkbox"
+                  class="w-5 h-5 cursor-pointer disabled:cursor-default a"
+                  value={member.id}
+                  checked={selectedCards.has(member.id)}
+                  on:change={onCheckCard}
+                />
+              </td>
+              <td class="py-2 pl-4">******{member.id.slice(-6)}</td>
               <td class="py-2 pl-4"
                 >{member.type === 'pvc' ? 'PVC' : capitalize(member.type)}
-                {capitalize(member.color)} ******{member.id.slice(-6)}</td
+                {capitalize(member.color)}</td
               >
               <td class="py-2 md:block hidden">{member.email.user}</td>
               <td class="py-2">
@@ -242,6 +295,20 @@
                 >
                   Transfer
                 </button>
+                <Confirmation
+                  {isLoading}
+                  isDelete
+                  isIconVisible
+                  isDispatch
+                  heading="Are you sure you want to delete"
+                  text={`?`}
+                  on:action={() => {
+                    console.log('delete');
+                  }}
+                  buttonLabel="Delete"
+                  showModal={showDeleteModal}
+                  toggleModal={deletModalHandler}
+                />
               </td>
             </tr>
           {/each}
