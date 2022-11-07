@@ -31,6 +31,7 @@
   };
   let totalMembers = 0;
   let isLoading = false;
+  let page = -1;
 
   function randomDate(start, end) {
     return new Date(
@@ -152,7 +153,7 @@
       console.log(error);
     }
   };
-
+  let lastEvaluatedKey = [];
   const getMembers = async () => {
     try {
       setTimeout(async () => {
@@ -164,11 +165,18 @@
           ExpressionAttributeValues: {
             ':tid': tenantData.TID,
           },
+          Limit: 2,
+          // ExclusiveStartKey: {
+          //   TID: tenantData.TID,
+          //   JoinedAt: '2021-12-01T00:00:00.000Z',
+          //   UID: '1638316800000',
+          // },
         };
 
         const data = await ddbDocClient.query(getparams);
 
         members = data.Items;
+        lastEvaluatedKey = [...lastEvaluatedKey, data.LastEvaluatedKey];
 
         members = members.sort((a, b) => {
           return (
@@ -176,7 +184,55 @@
           );
         });
 
-        // console.log(members);
+        // console.log(lastEvaluatedKey, 'members');
+        totalMembers = members.length;
+        sortOptions = [
+          ...sortOptions,
+          ...members.map((member) => member.AddedBy),
+        ];
+        sortOptions = [...new Set(sortOptions)];
+      }, 500);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const paginationMembers = async (foward) => {
+    try {
+      if (foward) {
+        page++;
+      } else {
+        page--;
+      }
+      console.log(page);
+      setTimeout(async () => {
+        // wait for the tenantData
+        const getparams = {
+          TableName: DDB_DOC.M,
+          IndexName: 'TID-JoinedAt-index',
+          KeyConditionExpression: 'TID = :tid',
+          ExpressionAttributeValues: {
+            ':tid': tenantData.TID,
+          },
+          Limit: 2,
+          ExclusiveStartKey: {
+            TID: lastEvaluatedKey[page].TID,
+            JoinedAt: lastEvaluatedKey[page].JoinedAt,
+            UID: lastEvaluatedKey[page].UID,
+          },
+        };
+
+        const data = await ddbDocClient.query(getparams);
+
+        members = data.Items;
+        lastEvaluatedKey = [...lastEvaluatedKey, data.LastEvaluatedKey];
+        members = members.sort((a, b) => {
+          return (
+            new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime()
+          );
+        });
+
+        console.log('pag', lastEvaluatedKey);
         totalMembers = members.length;
         sortOptions = [
           ...sortOptions,
@@ -227,7 +283,24 @@
     // console.log(data);
   };
 
-  // $: test();
+  const getMembersByTID = async () => {
+    try {
+      const data = await ddbDocClient.query({
+        TableName: DDB_DOC.M,
+        KeyConditionExpression: 'TID = :tid',
+        FilterExpression: 'TID = :tid',
+        ExpressionAttributeValues: {
+          ':tid': '1',
+        },
+      });
+
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // $: getMembersByTID();
   // const getdynamoDb
   // $: push();
   // $: getMembers();
@@ -244,6 +317,7 @@
         >{tenants.length} Tenants</span
       >
     </h1>
+    <button on:click={paginationMembers}>CLICKKK</button>
     <TenantModal
       {input}
       on:action={async (e) => await addNewTenantHandler(e.detail)}
@@ -330,6 +404,20 @@
         {:else}
           <div class="h-full">No Members</div>
         {/if}
+        <div class="flex justify-end gap-2">
+          <button
+            class="outline outline-1 outline-neutral-800 rounded-md p-2"
+            on:click={async () => await paginationMembers(false)}
+          >
+            Previous
+          </button>
+          <button
+            class="outline outline-1 outline-neutral-800 rounded-md p-2"
+            on:click={async () => await paginationMembers(true)}
+          >
+            Next
+          </button>
+        </div>
       </div>
     {:catch name}
       <h1>Error</h1>
