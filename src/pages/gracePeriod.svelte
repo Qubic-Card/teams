@@ -73,28 +73,29 @@
   class="flex flex-col w-full h-full gap-8 text-white justify-center items-center p-10 md:p-0"
 >
   <div class="flex flex-col text-center">
-    <h1 class="text-3xl font-bold">{hours}:{minutes}:{seconds}</h1>
-    <h2 class="text-xl">Grace Period Duration</h2>
+    <h1 class="text-2xl md:text-3xl font-bold">{hours}:{minutes}:{seconds}</h1>
+    <h2 class="text-lg md:text-xl">Grace Period Duration</h2>
   </div>
 
   <div class="flex flex-col items-center gap-2 text-center">
-    <h2 class="text-xl">Your Subscription has Ended</h2>
-    <p class="text-lg text-neutral-400">
+    <h2 class="text-lg md:text-xl">Your Subscription has Ended</h2>
+    <p class="text-md md:text-lg text-neutral-400">
       Your data will deleted after the probation ends
     </p>
     <div class="flex flex-col border-b-2 border-neutral-800 w-full pb-2 gap-2">
-      <button class="bg-blue-600 rounded-md p-2 w-full" on:click={toWhatsApp}
-        >Renew Subscription</button
+      <button
+        class="bg-blue-600 rounded-md p-2 w-full text-sm md:text-md"
+        on:click={toWhatsApp}>Renew Subscription</button
       >
       <button
         on:click
-        class="bg-neutral-600/60 outline outline-1 outline-neutral-500 hover:outline-neutral-600 rounded-md p-2 w-full"
+        class="bg-neutral-600/60 outline outline-1 outline-neutral-500 hover:outline-neutral-600 rounded-md p-2 w-full text-sm md:text-md"
         >Backup Team Data</button
       >
     </div>
     <button
       on:click={toggleModal}
-      class="bg-red-600/30 outline outline-1 outline-red-500 hover:outline-red-600 rounded-md p-2 w-full"
+      class="bg-red-600/30 outline outline-1 outline-red-500 hover:outline-red-600 rounded-md p-2 w-full text-sm md:text-md"
       >End Probation & Transfer Cards</button
     >
   </div>

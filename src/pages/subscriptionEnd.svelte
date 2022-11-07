@@ -2,23 +2,27 @@
   import supabase from '@lib/db';
   import { fade } from 'svelte/transition';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { onMount } from 'svelte';
-  import Confirmation from '@comp/modals/confirmation.svelte';
+  import {
+    cardConnectionHandler,
+    changeCardMode,
+    setNullTeamMemberUid,
+    updateBasicProfile,
+  } from '@lib/query/subscriptionEnd/transferCard';
+  import TransferModal from '@comp/modals/transferModal.svelte';
+  import DeleteCardModal from '@comp/modals/deleteCardModal.svelte';
+  import { selectedProfileMenu } from '@lib/stores/subsEndStore';
 
   export let teamId;
   let expiredMembers = [];
-  let showDeleteModal = false;
+  let isLoading = false;
+  let selectedCards = new Set();
 
-  const deletModalHandler = () => (showDeleteModal = !showDeleteModal);
-
-  const capitalize = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const getExpiredMembers = async () => {
     const { data: cards, error } = await supabase
       .from('business_cards')
-      .select('color, id, type, member: team_members(uid, id)')
+      .select('color, id, type, member: team_members(uid, id, team_profile)')
       .eq('team_id', teamId)
       .eq('mode', 'team')
       .order('created_at', { ascending: true });
@@ -53,19 +57,6 @@
     }
   };
 
-  let isLoading = false;
-  let showModal = false;
-  let teamMembersProfile = null;
-  let isSuccess = false;
-  let selectedMember = {};
-  let selectAll = false;
-
-  const toggleModal = () => (showModal = !showModal);
-
-  const cards = [];
-
-  let selectedCards = new Set();
-
   const onCheckCard = (event) => {
     if (event.target.checked) {
       selectedCards.add(event.target.value);
@@ -77,158 +68,102 @@
 
   const onSelectAll = (event) => {
     if (event.target.checked) {
-      selectedCards = new Set(cards);
+      selectedCards = new Set(expiredMembers.map((m) => m.id));
     } else {
       selectedCards.clear();
     }
     selectedCards = selectedCards;
   };
 
-  const uniqueByKeepFirst = (a, key) => {
-    let seen = new Set();
-    return a?.filter((item) => {
-      let k = key(item);
-      return seen.has(k) ? false : seen.add(k);
-    });
-  };
-
-  const updateBasicProfile = async () => {
-    if (teamMembersProfile) {
-      teamMembersProfile.forEach(async (member) => {
-        const { data, error } = await supabase
-          .from('profile')
-          .update(
-            {
-              uid: member.team_member_id.uid,
-              metadata: {
-                avatar: member?.team_member_id?.team_profile?.avatar,
-                address: member?.team_member_id?.team_profile?.address,
-                company: member?.team_member_id?.team_profile?.company,
-                design: member?.team_member_id?.team_profile?.design,
-                firstname: member?.team_member_id?.team_profile?.firstname,
-                lastname: member?.team_member_id?.team_profile?.lastname,
-                job: member?.team_member_id?.team_profile?.job,
-                isShowMetaImage:
-                  member?.team_member_id?.team_profile?.isShowMetaImage,
-                socials: uniqueByKeepFirst(
-                  member?.team_member_id?.team_profile?.socials,
-                  (social) => social.type
-                ),
-                links: member?.team_member_id?.team_profile?.links,
-              },
-            },
-            { returning: 'minimal' }
-          )
-          .eq('uid', member.team_member_id.uid);
-
-        if (error) {
-          console.log(error);
-          toastFailed('Something went wrong, please contact us');
-        }
-      });
-    }
-  };
-
-  const createCardConnection = async (member) => {
-    const { data, error } = await supabase.from('card_connection').insert(
-      {
-        uid: member.member.uid,
-        card_id: member.id,
-      },
-      { returning: 'minimal' }
-    );
-
-    if (error) {
-      console.log(error);
-      toastFailed('Something went wrong, please contact us');
-    }
-  };
-
   // 39ba7789-537c-4b0f-a8a7-c8a8345838f3 1
   // eac9c236-da25-4d9c-a058-632bd92bc951 2
   // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9 3
   // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
-  const cardConnectionHandler = async (member) => {
-    const { data, error } = await supabase
-      .from('card_connection')
-      .select('card_id, uid')
-      .eq('card_id', member.id);
+  // cc9f06e7-b6eb-44c8-8817-a2f729df3aa3
 
-    if (data.length === 0) {
-      await createCardConnection(member);
-    }
-  };
+  // 613572e9-f471-4f0d-90d2-d8511d1ac462
+  // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
+  // 121
 
-  const changeCardMode = async (cardId) => {
-    const { data, error } = await supabase
-      .from('business_cards')
-      .update(
-        {
-          mode: 'basic',
-        },
-        { returning: 'minimal' }
-      )
-      .eq('id', cardId);
-
-    if (error) {
-      console.log(error);
-      toastFailed('Something went wrong, please contact us');
-    }
-  };
-
-  const setNullTeamMemberUid = async (id) => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .update(
-        {
-          uid: null,
-        },
-        { returning: 'minimal' }
-      )
-      .eq('id', id);
-
-    if (error) {
-      console.log(error);
-      toastFailed('Something went wrong, please contact us');
-    }
-  };
-
-  const transferCardHandler = async (member) => {
-    // console.log(member);
+  const transferCardHandler = async (card) => {
     isLoading = true;
-    await setNullTeamMemberUid(member.member[0].id);
-    await changeCardMode(member.id);
-    await cardConnectionHandler(member);
-    // await getExpiredMembers();
-    // toastSuccess('Card transfered successfully');
-    // await updateBasicProfile();
+    // await setNullTeamMemberUid(card.member[0].id);
+    await changeCardMode(card.id);
+    await cardConnectionHandler(card);
+    if ($selectedProfileMenu.includes('with')) {
+      await updateBasicProfile(card);
+    }
+    toastSuccess('Card transfered successfully');
 
-    expiredMembers = expiredMembers.filter((item) => item.id !== member.id);
+    expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
 
     isLoading = false;
-    showModal = false;
+  };
+
+  const bulkTransfer = async () => {
+    isLoading = true;
+    let selectedArr = Array.from(selectedCards);
+
+    selectedArr = expiredMembers.filter((item) =>
+      selectedArr.includes(item.id)
+    );
+
+    selectedArr.forEach(async (card) => {
+      // await setNullTeamMemberUid(card.member[0].id);
+      await changeCardMode(card.id);
+      await cardConnectionHandler(card);
+      if ($selectedProfileMenu.includes('with')) {
+        await updateBasicProfile(card);
+      }
+
+      expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
+    });
+
+    toastSuccess('Cards transfered successfully');
+    isLoading = false;
+  };
+
+  const deleteCard = async (cards) => {
+    isLoading = true;
+    const { data, error } = await supabase.rpc('delete_card', {
+      cards: cards,
+    });
+    if (error) {
+      console.log(error);
+      toastFailed('Something went wrong, please contact us');
+      isLoading = false;
+    }
+    if (data) {
+      // console.log(data);
+      toastSuccess('Card deleted successfully');
+      isLoading = false;
+    }
+  };
+
+  const bulkDelete = async () => {
+    let selectedArr = Array.from(selectedCards);
+
+    selectedArr = expiredMembers.filter((item) =>
+      selectedArr.includes(item.id)
+    );
+
+    deleteCard(selectedArr.map((c) => c.id));
   };
 </script>
 
-<Confirmation
-  {isLoading}
-  isDispatch
-  isTransfer
-  heading="Are you sure to transfer this"
-  text="card to basic?"
-  buttonLabel="Proceed"
-  {showModal}
-  {toggleModal}
-  on:action={async () => await transferCardHandler(selectedMember)}
-/>
-
 {#await getExpiredMembers()}
-  <div class="animate pulse w-full h-full p-2 flex flex-col gap-2">
+  <div class="animate-pulse w-full h-full p-2 flex flex-col gap-2">
     <div class="bg-neutral-900 w-full rounded-md h-16" />
     <div class="bg-neutral-900 w-full rounded-md h-12" />
-    {#each expiredMembers as item}
-      <div class="bg-neutral-900 w-full rounded-md h-12" />
-    {/each}
+    {#if expiredMembers.length < 1}
+      {#each Array(5) as item}
+        <div class="bg-neutral-900 w-full rounded-md h-12" />
+      {/each}
+    {:else}
+      {#each expiredMembers as item}
+        <div class="bg-neutral-900 w-full rounded-md h-12" />
+      {/each}
+    {/if}
   </div>
 {:then name}
   {#if expiredMembers}
@@ -239,15 +174,18 @@
       <div
         class="text-xl border-b pl-4 p-2 border-neutral-700 font-bold pb-2 fixed bg-black h-12 w-full flex items-center justify-between"
       >
-        <h1>Transfer Cards</h1>
-        <div class="mr-4">
-          <button class="text-sm bg-blue-600 p-2 rounded-md"
-            >Transfer Selected</button
-          >
-          <button
-            class="text-sm bg-red-600/30 outline outline-1 outline-red-500 p-2 rounded-md"
-            >Delete Selected</button
-          >
+        <h1 class="text-sm md:text-lg">Transfer Cards</h1>
+        <div class="flex gap-2">
+          <TransferModal
+            disabled={selectedCards.size === 0}
+            bulkTransfer
+            on:transfer={async () => await bulkTransfer()}
+          />
+          <DeleteCardModal
+            bulkDelete
+            disabled={selectedCards.size === 0}
+            on:delete={async () => await bulkDelete()}
+          />
         </div>
       </div>
       <table class="mt-12">
@@ -256,8 +194,9 @@
             <th class="text-left py-3 pl-4">
               <input
                 type="checkbox"
-                class="w-5 h-5 cursor-pointer disabled:cursor-default a"
-                checked={selectedCards.size === cards.length}
+                class="w-5 h-5 cursor-pointer disabled:cursor-default"
+                checked={selectedCards.size ===
+                  expiredMembers.map((m) => m.id).length}
                 on:change={onSelectAll}
               />
             </th>
@@ -268,47 +207,32 @@
           </tr>
         </thead>
         <tbody>
-          {#each expiredMembers as member}
+          {#each expiredMembers as card}
             <tr class="bg-neutral-900 border-b-2 border-neutral-800">
               <td class="py-2 pl-4">
                 <input
                   type="checkbox"
                   class="w-5 h-5 cursor-pointer disabled:cursor-default a"
-                  value={member.id}
-                  checked={selectedCards.has(member.id)}
+                  value={card.id}
+                  checked={selectedCards.has(card.id)}
                   on:change={onCheckCard}
                 />
               </td>
-              <td class="py-2 pl-4">******{member.id.slice(-6)}</td>
+              <td class="py-2 pl-4">******{card.id.slice(-6)}</td>
               <td class="py-2 pl-4"
-                >{member.type === 'pvc' ? 'PVC' : capitalize(member.type)}
-                {capitalize(member.color)}</td
+                >{card.type === 'pvc' ? 'PVC' : capitalize(card.type)}
+                {capitalize(card.color)}</td
               >
-              <td class="py-2 md:block hidden">{member.email.user}</td>
+              <td class="py-2 md:block hidden">{card.email.user}</td>
               <td class="py-2">
-                <button
-                  on:click={() => {
-                    toggleModal();
-                    selectedMember = member;
-                  }}
-                  class="bg-neutral-800 rounded-md text-center w-28 p-2"
-                >
-                  Transfer
-                </button>
-                <Confirmation
-                  {isLoading}
-                  isDelete
-                  isIconVisible
-                  isDispatch
-                  heading="Are you sure you want to delete"
-                  text={`?`}
-                  on:action={() => {
-                    console.log('delete');
-                  }}
-                  buttonLabel="Delete"
-                  showModal={showDeleteModal}
-                  toggleModal={deletModalHandler}
-                />
+                <div class="flex">
+                  <TransferModal
+                    on:transfer={async () => await transferCardHandler(card)}
+                  />
+                  <DeleteCardModal
+                    on:delete={async () => deleteCard([card.id])}
+                  />
+                </div>
               </td>
             </tr>
           {/each}
