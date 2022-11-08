@@ -8,6 +8,9 @@
   import TeamAnalyticsCard from '@comp/cards/teamAnalyticsCard.svelte';
   import MemberSkeleton from '@comp/skeleton/memberSkeleton.svelte';
   import MemberSortDropdown from '@comp/buttons/memberSortDropdown.svelte';
+  import CardsCard from '@comp/cards/cardsCard.svelte';
+  import sortCard from '@lib/utils/sortCard';
+  import CardsSkeleton from '@comp/skeleton/cardsSkeleton.svelte';
 
   let permissions = {
     readMembers: false,
@@ -22,9 +25,12 @@
   let updatedRole = '';
   let isDeleteMember = false;
   let members = [];
-  let activeCardsId = [];
+  let menu = ['Team Members', 'Cards'];
+  let selectedMenu = 1;
+  let cards = [];
   const teamId = getContext('teamId');
 
+  const selectMenu = (index) => (selectedMenu = index);
   const setState = (newState) => (state = newState);
 
   $: {
@@ -68,7 +74,6 @@
       let active = data.filter((m) => m.uid !== null);
 
       members = sortMember(active, $user?.id, 'asc');
-      activeCardsId = members.map((m) => m.card_id);
     }
   };
 
@@ -82,26 +87,68 @@
     }, 500);
   };
 
-  const getInactiveCards = async () => {
-    if (activeCardsId.length > 0) {
-      const { data, error } = await supabase
-        .from('business_cards')
-        .select('id')
-        .eq('team_id', teamId)
-        .eq('mode', 'team');
+  const sortCardHandler = (sort) => {
+    let userCardId = cards.filter(
+      (c) => c.card[0].team_member_id.uid === $user?.id
+    )[0].id;
 
-      if (error) console.log(error);
-
-      if (data) {
-        inactiveCards = data.filter((d) => !activeCardsId.includes(d.id));
-      }
-    }
+    loading = true;
+    cards = sortCard(cards, userCardId, sort);
+    setTimeout(() => {
+      loading = false;
+    }, 500);
   };
 
   const getAll = async () => {
     await getMembers();
-    await getInactiveCards();
     roles = await getAllRoleByTeam(teamId);
+  };
+
+  const getCardEmail = async (uid) => {
+    const { data, error } = await supabase
+      .from('profile')
+      .select('email')
+      .eq('uid', uid);
+
+    if (error) console.log(error);
+
+    if (data) {
+      return data[0];
+    }
+  };
+
+  const getCards = async () => {
+    const { data, error } = await supabase
+      .from('business_cards')
+      .select(
+        'id, type, color, card: team_cardcon(status, datecreated, QRScan, NFCtap, team_member_id(uid, team_profile->>avatar))'
+      )
+      .eq('team_id', teamId)
+      .eq('mode', 'team')
+      .order('created_at', { ascending: false });
+
+    if (error) console.log(error);
+    if (data) {
+      cards = data.filter((c) => c.card.length > 0);
+
+      let userCardId = cards.filter(
+        (c) => c.card[0].team_member_id.uid === $user?.id
+      )[0].id;
+
+      // cards = cards.map(async (c) => {
+      //   const email = await getCardEmail(c.card[0].team_member_id.uid);
+
+      //   return {
+      //     ...c,
+      //     email,
+      //   };
+      // });
+
+      // console.log(cards);
+
+      cards = sortCard(cards, userCardId, 'asc');
+      inactiveCards = data.filter((c) => c.card.length < 1);
+    }
   };
 </script>
 
@@ -122,16 +169,27 @@
       </div>
     </div>
   </div>
-  {#await getAll()}
-    <MemberSkeleton all />
-  {:then}
-    <div class="flex flex-col my-2">
-      <div
-        class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 py-3 border-b mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
-      >
-        <h1 class="text-xl font-bold flex-grow w-full">Team Members</h1>
+
+  <div class="flex flex-col my-2">
+    <div
+      class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 border-b pt-3 mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
+    >
+      <div class="flex gap-2 w-full lg:w-1/2">
+        {#each menu as item, i}
+          <div
+            on:click={() => selectMenu(i)}
+            class="text-md md:text-lg font-bold cursor-pointer w-full md:w-auto text-center pb-3 {selectedMenu ===
+            i
+              ? 'border-b-2 border-neutral-400'
+              : ''}"
+          >
+            {item}
+          </div>
+        {/each}
+      </div>
+      {#if selectedMenu === 1}
         <div
-          class={`items-center justify-end rounded-md gap-2 w-full ${
+          class={`items-center justify-end rounded-md gap-2 pb-3 w-full ${
             permissions.readMembers ? 'flex' : 'hidden'
           }`}
         >
@@ -160,78 +218,98 @@
             on:click={() => setState('inactive')}>Inactive</button
           >
         </div>
-        <div class="flex gap-2 md:w-72 w-full items-center">
-          <MemberSortDropdown
-            on:asc={() => sortMemberHandler('asc')}
-            on:dsc={() => sortMemberHandler('dsc')}
-          />
-        </div>
+      {/if}
+      <div class="flex gap-2 md:w-72 w-full items-center pb-3">
+        <MemberSortDropdown
+          on:asc={() =>
+            selectedMenu === 0
+              ? sortMemberHandler('asc')
+              : sortCardHandler('asc')}
+          on:dsc={() =>
+            selectedMenu === 0
+              ? sortMemberHandler('dsc')
+              : sortCardHandler('dsc')}
+        />
       </div>
-      {#if loading}
+    </div>
+
+    {#if selectedMenu === 0}
+      {#await getAll()}
         <MemberSkeleton />
-      {:else}
-        {#if state === 'inactive'}
-          {#if inactiveCards.length === 0}
-            <div>
-              <h1 class="text-sm md:text-lg text-neutral-400 text-center mt-4">
-                No inactive cards
-              </h1>
-            </div>
-          {/if}
-        {/if}
-        {#if isDeleteMember}
+      {:then name}
+        {#if loading}
+          <MemberSkeleton />
+        {:else if isDeleteMember}
           <MemberSkeleton />
         {:else}
           <div class="flex flex-col gap-2 px-4">
+            {#each members as member, i}
+              <MemberCard
+                {member}
+                {roles}
+                {permissions}
+                {i}
+                {updatedRole}
+                {deleteMember}
+                active
+                on:setRole={(e) => (updatedRole = e.detail)}
+              />
+            {/each}
+          </div>
+        {/if}
+      {:catch name}
+        <div>
+          <h1 class="text-xl text-white text-center w-full mt-8">
+            Some error occurred. Please reload the page and try again <br /> or
+            <a href="https://wa.me/628113087599" class="font-bold">
+              contact us!
+            </a>
+          </h1>
+        </div>
+      {/await}
+    {:else}
+      {#await getCards()}
+        <CardsSkeleton cardsLength={cards.length + inactiveCards.length} />
+      {:then name}
+        {#if loading}
+          <CardsSkeleton cardsLength={cards.length + inactiveCards.length} />
+        {:else}
+          <div
+            class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
+          >
             {#if state === 'all'}
-              {#each members as member, i}
-                <MemberCard
-                  {member}
-                  {roles}
-                  {permissions}
-                  {i}
-                  {updatedRole}
-                  {deleteMember}
-                  active
-                  on:setRole={(e) => (updatedRole = e.detail)}
-                />
+              {#each cards as card}
+                <CardsCard {card} {permissions} {getCards} />
               {/each}
-              {#if inactiveCards.length !== 0}
-                {#each inactiveCards as member, i}
-                  <MemberCard {member} {permissions} />
-                {/each}
-              {/if}
+              {#each inactiveCards as card}
+                <CardsCard {card} {permissions} />
+              {/each}
             {/if}
             {#if state === 'active'}
-              {#each members as member, i}
-                <MemberCard
-                  {member}
-                  {roles}
-                  {permissions}
-                  {i}
-                  {updatedRole}
-                  active
-                  on:setRole={(e) => (updatedRole = e.detail)}
-                />
+              {#each cards as card}
+                {#if card.card.length > 0}
+                  <CardsCard {card} {permissions} {getCards} />
+                {/if}
               {/each}
             {/if}
             {#if state === 'inactive'}
-              {#if inactiveCards.length !== 0}
-                {#each inactiveCards as member, i}
-                  <MemberCard {member} {permissions} />
-                {/each}
-              {/if}
+              {#each inactiveCards as card}
+                <CardsCard {card} {permissions} />
+              {/each}
             {/if}
           </div>
         {/if}
-      {/if}
-    </div>
-  {:catch}
-    <div>
-      <h1 class="text-xl text-white text-center w-full mt-8">
-        Some error occurred. Please reload the page and try again <br /> or
-        <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
-      </h1>
-    </div>
-  {/await}
+      {:catch name}
+        <div>
+          <h1 class="text-xl text-white text-center w-full mt-8">
+            Some error occurred. Please reload the page and try again <br />
+            or
+            <a href="https://wa.me/628113087599" class="font-bold">
+              contact us!
+            </a>
+          </h1>
+        </div>
+      {/await}
+    {/if}
+  </div>
 </div>

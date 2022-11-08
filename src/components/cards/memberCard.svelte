@@ -1,4 +1,5 @@
 <script>
+  import setHours4Digit from '@lib/utils/setHour4Digit';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
   import MemberAnalyticsModal from '@comp/modals/memberAnalyticsModal.svelte';
   import MemberRoleDropdown from '@comp/buttons/memberRoleDropdown.svelte';
@@ -28,10 +29,8 @@
   let isLoading = false;
   let memberProfile = member?.team_profile;
   let role = { role_name: member?.role_name, index: member?.role_id };
-  let memberEmail = '';
   let showDeleteMemberModal = false;
   let connectionsCount = 0;
-  let logsCount = 0;
 
   const setRole = (role) => dispatch('setRole', { role_name: role, index: i });
   const toggleModal = () => (showModal = !showModal);
@@ -44,45 +43,6 @@
     });
 
   const selectRole = (role) => (selectedRole = role);
-
-  const setStatus = async () => {
-    const { data, error } = await supabase
-      .from('team_cardcon')
-      .update({ status: !member?.card_status }, { returning: 'minimal' })
-      .eq('card_id', member?.card_id);
-
-    member.card_status = !member?.card_status;
-
-    if (error) {
-      toastFailed();
-      return;
-    }
-
-    if (member?.card_status) {
-      toastSuccess('Card has been activated');
-    } else {
-      toastSuccess('Card has been deactivated');
-    }
-  };
-
-  const getUserEmail = async (uid) => {
-    if (member?.uid !== undefined) {
-      const { data, error } = await supabase.functions.invoke('getUserEmail', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          uid: uid,
-        }),
-      });
-      if (error) console.log(error);
-      if (data) {
-        if (member?.card_id !== undefined)
-          Cookies.set(member?.card_id, data.user);
-        memberEmail = data.user;
-      }
-    }
-  };
 
   const setMemberRole = async (id) => {
     isLoading = true;
@@ -102,8 +62,6 @@
       isLoading = false;
     }
   };
-
-  // 3bc4953a-262d-49e0-acdb-c3a09357be65
 
   const deleteMemberHandler = async () => {
     let card_holder = memberProfile.firstname + ' ' + memberProfile.lastname;
@@ -170,33 +128,8 @@
     }
   };
 
-  const getLogsCount = async () => {
-    if (memberProfile) {
-      const { data, error, count } = await supabase
-        .from('team_logs')
-        .select('type', { count: 'exact' })
-        .eq('team_member', member?.member_id);
-
-      if (error) {
-        console.log(error);
-        return;
-      }
-
-      if (data) {
-        logsCount = count;
-      }
-    }
-  };
-
   onMount(async () => {
-    if (!Cookies.get(member?.card_id)) {
-      await getUserEmail(member?.uid);
-    } else {
-      memberEmail = Cookies.get(member?.card_id);
-    }
-
     await getConnectionsCount();
-    await getLogsCount();
   });
 
   $: if (active) if (i === updatedRole.index) selectedRole = updatedRole.role;
@@ -235,195 +168,51 @@
   }}
 />
 
-{#if active}
-  {#if !permissions.readMembers}
-    {#if $user?.id === member.uid}
-      <div
-        class="flex bg-neutral-900 outline outline-1 outline-neutral-800 p-3 rounded-md h-auto gap-8 items-center rounded-custom"
-      >
-        <img
-          class="hidden md:block w-16 h-16 rounded-full {$user?.id ===
-          member.uid
-            ? 'outline-2 outline outline-blue-600'
-            : ''}"
-          src={memberProfile?.avatar}
-          alt={memberProfile?.firstname + ' avatar'}
-        />
-        <div class="flex flex-col w-full gap-2">
-          <div class="flex justify-between">
-            <div class="flex gap-4 text-sm">
-              <h1>Card ****{member?.card_id.slice(-6)}</h1>
-              <h1>
-                Joined since {convertToGMT7(member?.user_change)
-                  .toDateString()
-                  .slice(4)}
-              </h1>
-            </div>
-            <div class="flex gap-2 items-center">
-              <MemberAnalyticsModal {member} isRounded />
-            </div>
-          </div>
-
-          <div
-            class="grid grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_150px_100px_minmax(200px,_1fr)] text-sm"
-          >
-            <div class="flex flex-col">
-              <h1 class="font-bold text-white">
-                {memberProfile?.firstname ?? ''}
-                {memberProfile?.lastname ?? ''}
-              </h1>
-              <p>{memberProfile?.job}</p>
-            </div>
-            <div class="hidden md:flex flex-col">
-              <h1 class=" text-neutral-400">Connections</h1>
-              <p>{connectionsCount}</p>
-            </div>
-            <div class="hidden md:flex flex-col">
-              <h1 class=" text-neutral-400">Activity</h1>
-              <p>{logsCount}</p>
-            </div>
-            <div class="hidden md:flex flex-col">
-              <h1 class="text-neutral-400">Most Recent Activity</h1>
-
-              {#if member?.log_data}
-                {#if member.log_type === 'DANGER' || member.log_type === 'SUCCESS' || member.log_type === 'WARN'}
-                  <p
-                    class="break-all {member.log_type === 'DANGER'
-                      ? 'text-red-600'
-                      : member.log_type === 'SUCCESS'
-                      ? 'text-green-600'
-                      : member.log_type === 'WARN'
-                      ? 'text-yellow-600'
-                      : 'text-neutral-100'}"
-                  >
-                    {member.log_data.message}
-                  </p>
-                {:else}
-                  <p class="text-neutral-100 break-all">
-                    {`${member?.card_holder ?? 'Member'}'s` +
-                      member?.log_data?.message?.slice(4)}
-                  </p>
-                {/if}
-              {:else}
-                <p class="text-neutral-100">No activity</p>
-              {/if}
-            </div>
-          </div>
-        </div>
-      </div>
-    {/if}
-  {:else}
+{#if !permissions.readMembers}
+  {#if $user?.id === member.uid}
     <div
-      class="flex md:flex-row flex-col bg-neutral-900 outline outline-1 {$user?.id ===
-      member.uid
-        ? 'outline-blue-600'
-        : 'outline-neutral-800'} p-3 rounded-md h-auto gap-8 items-center rounded-custom"
+      class="flex bg-neutral-900 outline outline-1 outline-neutral-800 p-3 rounded-md h-auto gap-8 items-center rounded-custom"
     >
       <img
-        class="hidden md:block w-16 h-16 rounded-full"
+        class="hidden md:block w-16 h-16 rounded-full {$user?.id === member.uid
+          ? 'outline-2 outline outline-blue-600'
+          : ''}"
         src={memberProfile?.avatar}
         alt={memberProfile?.firstname + ' avatar'}
       />
-
       <div class="flex flex-col w-full gap-2">
-        <div class="flex justify-between items-center">
-          <div class="flex justify-between w-full gap-4 md:text-sm text-xs">
-            <div class="flex gap-2">
-              <h1 class="lg:text-sm text-xs">
-                Card ****{member?.card_id.slice(-6)}
-              </h1>
-              <h1 class="lg:text-sm text-xs">
-                Joined since {convertToGMT7(member?.user_change)
-                  .toDateString()
-                  .slice(4)}
-              </h1>
-            </div>
+        <div class="flex justify-between">
+          <div class="flex gap-4 text-sm">
+            <h1 class="font-bold text-white">
+              {memberProfile?.firstname ?? ''}
+              {memberProfile?.lastname ?? ''}
+            </h1>
           </div>
-          <div
-            class="hidden md:flex items-center divide-x-2 divide-neutral-700 outline outline-1 outline-neutral-700 rounded-l-md rounded-r-md"
-          >
-            <button
-              class="bg-blue-600 text-white text-xs p-1 w-20 rounded-l-md"
-              on:click={toProfileEditor}>Editor</button
-            >
-            <MemberAnalyticsModal {member} />
-            {#if permissions.readRoles}
-              <MemberRoleDropdown
-                class="w-40"
-                {roles}
-                {role}
-                {permissions}
-                memberUid={member?.uid}
-                selectedRole={selectedRole !== ''
-                  ? selectedRole?.charAt(0).toUpperCase() +
-                    selectedRole?.slice(1)
-                  : role?.role_name
-                  ? role?.role_name?.charAt(0).toUpperCase() +
-                    role?.role_name?.slice(1)
-                  : 'No role'}
-                on:selectSuperAdmin={async () => await setRoleHandlers(0)}
-                on:selectMember={async () => await setRoleHandlers(1)}
-                on:selectOthers={async (e) => {
-                  if ($user?.id === member.uid) {
-                    roleID = e.detail.id;
-                    roleName = e.detail.role_name;
-                    toggleModal();
-                  } else {
-                    await setMemberRole(e.detail.id);
-                    // selectRole(e.detail.role_name);
-                    setRole(e.detail.role_name);
-                  }
-                }}
-              />
-            {/if}
-
-            {#if permissions.writeMembers}
-              <SwitchButton
-                mode="member"
-                on:change={async () => await setStatus()}
-                checked={member?.card_status}
-              />
-            {/if}
-          </div>
-          <div
-            class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
-            on:click={toggleDeleteMemberModal}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="#ef4444"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
+          <div class="flex gap-2 items-center">
+            <MemberAnalyticsModal {member} isRounded />
           </div>
         </div>
 
         <div
-          class="grid grid-cols-1 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_150px_100px_minmax(200px,_1fr)] text-sm"
+          class="grid grid-cols-1 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_100px_150px_minmax(200px,_1fr)] gap-2 text-sm"
         >
           <div class="flex flex-col">
-            <h1 class="font-bold text-white md:text-sm text-xs">
-              {memberProfile?.firstname ?? ''}
-              {memberProfile?.lastname ?? ''}
-            </h1>
             <p>{memberProfile?.job}</p>
-            <p class="text-neutral-500 text-sm">{memberEmail}</p>
           </div>
           <div class="hidden md:flex flex-col">
             <h1 class=" text-neutral-400">Connections</h1>
             <p>{connectionsCount}</p>
           </div>
           <div class="hidden md:flex flex-col">
-            <h1 class=" text-neutral-400">Activity</h1>
-            <p>{logsCount}</p>
+            <h1 class=" text-neutral-400">Last Activity</h1>
+            <p class="break-all">
+              {convertToGMT7(member.logged_at).getMonth()}/{convertToGMT7(
+                member.logged_at
+              ).getFullYear()} - {setHours4Digit(
+                convertToGMT7(member.logged_at).getHours(),
+                convertToGMT7(member.logged_at).getMinutes()
+              )}
+            </p>
           </div>
           <div class="hidden md:flex flex-col">
             <h1 class="text-neutral-400">Most Recent Activity</h1>
@@ -453,83 +242,190 @@
           </div>
         </div>
       </div>
+    </div>
+  {/if}
+{:else}
+  <div
+    class="flex md:flex-row flex-col bg-neutral-900 outline outline-1 {$user?.id ===
+    member.uid
+      ? 'outline-blue-600'
+      : 'outline-neutral-800'} p-3 rounded-md h-auto gap-8 items-center rounded-custom"
+  >
+    <img
+      class="hidden md:block w-16 h-16 rounded-full"
+      src={memberProfile?.avatar}
+      alt={memberProfile?.firstname + ' avatar'}
+    />
+
+    <div class="flex flex-col w-full gap-2">
+      <div class="flex justify-between items-center">
+        <div class="flex justify-between w-full gap-4 md:text-sm text-xs">
+          <div class="flex gap-2">
+            <h1 class="font-bold text-white md:text-sm text-xs">
+              {memberProfile?.firstname ?? ''}
+              {memberProfile?.lastname ?? ''}
+            </h1>
+          </div>
+        </div>
+        <div
+          class="hidden md:flex items-center divide-x-2 divide-neutral-700 outline outline-1 outline-neutral-700 rounded-l-md rounded-r-md"
+        >
+          <button
+            class="bg-blue-600 text-white text-xs p-1 w-20 rounded-l-md"
+            on:click={toProfileEditor}>Editor</button
+          >
+          <MemberAnalyticsModal {member} />
+          {#if permissions.readRoles}
+            <MemberRoleDropdown
+              class="w-40"
+              {roles}
+              {role}
+              {permissions}
+              memberUid={member?.uid}
+              selectedRole={selectedRole !== ''
+                ? selectedRole?.charAt(0).toUpperCase() + selectedRole?.slice(1)
+                : role?.role_name
+                ? role?.role_name?.charAt(0).toUpperCase() +
+                  role?.role_name?.slice(1)
+                : 'No role'}
+              on:selectSuperAdmin={async () => await setRoleHandlers(0)}
+              on:selectMember={async () => await setRoleHandlers(1)}
+              on:selectOthers={async (e) => {
+                if ($user?.id === member.uid) {
+                  roleID = e.detail.id;
+                  roleName = e.detail.role_name;
+                  toggleModal();
+                } else {
+                  await setMemberRole(e.detail.id);
+                  // selectRole(e.detail.role_name);
+                  setRole(e.detail.role_name);
+                }
+              }}
+            />
+          {/if}
+        </div>
+        <div
+          class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
+          on:click={toggleDeleteMemberModal}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="#ef4444"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </div>
+      </div>
 
       <div
-        class="flex md:hidden items-center w-full divide-x-2 divide-neutral-700 outline outline-1 outline-neutral-700 rounded-l-md rounded-r-md"
+        class="grid grid-cols-1 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_100px_150px_minmax(200px,_1fr)] gap-2 text-sm"
       >
-        <button
-          class="bg-blue-600 text-white text-xs p-1 w-20 rounded-l-md"
-          on:click={toProfileEditor}>Editor</button
-        >
-        <MemberAnalyticsModal {member} />
-        {#if permissions.readRoles}
-          <MemberRoleDropdown
-            class="w-28"
-            {roles}
-            {role}
-            {permissions}
-            memberUid={member?.uid}
-            selectedRole={selectedRole !== ''
-              ? selectedRole?.charAt(0).toUpperCase() + selectedRole?.slice(1)
-              : role?.role_name
-              ? role?.role_name?.charAt(0).toUpperCase() +
-                role?.role_name?.slice(1)
-              : 'No role'}
-            on:selectSuperAdmin={async () => await setRoleHandlers(0)}
-            on:selectMember={async () => await setRoleHandlers(1)}
-            on:selectOthers={async (e) => {
-              if ($user?.id === member.uid) {
-                roleID = e.detail.id;
-                roleName = e.detail.role_name;
-                toggleModal();
-              } else {
-                await setMemberRole(e.detail.id);
-                // selectRole(e.detail.role_name);
-                setRole(e.detail.role_name);
-              }
-            }}
-          />
-        {/if}
+        <div class="flex flex-col">
+          <p>{memberProfile?.job}</p>
+          <p class="break-all text-neutral-400">
+            Joined since {convertToGMT7(member.user_change)
+              .toDateString()
+              .slice(4)}
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col">
+          <h1 class=" text-neutral-400">Connections</h1>
+          <p class="break-all">{connectionsCount}</p>
+        </div>
+        <div class="hidden md:flex flex-col">
+          <h1 class=" text-neutral-400">Last Activity</h1>
 
-        {#if permissions.writeMembers}
-          <SwitchButton
-            mode="member"
-            on:change={async () => await setStatus()}
-            checked={member?.card_status}
-          />
-        {/if}
-      </div>
-    </div>
-    {#if $user?.id === member.uid}
-      <h1
-        class="hidden md:block absolute md:translate-y-24 lg:translate-y-20 mt-4 lg:mt-4 rounded-bl-md rounded-tr-md text-xs font-bold bg-blue-600 p-1"
-      >
-        You
-      </h1>
-    {/if}
-  {/if}
-{:else if permissions.readMembers}
-  <div
-    class="flex flex-col justify-between w-full h-32 md:h-24 bg-neutral-900 rounded-md outline outline-1 outline-neutral-800 rounded-custom"
-  >
-    <div class="flex h-64 gap-7 p-4 items-center">
-      <img
-        src="/favicon.svg"
-        alt="Profile"
-        class="w-16 h-16 rounded-full hidden md:block"
-      />
-      <div class="flex flex-col gap-8 justify-between">
-        <h1 class="text-neutral-300 text-sm">
-          Card ****{member?.id?.slice(-6)}
-        </h1>
-        <div class="flex flex-col flex-wrap">
-          <h1 class="text-xs md:text-sm lg:text-md text-left w-56">
-            This card is <br class="block md:hidden" /> inactive
-          </h1>
+          <p class="break-all">
+            {convertToGMT7(member.logged_at).getMonth()}/{convertToGMT7(
+              member.logged_at
+            ).getFullYear()} - {setHours4Digit(
+              convertToGMT7(member.logged_at).getHours(),
+              convertToGMT7(member.logged_at).getMinutes()
+            )}
+          </p>
+        </div>
+        <div class="hidden md:flex flex-col">
+          <h1 class="text-neutral-400">Most Recent Activity</h1>
+
+          {#if member?.log_data}
+            {#if member.log_type === 'DANGER' || member.log_type === 'SUCCESS' || member.log_type === 'WARN'}
+              <p
+                class="break-all {member.log_type === 'DANGER'
+                  ? 'text-red-600'
+                  : member.log_type === 'SUCCESS'
+                  ? 'text-green-600'
+                  : member.log_type === 'WARN'
+                  ? 'text-yellow-600'
+                  : 'text-neutral-100'}"
+              >
+                {member.log_data.message}
+              </p>
+            {:else}
+              <p class="text-neutral-100 break-all">
+                {`${member?.card_holder ?? 'Member'}'s` +
+                  member?.log_data?.message?.slice(4)}
+              </p>
+            {/if}
+          {:else}
+            <p class="text-neutral-100">No activity</p>
+          {/if}
         </div>
       </div>
     </div>
+
+    <div
+      class="flex md:hidden items-center w-auto divide-x-2 divide-neutral-700 outline outline-1 outline-neutral-700 rounded-l-md rounded-r-md"
+    >
+      <button
+        class="bg-blue-600 text-white text-xs p-1 w-20 rounded-l-md"
+        on:click={toProfileEditor}>Editor</button
+      >
+      <MemberAnalyticsModal {member} />
+      {#if permissions.readRoles}
+        <MemberRoleDropdown
+          class="w-28"
+          {roles}
+          {role}
+          {permissions}
+          memberUid={member?.uid}
+          selectedRole={selectedRole !== ''
+            ? selectedRole?.charAt(0).toUpperCase() + selectedRole?.slice(1)
+            : role?.role_name
+            ? role?.role_name?.charAt(0).toUpperCase() +
+              role?.role_name?.slice(1)
+            : 'No role'}
+          on:selectSuperAdmin={async () => await setRoleHandlers(0)}
+          on:selectMember={async () => await setRoleHandlers(1)}
+          on:selectOthers={async (e) => {
+            if ($user?.id === member.uid) {
+              roleID = e.detail.id;
+              roleName = e.detail.role_name;
+              toggleModal();
+            } else {
+              await setMemberRole(e.detail.id);
+              // selectRole(e.detail.role_name);
+              setRole(e.detail.role_name);
+            }
+          }}
+        />
+      {/if}
+    </div>
   </div>
+  {#if $user?.id === member.uid}
+    <h1
+      class="hidden md:block absolute md:translate-y-20 lg:translate-y-16 mt-4 lg:mt-4 rounded-bl-md rounded-tr-md text-xs font-bold bg-blue-600 p-1"
+    >
+      You
+    </h1>
+  {/if}
 {/if}
 
 <style>

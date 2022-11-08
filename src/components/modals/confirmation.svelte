@@ -13,6 +13,7 @@
     isDispatch,
     isLoading,
     isRedButton,
+    isDisconnect,
     heading,
     buttonLabel,
     showModal,
@@ -82,6 +83,8 @@
             }`
           : isTransfer
           ? 'Transfer card'
+          : isDisconnect
+          ? 'Disconnect Card'
           : 'Change role'}
         <button on:click={toggleModal} class="self-start">
           <svg
@@ -122,7 +125,7 @@
             on:click={async () =>
               isDispatch ? action() : await deleteRoleHandler(id)}
             class={`text-sm   ${
-              isDelete || isTransfer
+              isDelete || isTransfer || isDisconnect
                 ? 'bg-red-600/30 outline outline-1 outline-red-500 hover:bg-red-600/80'
                 : 'bg-blue-600 hover:bg-blue-600/60'
             } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 flex justify-center items-center gap-2`}
