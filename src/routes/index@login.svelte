@@ -1,14 +1,13 @@
 <script>
+  import TeamLogin from '@pages/teamLogin.svelte';
+  import AuthWrapper from '@comp/auth/authWrapper.svelte';
+  import Spinner from '@comp/loading/spinner.svelte';
+  import SelectEditor from '@pages/selectEditor.svelte';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
-  import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import Spinner from '@comp/loading/spinner.svelte';
   import { fade } from 'svelte/transition';
-  import SelectEditor from '@pages/selectEditor.svelte';
-  import { goto } from '$app/navigation';
-  import { teams } from '@lib/stores/teamStore';
-  import { onMount } from 'svelte';
+  import { page } from '$app/stores';
 
   let loading = false;
   let email = '';
@@ -63,6 +62,8 @@
 <AuthWrapper>
   {#if $user}
     <SelectEditor />
+  {:else if $page.url.searchParams.get('team_id')}
+    <TeamLogin />
   {:else}
     <div
       class="text-white bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
@@ -91,7 +92,7 @@
                 bind:value={email}
                 type="email"
                 placeholder="Your Email"
-                class="w-full px-4 py-2 mt-2 text-base rounded-md text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-200 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
+                class="w-full px-4 py-2 mt-2 text-base rounded-md text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-100 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
               />
               {#if !isForgotPassword}
                 <p class="block text-sm mt-2 text-left">Password</p>
@@ -100,7 +101,7 @@
                   on:keypress={onKeyPress}
                   type="password"
                   placeholder="Your Password"
-                  class="w-full px-4 py-2 mt-2 text-base rounded-md text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-200 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
+                  class="w-full px-4 py-2 mt-2 text-base rounded-md text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-100 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
                 />
               {/if}
             </div>

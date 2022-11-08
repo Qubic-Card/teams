@@ -30,6 +30,8 @@
   export let inputbg = 'bg-neutral-800';
   export let inputText = 'text-gray-100';
   export let small;
+  export let outline;
+  export let titleColor = 'text-gray-400';
   let isWhatsappInvalid = false;
   let focus = false;
 
@@ -61,9 +63,10 @@
 <div class={`flex flex-col text-xs md:text-sm ${$$props.class}`}>
   <h1
     in:fade|local={{ duration: 500 }}
-    class={`text-gray-400 after:content-['*'] after:ml-0.5 ${
-      value === '' && isEmptyChecking ? 'after:text-red-500' : 'after:hidden'
-    }`}
+    class="{titleColor} after:content-['*'] after:ml-0.5 {value === '' &&
+    isEmptyChecking
+      ? 'after:text-red-500'
+      : 'after:hidden'}"
   >
     {title}
   </h1>
@@ -76,7 +79,7 @@
       placeholder={`${$$props.placeholder}`}
       bind:value
       maxlength={$$props.maxlength}
-      class="w-full rounded-md  px-2 {inputbg} {inputText} {small
+      class="w-full rounded-md  px-2 {outline} {inputbg} {inputText} {small
         ? 'h-8'
         : 'my-2 h-10'}"
       disabled={$$props.disabled}
