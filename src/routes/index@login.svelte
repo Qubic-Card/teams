@@ -1,5 +1,5 @@
 <script>
-  import TeamLogin from '@pages/teamLogin.svelte';
+  import RegisterTeam from '@pages/registerTeam.svelte';
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
   import Spinner from '@comp/loading/spinner.svelte';
   import SelectEditor from '@pages/selectEditor.svelte';
@@ -68,7 +68,7 @@
     >
       <div class="flex justify-start items-center h-screen p-6 md:p-10 lg:p-24">
         {#if $page.url.searchParams.get('team_id')}
-          <TeamLogin />
+          <RegisterTeam />
         {:else}
           <div
             class="flex flex-col justify-between h-full w-full 2xl:w-1/2 py-16 px-8 bg-white rounded-md md:rounded-xl text-black"

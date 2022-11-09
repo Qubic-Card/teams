@@ -171,15 +171,25 @@
 {#if !permissions.readMembers}
   {#if $user?.id === member.uid}
     <div
-      class="flex bg-neutral-900 outline outline-1 outline-neutral-800 p-3 rounded-md h-auto gap-8 items-center rounded-custom"
+      class="flex bg-neutral-900 outline outline-1 outline-neutral-800 p-3 rounded-md h-auto gap-8 items-center rounded-custom {$user?.id ===
+      member.uid
+        ? 'outline-blue-600'
+        : 'outline-neutral-800'}"
     >
-      <img
-        class="hidden md:block w-16 h-16 rounded-full {$user?.id === member.uid
-          ? 'outline-2 outline outline-blue-600'
-          : ''}"
-        src={memberProfile?.avatar}
-        alt={memberProfile?.firstname + ' avatar'}
-      />
+      {#if memberProfile?.avatar === ''}
+        <img
+          class="hidden md:block w-16 h-16 bg-black rounded-full"
+          src="/favicon.svg"
+          alt={memberProfile?.firstname + ' avatar'}
+        />
+      {:else}
+        <img
+          class="hidden md:block w-16 h-16 rounded-full"
+          src={memberProfile?.avatar}
+          alt={memberProfile?.firstname + ' avatar'}
+        />
+      {/if}
+
       <div class="flex flex-col w-full gap-2">
         <div class="flex justify-between">
           <div class="flex gap-4 text-sm">
@@ -243,6 +253,13 @@
         </div>
       </div>
     </div>
+    {#if $user?.id === member.uid}
+      <h1
+        class="hidden md:block absolute rounded-br-md rounded-tl-md text-xs font-bold bg-blue-600 p-[3px]"
+      >
+        You
+      </h1>
+    {/if}
   {/if}
 {:else}
   <div
@@ -251,11 +268,19 @@
       ? 'outline-blue-600'
       : 'outline-neutral-800'} p-3 rounded-md h-auto gap-8 items-center rounded-custom"
   >
-    <img
-      class="hidden md:block w-16 h-16 rounded-full"
-      src={memberProfile?.avatar}
-      alt={memberProfile?.firstname + ' avatar'}
-    />
+    {#if memberProfile?.avatar === ''}
+      <img
+        class="hidden md:block bg-black w-16 h-16 rounded-full"
+        src="/favicon.svg"
+        alt={memberProfile?.firstname + ' avatar'}
+      />
+    {:else}
+      <img
+        class="hidden md:block w-16 h-16 rounded-full"
+        src={memberProfile?.avatar}
+        alt={memberProfile?.firstname + ' avatar'}
+      />
+    {/if}
 
     <div class="flex flex-col w-full gap-2">
       <div class="flex justify-between items-center">
@@ -421,7 +446,7 @@
   </div>
   {#if $user?.id === member.uid}
     <h1
-      class="hidden md:block absolute md:translate-y-20 lg:translate-y-16 mt-4 lg:mt-4 rounded-bl-md rounded-tr-md text-xs font-bold bg-blue-600 p-1"
+      class="hidden md:block absolute rounded-br-md rounded-tl-md text-xs font-bold bg-blue-600 p-[3px]"
     >
       You
     </h1>

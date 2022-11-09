@@ -7,7 +7,7 @@
   export let isProfile = true;
 
   // $: console.log($isInViewTriggered);
-  // $: console.log(theme);
+  // $: console.log(background);
   // $: if (!$inView) $isInViewTriggered = true;
 </script>
 
@@ -19,7 +19,9 @@
       ? 'mx-auto rounded-3xl border-8'
       : `${isProfile && 'mt-2 ml-4'} rounded-2xl border-4`} {theme === undefined
       ? `${editor === 'basic' ? 'border-white' : 'border-neutral-800'}`
-      : `${theme?.avatarBorder}`} object-cover"
+      : `${theme?.avatarBorder}`} object-cover {background === '/favicon.svg'
+      ? 'bg-black'
+      : ''}"
     class:growup={$inView && $isInViewTriggered}
     class:shrink={!$inView}
     alt="Avatar"

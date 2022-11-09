@@ -4,12 +4,19 @@
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import Spinner from '@comp/loading/spinner.svelte';
+  import encryptActivationCode from '@lib/utils/encryptActivationCode';
+  import {
+    checkFirstRegisteredMember,
+    checkIsRegistered,
+    checkRegisteredMemberCount,
+    createTeamMember,
+  } from '@lib/query/register';
+  import { goto } from '$app/navigation';
 
   let loading = false;
   let codeActivation = '';
   let state = 'activation';
-  let code = '12345';
-  let teamName = '';
+  let team = {};
   let register = {
     fname: '',
     lname: '',
@@ -28,46 +35,36 @@
   const getTeamData = async () => {
     const { data, error } = await supabase
       .from('teams')
-      .select('name')
+      .select('name, metadata->>company, member_count')
       .eq('id', $page.url.searchParams.get('team_id'));
     if (error) console.log(error);
     if (data) {
-      teamName = data[0].name;
+      team = data[0];
     }
   };
 
   const codeActivationHandler = async () => {
     try {
-      if (codeActivation === code) {
-        state = 'register';
-        toastSuccess('Code activation match!');
-      } else {
-        toastFailed('Wrong code');
+      const { data, error } = await supabase
+        .from('teams')
+        .select('team_token')
+        .eq('id', $page.url.searchParams.get('team_id'));
+
+      if (error) console.log(error);
+
+      if (data) {
+        const hash = await encryptActivationCode(codeActivation);
+        if (hash === data[0].team_token) {
+          state = 'register';
+          toastSuccess('Code activation match!');
+        } else {
+          toastFailed('Invalid activation code');
+        }
       }
 
       codeActivation = '';
     } catch (error) {
       toastFailed();
-    }
-  };
-
-  const checkIsRegistered = async (uid) => {
-    const { data, error } = await supabase.functions.invoke('getUserEmail', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        uid: uid,
-      }),
-    });
-
-    if (error) console.log(error);
-    if (data) {
-      if (data.user) {
-        return false;
-      } else {
-        return true;
-      }
     }
   };
 
@@ -80,36 +77,6 @@
       } else {
         await loginHandler();
       }
-    }
-  };
-
-  const createTeamProfile = async (uid) => {
-    const { data, error } = await supabase.from('team_members').insert(
-      {
-        uid: uid,
-        team_profile: {
-          firstname: register.fname,
-          lastname: register.lname,
-          socials: [
-            {
-              data: register.email,
-              type: 'email',
-              isActive: true,
-            },
-          ],
-        },
-        role: 1,
-        team_id: $page.url.searchParams.get('team_id'),
-      },
-      {
-        returning: 'minimal',
-      }
-    );
-    if (error) {
-      console.log(error);
-      return { error: error.message };
-    } else {
-      return { error: false };
     }
   };
 
@@ -133,26 +100,63 @@
         toastFailed("Password doesn't match");
       } else {
         try {
-          loading = true;
-          const { user, session, error } = await supabase.auth.signUp({
-            email: register.email,
-            password: register.password,
-          });
+          const { error: check_error, available } =
+            await checkRegisteredMemberCount(
+              $page.url.searchParams.get('team_id'),
+              team.member_count
+            );
 
-          if (await checkIsRegistered(user.id)) {
-            toastFailed('Email is already registered');
-            loading = false;
+          if (check_error) {
+            toastFailed();
+            return;
           } else {
-            const { error } = await createTeamProfile(user.id);
-            if (error) {
-              toastFailed(error);
+            if (!available) {
+              toastFailed('Team member limit reached');
+              return;
             } else {
-              // toastSuccess('Successfully registered');
-              toastSuccess('Please confirm your email');
-              register.success = true;
-            }
+              loading = true;
+              const { user, session, error } = await supabase.auth.signUp(
+                {
+                  email: register.email,
+                  password: register.password,
+                },
+                {
+                  data: {
+                    firstname: register.fname,
+                    lastname: register.lname,
+                    company: team.company ?? '',
+                  },
+                }
+              );
 
-            loading = false;
+              if (await checkIsRegistered(user.id)) {
+                toastFailed('Email is already registered');
+                loading = false;
+              } else {
+                const { error } = await createTeamMember(
+                  user.id,
+                  register,
+                  team.company,
+                  $page.url.searchParams.get('team_id'),
+                  (await checkFirstRegisteredMember(
+                    $page.url.searchParams.get('team_id')
+                  ))
+                    ? 1
+                    : 2
+                );
+
+                if (error) {
+                  toastFailed(
+                    'Something went wrong, please contact our support'
+                  );
+                } else {
+                  toastSuccess('Please confirm your email');
+                }
+
+                register.success = true;
+                loading = false;
+              }
+            }
           }
         } catch (error) {
           toastFailed();
@@ -235,7 +239,8 @@
       class="flex flex-col justify-center bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg gap-10 py-16 px-4 md:px-8"
     >
       <h1 class="text-xl">
-        Welcome to <br /> <span class="font-bold text-3xl">{teamName}</span>
+        Welcome to <br />
+        <span class="font-bold text-3xl">{team.name ?? ''}</span>
       </h1>
 
       <div class="flex flex-col mt-10">
@@ -265,11 +270,18 @@
       class="flex flex-col justify-center bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg py-16 px-4 md:px-8"
     >
       {#if register.success}
-        <h1>
-          Welcome to <br />
-          <span class="font-bold text-3xl">{teamName}</span>
-        </h1>
-        <h1 class="mt-4">Please check your email to confirm your account.</h1>
+        <div class="flex flex-col gap-2 h-1/2">
+          <h1 class="text-3xl font-bold">Success</h1>
+          <h1 class="text-xl">
+            Please check your email to confirm your account.
+          </h1>
+        </div>
+        <button
+          class="bg-blue-600 rounded-md text-white p-2 mt-10"
+          on:click={() => goto('/')}
+        >
+          Back to login
+        </button>
       {:else}
         <div class="flex gap-2 w-full">
           <Input
@@ -413,18 +425,26 @@
             {/if}
             Join
           </button>
+          <button
+            on:click={() => (login.forgotPassword = true)}
+            class="p-2 outline outline-1 outline-neutral-500 rounded-md hover:outline-neutral-800 text-sm"
+          >
+            Forgot Password
+          </button>
         {/if}
 
-        <button
-          on:click={async () => {
-            login.forgotPassword
-              ? await handleForgotPassword()
-              : (login.forgotPassword = true);
-          }}
-          class="p-2 outline outline-1 outline-neutral-500 rounded-md hover:outline-neutral-800 text-sm"
-        >
-          Forgot Password
-        </button>
+        {#if login.forgotPassword}
+          <button
+            on:click={async () => {
+              login.forgotPassword
+                ? await handleForgotPassword()
+                : (login.forgotPassword = true);
+            }}
+            class="p-2 bg-blue-600 rounded-md text-sm text-white"
+          >
+            Send Email
+          </button>
+        {/if}
       </div>
     </div>
   {/if}

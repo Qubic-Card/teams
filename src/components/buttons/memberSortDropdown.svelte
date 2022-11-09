@@ -43,9 +43,9 @@
   >
 
   <ListboxOptions
-    class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-36 mt-2 {mode ===
+    class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-[90%] md:w-40 mt-2 flex flex-col gap-2 {mode ===
     'member'
-      ? '-translate-x-4'
+      ? ''
       : ''} shadow-md z-50 rounded-md"
   >
     {#each sortOptions as item, i}

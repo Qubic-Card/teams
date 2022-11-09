@@ -7,7 +7,7 @@
     changeCardMode,
     setNullTeamMemberUid,
     updateBasicProfile,
-  } from '@lib/query/subscriptionEnd/transferCard';
+  } from '@lib/query/transferCard';
   import TransferModal from '@comp/modals/transferModal.svelte';
   import DeleteCardModal from '@comp/modals/deleteCardModal.svelte';
   import { selectedProfileMenu } from '@lib/stores/subsEndStore';

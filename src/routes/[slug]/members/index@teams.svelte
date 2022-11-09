@@ -26,8 +26,9 @@
   let isDeleteMember = false;
   let members = [];
   let menu = ['Team Members', 'Cards'];
-  let selectedMenu = 1;
+  let selectedMenu = 0;
   let cards = [];
+  let loading = false;
   const teamId = getContext('teamId');
 
   const selectMenu = (index) => (selectedMenu = index);
@@ -77,8 +78,6 @@
     }
   };
 
-  let loading = false;
-
   const sortMemberHandler = (sort) => {
     loading = true;
     members = sortMember(members, $user?.id, sort);
@@ -88,12 +87,8 @@
   };
 
   const sortCardHandler = (sort) => {
-    let userCardId = cards.filter(
-      (c) => c.card[0].team_member_id.uid === $user?.id
-    )[0].id;
-
     loading = true;
-    cards = sortCard(cards, userCardId, sort);
+    cards = sortCard(cards, $user?.id, sort);
     setTimeout(() => {
       loading = false;
     }, 500);
@@ -104,50 +99,56 @@
     roles = await getAllRoleByTeam(teamId);
   };
 
-  const getCardEmail = async (uid) => {
+  const getInactiveCards = async () => {
     const { data, error } = await supabase
-      .from('profile')
-      .select('email')
-      .eq('uid', uid);
+      .from('business_cards')
+      .select('id, color, type, tcc: team_cardcon(card_id)')
+      .eq('team_id', teamId)
+      .eq('mode', 'team');
 
     if (error) console.log(error);
 
     if (data) {
-      return data[0];
+      inactiveCards = data.filter((c) => c.tcc.length === 0);
+
+      cards = inactiveCards.map((c) => {
+        return {
+          NFCtap: null,
+          QRScan: null,
+          avatar: null,
+          color: c.color,
+          datecreated: null,
+          email: null,
+          id: c.id,
+          status: null,
+          type: c.type,
+        };
+      });
     }
   };
 
-  const getCards = async () => {
-    const { data, error } = await supabase
-      .from('business_cards')
-      .select(
-        'id, type, color, card: team_cardcon(status, datecreated, QRScan, NFCtap, team_member_id(uid, team_profile->>avatar))'
-      )
-      .eq('team_id', teamId)
-      .eq('mode', 'team')
-      .order('created_at', { ascending: false });
+  const getAllCards = async () => {
+    const { data, error } = await supabase.rpc('getcards', {
+      tid: teamId,
+    });
 
     if (error) console.log(error);
+
     if (data) {
-      cards = data.filter((c) => c.card.length > 0);
+      cards = sortCard(data, $user?.id, 'asc');
+      // console.log(data);
+    }
+  };
 
-      let userCardId = cards.filter(
-        (c) => c.card[0].team_member_id.uid === $user?.id
-      )[0].id;
+  const getActiveCards = async () => {
+    const { data, error } = await supabase.rpc('getactivecards', {
+      tid: teamId,
+    });
 
-      // cards = cards.map(async (c) => {
-      //   const email = await getCardEmail(c.card[0].team_member_id.uid);
+    if (error) console.log(error);
 
-      //   return {
-      //     ...c,
-      //     email,
-      //   };
-      // });
-
-      // console.log(cards);
-
-      cards = sortCard(cards, userCardId, 'asc');
-      inactiveCards = data.filter((c) => c.card.length < 1);
+    if (data) {
+      cards = sortCard(data, $user?.id, 'asc');
     }
   };
 </script>
@@ -193,30 +194,21 @@
             permissions.readMembers ? 'flex' : 'hidden'
           }`}
         >
-          <button
-            class={`p-2 md:w-20 w-full rounded-md text-xs ${
-              state === 'all'
-                ? 'bg-neutral-200 text-black'
-                : 'outline outline-neutral-600 outline-1 text-neutral-400'
-            }`}
-            on:click={() => setState('all')}>All</button
-          >
-          <button
-            class={`p-2 md:w-20 w-full rounded-md text-xs ${
-              state === 'active'
-                ? 'bg-neutral-200 text-black'
-                : 'outline outline-neutral-600 outline-1 text-neutral-400'
-            }`}
-            on:click={() => setState('active')}>Active</button
-          >
-          <button
-            class={`p-2 md:w-20 w-full rounded-md text-xs ${
-              state === 'inactive'
-                ? 'bg-neutral-200 text-black'
-                : 'outline outline-neutral-600 outline-1 text-neutral-400'
-            }`}
-            on:click={() => setState('inactive')}>Inactive</button
-          >
+          {#each ['all', 'active', 'inactive'] as item, i}
+            <button
+              class={`p-2 md:w-20 w-full rounded-md text-xs ${
+                state === item
+                  ? 'bg-neutral-200 text-black'
+                  : 'outline outline-neutral-600 outline-1 text-neutral-400'
+              }`}
+              on:click={async () => {
+                setState(item);
+                if (i === 0) await getAllCards();
+                if (i === 1) await getActiveCards();
+                if (i === 2) await getInactiveCards();
+              }}>{item.charAt(0).toUpperCase() + item.slice(1)}</button
+            >
+          {/each}
         </div>
       {/if}
       <div class="flex gap-2 md:w-72 w-full items-center pb-3">
@@ -268,35 +260,24 @@
         </div>
       {/await}
     {:else}
-      {#await getCards()}
-        <CardsSkeleton cardsLength={cards.length + inactiveCards.length} />
+      {#await getAllCards()}
+        <CardsSkeleton cardsLength={cards.length} />
       {:then name}
         {#if loading}
-          <CardsSkeleton cardsLength={cards.length + inactiveCards.length} />
+          <CardsSkeleton cardsLength={cards.length} />
         {:else}
           <div
             class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
           >
-            {#if state === 'all'}
-              {#each cards as card}
-                <CardsCard {card} {permissions} {getCards} />
-              {/each}
-              {#each inactiveCards as card}
-                <CardsCard {card} {permissions} />
-              {/each}
-            {/if}
-            {#if state === 'active'}
-              {#each cards as card}
-                {#if card.card.length > 0}
-                  <CardsCard {card} {permissions} {getCards} />
-                {/if}
-              {/each}
-            {/if}
-            {#if state === 'inactive'}
-              {#each inactiveCards as card}
-                <CardsCard {card} {permissions} />
-              {/each}
-            {/if}
+            {#each cards as card}
+              <CardsCard
+                {card}
+                {permissions}
+                {getAllCards}
+                {getActiveCards}
+                {state}
+              />
+            {/each}
           </div>
         {/if}
       {:catch name}
