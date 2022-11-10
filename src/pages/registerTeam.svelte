@@ -8,10 +8,12 @@
   import {
     checkFirstRegisteredMember,
     checkIsRegistered,
-    checkRegisteredMemberCount,
+    checkTeamMembers,
     createTeamMember,
+    updateTeamMember,
   } from '@lib/query/register';
   import { goto } from '$app/navigation';
+  import { log } from '@lib/logger/logger';
 
   let loading = false;
   let codeActivation = '';
@@ -32,6 +34,10 @@
     forgotPassword: false,
   };
 
+  const logMsg = (email) => {
+    return `User ${email ?? ''} has joined the team`;
+  };
+
   const getTeamData = async () => {
     const { data, error } = await supabase
       .from('teams')
@@ -45,6 +51,7 @@
 
   const codeActivationHandler = async () => {
     try {
+      loading = true;
       const { data, error } = await supabase
         .from('teams')
         .select('team_token')
@@ -63,8 +70,10 @@
       }
 
       codeActivation = '';
+      loading = false;
     } catch (error) {
       toastFailed();
+      loading = false;
     }
   };
 
@@ -100,11 +109,15 @@
         toastFailed("Password doesn't match");
       } else {
         try {
-          const { error: check_error, available } =
-            await checkRegisteredMemberCount(
-              $page.url.searchParams.get('team_id'),
-              team.member_count
-            );
+          const {
+            error: check_error,
+            available,
+            nullUid,
+            mid,
+          } = await checkTeamMembers(
+            $page.url.searchParams.get('team_id'),
+            team.member_count
+          );
 
           if (check_error) {
             toastFailed();
@@ -129,37 +142,94 @@
                 }
               );
 
-              if (await checkIsRegistered(user.id)) {
-                toastFailed('Email is already registered');
+              if (error) {
+                toastFailed();
+                console.log(error);
                 loading = false;
+                return;
               } else {
-                const { error } = await createTeamMember(
-                  user.id,
-                  register,
-                  team.company,
-                  $page.url.searchParams.get('team_id'),
-                  (await checkFirstRegisteredMember(
-                    $page.url.searchParams.get('team_id')
-                  ))
-                    ? 1
-                    : 2
-                );
-
-                if (error) {
-                  toastFailed(
-                    'Something went wrong, please contact our support'
-                  );
+                if (await checkIsRegistered(user.id)) {
+                  toastFailed('Email is already registered');
+                  loading = false;
                 } else {
-                  toastSuccess('Please confirm your email');
-                }
+                  if (nullUid) {
+                    const { error } = await updateTeamMember(
+                      mid,
+                      user.id,
+                      $page.url.searchParams.get('team_id'),
+                      register,
+                      team.company
+                    );
 
-                register.success = true;
-                loading = false;
+                    if (error) {
+                      toastFailed(
+                        'Something went wrong, please contact our support'
+                      );
+                      loading = false;
+                    } else {
+                      toastSuccess('Please confirm your email');
+                      log(
+                        logMsg(register.email),
+                        'SUCCESS',
+                        '',
+                        $page.url.searchParams.get('team_id'),
+                        '',
+                        '',
+                        mid
+                      );
+                      loading = false;
+                      register.success = true;
+                    }
+                  } else {
+                    const { error, memberId } = await createTeamMember(
+                      user.id,
+                      register,
+                      team.company,
+                      $page.url.searchParams.get('team_id'),
+                      (await checkFirstRegisteredMember(
+                        $page.url.searchParams.get('team_id')
+                      ))
+                        ? 1
+                        : 2
+                    );
+
+                    if (error) {
+                      toastFailed(
+                        'Something went wrong, please contact our support'
+                      );
+                    } else {
+                      log(
+                        logMsg(register.email),
+                        'SUCCESS',
+                        '',
+                        $page.url.searchParams.get('team_id'),
+                        '',
+                        '',
+                        memberId
+                      );
+                      toastSuccess('Please confirm your email');
+                    }
+
+                    register.success = true;
+                    loading = false;
+                  }
+                }
               }
             }
           }
+
+          register = {
+            fname: '',
+            lname: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            checked: false,
+            success: false,
+          };
         } catch (error) {
           toastFailed();
+          console.log(error);
           loading = false;
         }
       }

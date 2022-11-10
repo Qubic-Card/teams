@@ -2,8 +2,8 @@
   import { tweened } from 'svelte/motion';
   import supabase from '@lib/db';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import Confirmation from '@comp/modals/confirmation.svelte';
   import { sevenDays } from '@lib/utils/getDates';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let teamId, sevenDaysAfterEndDate;
 
@@ -57,17 +57,23 @@
   }
 </script>
 
-<Confirmation
-  {isLoading}
-  isDispatch
-  isTransfer
-  heading="Are you sure to transfer everyone's"
-  text="card to basic?"
-  buttonLabel="Proceed"
+<ConfirmationModal
   {showModal}
   {toggleModal}
+  buttonLabel="Proceed"
+  {isLoading}
   on:action={async () => await setSubsEndDate()}
-/>
+>
+  <slot slot="title">
+    <h1 class="font-bold">Transfer cards</h1>
+  </slot>
+  <slot slot="text">
+    <p>
+      Are you sure to transfer everyone's <br />
+      card to basic?
+    </p>
+  </slot>
+</ConfirmationModal>
 
 <div
   class="flex flex-col w-full h-full gap-8 text-white justify-center items-center p-10 md:p-0"

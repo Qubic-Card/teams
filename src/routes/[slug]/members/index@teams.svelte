@@ -17,6 +17,7 @@
     writeMembers: false,
     writeRoles: false,
     readRoles: false,
+    analytics: false,
   };
   let innerWidth = 0;
   let roles = [];
@@ -29,7 +30,17 @@
   let selectedMenu = 0;
   let cards = [];
   let loading = false;
+  let selectedIndex = 0;
+  let resetSort = false;
   const teamId = getContext('teamId');
+
+  const resetSortHandler = () => {
+    resetSort = true;
+    selectedIndex = 0;
+    setTimeout(() => {
+      resetSort = false;
+    }, 200);
+  };
 
   const selectMenu = (index) => (selectedMenu = index);
   const setState = (newState) => (state = newState);
@@ -40,28 +51,19 @@
       if (item === 'allow_write_members') permissions.writeMembers = true;
       if (item === 'allow_write_roles') permissions.writeRoles = true;
       if (item === 'allow_read_roles') permissions.readRoles = true;
+      if (item === 'allow_read_analytics') permissions.analytics = true;
     });
   }
   // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
   const deleteMember = async (id) => {
-    let deletedMember = members.filter((m) => m.member_id === id);
-
-    deletedMember = deletedMember.map((m) => {
-      return {
-        id: m.card_id,
-      };
-    });
-
     members = members.filter((m) => m.member_id !== id);
-
-    inactiveCards = [...inactiveCards, ...deletedMember];
 
     isDeleteMember = true;
     setTimeout(() => {
       isDeleteMember = false;
     }, 500);
 
-    members = sortMember(members, $user?.id);
+    members = sortMember(members, $user?.id, 'asc');
   };
 
   const getMembers = async () => {
@@ -72,9 +74,7 @@
     if (error) console.log(error);
 
     if (data) {
-      let active = data.filter((m) => m.uid !== null);
-
-      members = sortMember(active, $user?.id, 'asc');
+      members = sortMember(data, $user?.id, 'asc');
     }
   };
 
@@ -100,6 +100,7 @@
   };
 
   const getInactiveCards = async () => {
+    loading = true;
     const { data, error } = await supabase
       .from('business_cards')
       .select('id, color, type, tcc: team_cardcon(card_id)')
@@ -125,9 +126,12 @@
         };
       });
     }
+
+    loading = false;
   };
 
   const getAllCards = async () => {
+    loading = true;
     const { data, error } = await supabase.rpc('getcards', {
       tid: teamId,
     });
@@ -138,9 +142,12 @@
       cards = sortCard(data, $user?.id, 'asc');
       // console.log(data);
     }
+
+    loading = false;
   };
 
   const getActiveCards = async () => {
+    loading = true;
     const { data, error } = await supabase.rpc('getactivecards', {
       tid: teamId,
     });
@@ -150,26 +157,30 @@
     if (data) {
       cards = sortCard(data, $user?.id, 'asc');
     }
+
+    loading = false;
   };
 </script>
 
 <svelte:window bind:innerWidth />
 
 <div class="flex flex-col pb-20 bg-black min-h-screen pl-0 md:pl-16  gap-2">
-  <div
-    class="border-b border-neutral-700 h-12 text-lg font-regular pt-2 top-0 sticky w-full bg-black pl-6 z-10"
-  >
-    Team Performance
-  </div>
-  <div class="flex justify-between gap-4 px-4">
-    <div class="flex flex-col w-full gap-4">
-      <h1 class="text-sm text-neutral-400">Data from last 7 days</h1>
+  {#if permissions.analytics}
+    <div
+      class="border-b border-neutral-700 h-12 text-lg font-regular pt-2 top-0 sticky w-full bg-black pl-6 z-10"
+    >
+      Team Performance
+    </div>
+    <div class="flex justify-between gap-4 px-4">
+      <div class="flex flex-col w-full gap-4">
+        <h1 class="text-sm text-neutral-400">Data from last 7 days</h1>
 
-      <div class="flex flex-col md:flex-row gap-2 w-full">
-        <TeamAnalyticsCard {teamId} teams />
+        <div class="flex flex-col md:flex-row gap-2 w-full">
+          <TeamAnalyticsCard {teamId} teams />
+        </div>
       </div>
     </div>
-  </div>
+  {/if}
 
   <div class="flex flex-col my-2">
     <div
@@ -178,7 +189,10 @@
       <div class="flex gap-2 w-full lg:w-1/2">
         {#each menu as item, i}
           <div
-            on:click={() => selectMenu(i)}
+            on:click={() => {
+              selectMenu(i);
+              resetSortHandler();
+            }}
             class="text-md md:text-lg font-bold cursor-pointer w-full md:w-auto text-center pb-3 {selectedMenu ===
             i
               ? 'border-b-2 border-neutral-400'
@@ -206,22 +220,32 @@
                 if (i === 0) await getAllCards();
                 if (i === 1) await getActiveCards();
                 if (i === 2) await getInactiveCards();
+                resetSortHandler();
               }}>{item.charAt(0).toUpperCase() + item.slice(1)}</button
             >
           {/each}
         </div>
       {/if}
-      <div class="flex gap-2 md:w-72 w-full items-center pb-3">
-        <MemberSortDropdown
-          on:asc={() =>
-            selectedMenu === 0
-              ? sortMemberHandler('asc')
-              : sortCardHandler('asc')}
-          on:dsc={() =>
-            selectedMenu === 0
-              ? sortMemberHandler('dsc')
-              : sortCardHandler('dsc')}
-        />
+      <div
+        class="flex gap-2 md:w-72 w-full items-center pb-3 {resetSort
+          ? 'animate-pulse'
+          : ''}"
+      >
+        {#if resetSort}
+          <div class="bg-neutral-800 h-8 w-full rounded-md" />
+        {:else}
+          <MemberSortDropdown
+            {selectedIndex}
+            on:asc={() =>
+              selectedMenu === 0
+                ? sortMemberHandler('asc')
+                : sortCardHandler('asc')}
+            on:dsc={() =>
+              selectedMenu === 0
+                ? sortMemberHandler('dsc')
+                : sortCardHandler('dsc')}
+          />
+        {/if}
       </div>
     </div>
 
@@ -236,16 +260,18 @@
         {:else}
           <div class="flex flex-col gap-2 px-4">
             {#each members as member, i}
-              <MemberCard
-                {member}
-                {roles}
-                {permissions}
-                {i}
-                {updatedRole}
-                {deleteMember}
-                active
-                on:setRole={(e) => (updatedRole = e.detail)}
-              />
+              {#if member.email !== null}
+                <MemberCard
+                  {member}
+                  {roles}
+                  {permissions}
+                  {i}
+                  {updatedRole}
+                  {deleteMember}
+                  active
+                  on:setRole={(e) => (updatedRole = e.detail)}
+                />
+              {/if}
             {/each}
           </div>
         {/if}

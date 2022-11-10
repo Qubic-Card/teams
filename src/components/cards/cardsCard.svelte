@@ -109,7 +109,18 @@
     )} {bgColor(card.color)}"
   >
     <div class="flex justify-between relative">
-      <h1>******{card.id.slice(-6)}</h1>
+      <div class="flex flex-col gap-2">
+        <h1>******{card.id.slice(-6)}</h1>
+        {#if card.email !== null}
+          <h1
+            class="text-xs md:text-sm {card.color === 'white'
+              ? 'text-neutral-600'
+              : 'text-neutral-400'}"
+          >
+            {card.email}
+          </h1>
+        {/if}
+      </div>
       {#if card.avatar !== null}
         <AvatarDropdown
           avatar={card.avatar}
@@ -126,17 +137,17 @@
         <h1>
           {card.NFCtap}
           <span
-            class={card.color === 'red'
-              ? 'text-neutral-400'
-              : 'text-neutral-700'}>Taps</span
+            class={card.color === 'white'
+              ? 'text-neutral-600'
+              : 'text-neutral-400'}>Taps</span
           >
         </h1>
         <h1>
           {card.QRScan}
           <span
-            class={card.color === 'red'
-              ? 'text-neutral-400'
-              : 'text-neutral-700'}>Scans</span
+            class={card.color === 'white'
+              ? 'text-neutral-600'
+              : 'text-neutral-400'}>Scans</span
           >
         </h1>
       </div>

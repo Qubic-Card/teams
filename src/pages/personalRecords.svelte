@@ -197,7 +197,7 @@
   class="w-1/4 hidden md:flex flex-col justify-between gap-4 border-r-2 border-neutral-700 h-full"
 >
   <div class="pl-20 pt-4 pr-4 flex flex-col gap-4">
-    {#if $userData.includes('inactive')}
+    {#if $userData?.includes('inactive')}
       <Input
         disabled={true}
         placeholder="Type"
@@ -244,7 +244,7 @@
       </div>
     {/if}
     <Input
-      disabled={$userData.includes('inactive')}
+      disabled={$userData?.includes('inactive')}
       placeholder="Filename"
       title="Filename"
       bind:value={fileName}
@@ -262,7 +262,7 @@
     class="flex justify-center items-center h-16 gap-4 bg-blue-600 pl-20 p-3 disabled:bg-blue-600/60 disabled:cursor-default"
     disabled={fileName.includes('.') || fileName.length < 4
       ? true
-      : false || $userData.includes('inactive') || isCreateRecordLoading}
+      : false || $userData?.includes('inactive') || isCreateRecordLoading}
     on:click={async () => {
       if (selectedType === 'Choose Type') {
         toastFailed('Please select a type');

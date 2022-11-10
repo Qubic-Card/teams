@@ -1,11 +1,52 @@
 import supabase from '@lib/db';
 
 export const createTeamMember = async (uid, input, company, tid, role) => {
-  const { data, error } = await supabase.from('team_members').insert(
-    {
-      team_id: tid,
+  const { data, error } = await supabase.from('team_members').insert({
+    team_id: tid,
+    uid: uid,
+    role: role,
+    team_profile: {
+      firstname: input.fname,
+      lastname: input.lname,
+      job: '',
+      avatar: '',
+      design: {
+        theme: 'black',
+        background: '',
+      },
+      address: '',
+      company: company ?? '',
+      links: [
+        {
+          link: 'https://qubic.id',
+          title: 'My Website',
+          isActive: true,
+        },
+      ],
+      socials: [
+        {
+          data: input.email,
+          type: 'email',
+          isActive: true,
+        },
+      ],
+      isShowMetaImage: true,
+    },
+  });
+
+  if (error) {
+    console.log(error);
+    return { error: true, memberId: null };
+  } else {
+    return { error: false, memberId: data[0].id };
+  }
+};
+
+export const updateTeamMember = async (mid, uid, tid, input, company) => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .update({
       uid: uid,
-      role: role,
       team_profile: {
         firstname: input.fname,
         lastname: input.lname,
@@ -33,11 +74,9 @@ export const createTeamMember = async (uid, input, company, tid, role) => {
         ],
         isShowMetaImage: true,
       },
-    },
-    {
-      returning: 'minimal',
-    }
-  );
+    })
+    .eq('id', mid)
+    .eq('team_id', tid);
 
   if (error) {
     console.log(error);
@@ -83,20 +122,28 @@ export const checkIsRegistered = async (uid) => {
   }
 };
 
-export const checkRegisteredMemberCount = async (tid, member_count) => {
-  const { data, error, count } = await supabase
+export const checkTeamMembers = async (tid, member_count) => {
+  const { data, error } = await supabase
     .from('team_members')
-    .select('id', { count: 'exact' })
+    .select('id, uid')
     .eq('team_id', tid);
 
   if (error) {
     console.log(error);
     return { error: true };
   } else {
-    if (count < member_count) {
-      return { error: false, available: true };
+    const nullUid = data.filter((item) => item.uid === null);
+    const active = data.filter((item) => item.uid !== null);
+
+    if (active.length < member_count) {
+      return {
+        error: false,
+        available: true,
+        nullUid: nullUid.length > 0,
+        mid: nullUid[0]?.id ?? null,
+      };
     } else {
-      return { error: false, available: false };
+      return { error: false, available: false, nullUid: nullUid.length > 0 };
     }
   }
 };

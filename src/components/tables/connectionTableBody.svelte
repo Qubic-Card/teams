@@ -4,7 +4,7 @@
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import download from '@lib/utils/download';
   import { genvcard } from '@lib/vcard/vcardgen';
-  import Confirmation from '@comp/modals/confirmation.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let innerWidth, connection, tab, deleteHandler, isLoading, permissions;
 
@@ -54,22 +54,29 @@
               data={connection}
               on:sendUpdatedData={(e) => (connection = e.detail)}
             />
-            <Confirmation
-              {isLoading}
-              isDelete
+            <ConfirmationModal
+              showModal={showDeleteModal}
+              toggleModal={deletModalHandler}
+              buttonLabel="Remove"
               isIconVisible
-              isDispatch
-              heading="Are you sure you want to delete"
-              text={`${connection.profileData?.firstname ?? connection?.name}
-      ${connection.profileData?.lastname ?? ''} ?`}
+              {isLoading}
               on:action={() => {
                 deleteHandler(connection.id, tab);
                 deletModalHandler();
               }}
-              buttonLabel="Delete"
-              showModal={showDeleteModal}
-              toggleModal={deletModalHandler}
-            />
+            >
+              <slot slot="title">
+                <h1 class="font-bold">Remove Connection</h1>
+              </slot>
+              <slot slot="text">
+                <p>
+                  Are you sure you want to remove <br />
+                  {connection.profileData?.firstname ?? connection?.name}
+                  {connection.profileData?.lastname ?? ''} ?
+                </p>
+              </slot>
+            </ConfirmationModal>
+
             <img
               src="/download-icon.svg"
               alt=""

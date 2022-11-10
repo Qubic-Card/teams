@@ -1,9 +1,7 @@
 <script>
   import setHours4Digit from '@lib/utils/setHour4Digit';
-  import SwitchButton from '@comp/buttons/switchButton.svelte';
   import MemberAnalyticsModal from '@comp/modals/memberAnalyticsModal.svelte';
   import MemberRoleDropdown from '@comp/buttons/memberRoleDropdown.svelte';
-  import Confirmation from '@comp/modals/confirmation.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
@@ -14,7 +12,8 @@
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { teamProfileTemplate } from '@lib/constants';
   import { log } from '@lib/logger/logger';
-  import Cookies from 'js-cookie';
+  import { teamData } from '@lib/stores/teamStore';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let permissions, deleteMember;
   export let roles = [];
@@ -135,13 +134,11 @@
   $: if (active) if (i === updatedRole.index) selectedRole = updatedRole.role;
 </script>
 
-<Confirmation
+<ConfirmationModal
   {isLoading}
-  isDispatch
-  heading="Are you sure you want to change your role?"
-  buttonLabel="Yes"
   {showModal}
   {toggleModal}
+  buttonLabel="Yes"
   on:action={async () => {
     await setMemberRole(roleID);
     selectRole(roleName);
@@ -149,24 +146,46 @@
 
     showModal = false;
   }}
-/>
+>
+  <slot slot="title">
+    <h1 class="font-bold">Change role</h1>
+  </slot>
+  <slot slot="text">
+    <p>
+      Are you sure you want to change <br />
+      {memberProfile?.firstname}'s role?
+    </p>
+  </slot>
+</ConfirmationModal>
 
-<Confirmation
-  {isLoading}
-  isDelete
-  isMember
-  isDispatch
-  heading="Are you sure you want to delete"
-  text={`${memberProfile?.firstname} ${memberProfile?.lastname}?`}
-  buttonLabel="Delete"
+<ConfirmationModal
   showModal={showDeleteMemberModal}
   toggleModal={toggleDeleteMemberModal}
+  buttonLabel="Remove"
+  {isLoading}
   on:action={async () => {
     await deleteMemberHandler();
     await deleteMember(member.member_id);
     showDeleteMemberModal = false;
   }}
-/>
+>
+  <slot slot="title">
+    <h1 class="font-bold">Remove user</h1>
+  </slot>
+  <slot slot="text">
+    <div class="flex flex-col gap-4">
+      <p>
+        Are you sure you want to remove <br />
+        {memberProfile?.firstname}
+        {memberProfile?.lastname} from {$teamData.name} team?
+      </p>
+      <p>
+        <span class="font-bold">WARNING!</span> All data from this user will be deleted.
+        Please consider backing up the data before removing.
+      </p>
+    </div>
+  </slot>
+</ConfirmationModal>
 
 {#if !permissions.readMembers}
   {#if $user?.id === member.uid}
@@ -359,6 +378,9 @@
             Joined since {convertToGMT7(member.user_change)
               .toDateString()
               .slice(4)}
+          </p>
+          <p class="break-all text-neutral-400">
+            {member.email}
           </p>
         </div>
         <div class="hidden md:flex flex-col">

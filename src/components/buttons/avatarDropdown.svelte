@@ -1,6 +1,7 @@
 <script>
-  import Confirmation from '@comp/modals/confirmation.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
+  import { teamData } from '@lib/stores/teamStore';
   import { user } from '@lib/stores/userStore';
   import { toastSuccess } from '@lib/utils/toast';
   import { Listbox } from '@rgossiaux/svelte-headlessui';
@@ -47,24 +48,30 @@
   // 613572e9-f471-4f0d-90d2-d8511d1ac462
 </script>
 
-<Confirmation
-  {isLoading}
-  isDispatch
-  isDisconnect
-  heading="Are you sure ?"
-  text="This action will reset the card."
-  buttonLabel="Disconnect"
+<ConfirmationModal
   {showModal}
   {toggleModal}
+  buttonLabel="Disconnect"
+  {isLoading}
   on:action={async () => {
     await disconnectHandler();
     action();
     showModal = false;
   }}
-/>
+>
+  <slot slot="title">
+    <h1 class="font-bold">Disconnect card</h1>
+  </slot>
+  <slot slot="text">
+    <p>
+      Are you sure you want to disconnect <br />
+      ******{cardId.slice(-6)} from {$teamData.name} team?
+    </p>
+  </slot>
+</ConfirmationModal>
 
 <Listbox
-  class="w-1/2"
+  class="w-full absolute flex flex-col"
   value={selected}
   on:change={(e) => (selected = e.detail)}
 >
@@ -82,7 +89,7 @@
       on:click={() => (isOpen = true)}
       src="/favicon.svg"
       alt=""
-      class="rounded-full w-20 h-20 bg-black absolute right-0 -bottom-6 cursor-pointer {uid ===
+      class="rounded-full w-20 h-20 bg-black absolute right-0 -bottom-12 cursor-pointer {uid ===
       $user?.id
         ? 'outline outline-2 outline-blue-600'
         : ''}"
@@ -92,7 +99,7 @@
       on:click={() => (isOpen = true)}
       src={avatar}
       alt=""
-      class="rounded-full w-20 h-20 absolute right-0 -bottom-6 cursor-pointer {uid ===
+      class="rounded-full w-20 h-20 absolute right-0 -bottom-12 cursor-pointer {uid ===
       $user?.id
         ? 'outline outline-2 outline-blue-600'
         : ''}"
@@ -101,7 +108,7 @@
 
   {#if isOpen}
     <div
-      class="absolute bg-neutral-800 text-white outline outline-1 outline-neutral-700 p-2 w-52 mt-2 shadow-md z-50 flex flex-col gap-2 rounded-md -translate-x-16 lg:-translate-x-12 translate-y-12"
+      class="absolute bg-neutral-800 text-white outline outline-1 outline-neutral-700 p-2 w-52 mt-2 shadow-md z-50 flex flex-col gap-2 rounded-md self-end"
     >
       <h1 class="text-xs md:text-sm break-all">
         Connected to <span class="font-bold">{email}</span>
@@ -114,3 +121,4 @@
     </div>
   {/if}
 </Listbox>
+<!-- -translate-x-32 md:-translate-x-16 lg:-translate-x-12 translate-y-12 -->

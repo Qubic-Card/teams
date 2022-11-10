@@ -3,7 +3,7 @@
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import Confirmation from '@comp/modals/confirmation.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let record, teamId, isTeam, deleteHandler, isLoading, innerWidth;
   export let isTeamInactive = false;
@@ -90,27 +90,33 @@
     class="h-12 md:pl-2 lg:pl-4 md:pr-2 lg:pr-4 flex gap-1 md:gap-4 items-center w-16 md:w-24 lg:w-auto"
   >
     {#if isTeamInactive === false}
-      <Confirmation
-        {isLoading}
-        isDelete
-        isRecord
-        isIconVisible
-        isDispatch
-        heading="Are you sure you want to delete"
-        text={`${
-          record.storage_url
-            ? record.filename
-            : record.profileData?.firstname ?? record?.name
-        }
-      ${!record.storage_url ? '' : record.profileData?.lastname ?? ''} ?`}
-        buttonLabel="Delete"
+      <ConfirmationModal
         showModal={showDeleteModal}
         toggleModal={deleteModalHandler}
+        buttonLabel="Remove"
+        isIconVisible
+        {isLoading}
         on:action={async () => {
           await deleteHandler(record);
           deleteModalHandler();
         }}
-      />
+      >
+        <slot slot="title">
+          <h1 class="font-bold">Remove record</h1>
+        </slot>
+        <slot slot="text">
+          <div class="flex flex-col gap-4">
+            <p>
+              Are you sure you want to remove <br />
+              {record.storage_url
+                ? record.filename
+                : record.profileData?.firstname ?? record?.name}
+              {!record.storage_url ? '' : record.profileData?.lastname ?? ''} ?
+            </p>
+          </div>
+        </slot>
+      </ConfirmationModal>
+
       <img
         src="/download-icon.svg"
         alt=""

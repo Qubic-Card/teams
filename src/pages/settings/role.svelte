@@ -16,7 +16,7 @@
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { defaultRole } from '@lib/constants';
   import { getContext } from 'svelte';
-  import Confirmation from '@comp/modals/confirmation.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   const teamId = getContext('teamId');
   export let permissions;
@@ -91,18 +91,23 @@
   };
 </script>
 
-<Confirmation
+<ConfirmationModal
   {isLoading}
-  isDelete
-  isRole
-  id={roleId}
-  heading="Are you sure you want to delete"
-  text={`${roleName.charAt(0).toUpperCase() + roleName.slice(1)}?`}
-  buttonLabel="Delete"
   showModal={showDeleteModal}
   toggleModal={toggleDelete}
-  {deleteRoleHandler}
-/>
+  buttonLabel="Remove"
+  on:action={async () => await deleteRoleHandler(roleId)}
+>
+  <slot slot="title">
+    <h1 class="font-bold">Remove role</h1>
+  </slot>
+  <slot slot="text">
+    <p>
+      Are you sure you want to delete <br />
+      {roleName.charAt(0).toUpperCase() + roleName.slice(1)}?
+    </p>
+  </slot>
+</ConfirmationModal>
 
 <div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-3`}>
   <div

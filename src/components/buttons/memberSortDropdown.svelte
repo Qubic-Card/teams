@@ -10,8 +10,8 @@
 
   export let mode = 'member';
 
-  let sortOptions = ['Most Recent', 'Oldest'];
-  let selectedIndex = 0;
+  export let sortOptions = ['Most Recent', 'Oldest'];
+  export let selectedIndex = 0;
   let selected = sortOptions[selectedIndex];
 
   const dispatch = createEventDispatcher();
