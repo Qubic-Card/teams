@@ -5,12 +5,16 @@
   import {
     cardConnectionHandler,
     changeCardMode,
-    setNullTeamMemberUid,
+    deleteTeamCardCon,
+    searchProfile,
     updateBasicProfile,
   } from '@lib/query/transferCard';
   import TransferModal from '@comp/modals/transferModal.svelte';
   import DeleteCardModal from '@comp/modals/deleteCardModal.svelte';
-  import { selectedProfileMenu } from '@lib/stores/subsEndStore';
+  import {
+    selectedAddress,
+    selectedProfileMenu,
+  } from '@lib/stores/subsEndStore';
 
   export let teamId;
   let expiredMembers = [];
@@ -85,17 +89,42 @@
   // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
   // 121
 
-  const transferCardHandler = async (card) => {
+  // eac9c236-da25-4d9c-a058-632bd92bc951
+  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb // di team member
+  // 2
+  // c8069595-2a92-487a-8756-2ab437c29757 //eac
+  const transferCardHandler = async (card, toast) => {
     isLoading = true;
-    // await setNullTeamMemberUid(card.member[0].id);
-    await changeCardMode(card.id);
-    await cardConnectionHandler(card);
-    if ($selectedProfileMenu.includes('with')) {
-      await updateBasicProfile(card);
-    }
-    toastSuccess('Card transfered successfully');
+    if ($selectedAddress.choosen === 0) {
+      await deleteTeamCardCon(card.id);
+      await changeCardMode(card.id);
+      await cardConnectionHandler(card);
+      if ($selectedProfileMenu.includes('with')) {
+        await updateBasicProfile(card);
+      }
+      if (toast) toastSuccess('Card transfered successfully');
 
-    expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
+      expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
+    } else {
+      let uid = await searchProfile($selectedAddress.email);
+
+      if (uid) {
+        card.member[0].uid = uid;
+
+        await deleteTeamCardCon(card.id);
+        await changeCardMode(card.id);
+        await cardConnectionHandler(card);
+        if ($selectedProfileMenu.includes('with')) {
+          await updateBasicProfile(card);
+        }
+
+        if (toast) toastSuccess('Card transfered successfully');
+
+        expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
+      } else {
+        toastFailed('Email not found');
+      }
+    }
 
     isLoading = false;
   };
@@ -109,14 +138,7 @@
     );
 
     selectedArr.forEach(async (card) => {
-      // await setNullTeamMemberUid(card.member[0].id);
-      await changeCardMode(card.id);
-      await cardConnectionHandler(card);
-      if ($selectedProfileMenu.includes('with')) {
-        await updateBasicProfile(card);
-      }
-
-      expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
+      await transferCardHandler(card, false);
     });
 
     toastSuccess('Cards transfered successfully');
@@ -128,13 +150,17 @@
     const { data, error } = await supabase.rpc('delete_card', {
       cards: cards,
     });
+
     if (error) {
       console.log(error);
       toastFailed('Something went wrong, please contact us');
       isLoading = false;
-    }
-    if (data) {
+    } else {
       // console.log(data);
+      expiredMembers = expiredMembers.filter(
+        (item) => !cards.includes(item.id)
+      );
+
       toastSuccess('Card deleted successfully');
       isLoading = false;
     }
@@ -227,7 +253,8 @@
               <td class="py-2">
                 <div class="flex">
                   <TransferModal
-                    on:transfer={async () => await transferCardHandler(card)}
+                    on:transfer={async () =>
+                      await transferCardHandler(card, true)}
                   />
                   <DeleteCardModal
                     on:delete={async () => deleteCard([card.id])}

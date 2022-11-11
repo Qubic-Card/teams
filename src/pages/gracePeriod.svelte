@@ -1,9 +1,9 @@
 <script>
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import { tweened } from 'svelte/motion';
   import supabase from '@lib/db';
-  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  import { toastFailed } from '@lib/utils/toast';
   import { sevenDays } from '@lib/utils/getDates';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let teamId, sevenDaysAfterEndDate;
 
@@ -11,11 +11,11 @@
   let showModal = false;
 
   const toggleModal = () => (showModal = !showModal);
-  const handleLogout = async () => await supabase.auth.signOut();
   const toWhatsApp = () =>
     window.open('https://wa.me/628113087599', '_blank').focus();
 
   const setSubsEndDate = async () => {
+    isLoading = true;
     const { data, error } = await supabase
       .from('teams')
       .update(
@@ -32,6 +32,8 @@
     } else {
       location.reload();
     }
+
+    isLoading = false;
   };
 
   var expected = sevenDaysAfterEndDate.getTime();

@@ -1,20 +1,32 @@
 <script>
   import TransferProfileDropdown from '@comp/buttons/transferProfileDropdown.svelte';
+  import TransferAddressDropdown from '@comp/buttons/transferAddressDropdown.svelte';
+  import Input from '@comp/input.svelte';
   import { Dialog, DialogOverlay } from '@rgossiaux/svelte-headlessui';
   import { createEventDispatcher } from 'svelte';
+  import {
+    selectedAddress,
+    selectedProfileMenu,
+  } from '@lib/stores/subsEndStore';
 
   export let bulkTransfer = false,
     disabled;
 
   let showModal = false;
 
-  const toggleModal = () => (showModal = !showModal);
+  const toggleModal = () => {
+    showModal = !showModal;
+    $selectedAddress.choosen = 0;
+    $selectedProfileMenu = 'Transfer with current profile';
+  };
   const dispatch = createEventDispatcher();
 
   const handleTransfer = () => {
     dispatch('transfer');
     toggleModal();
   };
+
+  // $: console.log($selectedAddress);
 </script>
 
 <button
@@ -31,7 +43,10 @@
 {#if showModal}
   <Dialog
     open={showModal}
-    on:close={() => (showModal = false)}
+    on:close={() => {
+      showModal = false;
+      $selectedAddress.choosen = 0;
+    }}
     class="fixed inset-0 z-50 overflow-y-auto flex justify-center items-end md:items-center overflow-x-hidden"
   >
     <DialogOverlay
@@ -44,7 +59,15 @@
       <h1 class="text-lg">Select how you want to transfer</h1>
       <div class="flex flex-col gap-2">
         <TransferProfileDropdown />
-        <!-- <TransferAddressDropdown /> -->
+        <TransferAddressDropdown />
+        {#if $selectedAddress.choosen === 1}
+          <Input
+            title=""
+            placeholder="Email"
+            bind:value={$selectedAddress.email}
+            inputbg="bg-neutral-900"
+          />
+        {/if}
       </div>
       <div class="flex flex-col">
         <h2>This action cannot be undone.</h2>

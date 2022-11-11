@@ -6,7 +6,11 @@
     ListboxOptions,
     ListboxOption,
   } from '@rgossiaux/svelte-headlessui';
-  import { selectedProfileMenu } from '@lib/stores/subsEndStore';
+  import {
+    selectedAddress,
+    selectedProfileMenu,
+  } from '@lib/stores/subsEndStore';
+  import { createEventDispatcher } from 'svelte';
 
   let options = ['Transfer to owner(s)', 'Transfer to a Qubic user'];
 
@@ -39,13 +43,13 @@
         <ListboxOptions
           class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-96 mt-2 shadow-md z-50 gap-2 flex flex-col rounded-md"
         >
-          {#each options as item}
+          {#each options as item, i}
             <ListboxOption
               class="flex hover:bg-neutral-700 px-2 py-2 rounded-md cursor-pointer text-xs md:text-sm break-all {selected ===
               item
                 ? 'bg-neutral-700'
                 : ''}"
-              on:click={() => ($selectedProfileMenu = item)}
+              on:click={() => ($selectedAddress.choosen = i)}
               value={item}
             >
               {item}

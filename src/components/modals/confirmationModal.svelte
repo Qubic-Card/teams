@@ -79,7 +79,9 @@
             disabled={isLoading}
             on:click={action}
             class={`text-sm   ${
-              buttonLabel === 'Remove' || buttonLabel === 'Disconnect'
+              buttonLabel === 'Remove' ||
+              buttonLabel === 'Disconnect' ||
+              buttonLabel === 'Proceed'
                 ? 'bg-red-600/30 outline outline-1 outline-red-500 hover:outline-red-600'
                 : 'bg-blue-600 hover:bg-blue-600/60'
             } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 flex justify-center items-center gap-2`}

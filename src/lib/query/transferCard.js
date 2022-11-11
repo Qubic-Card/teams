@@ -9,11 +9,11 @@ const uniqueByKeepFirst = (a, key) => {
   });
 };
 
-export const createCardConnection = async (member) => {
+const createCardConnection = async (card) => {
   const { data, error } = await supabase.from('card_connection').insert(
     {
-      uid: member.member[0].uid,
-      card_id: member.id,
+      uid: card.member[0].uid,
+      card_id: card.id,
     },
     { returning: 'minimal' }
   );
@@ -24,14 +24,35 @@ export const createCardConnection = async (member) => {
   }
 };
 
-export const cardConnectionHandler = async (member) => {
+const updateCardConnection = async (card) => {
+  const { data, error } = await supabase
+    .from('card_connection')
+    .update(
+      { uid: card.member[0].uid },
+      {
+        returning: 'minimal',
+      }
+    )
+    .eq('card_id', card.id);
+
+  if (error) {
+    console.log(error);
+    toastFailed('Something went wrong, please contact us');
+  }
+};
+
+export const cardConnectionHandler = async (card) => {
   const { data, error } = await supabase
     .from('card_connection')
     .select('card_id, uid')
-    .eq('card_id', member.id);
+    .eq('card_id', card.id);
 
   if (data.length === 0) {
-    await createCardConnection(member);
+    await createCardConnection(card);
+  } else {
+    if (data[0].uid !== card.member[0].uid) {
+      await updateCardConnection(card);
+    }
   }
 };
 
@@ -41,6 +62,7 @@ export const changeCardMode = async (cardId) => {
     .update(
       {
         mode: 'basic',
+        team_id: null,
       },
       { returning: 'minimal' }
     )
@@ -52,16 +74,11 @@ export const changeCardMode = async (cardId) => {
   }
 };
 
-export const setNullTeamMemberUid = async (id) => {
+export const deleteTeamCardCon = async (cardId) => {
   const { data, error } = await supabase
-    .from('team_members')
-    .update(
-      {
-        uid: null,
-      },
-      { returning: 'minimal' }
-    )
-    .eq('id', id);
+    .from('team_cardcon')
+    .delete()
+    .eq('card_id', cardId);
 
   if (error) {
     console.log(error);
@@ -99,4 +116,19 @@ export const updateBasicProfile = async (member) => {
     console.log(error);
     toastFailed('Something went wrong, please contact us');
   }
+};
+
+export const searchProfile = async (email) => {
+  const { data, error } = await supabase
+    .from('profile')
+    .select('uid')
+    .eq('email', email);
+
+  if (error) {
+    console.log(error);
+    toastFailed('Something went wrong, please contact us');
+    return false;
+  }
+
+  return data[0].uid;
 };
