@@ -1,7 +1,7 @@
 <script>
   import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
   import { createEventDispatcher } from 'svelte';
-  import CropModal from '@comp/modals/cropModal.svelte';
+  import CropModal from '@comp/basic/cropModal.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
@@ -87,7 +87,7 @@
   };
 </script>
 
-<CropModal
+<!-- <CropModal
   isBanner
   aspect={3 / 1}
   isOpen={isBannerOpen}
@@ -96,7 +96,7 @@
   {fileName}
   on:updatedData={updateData}
   on:closeModal={closeBannerModal}
-/>
+/> -->
 
 <button
   on:click={toggleModal}

@@ -14,7 +14,7 @@
   />
 
   <div
-    class="flex flex-col md:grid gap-2 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_150px_100px_minmax(200px,_1fr)] text-sm"
+    class="flex flex-col md:grid gap-2 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_200px_105px_minmax(200px,_1fr)] text-sm"
   >
     <div class="flex flex-col">
       <h1 class="font-bold text-white md:text-sm text-xs break-all">

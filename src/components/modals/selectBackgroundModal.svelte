@@ -16,7 +16,6 @@
   import getCroppedImg from '@lib/utils/canvas';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { profileData } from '@lib/stores/profileData';
-  import CropModal from '@comp/modals/cropModal.svelte';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';

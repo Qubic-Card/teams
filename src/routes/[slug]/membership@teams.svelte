@@ -11,12 +11,11 @@
   import TenantModal from '@comp/modals/tenantModal.svelte';
   import { DDB_DOC } from '@lib/constants';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { ExecuteStatementCommand } from '@aws-sdk/client-dynamodb';
   import { user } from '@lib/stores/userStore';
 
   const teamId = getContext('teamId');
   let searchQuery = '';
-  let members = [];
+  let members;
   let tenants = [];
   let tenantData = {};
   let sortOptions = ['all'];
@@ -29,9 +28,9 @@
       Logo: 'https://placeimg.com/640/480/any',
     },
   };
-  let totalMembers = 0;
   let isLoading = false;
   let page = -1;
+  let lastEvaluatedKey = {};
 
   function randomDate(start, end) {
     return new Date(
@@ -42,7 +41,6 @@
   const selectTenantHandler = async (i, tenant) => {
     selectedTenant = i;
     tenantData = tenant;
-    await getMembers();
   };
 
   const sortHandler = (mode) => {
@@ -60,36 +58,34 @@
     setTimeout(() => (isLoading = false), 500);
   };
 
-  const filterHandler = (selected) => {
+  const filterHandler = async (selected) => {
     try {
-      setTimeout(async () => {
-        // wait for the tenantData
-        const getparams = {
-          TableName: DDB_DOC.M,
-          IndexName: 'TID-JoinedAt-index',
-          KeyConditionExpression: 'TID = :tid AND AddedBy = :addedBy',
-          ExpressionAttributeValues: {
-            ':tid': tenantData.TID,
-            ':addedBy': selected,
-          },
-        };
+      // setTimeout(async () => {
+      //   // wait for the tenantData
+      const getparams = {
+        TableName: DDB_DOC.M,
+        IndexName: 'TID-JoinedAt-index',
+        KeyConditionExpression: 'TID = :tid AND AddedBy = :addedBy',
+        ExpressionAttributeValues: {
+          ':tid': tenantData.TID,
+          ':addedBy': selected,
+        },
+      };
 
-        const data = await ddbDocClient.query(getparams);
+      const data = await ddbDocClient.query(getparams);
 
-        members = data.Items;
+      members = data.Items;
 
-        members = members.sort((a, b) => {
-          return (
-            new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime()
-          );
-        });
-      }, 500);
+      members = members.sort((a, b) => {
+        return new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime();
+      });
+      // }, 500);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const push = async () => {
+  const addTenantMember = async () => {
     try {
       let t1 = '1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038-1667545411079';
       let t2 = '1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038-1667545418952';
@@ -153,93 +149,75 @@
       console.log(error);
     }
   };
-  let lastEvaluatedKey = [];
-  const getMembers = async () => {
+
+  const getMembers = async (tid) => {
     try {
-      setTimeout(async () => {
-        // wait for the tenantData
-        const getparams = {
-          TableName: DDB_DOC.M,
-          IndexName: 'TID-JoinedAt-index',
-          KeyConditionExpression: 'TID = :tid',
-          ExpressionAttributeValues: {
-            ':tid': tenantData.TID,
-          },
-          Limit: 2,
-          // ExclusiveStartKey: {
-          //   TID: tenantData.TID,
-          //   JoinedAt: '2021-12-01T00:00:00.000Z',
-          //   UID: '1638316800000',
-          // },
-        };
+      const getparams = {
+        TableName: DDB_DOC.M,
+        IndexName: 'TID-JoinedAt-index',
+        KeyConditionExpression: 'TID = :tid',
+        ExpressionAttributeValues: {
+          ':tid': tid,
+        },
+        Limit: 10,
+      };
 
-        const data = await ddbDocClient.query(getparams);
+      const data = await ddbDocClient.query(getparams);
 
-        members = data.Items;
-        lastEvaluatedKey = [...lastEvaluatedKey, data.LastEvaluatedKey];
+      members = data.Items;
+      lastEvaluatedKey = data.LastEvaluatedKey;
 
-        members = members.sort((a, b) => {
-          return (
-            new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime()
-          );
-        });
-
-        // console.log(lastEvaluatedKey, 'members');
-        totalMembers = members.length;
-        sortOptions = [
-          ...sortOptions,
-          ...members.map((member) => member.AddedBy),
-        ];
-        sortOptions = [...new Set(sortOptions)];
-      }, 500);
+      // members = members.sort((a, b) => {
+      //   return (
+      //     new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime()
+      //   );
+      // });
+      console.log(members);
+      // console.log(
+      // members.sort((a, b) => {
+      //   return (
+      //     new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime()
+      //   );
+      // })
+      // members.map((m) => m.JoinedAt)
+      // .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+      // );
     } catch (err) {
       console.error(err);
     }
   };
 
-  const paginationMembers = async (foward) => {
+  const loadMoreMembers = async (tid) => {
     try {
-      if (foward) {
-        page++;
-      } else {
-        page--;
-      }
-      console.log(page);
-      setTimeout(async () => {
-        // wait for the tenantData
-        const getparams = {
-          TableName: DDB_DOC.M,
-          IndexName: 'TID-JoinedAt-index',
-          KeyConditionExpression: 'TID = :tid',
-          ExpressionAttributeValues: {
-            ':tid': tenantData.TID,
-          },
-          Limit: 2,
-          ExclusiveStartKey: {
-            TID: lastEvaluatedKey[page].TID,
-            JoinedAt: lastEvaluatedKey[page].JoinedAt,
-            UID: lastEvaluatedKey[page].UID,
-          },
-        };
+      isLoading = true;
+      page++;
 
-        const data = await ddbDocClient.query(getparams);
+      const getparams = {
+        TableName: DDB_DOC.M,
+        IndexName: 'TID-JoinedAt-index',
+        KeyConditionExpression: 'TID = :tid',
+        ExpressionAttributeValues: {
+          ':tid': tid,
+        },
+        Limit: 10,
+        ExclusiveStartKey: {
+          TID: lastEvaluatedKey.TID,
+          JoinedAt: lastEvaluatedKey.JoinedAt,
+          UID: lastEvaluatedKey.UID,
+        },
+      };
 
-        members = data.Items;
-        lastEvaluatedKey = [...lastEvaluatedKey, data.LastEvaluatedKey];
-        members = members.sort((a, b) => {
-          return (
-            new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime()
-          );
-        });
+      const data = await ddbDocClient.query(getparams);
 
-        console.log('pag', lastEvaluatedKey);
-        totalMembers = members.length;
-        sortOptions = [
-          ...sortOptions,
-          ...members.map((member) => member.AddedBy),
-        ];
-        sortOptions = [...new Set(sortOptions)];
-      }, 500);
+      members = [...members, ...data.Items];
+      lastEvaluatedKey = data.LastEvaluatedKey;
+      // members = members.sort((a, b) => {
+      //   return new Date(b.JoinedAt).getTime() - new Date(a.JoinedAt).getTime();
+      // });
+
+      // console.log(lastEvaluatedKey);
+
+      isLoading = false;
     } catch (err) {
       console.error(err);
     }
@@ -265,102 +243,114 @@
     }
   };
 
-  const test = async () => {
-    const statement = `SELECT * FROM "${DDB_DOC.M}" WHERE TID = ?`;
-    const params = {
-      Statement: statement,
-      Parameters: [
-        {
-          S: '1',
-        },
-      ],
-    };
-
-    const command = new ExecuteStatementCommand(params);
-
-    const data = await ddbDocClient.send(command);
-
-    // console.log(data);
-  };
-
-  const getMembersByTID = async () => {
+  const getStaff = async (tid) => {
     try {
-      const data = await ddbDocClient.query({
+      const getparams = {
         TableName: DDB_DOC.M,
+        IndexName: 'TID-JoinedAt-index',
         KeyConditionExpression: 'TID = :tid',
-        FilterExpression: 'TID = :tid',
         ExpressionAttributeValues: {
-          ':tid': '1',
+          ':tid': tid,
         },
-      });
+        ProjectionExpression: 'AddedBy',
+      };
 
-      console.log(data);
-    } catch (error) {
-      console.log(error);
+      const data = await ddbDocClient.query(getparams);
+
+      let staff = data.Items;
+
+      console.log(staff);
+
+      sortOptions = [
+        ...sortOptions,
+        ...members.map((member) => member.AddedBy),
+      ];
+      sortOptions = [...new Set(sortOptions)];
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  // $: getMembersByTID();
-  // const getdynamoDb
-  // $: push();
-  // $: getMembers();
+  const search = async (tid) => {
+    try {
+      const getparams = {
+        TableName: DDB_DOC.M,
+        IndexName: 'TID-JoinedAt-index',
+        KeyConditionExpression: 'TID = :tid AND Firstname = :fname',
+        ExpressionAttributeValues: {
+          ':tid': tid,
+          ':fname': 'Galih',
+        },
+        ProjectionExpression: 'AddedBy',
+      };
+
+      const data = await ddbDocClient.query(getparams);
+
+      let staff = data.Items;
+
+      console.log(staff);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // $: addTenantMember();
+  // $: search(tenantData?.TID);
   // $: addNewTenantHandler();
   // $: getTenants();
 </script>
 
-<div class="flex flex-col pb-20 bg-black min-h-screen pl-0 md:pl-16 gap-2">
-  <div
-    class="border-b border-neutral-700 h-12 text-lg font-regular z-40 fixed w-full bg-black pl-6 flex justify-between items-center pr-4 md:pr-20"
-  >
-    <h1>
-      Membership <span class="text-neutral-400 text-sm"
-        >{tenants.length} Tenants</span
-      >
-    </h1>
-    <button on:click={paginationMembers}>CLICKKK</button>
-    <TenantModal
-      {input}
-      on:action={async (e) => await addNewTenantHandler(e.detail)}
-    />
-  </div>
+{#await getTenants()}
+  <h1>Loading...</h1>
+{:then name}
+  <div class="flex flex-col pb-20 bg-black min-h-screen pl-0 md:pl-16 gap-2">
+    <div
+      class="border-b border-neutral-700 h-12 text-lg font-regular z-40 fixed w-full bg-black pl-6 flex justify-between items-center pr-4 md:pr-20"
+    >
+      <h1>
+        Membership <span class="text-neutral-400 text-sm"
+          >{tenants.length} Tenants</span
+        >
+      </h1>
 
-  {#await getTenants()}
-    <h1>Loading...</h1>
-  {:then name}
+      <TenantModal
+        {input}
+        on:action={async (e) => await addNewTenantHandler(e.detail)}
+      />
+    </div>
+
     <div
       class="border-b border-neutral-700 h-12 text-lg font-regular z-40 sticky mt-16 bg-black pl-6 flex items-center pr-4 md:pr-20 gap-2"
     >
       {#if tenants.length > 0}
         {#each tenants as tenant, i}
-          <div
+          <button
+            disabled={selectedTenant === i}
             class="{selectedTenant === i
               ? 'border-b-2 border-neutral-500'
-              : ''} h-full cursor-pointer"
+              : ''} h-full"
             on:click={() => selectTenantHandler(i, tenant)}
           >
             {tenant.Name}
-          </div>
+          </button>
         {/each}
       {:else}
         <div class="h-full">No Tenant</div>
       {/if}
     </div>
-  {:catch name}
-    <h1>Error</h1>
-  {/await}
 
-  <div class="flex justify-between gap-4 pl-4 pr-4 mt-2">
-    <div class="flex flex-col w-full gap-4">
-      <TenantInfoCard {tenantData} />
+    <div class="flex justify-between gap-4 pl-4 pr-4 mt-2">
+      <div class="flex flex-col w-full gap-4">
+        <TenantInfoCard {tenantData} />
 
-      <h1 class="text-sm text-neutral-400 mt-40 md:mt-0">
-        Data from last 7 days
-      </h1>
-      <div class="flex flex-col md:flex-row gap-2 w-full">
-        <MembershipAnalyticCard {tenantData} />
+        <h1 class="text-sm text-neutral-400 mt-40 md:mt-0">
+          Data from last 7 days
+        </h1>
+        <div class="flex flex-col md:flex-row gap-2 w-full">
+          <MembershipAnalyticCard {tenantData} />
+        </div>
       </div>
     </div>
-  </div>
 
   <div class="flex flex-col gap-2 my-2 pr-4">
     <div
@@ -389,38 +379,47 @@
           inputText="text-white"
         />
       </div>
-    </div>
 
-    {#await getMembers()}
-      <h1>Loading...</h1>
-    {:then name}
       <div class="flex flex-col gap-2 pl-4">
-        {#if isLoading}
-          <h1>Loading</h1>
-        {:else if members.length > 0}
-          {#each members as member, i}
-            <MembershipCard {member} />
-          {/each}
-        {:else}
-          <div class="h-full">No Members</div>
-        {/if}
-        <div class="flex justify-end gap-2">
-          <button
-            class="outline outline-1 outline-neutral-800 rounded-md p-2"
-            on:click={async () => await paginationMembers(false)}
-          >
-            Previous
-          </button>
-          <button
-            class="outline outline-1 outline-neutral-800 rounded-md p-2"
-            on:click={async () => await paginationMembers(true)}
-          >
-            Next
-          </button>
-        </div>
+        {#await getMembers(tenantData?.TID)}
+          <div class="animate-pulse">
+            {#each Array(10) as item}
+              <div class="bg-neutral-900 h-20 rounded-md" />
+            {/each}
+          </div>
+        {:then name}
+          {#if isLoading}
+            {#each Array(members.length) as item}
+              <div class="bg-neutral-900 h-20 rounded-md" />
+            {/each}
+          {:else if members}
+            {#if members.length > 0}
+              {#each members as member, i}
+                <MembershipCard {member} />
+              {/each}
+              {#if lastEvaluatedKey === undefined}
+                <h1 class="text-center mt-6">
+                  You have reached the end of the list
+                </h1>
+              {:else}
+                <button
+                  disabled={lastEvaluatedKey === undefined}
+                  class="bg-blue-600 rounded-md p-2 w-full disabled:opacity-50"
+                  on:click={async () => await loadMoreMembers(tenantData?.TID)}
+                >
+                  View more
+                </button>
+              {/if}
+            {:else}
+              <div class="h-full">No Members</div>
+            {/if}
+          {/if}
+        {:catch name}
+          <h1>Error</h1>
+        {/await}
       </div>
-    {:catch name}
-      <h1>Error</h1>
-    {/await}
+    </div>
   </div>
-</div>
+{:catch name}
+  <h1>Error</h1>
+{/await}

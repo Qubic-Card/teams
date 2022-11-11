@@ -7,7 +7,7 @@
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import Cropper from 'svelte-easy-crop';
   import getCroppedImg from '@lib/utils/canvas';
-
+  import CropModal from '@comp/modals/cropModal.svelte';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
   import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
@@ -58,7 +58,8 @@
   };
 
   const handleCrop = async (item) => {
-    showModal = false;
+    // showModal = false;
+    pond.removeFile();
     image = URL.createObjectURL(item.file);
     fileName = item.id.trim();
     isOpen = true;
@@ -189,7 +190,9 @@
   <Dialog
     open={showModal}
     on:close={() => (showModal = false)}
-    class="fixed inset-0 z-50 overflow-y-auto flex justify-center items-end md:items-center overflow-x-hidden"
+    class="fixed inset-0 {isOpen
+      ? 'z-20'
+      : 'z-50'} overflow-y-auto flex justify-center items-end md:items-center overflow-x-hidden"
   >
     <DialogOverlay
       class="fixed inset-0 bg-black opacity-50 z-10"
