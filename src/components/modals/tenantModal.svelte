@@ -58,7 +58,7 @@
   };
 
   const handleCrop = async (item) => {
-    // showModal = false;
+    showModal = false;
     pond.removeFile();
     image = URL.createObjectURL(item.file);
     fileName = item.id.trim();
@@ -111,6 +111,7 @@
   open={isOpen}
   on:close={() => {
     isOpen = false;
+    showModal = true;
     croppedImage = '';
     pond.removeFile();
   }}
