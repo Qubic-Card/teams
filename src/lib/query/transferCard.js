@@ -135,13 +135,11 @@ export const searchProfile = async (email) => {
 
   if (data) {
     if (data.length === 0) {
-      toastFailed('Email not found');
       selectedAddress.set({
         choosen: 1,
         uid: '',
       });
     } else {
-      toastSuccess('Email found');
       selectedAddress.set({
         choosen: 1,
         uid: data[0].uid,

@@ -72,8 +72,12 @@
             inputbg="bg-neutral-900"
             isEmailInput
           />
-          {#if $selectedAddress.uid}
-            <small class="text-green-500"> Email found! </small>
+          {#if email !== ''}
+            {#if $selectedAddress.uid}
+              <small class="text-green-500"> User found! </small>
+            {:else}
+              <small class="text-red-500"> User not found! </small>
+            {/if}
           {/if}
         {/if}
       </div>
