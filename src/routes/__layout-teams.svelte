@@ -199,7 +199,7 @@
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
-        {#if subscription?.isActive}
+        {#if subscription?.isActive || backupTeamData}
           {#if $teamData.name}
             {#if isSidebarOpened}
               <img
@@ -238,7 +238,7 @@
       <MenuButtonModal logo={$teamData.logo} />
     </div>
 
-    {#if subscription?.isActive}
+    {#if subscription?.isActive || backupTeamData}
       <div
         class={`border-r border-neutral-700 bg-black w-12 md:w-16 hidden md:block fixed ${
           sevenDaysAfterEndDate
@@ -338,7 +338,7 @@
     >
       <SvelteToast />
 
-      {#if subscription?.isActive}
+      {#if subscription?.isActive || backupTeamData}
         <slot />
       {:else if !subscription?.isActive && subscription?.isAfter7Days}
         <SubscriptionEnd {teamId} />
