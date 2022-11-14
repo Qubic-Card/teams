@@ -148,7 +148,7 @@
   }}
 >
   <slot slot="title">
-    <h1 class="font-bold">Change role</h1>
+    <h1 class="font-semibold">Change role</h1>
   </slot>
   <slot slot="text">
     <p>
@@ -170,18 +170,24 @@
   }}
 >
   <slot slot="title">
-    <h1 class="font-bold">Remove user</h1>
+    <h1 class="font-semibold">Remove user</h1>
   </slot>
   <slot slot="text">
     <div class="flex flex-col gap-4">
       <p>
         Are you sure you want to remove <br />
-        {memberProfile?.firstname}
-        {memberProfile?.lastname} from {$teamData.name} team?
+        <span class="font-semibold">
+          {memberProfile?.firstname}
+          {memberProfile?.lastname}
+        </span>
+        from
+        <span class="font-semibold">
+          {$teamData.name}
+        </span> team?
       </p>
       <p>
-        <span class="font-bold">WARNING!</span> All data from this user will be deleted.
-        Please consider backing up the data before removing.
+        <span class="font-semibold">WARNING!</span> All data from this user will
+        be deleted. <br /> Please consider backing up the data before removing.
       </p>
     </div>
   </slot>
@@ -212,7 +218,7 @@
       <div class="flex flex-col w-full gap-2">
         <div class="flex justify-between">
           <div class="flex gap-4 text-sm">
-            <h1 class="font-bold text-white">
+            <h1 class="font-semibold text-white">
               {memberProfile?.firstname ?? ''}
               {memberProfile?.lastname ?? ''}
             </h1>
@@ -274,7 +280,7 @@
     </div>
     {#if $user?.id === member.uid}
       <h1
-        class="hidden md:block absolute rounded-br-md rounded-tl-md text-xs font-bold bg-blue-600 p-[3px]"
+        class="hidden md:block absolute rounded-br-md rounded-tl-md text-xs font-semibold bg-blue-600 p-[3px]"
       >
         You
       </h1>
@@ -305,7 +311,7 @@
       <div class="flex justify-between items-center">
         <div class="flex justify-between w-full gap-4 md:text-sm text-xs">
           <div class="flex gap-2">
-            <h1 class="font-bold text-white md:text-sm text-xs">
+            <h1 class="font-semibold text-white md:text-sm text-xs">
               {memberProfile?.firstname ?? ''}
               {memberProfile?.lastname ?? ''}
             </h1>
@@ -468,7 +474,7 @@
   </div>
   {#if $user?.id === member.uid}
     <h1
-      class="hidden md:block absolute rounded-br-md rounded-tl-md text-xs font-bold bg-blue-600 p-[3px]"
+      class="hidden md:block absolute rounded-br-md rounded-tl-md text-xs font-semibold bg-blue-600 p-[3px]"
     >
       You
     </h1>

@@ -52,7 +52,7 @@
   out:fade|local={{ duration: 150 }}
   class="h-12 text-xs md:text-sm text-left py-6 px-4 mb-2 bg-neutral-900 text-neutral-300 border-b border-neutral-800"
 >
-  <td class="font-bold text-ellipsis pl-4">
+  <td class="font-semibold text-ellipsis pl-4">
     <p class="w-56 lg:w-80 truncate">
       {#if record.storage_url}
         {record?.filename?.split('-').slice(0, -1).join('-') ?? '-'}
@@ -102,7 +102,7 @@
         }}
       >
         <slot slot="title">
-          <h1 class="font-bold">Remove record</h1>
+          <h1 class="font-semibold">Remove record</h1>
         </slot>
         <slot slot="text">
           <div class="flex flex-col gap-4">

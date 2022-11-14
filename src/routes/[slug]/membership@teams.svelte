@@ -29,7 +29,7 @@
     <div
       class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 py-3 border-b mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
     >
-      <h1 class="text-xl font-bold flex-grow w-1/2">Members</h1>
+      <h1 class="text-xl font-semibold flex-grow w-1/2">Members</h1>
 
       <div class="flex gap-2 md:w-1/2 w-full items-center">
         <div

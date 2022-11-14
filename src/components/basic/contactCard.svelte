@@ -99,11 +99,11 @@
           alt="close"
         />
         <p class="text-center mt-2">
-          Are you sure you want to delete <span class="font-bold"
+          Are you sure you want to delete <span class="font-semibold"
             >{profile?.profileData?.firstname}</span
           > from your connection?
         </p>
-        <small class="font-bold text-center"
+        <small class="font-semibold text-center"
           >This action cannot be undone.</small
         >
       </div>
@@ -176,7 +176,7 @@
             />
           {/if}
           <div class="flex flex-col text-center">
-            <p class="font-bold">
+            <p class="font-semibold">
               {profile?.profileData?.firstname ??
                 profile?.profileData?.firstName}
               {profile?.profileData?.lastname ?? profile?.profileData?.lastName}
@@ -244,7 +244,7 @@
               ),
               'contact'
             )}
-          class="w-full bg-blue-600 hover:font-bold text-white mx-auto p-3 rounded-md"
+          class="w-full bg-blue-600 hover:font-semibold text-white mx-auto p-3 rounded-md"
         >
           Save contact
         </button>

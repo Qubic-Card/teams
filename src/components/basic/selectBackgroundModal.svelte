@@ -193,7 +193,7 @@
               <div class="m-1 bg-black mt-2 flex flex-col">
                 <div
                   on:click={() => pickHandler(item)}
-                  class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
+                  class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-semibold ${
                     item.urls.regular === selectedImage
                       ? 'border-4 border-black'
                       : ''

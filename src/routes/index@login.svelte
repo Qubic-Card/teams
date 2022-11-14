@@ -76,7 +76,9 @@
             <div class="text-xl">
               <div class="flex items-center">
                 <img src="/qubic-black.svg" alt="" width="40" height="40" />
-                <span class="text-3xl md:text-4xl font-bold ml-2">Editor</span>
+                <span class="text-3xl md:text-4xl font-semibold ml-2"
+                  >Editor</span
+                >
               </div>
             </div>
             {#if !isSuccessful}

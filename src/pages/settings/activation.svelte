@@ -8,7 +8,7 @@
     class="bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg p-4 w-full md:w-3/4 flex flex-col md:flex-row justify-between items-center"
   >
     <div class="flex flex-col gap-2 w-full md:w-auto">
-      <h1 class="font-bold text-sm md:text-xl">Activation Code</h1>
+      <h1 class="font-semibold text-sm md:text-xl">Activation Code</h1>
       <input
         on:input
         on:keypress

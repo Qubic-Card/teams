@@ -8,15 +8,20 @@
     selectedAddress,
     selectedProfileMenu,
   } from '@lib/stores/subsEndStore';
-
+  import supabase from '@lib/db';
+  import { toastFailed } from '@lib/utils/toast';
+  import { searchProfile } from '@lib/query/transferCard';
   export let bulkTransfer = false,
     disabled;
 
   let showModal = false;
+  let email = '';
 
   const toggleModal = () => {
     showModal = !showModal;
     $selectedAddress.choosen = 0;
+    $selectedAddress.uid = '';
+    email = '';
     $selectedProfileMenu = 'Transfer with current profile';
   };
   const dispatch = createEventDispatcher();
@@ -25,8 +30,6 @@
     dispatch('transfer');
     toggleModal();
   };
-
-  // $: console.log($selectedAddress);
 </script>
 
 <button
@@ -54,7 +57,7 @@
       on:click={toggleModal}
     />
     <div
-      class="flex flex-col justify-between bg-neutral-800 text-white w-full md:w-[30%] h-auto p-4 z-40 rounded-md gap-8 outline outline-1 outline-neutral-700"
+      class="flex flex-col justify-between bg-neutral-800 text-white w-full md:w-[30%] h-auto p-4 z-40 rounded-md gap-8"
     >
       <h1 class="text-lg">Select how you want to transfer</h1>
       <div class="flex flex-col gap-2">
@@ -64,9 +67,14 @@
           <Input
             title=""
             placeholder="Email"
-            bind:value={$selectedAddress.email}
+            bind:value={email}
+            on:change={async () => await searchProfile(email)}
             inputbg="bg-neutral-900"
+            isEmailInput
           />
+          {#if $selectedAddress.uid}
+            <small class="text-green-500"> Email found! </small>
+          {/if}
         {/if}
       </div>
       <div class="flex flex-col">
@@ -80,8 +88,9 @@
           >Cancel</button
         >
         <button
+          disabled={$selectedAddress.uid === ''}
           on:click={handleTransfer}
-          class="outline outline-1 outline-red-500 hover:outline-red-600 w-40 bg-red-600/40 p-2 rounded-md text-center"
+          class="outline outline-1 outline-red-500 hover:outline-red-600 w-40 bg-red-600/40 p-2 rounded-md text-center disabled:opacity-50"
           >Proceed</button
         >
       </div>

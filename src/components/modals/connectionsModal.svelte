@@ -72,7 +72,7 @@
           </div>
         {/if}
         <div class="flex flex-col  mt-3">
-          <p class="font-bold">
+          <p class="font-semibold">
             {connection.profileData.firstname ?? ''}
             {connection.profileData.lastname ?? ''}
           </p>
@@ -150,7 +150,7 @@
             ),
             'contact'
           )}
-        class="w-full bg-blue-600 rounded-md hover:font-bold text-white text-xs md:text-sm mx-auto p-3 mb-4"
+        class="w-full bg-blue-600 rounded-md hover:font-semibold text-white text-xs md:text-sm mx-auto p-3 mb-4"
       >
         Save to Contacts
       </button>

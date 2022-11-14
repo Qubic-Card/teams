@@ -5,7 +5,7 @@
 
 <div class="flex flex-col lg:w-1/2 w-full">
   <div class="flex w-full justify-between">
-    <h1 class="text-lg font-regular">{label}</h1>
+    <h1 class="text-lg font-semibold">{label}</h1>
   </div>
   <div
     class="h-80 {editor === 'team'

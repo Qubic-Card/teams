@@ -167,7 +167,7 @@
 <div class="flex flex-col pb-20 bg-black min-h-screen pl-0 md:pl-16  gap-2">
   {#if permissions.analytics}
     <div
-      class="border-b border-neutral-700 h-12 text-lg font-regular pt-2 top-0 sticky w-full bg-black pl-6 z-10"
+      class="border-b border-neutral-700 h-12 text-lg font-semibold pt-2 top-0 sticky w-full bg-black pl-6 z-10"
     >
       Team Performance
     </div>
@@ -186,17 +186,17 @@
     <div
       class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 border-b pt-3 mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
     >
-      <div class="flex gap-2 w-full lg:w-1/2">
+      <div class="flex gap-6 w-full lg:w-1/2">
         {#each menu as item, i}
           <div
             on:click={() => {
               selectMenu(i);
               resetSortHandler();
             }}
-            class="text-md md:text-lg font-bold cursor-pointer w-full md:w-auto text-center pb-3 {selectedMenu ===
+            class="cursor-pointer w-full md:w-auto text-center {selectedMenu ===
             i
-              ? 'border-b-2 border-neutral-400'
-              : ''}"
+              ? 'border-b-2 border-neutral-400 font-semibold text-md md:text-lg pb-3'
+              : 'font-regular text-neutral-400 text-sm md:text-md my-auto'}"
           >
             {item}
           </div>
@@ -279,7 +279,7 @@
         <div>
           <h1 class="text-xl text-white text-center w-full mt-8">
             Some error occurred. Please reload the page and try again <br /> or
-            <a href="https://wa.me/628113087599" class="font-bold">
+            <a href="https://wa.me/628113087599" class="font-semibold">
               contact us!
             </a>
           </h1>
@@ -311,7 +311,7 @@
           <h1 class="text-xl text-white text-center w-full mt-8">
             Some error occurred. Please reload the page and try again <br />
             or
-            <a href="https://wa.me/628113087599" class="font-bold">
+            <a href="https://wa.me/628113087599" class="font-semibold">
               contact us!
             </a>
           </h1>

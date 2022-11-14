@@ -59,7 +59,7 @@
     {#if open}
       <div transition:fade|local={{ duration: 100 }}>
         <ListboxOptions
-          class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-40 mt-2 shadow-md z-50 rounded-md"
+          class="absolute bg-neutral-900 border border-neutral-700 p-2 w-40 mt-2 shadow-md z-50 rounded-md"
         >
           {#if roles}
             <!-- {#if selected !== '' ? selected !== 'Super Admin' : role?.role_name !== 'superadmin'} -->

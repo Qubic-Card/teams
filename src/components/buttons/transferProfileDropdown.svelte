@@ -37,7 +37,7 @@
     {#if open}
       <div transition:fade|local={{ duration: 100 }}>
         <ListboxOptions
-          class="absolute bg-neutral-900 outline outline-1 outline-neutral-700 p-2 w-96 mt-2 shadow-md z-50 gap-2 flex flex-col rounded-md"
+          class="absolute bg-neutral-900 border border-neutral-700 p-2 w-96 mt-2 shadow-md z-50 gap-2 flex flex-col rounded-md"
         >
           {#each options as item}
             <ListboxOption

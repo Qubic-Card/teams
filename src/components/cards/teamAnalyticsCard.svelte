@@ -154,6 +154,16 @@
       active = unique;
     }
   };
+
+  const formatNumber = (int) => {
+    if (int >= 1000 && int < 1000000) {
+      return (int / 1000).toFixed(1) + 'K';
+    } else if (int >= 1000000) {
+      return (int / 1000000).toFixed(1) + 'M';
+    } else {
+      return int;
+    }
+  };
 </script>
 
 {#await (getTeamWeeklyLogsActivity(), getTeamConnections())}
@@ -166,11 +176,13 @@
       <div
         class="flex justify-between w-full h-1/2 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-lg p-3"
       >
-        <div class="grid grid-cols-[70px_100px] justify-between items-center">
-          <h1 class="text-sm md:text-md font-bold">
-            {item.data}
+        <div
+          class="grid grid-cols-[minmax(25px,_1fr)_100px] gap-2 justify-between items-center"
+        >
+          <h1 class="text-md md:text-xl font-semibold">
+            {formatNumber(item.data)}
           </h1>
-          <h1 class="text-xs md:text-sm text-neutral-400 font-bold">
+          <h1 class="text-xs md:text-sm text-neutral-400">
             {item.type}
           </h1>
         </div>
@@ -194,11 +206,11 @@
   <div
     class="flex flex-col justify-center items-center gap-2 w-full md:w-1/3 h-32 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-md"
   >
-    <h1 class="font-bold">Error</h1>
+    <h1 class="font-semibold">Error</h1>
     <p class="text-sm">
       Please, reload the page or <a
         href="https://wa.me/628113087599"
-        class="font-bold"
+        class="font-semibold"
       >
         contact us!
       </a>
@@ -215,7 +227,7 @@
     <div
       class="w-full md:w-1/3 outline outline-1 outline-neutral-800 bg-neutral-900 p-4 h-24 md:h-32 rounded-md flex flex-col justify-between "
     >
-      <h1 class="text-md md:text-lg">Members Efficiency</h1>
+      <h1 class="text-md md:text-lg font-semibold">Members Efficiency</h1>
 
       <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
         <div
@@ -245,11 +257,11 @@
     <div
       class="flex flex-col justify-center items-center gap-2 w-full md:w-1/3 h-32 outline outline-1 outline-neutral-800 bg-neutral-900 rounded-md"
     >
-      <h1 class="font-bold">Error</h1>
+      <h1 class="font-semibold">Error</h1>
       <p class="text-sm">
         Please, reload the page or <a
           href="https://wa.me/628113087599"
-          class="font-bold"
+          class="font-semibold"
         >
           contact us!
         </a>
@@ -263,7 +275,9 @@
     class="flex w-full md:w-1/3 h-24 md:h-32 rounded-md outline outline-1 outline-neutral-800 bg-neutral-900 p-4"
   >
     <div class="w-full flex flex-col justify-between">
-      <h1 class="text-md md:text-lg">Social Media Effectiveness</h1>
+      <h1 class="text-md md:text-lg font-semibold">
+        Social Media Effectiveness
+      </h1>
       {#if checkDataAvailability(socialsCount)}
         <div class="bg-neutral-600 w-full h-4 flex items-center  rounded-sm">
           {#each socialsCount as item}
@@ -315,7 +329,7 @@
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      <a href="https://wa.me/628113087599" class="font-semibold"> contact us! </a>
     </h1>
   </div>
 {/await} -->

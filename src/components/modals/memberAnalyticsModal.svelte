@@ -138,7 +138,7 @@
     on:close={closeModal}
     class="transition-all md:transition-none duration-300 ease-in-out {isOpen
       ? 'h-full md:h-[80%]'
-      : 'h-0 translate-y-10 md:opacity-0'} text-xs md:text-sm bg-neutral-900 text-white outline-1 outline outline-neutral-700 gap-2 top-0 md:top-[10%] right-0 md:right-9 flex flex-col ml-0 lg:ml-12 w-full md:w-[95%] pb-2 bottom-20 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none"
+      : 'h-0 translate-y-10 md:opacity-0'} text-xs md:text-sm bg-neutral-900 text-white border border-neutral-700 gap-2 top-0 md:top-[10%] right-0 md:right-9 flex flex-col ml-0 lg:ml-12 w-full md:w-[95%] pb-2 bottom-20 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none"
   >
     <div
       on:click={() => (isOpen = true)}
@@ -154,7 +154,7 @@
             alt={member?.team_profile?.firstname + ' avatar'}
           />
           <div class="flex flex-col w-full">
-            <h1 class="font-bold text-white text-md md:text-lg">
+            <h1 class="font-semibold text-white text-md md:text-lg">
               {member?.team_profile?.firstname ?? ''}
               {member?.team_profile?.lastname ?? ''}
             </h1>

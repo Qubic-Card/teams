@@ -21,7 +21,7 @@
 >
   <td
     on:click={modalHandler}
-    class="font-bold truncate pl-4 cursor-pointer flex-1"
+    class="font-semibold truncate pl-4 cursor-pointer flex-1"
   >
     <p class="flex items-center gap-1">
       {connection?.profileData?.firstname ?? ''}
@@ -66,7 +66,7 @@
               }}
             >
               <slot slot="title">
-                <h1 class="font-bold">Remove Connection</h1>
+                <h1 class="font-semibold">Remove Connection</h1>
               </slot>
               <slot slot="text">
                 <p>

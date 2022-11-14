@@ -474,7 +474,7 @@
               <TabPanel>
                 <div class="border mb-4 rounded-lg p-4">
                   <div class="flex justify-between items-center">
-                    <h1 class="font-bold text-lg">Socials</h1>
+                    <h1 class="font-semibold text-lg">Socials</h1>
                     <AddSocialsModal profileData={$basicProfile} />
                   </div>
                   {#if $basicProfile.isBusiness}
@@ -522,7 +522,7 @@
               <TabPanel>
                 <div class="border p-4 rounded-lg mb-0 lg:mb-4">
                   <div class="flex justify-between items-center">
-                    <h1 class="font-bold text-lg">Links</h1>
+                    <h1 class="font-semibold text-lg">Links</h1>
                     <img
                       class="h-10 w-10 cursor-pointer"
                       on:click={() =>
@@ -587,7 +587,7 @@
     <div>
       <h1 class="text-xl text-black text-center w-full mt-8">
         Some error occurred. Please reload the page and try again <br /> or
-        <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+        <a href="https://wa.me/628113087599" class="font-semibold"> contact us! </a>
       </h1>
     </div>
   {/await}

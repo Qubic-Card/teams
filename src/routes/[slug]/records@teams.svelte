@@ -115,16 +115,15 @@
             <Tab
               class={({ selected }) =>
                 selected
-                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2 w-full md:w-1/5 h-full'
-                  : 'text-white text-xs md:text-sm pb-2 w-full md:w-1/5 h-full'}
+                  ? 'text-white text-sm md:text-md font-semibold border-b-2 border-white pb-2 w-full md:w-1/4 h-full'
+                  : 'text-white text-xs pb-2 w-full md:w-1/5 h-full'}
               >Personal</Tab
             >
             <Tab
               class={({ selected }) =>
                 selected
-                  ? 'text-white text-xs md:text-sm font-bold border-b-2 border-white pb-2 w-full md:w-1/5 h-full'
-                  : 'text-white text-xs md:text-sm pb-2 w-full md:w-1/5 h-full'}
-              >Team</Tab
+                  ? 'text-white text-sm md:text-md font-semibold border-b-2 border-white pb-2 w-full md:w-1/4 h-full'
+                  : 'text-white text-xs pb-2 w-full md:w-1/5 h-full'}>Team</Tab
             >
           </div>
         </TabList>
@@ -156,7 +155,9 @@
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      <a href="https://wa.me/628113087599" class="font-semibold">
+        contact us!
+      </a>
     </h1>
   </div>
 {/await}

@@ -74,7 +74,7 @@
       class="flex flex-col justify-between bg-neutral-800 text-white w-full md:w-[40%] h-44 p-2 z-40 rounded-md"
     >
       <div
-        class="text-md md:text-lg border-b border-neutral-700 flex justify-between"
+        class="text-md md:text-lg border-b font-semibold border-neutral-700 flex justify-between"
       >
         Change Role Name
         <button on:click={toggleModal} class="self-start">

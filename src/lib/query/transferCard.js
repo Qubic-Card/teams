@@ -1,5 +1,7 @@
+import { toastFailed, toastSuccess } from '@lib/utils/toast';
+
+import { selectedAddress } from '@lib/stores/subsEndStore';
 import supabase from '@lib/db';
-import { toastFailed } from '@lib/utils/toast';
 
 const uniqueByKeepFirst = (a, key) => {
   let seen = new Set();
@@ -119,6 +121,7 @@ export const updateBasicProfile = async (member) => {
 };
 
 export const searchProfile = async (email) => {
+  console.log(email);
   const { data, error } = await supabase
     .from('profile')
     .select('uid')
@@ -130,5 +133,19 @@ export const searchProfile = async (email) => {
     return false;
   }
 
-  return data[0].uid;
+  if (data) {
+    if (data.length === 0) {
+      toastFailed('Email not found');
+      selectedAddress.set({
+        choosen: 1,
+        uid: '',
+      });
+    } else {
+      toastSuccess('Email found');
+      selectedAddress.set({
+        choosen: 1,
+        uid: data[0].uid,
+      });
+    }
+  }
 };

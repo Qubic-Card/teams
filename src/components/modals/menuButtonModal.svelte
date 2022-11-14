@@ -57,36 +57,36 @@
     open={isOpen}
     on:close={() => (isOpen = false)}
     class="transition-all md:transition-none duration-300 ease-in-out {isOpen
-      ? `${editor === 'team' ? 'h-44' : 'h-40'}`
+      ? 'h-48'
       : 'h-0 translate-y-10 md:opacity-0'} {editor == 'team'
-      ? 'bg-neutral-900 text-white p-3 outline outline-1 outline-neutral-700 gap-2 md:top-20 right-0 md:right-6'
+      ? 'bg-neutral-900 text-white p-3 border border-neutral-700 gap-2 md:top-20 right-0 md:right-6'
       : 'bg-white text-black gap-2 p-3 md:top-16 right-0 md:right-4'} flex flex-col ml-0 lg:ml-12 w-full md:w-96 md:max-w-xs px-4 pb-4 bottom-0 fixed z-50 shadow-lg rounded-lg outline-none focus:outline-none overflow-y-auto snap-container"
   >
     {#if editor === 'team'}
       {#if $user}
-        <h1 class="md:text-sm text-neutral-300 text-xs">
-          Logged-in as <br /><strong class="text-white text-lg">{$user?.email ?? ''}</strong>
-        </h1>
+        <p class="text-sm">
+          Logged-in as <br />
+        </p>
+        <p class="text-white">{$user?.email ?? ''}</p>
       {/if}
     {/if}
 
     {#if editor === 'basic'}
       <a
-        class="border-b hover:font-bold md:text-sm text-xs"
+        class="border-b hover:font-semibold md:text-sm text-xs"
         href="https://qubic.id/pages/contactus">Contact Support</a
       >
       <a
-        class="hover:font-bold md:text-sm text-xs"
+        class="hover:font-semibold md:text-sm text-xs"
         href="https://qubic.id/products#howitworks">Tutorial</a
       >
     {/if}
 
+    <div class="border-b border-neutral-700 my-1" />
+
+    <h2 class="font-semibold">Actions</h2>
     <button
-      class="{editor === 'team'
-
-        ? 'text-white bg-blue-600 rounded-md'
-        : ' bg-blue-600 rounded-md '} p-1 w-full flex h-8 justify-center items-center text-xs md:text-sm"
-
+      class="w-full flex items-center h-8 text-xs md:text-sm"
       on:click={() => {
         $isInViewTriggered = false;
         goto('/');
@@ -95,10 +95,7 @@
       Change Editor
     </button>
     <button
-      class="{editor === 'team'
-        ? 'text-red-300 bg-red-600/30 outline outline-red-500 outline-1 rounded-md'
-        : 'text-red-300 bg-red-600/30 outline outline-red-500 outline-1 rounded-md'} text-xs md:text-sm p-2 w-full h-9"
-
+      class="flex items-center text-xs md:text-sm w-full h-9"
       on:click={handleLogout}>Log Out</button
     >
   </Dialog>

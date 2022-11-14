@@ -40,7 +40,7 @@
         bg = 'bg-white';
         break;
       case 'black':
-        bg = 'bg-black';
+        bg = 'bg-neutral-800';
         break;
       default:
         bg = 'bg-neutral-900';

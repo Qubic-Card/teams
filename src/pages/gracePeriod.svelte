@@ -67,7 +67,7 @@
   on:action={async () => await setSubsEndDate()}
 >
   <slot slot="title">
-    <h1 class="font-bold">Transfer cards</h1>
+    <h1 class="font-semibold">Transfer cards</h1>
   </slot>
   <slot slot="text">
     <p>
@@ -81,7 +81,9 @@
   class="flex flex-col w-full h-full gap-8 text-white justify-center items-center p-10 md:p-0"
 >
   <div class="flex flex-col text-center">
-    <h1 class="text-2xl md:text-3xl font-bold">{hours}:{minutes}:{seconds}</h1>
+    <h1 class="text-2xl md:text-3xl font-semibold">
+      {hours}:{minutes}:{seconds}
+    </h1>
     <h2 class="text-lg md:text-xl">Grace Period Duration</h2>
   </div>
 

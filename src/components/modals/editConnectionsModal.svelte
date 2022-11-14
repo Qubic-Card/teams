@@ -83,7 +83,7 @@
   >
 
   <div class="flex flex-col mb-2 z-30">
-    <h1 class="font-bold text-xl text-white mb-2">Identity</h1>
+    <h1 class="font-semibold text-xl text-white mb-2">Identity</h1>
     <Input
       placeholder="Firstname"
       title="Firstname"
@@ -115,7 +115,7 @@
   </div>
   <div class="flex flex-col mb-2 z-30">
     <div class="flex justify-between">
-      <h1 class="font-bold text-xl text-white mb-2">Socials</h1>
+      <h1 class="font-semibold text-xl text-white mb-2">Socials</h1>
       <AddSocialsModal />
     </div>
     {#each $socials as social}
@@ -158,7 +158,7 @@
 
   <div class="flex flex-col mb-2 z-30">
     <div class="flex justify-between items-center">
-      <h1 class="font-bold text-xl text-white">Links</h1>
+      <h1 class="font-semibold text-xl text-white">Links</h1>
       <img
         class="h-10 w-10 cursor-pointer"
         on:click={addLink}
