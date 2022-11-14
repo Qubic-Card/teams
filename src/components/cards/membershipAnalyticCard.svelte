@@ -70,7 +70,7 @@
         class="flex justify-between w-full h-1/2 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-md p-3"
       >
         <div class="flex justify-between items-center">
-          <h1 class="text-sm md:text-md font-bold">
+          <h1 class="text-sm md:text-md font-semibold">
             {item.data}
             <span class="text-xs md:text-sm text-neutral-400">{item.type}</span>
           </h1>
@@ -169,7 +169,7 @@
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      <a href="https://wa.me/628113087599" class="font-semibold"> contact us! </a>
     </h1>
   </div>
 {/await} -->

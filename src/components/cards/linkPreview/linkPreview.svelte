@@ -47,7 +47,7 @@
 
 <div class={`Container p-2 ${className}`} on:click={teamClickHandler}>
   <div class="LowerContainer">
-    <h3 class="font-bold my-2">{title ?? data.title}</h3>
+    <h3 class="font-semibold my-2">{title ?? data.title}</h3>
 
     {#if data}
       {#if isShowMetaImage}

@@ -33,7 +33,7 @@
 
   {#if open}
     <MenuItems
-      class={`${$$props.class} mt-24 gap-2 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md outline outline-1 outline-neutral-800 p-2 w-64`}
+      class={`${$$props.class} mt-24 gap-2 z-40 absolute rounded-md flex flex-col bg-neutral-900 shadow-md border border-neutral-800 p-2 w-64`}
     >
       {#each days as item}
         <MenuItem

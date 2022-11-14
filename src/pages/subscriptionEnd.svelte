@@ -17,13 +17,13 @@
   } from '@lib/stores/subsEndStore';
 
   export let teamId;
-  let expiredMembers = [];
+  let expiredCards = [];
   let isLoading = false;
   let selectedCards = new Set();
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
-  const getExpiredMembers = async () => {
+  const getExpiredCards = async () => {
     const { data: cards, error } = await supabase
       .from('business_cards')
       .select('color, id, type, member: team_members(uid, id, team_profile)')
@@ -48,8 +48,8 @@
           );
           if (error) console.log(error);
           if (data) {
-            expiredMembers = [
-              ...expiredMembers,
+            expiredCards = [
+              ...expiredCards,
               {
                 ...cards[index],
                 email: data,
@@ -72,27 +72,13 @@
 
   const onSelectAll = (event) => {
     if (event.target.checked) {
-      selectedCards = new Set(expiredMembers.map((m) => m.id));
+      selectedCards = new Set(expiredCards.map((m) => m.id));
     } else {
       selectedCards.clear();
     }
     selectedCards = selectedCards;
   };
 
-  // 39ba7789-537c-4b0f-a8a7-c8a8345838f3 1
-  // eac9c236-da25-4d9c-a058-632bd92bc951 2
-  // bec89896-55b3-4e5a-b66f-01bd1aa4b5e9 3
-  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
-  // cc9f06e7-b6eb-44c8-8817-a2f729df3aa3
-
-  // 613572e9-f471-4f0d-90d2-d8511d1ac462
-  // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
-  // 121
-
-  // eac9c236-da25-4d9c-a058-632bd92bc951
-  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb // di team member
-  // 2
-  // c8069595-2a92-487a-8756-2ab437c29757 //eac
   const transferCardHandler = async (card, toast) => {
     isLoading = true;
     if ($selectedAddress.choosen === 0) {
@@ -104,12 +90,10 @@
       }
       if (toast) toastSuccess('Card transfered successfully');
 
-      expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
+      expiredCards = expiredCards.filter((item) => item.id !== card.id);
     } else {
-      let uid = await searchProfile($selectedAddress.email);
-
-      if (uid) {
-        card.member[0].uid = uid;
+      if ($selectedAddress.uid) {
+        card.member[0].uid = $selectedAddress.uid;
 
         await deleteTeamCardCon(card.id);
         await changeCardMode(card.id);
@@ -120,9 +104,7 @@
 
         if (toast) toastSuccess('Card transfered successfully');
 
-        expiredMembers = expiredMembers.filter((item) => item.id !== card.id);
-      } else {
-        toastFailed('Email not found');
+        expiredCards = expiredCards.filter((item) => item.id !== card.id);
       }
     }
 
@@ -133,9 +115,7 @@
     isLoading = true;
     let selectedArr = Array.from(selectedCards);
 
-    selectedArr = expiredMembers.filter((item) =>
-      selectedArr.includes(item.id)
-    );
+    selectedArr = expiredCards.filter((item) => selectedArr.includes(item.id));
 
     selectedArr.forEach(async (card) => {
       await transferCardHandler(card, false);
@@ -157,9 +137,7 @@
       isLoading = false;
     } else {
       // console.log(data);
-      expiredMembers = expiredMembers.filter(
-        (item) => !cards.includes(item.id)
-      );
+      expiredCards = expiredCards.filter((item) => !cards.includes(item.id));
 
       toastSuccess('Card deleted successfully');
       isLoading = false;
@@ -169,36 +147,34 @@
   const bulkDelete = async () => {
     let selectedArr = Array.from(selectedCards);
 
-    selectedArr = expiredMembers.filter((item) =>
-      selectedArr.includes(item.id)
-    );
+    selectedArr = expiredCards.filter((item) => selectedArr.includes(item.id));
 
     deleteCard(selectedArr.map((c) => c.id));
   };
 </script>
 
-{#await getExpiredMembers()}
+{#await getExpiredCards()}
   <div class="animate-pulse w-full h-full p-2 flex flex-col gap-2">
     <div class="bg-neutral-900 w-full rounded-md h-16" />
     <div class="bg-neutral-900 w-full rounded-md h-12" />
-    {#if expiredMembers.length < 1}
+    {#if expiredCards.length < 1}
       {#each Array(5) as item}
         <div class="bg-neutral-900 w-full rounded-md h-12" />
       {/each}
     {:else}
-      {#each expiredMembers as item}
+      {#each expiredCards as item}
         <div class="bg-neutral-900 w-full rounded-md h-12" />
       {/each}
     {/if}
   </div>
 {:then name}
-  {#if expiredMembers}
+  {#if expiredCards}
     <div
       class="flex flex-col text-white w-full h-screen gap-2 text-sm"
       transition:fade|local
     >
       <div
-        class="text-xl border-b pl-4 p-2 border-neutral-700 font-bold pb-2 fixed bg-black h-12 w-full flex items-center justify-between"
+        class="text-xl border-b pl-4 p-2 border-neutral-700 font-semibold pb-2 fixed bg-black h-12 w-full flex items-center justify-between"
       >
         <h1 class="text-sm md:text-lg">Transfer Cards</h1>
         <div class="flex gap-2">
@@ -222,7 +198,7 @@
                 type="checkbox"
                 class="w-5 h-5 cursor-pointer disabled:cursor-default"
                 checked={selectedCards.size ===
-                  expiredMembers.map((m) => m.id).length}
+                  expiredCards.map((m) => m.id).length}
                 on:change={onSelectAll}
               />
             </th>
@@ -233,7 +209,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each expiredMembers as card}
+          {#each expiredCards as card}
             <tr class="bg-neutral-900 border-b-2 border-neutral-800">
               <td class="py-2 pl-4">
                 <input
@@ -271,7 +247,9 @@
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      <a href="https://wa.me/628113087599" class="font-semibold">
+        contact us!
+      </a>
     </h1>
   </div>
 {/await}

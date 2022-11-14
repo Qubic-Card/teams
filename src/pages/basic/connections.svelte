@@ -132,7 +132,7 @@
             <CardMock>
               <div class="flex flex-col justify-between h-full flex-1">
                 <div class="text-white p-6">
-                  <h1 class="text-lg lg:text-xl font-bold">
+                  <h1 class="text-lg lg:text-xl font-semibold">
                     {card?.card_id?.type?.toUpperCase()}
                     {card?.card_id?.color?.toUpperCase()}
                   </h1>
@@ -143,17 +143,21 @@
                 <div class="flex flex-row justify-between px-6">
                   <div class="text-white items-center">
                     <p class="text-neutral-400 text-xs">NFC Taps</p>
-                    <p class="font-bold text-lg lg:text-2xl">{card.NFCtap}</p>
+                    <p class="font-semibold text-lg lg:text-2xl">
+                      {card.NFCtap}
+                    </p>
                   </div>
                   <div class="text-white items-center">
                     <p class="text-neutral-400 text-xs">QR Scan</p>
-                    <p class="font-bold text-lg lg:text-2xl">{card.QRScan}</p>
+                    <p class="font-semibold text-lg lg:text-2xl">
+                      {card.QRScan}
+                    </p>
                   </div>
                 </div>
                 <div
                   class="flex justify-between rounded-b-lg bg-white px-6 py-4 w-full"
                 >
-                  <p class="text-black font-bold">
+                  <p class="text-black font-semibold">
                     {card.status ? 'Active' : 'Inactive'}
                   </p>
                   <SwitchButton

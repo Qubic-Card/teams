@@ -342,7 +342,7 @@
                 <!-- SOCIAL EDITOR -->
                 <div class="outline-1 outline outline-neutral-700 mb-4 p-4">
                   <div class="flex justify-between items-center">
-                    <h1 class="font-bold text-lg text-white">Socials</h1>
+                    <h1 class="font-semibold text-lg text-white">Socials</h1>
                     <AddSocialsModal
                       class={`${
                         permissions.writeProfile || permissions.writeMembers
@@ -530,7 +530,7 @@
                   class="outline-1 outline outline-neutral-700 p-4 mb-0 lg:mb-4"
                 >
                   <div class="flex justify-between items-center">
-                    <h1 class="font-bold text-lg text-white">Links</h1>
+                    <h1 class="font-semibold text-lg text-white">Links</h1>
                     <img
                       class={`h-10 w-10 cursor-pointer ${
                         permissions.writeProfile || permissions.writeMembers

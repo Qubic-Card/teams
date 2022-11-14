@@ -26,11 +26,6 @@
       if (!checked.includes('allow_read_team')) checked.push('allow_read_team');
     }
 
-    if (checked.includes('allow_write_billing')) {
-      if (!checked.includes('allow_read_billing'))
-        checked.push('allow_read_billing');
-    }
-
     if (checked.includes('allow_write_connections')) {
       if (!checked.includes('allow_read_connections'))
         checked.push('allow_read_connections');
@@ -49,9 +44,7 @@
         'allow_read_members',
         'allow_read_analytics',
         'allow_read_connections',
-        'allow_read_billing',
         'allow_write_profile',
-        'allow_write_billing',
         'allow_write_team',
         'allow_write_members',
         'allow_write_roles',
@@ -68,7 +61,6 @@
   let companyRole = [roles[1], roles[7]];
   let analyticsRecords = [roles[2], roles[9]];
   let role = [roles[4], roles[10]];
-  let billing = [roles[5], roles[11]];
   let profile = [roles[8], roles[13]];
   let connections = [roles[3], roles[12]];
 
@@ -90,9 +82,6 @@
     },
     {
       role: { title: 'Role', roles: [role[0], role[1]] },
-    },
-    {
-      role: { title: 'Billing', roles: [billing[0], billing[1]] },
     },
     {
       role: { title: 'Connection', roles: [connections[0], connections[1]] },
@@ -120,7 +109,7 @@
   {/if}
 
   {#each rolesArr.map((item) => item.role) as items, i}
-    <h1 class="font-bold text-sm my-4 ml-2 self-start">{items.title}</h1>
+    <h1 class="font-semibold text-sm my-4 ml-2 self-start">{items.title}</h1>
 
     {#each items.roles as role}
       <div

@@ -86,7 +86,7 @@
   }}
 >
   <div class="p-2 pt-4 md:0 flex justify-between">
-    <h1 class="font-bold">Add new role</h1>
+    <h1 class="font-semibold">Add new role</h1>
     <button on:click={() => (showModal = false)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -34,7 +34,7 @@
       on:click={toggleModal}
     />
     <div
-      class="flex flex-col bg-neutral-800 text-white w-full md:w-[60%] lg:w-[40%] h-auto p-2 z-40 rounded-md"
+      class="flex flex-col bg-neutral-800 text-white w-full md:w-[60%] lg:w-[40%] h-auto p-2 z-40 rounded-md border border-neutral-700"
     >
       <div
         class="text-md md:text-lg border-b border-neutral-700 flex justify-between"

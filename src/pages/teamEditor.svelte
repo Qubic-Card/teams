@@ -196,7 +196,7 @@
     }}
   >
     <slot slot="title">
-      <h1 class="font-bold">Remove brochure</h1>
+      <h1 class="font-semibold">Remove brochure</h1>
     </slot>
     <slot slot="text">
       <p>Are you sure you want to remove brochure?</p>
@@ -426,7 +426,7 @@
                 <!-- SOCIAL EDITOR -->
                 <div class="outline-1 outline outline-neutral-700 mb-4 p-4">
                   <div class="flex justify-between items-center">
-                    <h1 class="font-bold text-lg text-white">Socials</h1>
+                    <h1 class="font-semibold text-lg text-white">Socials</h1>
                     <AddSocialsModal
                       isTeam
                       class={`${permissions.writeTeam ? '' : 'hidden'}`}
@@ -620,7 +620,7 @@
                   class="outline-1 outline outline-neutral-700 p-4 mb-0 lg:mb-4"
                 >
                   <div class="flex justify-between items-center">
-                    <h1 class="font-bold text-lg text-white">Links</h1>
+                    <h1 class="font-semibold text-lg text-white">Links</h1>
                     <img
                       class={`h-10 w-10 cursor-pointer ${
                         permissions.writeTeam ? '' : 'hidden'

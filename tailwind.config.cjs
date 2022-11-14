@@ -3,7 +3,7 @@ const config = {
 
   theme: {
     fontFamily: {
-      sans: 'Inter',
+      sans: ['Poppins', 'system-ui'],
     },
     extend: {},
   },

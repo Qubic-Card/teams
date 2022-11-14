@@ -236,7 +236,7 @@
 >
   {#if state === 'idle'}
     <div class="p-2 flex justify-between">
-      <h1 class="font-bold">Select background image</h1>
+      <h1 class="font-semibold">Select background image</h1>
       <button
         on:click={() => {
           isOpen = false;
@@ -314,7 +314,7 @@
       <div class="p-2 w-full flex flex-row-reverse shadow-md">
         <button
           on:click={searchHandler}
-          class="bg-neutral-700 text-white w-32 mx-4 hover:font-bold hover:bg-neutral-800 transition-colors duration-400 rounded-md"
+          class="bg-neutral-700 text-white w-32 mx-4 hover:font-semibold hover:bg-neutral-800 transition-colors duration-400 rounded-md"
           >Search</button
         >
         <input
@@ -336,7 +336,7 @@
               <div class="m-1 bg-black mt-2 flex flex-col">
                 <div
                   on:click={() => pickHandler(item)}
-                  class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-bold ${
+                  class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-semibold ${
                     item.urls.regular === selectedImage
                       ? 'border-4 border-black'
                       : ''

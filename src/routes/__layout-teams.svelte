@@ -205,14 +205,14 @@
               <img
                 src="/close-white.svg"
                 alt="close"
-                class="cursor-pointer px-4 w-16 py-6 border-r border-neutral-700"
+                class="cursor-pointer px-4 w-16 py-4 border-r border-neutral-700"
                 on:click={sidebarHandler}
               />
             {:else}
               <img
                 src="/menu-white.svg"
                 alt="humberger-menu"
-                class="cursor-pointer px-4 w-16 py-6 border-r border-neutral-700 hidden md:block"
+                class="cursor-pointer px-4 w-16 py-4 border-r border-neutral-700 hidden md:block"
                 on:click={sidebarHandler}
               />
             {/if}
@@ -225,7 +225,7 @@
           {/if}
         {/if}
         {#if $teamData.name}
-          <p class="text-xl font-bold ml-4">
+          <p class="text-xl font-semibold ml-4">
             {$teamData.name}
           </p>
         {:else}
@@ -243,7 +243,7 @@
         class={`border-r border-neutral-700 bg-black w-12 md:w-16 hidden md:block fixed ${
           sevenDaysAfterEndDate
             ? !subscription?.isActive && !subscription?.isAfter7Days
-              ? 'top-36 md:top-24'
+              ? 'top-36 md:top-[6.3rem]'
               : 'top-[100px] md:top-16'
             : 'top-16'
         } bottom-0 left-0 z-50 flex flex-col items-center shadow-md transition-all duration-300 ease-in-out ${
@@ -258,10 +258,8 @@
                   isSidebarOpened ? 'justify-between' : 'justify-center'
                 } ${isSidebarOpened && 'px-12 w-full'} ${
                   $page.routeId === '[slug]/dashboard/team@teams'
-                    ? 'first:bg-neutral-900 '
+                    ? 'first:bg-neutral-900'
                     : ''
-                }  ${
-                  $page.routeId === item.routeId ? 'w-full bg-neutral-700' : ''
                 } ${
                   isSidebarOpened && $page.routeId === item.routeId
                     ? 'bg-neutral-900'
@@ -274,12 +272,16 @@
                     {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                   </p>
                 {/if}
-                <div class="rounded-lg bg-neutral-800 p-3">
+                <div
+                  class="rounded-lg p-3 {$page.routeId === item.routeId
+                    ? 'bg-neutral-800'
+                    : 'outline outline-1 outline-neutral-800'}"
+                >
                   <img
-                  src={item.urldefault}
-                  alt={item.title}
-                  class="w-4 md:w-5 "
-                />
+                    src={item.urldefault}
+                    alt={item.title}
+                    class="w-4 md:w-5 "
+                  />
                 </div>
               </div>
             {:else}
@@ -304,8 +306,6 @@
                   $page.routeId === '[slug]/dashboard/team@teams'
                     ? 'first:bg-neutral-900'
                     : ''
-                }  ${
-                  $page.routeId === item.routeId ? 'w-full bg-neutral-900' : ''
                 } ${
                   isSidebarOpened && $page.routeId === item.routeId
                     ? 'bg-neutral-900'
@@ -313,11 +313,17 @@
                 }`}
                 on:click={() => handler($teamData?.id, item.title)}
               >
-                <img
-                  src={item.urldefault}
-                  alt={item.title}
-                  class="w-6 md:w-5"
-                />
+                <div
+                  class="rounded-lg {$page.routeId === item.routeId
+                    ? 'bg-neutral-800'
+                    : 'outline outline-1 outline-neutral-800'} p-3"
+                >
+                  <img
+                    src={item.urldefault}
+                    alt={item.title}
+                    class="w-4 md:w-5 "
+                  />
+                </div>
               </div>
             {:else}
               <div

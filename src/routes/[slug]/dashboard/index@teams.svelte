@@ -42,7 +42,7 @@
   class="flex flex-col justify-between text-white gap-4 mb-20 md:mb-8 pt-6 pl-4 md:pl-24 pr-4"
 >
   <div class="flex flex-col">
-    <h1 class="text-sm md:text-md font-bold">Quick Actions</h1>
+    <h1 class="text-sm md:text-lg font-semibold">Quick Actions</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-16 lg:h-12 flex w-full overflow-x-auto mt-2 gap-2"
     >
@@ -60,7 +60,7 @@
   <Analytics />
 
   <div class="flex flex-col">
-    <h1 class="text-sm md:text-md font-bold">Learn More</h1>
+    <h1 class="text-sm md:text-lg font-semibold">Learn More</h1>
     <div
       class="snap-container snap-x mx-auto snap-mandatory h-full md:h-56 lg:h-full flex w-full overflow-x-auto gap-2"
     >
@@ -73,7 +73,7 @@
             class="bg-neutral-900 w-[350px] lg:w-[450px] h-full p-3 rounded-md outline outline-1 outline-neutral-800"
           >
             <div class="Image" style={`background-image:url(${content.bg})`} />
-            <h1 class="font-bold text-md my-2">{content.title}</h1>
+            <h1 class="font-semibold text-md my-2">{content.title}</h1>
             <p class="text-neutral-400 text-xs md:text-sm">{content.desc}</p>
           </div>
         </div>

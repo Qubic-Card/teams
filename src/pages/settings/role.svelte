@@ -99,7 +99,7 @@
   on:action={async () => await deleteRoleHandler(roleId)}
 >
   <slot slot="title">
-    <h1 class="font-bold">Remove role</h1>
+    <h1 class="font-semibold">Remove role</h1>
   </slot>
   <slot slot="text">
     <p>
@@ -109,14 +109,14 @@
   </slot>
 </ConfirmationModal>
 
-<div class={`${permissions.readRoles ? 'flex' : 'hidden'} gap-3`}>
+<div class="flex gap-3">
   <div
     class="bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg w-full md:w-3/4 p-4"
   >
     <div
       class="flex flex-col md:flex-row  justify-between items-start md:items-center mb-4"
     >
-      <h1 class="font-bold text-sm md:text-xl">Role Settings</h1>
+      <h1 class="font-semibold text-sm md:text-xl">Role Settings</h1>
       {#if permissions.writeRoles}
         <AddRoleModal {permissions} />
       {/if}

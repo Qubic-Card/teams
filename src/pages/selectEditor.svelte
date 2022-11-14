@@ -69,7 +69,7 @@
         class="flex flex-col h-[90%] w-full p-4 2xl:w-1/2 py-6 md:py-16 gap-2 bg-white rounded-md md:rounded-xl"
         in:fly|local={{ y: 5000, duration: 1000 }}
       >
-        <h1 class="text-xl md:text-2xl font-bold mb-2 md:mb-4">
+        <h1 class="text-xl md:text-2xl font-semibold mb-2 md:mb-4">
           Select Editor
         </h1>
         {#if isHasBasic}
@@ -104,7 +104,7 @@
             <p class="text-neutral-600">You don't have any teams yet.</p>
             <p class="text-sm">
               Contact us <span
-                class="cursor-pointer font-bold underline"
+                class="cursor-pointer font-semibold underline"
                 on:click={() =>
                   window.open('https://wa.me/628113087599', '_blank').focus()}
                 >here</span
@@ -121,7 +121,9 @@
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      <a href="https://wa.me/628113087599" class="font-semibold">
+        contact us!
+      </a>
     </h1>
   </div>
 {/await}

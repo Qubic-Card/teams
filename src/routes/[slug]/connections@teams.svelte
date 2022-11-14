@@ -199,9 +199,12 @@
           class="flex w-full md:w-48 text-white gap-1 border-b border-neutral-700"
         >
           <button
+            disabled={tabs !== 'all'}
             class={`${
-              tabs !== 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-10 md:h-16 text-xs md:text-sm`}
+              tabs !== 'all'
+                ? 'font-semibold border-b-2 border-white transition-all duration-100 text-md'
+                : 'text-xs'
+            } w-full md:w-1/2 h-10 md:h-16`}
             on:click={async () => {
               setTabs('user');
               searchQuery = '';
@@ -211,9 +214,12 @@
             Personal
           </button>
           <button
+            disabled={tabs === 'all'}
             class={`${
-              tabs === 'all' ? 'font-bold border-b-2 border-white' : ''
-            } w-full md:w-1/2 h-10 md:h-16 text-xs md:text-sm`}
+              tabs === 'all'
+                ? 'font-semibold border-b-2 border-white transition-all duration-100 text-md'
+                : 'text-xs'
+            } w-full md:w-1/2 h-10 md:h-16`}
             on:click={async () => {
               setTabs('all');
               searchQuery = '';
@@ -305,19 +311,19 @@
 
           {#if searchNotFoundMsg !== ''}
             <h1
-              class="text-sm md:text-xl font-bold text-white text-center w-full mt-8"
+              class="text-sm md:text-xl font-semibold text-white text-center w-full mt-8"
             >
               {searchNotFoundMsg}
             </h1>
           {:else if tabs === 'all' && teamConnections.length === 0}
             <h1
-              class="text-sm md:text-xl font-bold text-white text-center w-full mt-8"
+              class="text-sm md:text-xl font-semibold text-white text-center w-full mt-8"
             >
               No connection found.
             </h1>
           {:else if tabs !== 'all' && userConnections.length === 0}
             <h1
-              class="text-sm md:text-xl font-bold text-white text-center w-full mt-8"
+              class="text-sm md:text-xl font-semibold text-white text-center w-full mt-8"
             >
               No connection found.
             </h1>
@@ -335,7 +341,7 @@
       <div>
         <h1 class="text-xl text-white text-center w-full mt-8">
           Some error occurred. Please reload the page and try again <br /> or
-          <a href="https://wa.me/628113087599" class="font-bold">
+          <a href="https://wa.me/628113087599" class="font-semibold">
             contact us!
           </a>
         </h1>
@@ -402,11 +408,15 @@
             </tbody>
           </table>
           {#if searchNotFoundMsg !== ''}
-            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+            <h1
+              class="text-2xl font-semibold text-white text-center w-full mt-8"
+            >
               {searchNotFoundMsg}
             </h1>
           {:else if userConnections.length === 0}
-            <h1 class="text-2xl font-bold text-white text-center w-full mt-8">
+            <h1
+              class="text-2xl font-semibold text-white text-center w-full mt-8"
+            >
               No connection found.
             </h1>
           {/if}
@@ -420,7 +430,7 @@
       <div>
         <h1 class="text-xl text-white text-center w-full mt-8">
           Some error occurred. Please reload the page and try again <br /> or
-          <a href="https://wa.me/628113087599" class="font-bold">
+          <a href="https://wa.me/628113087599" class="font-semibold">
             contact us!
           </a>
         </h1>

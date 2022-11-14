@@ -93,7 +93,7 @@
             <!-- {currentTheme?.pageBackground} {currentTheme?.text} rounded-md p-1 -->
             <div class="{$currentTheme?.pageBackground} p-2 rounded-md">
               <h1
-                class="text-xs font-bold"
+                class="text-xs font-semibold"
                 bind:this={forScrollToSocialsSection}
               >
                 {data?.firstname ?? Dummy.firstname}
@@ -148,7 +148,7 @@
         ? $currentTheme?.text
         : 'text-transparent'}"
     >
-      <h1 class="text-sm md:text-lg font-bold">
+      <h1 class="text-sm md:text-lg font-semibold">
         {data?.firstname ?? ''}
         {data?.lastname ?? ''}
       </h1>

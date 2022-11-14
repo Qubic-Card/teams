@@ -18,8 +18,6 @@
   let roles = [];
   let isClicked = true;
   let permissions = {
-    readBilling: false,
-    writeBilling: false,
     readRoles: false,
     writeRoles: false,
     isTeamInactive: false,
@@ -130,8 +128,6 @@
 
   $: if ($userData)
     $userData?.filter((item) => {
-      if (item === 'allow_read_billing') permissions.readBilling = true;
-      if (item === 'allow_write_billing') permissions.writeBilling = true;
       if (item === 'allow_read_roles') permissions.readRoles = true;
       if (item === 'allow_write_roles') permissions.writeRoles = true;
       if (item === 'inactive') permissions.isTeamInactive = true;
@@ -147,11 +143,18 @@
     />
   </div>
 {:then}
-  <div class="flex justify-center pt-4 pl-4 md:pl-24 pr-4 mb-20 md:mb-0">
-    <div class="flex flex-col w-full gap-3 text-sm pb-10">
-      <Billing {permissions} />
+  <div class="flex justify-center h-full pt-4 pl-4 md:pl-20 pr-4 mb-20 md:mb-0">
+    <div
+      class="flex flex-col {permissions.isTeamInactive ||
+      permissions.isTeamWillExpire
+        ? 'justify-center items-center'
+        : $memberData?.roleName === 'superadmin' || permissions.readRoles
+        ? ''
+        : 'justify-center items-center'} h-full w-full gap-3 text-sm pb-10"
+    >
       {#if $memberData?.roleName === 'superadmin'}
         {#if !permissions.isTeamInactive && !permissions.isTeamWillExpire}
+          <Billing {permissions} />
           <TeamName
             {loading}
             on:input={() => (isTeamNameChanged = true)}
@@ -166,27 +169,62 @@
             on:keypress={onKeyPress}
             on:click={async () => addActivationCode(activationCode)}
           />
+        {:else}
+          <div class="h-72 bg-no-repeat flex justify-center items-center bg-">
+            <h1 class="z-30 absolute text-xs md:text-sm lg:text-lg">
+              You don't have access to this section
+            </h1>
+            <img src="/bg-donthaveaccess.png" alt="" class="w-[600px]" />
+          </div>
         {/if}
+      {:else}
+        <div class="h-72 bg-no-repeat flex justify-center items-center bg-">
+          <h1 class="z-30 absolute text-xs md:text-sm lg:text-lg">
+            You don't have access to this section
+          </h1>
+          <img src="/bg-donthaveaccess.png" alt="" class="w-[600px]" />
+        </div>
       {/if}
-      <Role {permissions} {roles} />
-      <div
-        class="flex flex-col p-4 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg"
-      >
-        <h1 class="text-sm md:text-xl font-bold">Contact us</h1>
-        <a href="mailto:support@qubic.id text-xs md:text-sm"
-          >Email: support@qubic.id</a
-        >
-        <a href="https://wa.me/628113087599 text-xs md:text-sm"
-          >Whatsapp: +62 811 3087599</a
-        >
-      </div>
+
+      {#if permissions.readRoles}
+        {#if !permissions.isTeamInactive && !permissions.isTeamWillExpire}
+          <Role {permissions} {roles} />
+          <div
+            class="flex flex-col p-4 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-lg"
+          >
+            <h1 class="text-sm md:text-xl font-semibold">Contact us</h1>
+            <a href="mailto:support@qubic.id text-xs md:text-sm"
+              >Email: support@qubic.id</a
+            >
+            <a href="https://wa.me/628113087599 text-xs md:text-sm"
+              >Whatsapp: +62 811 3087599</a
+            >
+          </div>
+        {:else}
+          <div class="h-72 bg-no-repeat flex justify-center items-center bg-">
+            <h1 class="z-30 absolute text-xs md:text-sm lg:text-lg">
+              You don't have access to this section
+            </h1>
+            <img src="/bg-donthaveaccess.png" alt="" class="w-[600px]" />
+          </div>
+        {/if}
+      {:else}
+        <div class="h-72 bg-no-repeat flex justify-center items-center bg-">
+          <h1 class="z-30 absolute text-xs md:text-sm lg:text-lg">
+            You don't have access to this section
+          </h1>
+          <img src="/bg-donthaveaccess.png" alt="" class="w-[600px]" />
+        </div>
+      {/if}
     </div>
   </div>
 {:catch name}
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
-      <a href="https://wa.me/628113087599" class="font-bold"> contact us! </a>
+      <a href="https://wa.me/628113087599" class="font-semibold">
+        contact us!
+      </a>
     </h1>
   </div>
 {/await}

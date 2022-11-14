@@ -74,7 +74,7 @@
         ? 'bg-neutral-900 text-neutral-100'
         : 'bg-neutral-100 text-neutral-900'} h-12"
     >
-      <h1 class="font-bold" bind:this={title}>Select Theme</h1>
+      <h1 class="font-semibold" bind:this={title}>Select Theme</h1>
       <button on:click={modalHandler}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -138,10 +138,9 @@
             />
           </div>
           <h1
-            class="mt-2 {$profileTheme === key ? 'font-bold' : ''} {editor ==
-            'team'
-              ? 'text-white'
-              : 'text-black'}"
+            class="mt-2 {$profileTheme === key
+              ? 'font-semibold'
+              : ''} {editor == 'team' ? 'text-white' : 'text-black'}"
           >
             {#if key === 'offwhite'}
               Off White

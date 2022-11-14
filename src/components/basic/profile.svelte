@@ -86,7 +86,7 @@
           >
             <!-- {$basicCurrentTheme?.pageBackground} {$basicCurrentTheme?.text} rounded-md p-1 -->
             <div class="{$basicCurrentTheme?.pageBackground} p-2 rounded-md">
-              <h1 class="text-sm font-bold">
+              <h1 class="text-sm font-semibold">
                 {#if !$basicProfile?.isBusiness}
                   {$basicProfile?.firstname ?? Dummy.firstname}
                   {$basicProfile?.lastname ?? ''}
@@ -155,7 +155,7 @@
         : 'text-transparent'}"
     >
       <h1
-        class="text-lg font-bold text-center"
+        class="text-lg font-semibold text-center"
         bind:this={forScrollToSocialsSection}
       >
         {#if !$basicProfile.isBusiness}

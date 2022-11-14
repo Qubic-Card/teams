@@ -60,7 +60,7 @@
   }}
 >
   <slot slot="title">
-    <h1 class="font-bold">Disconnect card</h1>
+    <h1 class="font-semibold">Disconnect card</h1>
   </slot>
   <slot slot="text">
     <p>
@@ -108,10 +108,10 @@
 
   {#if isOpen}
     <div
-      class="absolute bg-neutral-800 text-white outline outline-1 outline-neutral-700 p-2 w-52 mt-2 shadow-md z-50 flex flex-col gap-2 rounded-md self-end"
+      class="absolute bg-neutral-800 text-white border border-neutral-700 p-2 w-52 mt-2 shadow-md z-50 flex flex-col gap-2 rounded-md self-end"
     >
       <h1 class="text-xs md:text-sm break-all">
-        Connected to <span class="font-bold">{email}</span>
+        Connected to <span class="font-semibold">{email}</span>
       </h1>
       <button
         on:click={toggleModal}
