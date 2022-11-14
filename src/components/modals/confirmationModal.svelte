@@ -3,21 +3,13 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let text,
-    isRecord,
-    isMember,
-    isRole,
-    isTransfer,
-    isDelete,
+  export let isDelete,
     isIconVisible,
-    isDispatch,
     isLoading,
-    heading,
     buttonLabel,
     showModal,
-    toggleModal,
-    id,
-    deleteRoleHandler;
+    toggleModal;
+
   const dispatch = createEventDispatcher();
   const action = () => dispatch('action');
 </script>
@@ -42,24 +34,13 @@
       on:click={toggleModal}
     />
     <div
-      class="flex flex-col bg-neutral-800 text-white w-full md:w-[40%] h-auto p-2 z-40 rounded-md"
+      class="flex flex-col bg-neutral-800 text-white w-full md:w-[60%] lg:w-[40%] h-auto p-2 z-40 rounded-md"
     >
       <div
         class="text-md md:text-lg border-b border-neutral-700 flex justify-between"
       >
-        {isDelete
-          ? `Delete ${
-              isRecord
-                ? 'Record'
-                : isMember
-                ? 'Member'
-                : isRole
-                ? 'Role'
-                : 'Connection'
-            }`
-          : isTransfer
-          ? 'Transfer card'
-          : 'Change role'}
+        <slot name="title" />
+
         <button on:click={toggleModal} class="self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -80,8 +61,8 @@
       <div
         class="flex flex-col w-full justify-center items-center p-2 rounded-lg gap-3"
       >
-        <h1 class="text-white text-center w-96 text-sm md:text-md">
-          {heading ?? ''} <br />{text ?? ''}
+        <h1 class="text-white text-center w-96 text-sm md:text-md break-all">
+          <slot name="text" />
         </h1>
         {#if isDelete}
           <p class="text-xs text-neutral-100 font-light">
@@ -96,13 +77,14 @@
           >
           <button
             disabled={isLoading}
-            on:click={async () =>
-              isDispatch ? action() : await deleteRoleHandler(id)}
+            on:click={action}
             class={`text-sm   ${
-              isDelete
-                ? 'bg-red-600 hover:bg-red-600/60'
+              buttonLabel === 'Remove' ||
+              buttonLabel === 'Disconnect' ||
+              buttonLabel === 'Proceed'
+                ? 'bg-red-600/30 outline outline-1 outline-red-500 hover:outline-red-600'
                 : 'bg-blue-600 hover:bg-blue-600/60'
-            } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 hover:bg-neutral-800 flex justify-center items-center gap-2`}
+            } p-2 rounded-md  text-white border-neutral-700 w-full mt-6 flex justify-center items-center gap-2`}
           >
             {#if isLoading}
               <Spinner bg={isDelete ? '#8d2020' : '#1f4496'} class="w-6 h-6" />

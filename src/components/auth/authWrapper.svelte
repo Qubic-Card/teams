@@ -30,8 +30,12 @@
       if (!(await checkIsActiveMember())) {
         $user = null;
       }
+      if (!$user) goto('/');
     }
-    if (!$user) goto('/');
+
+    if ($page?.routeId?.includes('basic')) {
+      if (!$user) goto('/');
+    }
   };
   $: if (browser) redirect();
 

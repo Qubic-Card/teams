@@ -83,8 +83,10 @@
 
     <button
       class="{editor === 'team'
+
         ? 'text-white bg-blue-600 rounded-md'
         : ' bg-blue-600 rounded-md '} p-1 w-full flex h-8 justify-center items-center text-xs md:text-sm"
+
       on:click={() => {
         $isInViewTriggered = false;
         goto('/');
@@ -96,6 +98,7 @@
       class="{editor === 'team'
         ? 'text-red-300 bg-red-600/30 outline outline-red-500 outline-1 rounded-md'
         : 'text-red-300 bg-red-600/30 outline outline-red-500 outline-1 rounded-md'} text-xs md:text-sm p-2 w-full h-9"
+
       on:click={handleLogout}>Log Out</button
     >
   </Dialog>
