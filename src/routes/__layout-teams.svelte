@@ -17,11 +17,12 @@
   import { teams } from '@lib/stores/teamStore';
   import { teamData } from '@lib/stores/teamStore';
   import MenuButtonModal from '@comp/modals/menuButtonModal.svelte';
+  import GracePeriod from '@pages/gracePeriod.svelte';
 
   let isSidebarOpened = false;
   let member = [];
   let subscription;
-  let loading = true;
+  // let loading = true;
   let permissions = {
     readAnalytics: false,
   };
@@ -66,7 +67,7 @@
       )
     );
 
-    if (member || userChangeTimestamp || $userData) loading = false;
+    // if (member || userChangeTimestamp || $userData) loading = false;
   });
 
   $: {
@@ -131,7 +132,10 @@
     }
   }
 
+  // $: console.log(subscription, sevenDaysAfterEndDate);
+
   let isBannerOpen = true; // Banner view on desktop
+  let backupTeamData = false;
 </script>
 
 <svelte:head>
@@ -139,6 +143,18 @@
 </svelte:head>
 
 <AuthWrapper>
+  {#if !subscription}
+    <div
+      transition:fade|local
+      class=" w-full flex flex-col h-screen justify-center items-center rounded-md px-4 md:px-0"
+    >
+      <small class="text-left w-full md:w-1/2 mb-2 text-white">
+        Secondary security authenticating user access ...
+      </small>
+      <div class="h-6 w-full md:w-1/2 rounded-md shim-red bg-neutral-700" />
+    </div>
+  {/if}
+
   <div class="relative min-h-screen">
     {#if sevenDaysAfterEndDate}
       {#if !subscription?.isActive && !subscription?.isAfter7Days}
@@ -183,7 +199,7 @@
       class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
     >
       <div class="flex justify-center items-center h-auto">
-        {#if subscription?.isActive || (!subscription?.isActive && !subscription?.isAfter7Days)}
+        {#if subscription?.isActive || backupTeamData}
           {#if $teamData.name}
             {#if isSidebarOpened}
               <img
@@ -222,9 +238,7 @@
       <MenuButtonModal logo={$teamData.logo} />
     </div>
 
-    {#if subscription?.isActive === false && subscription?.isAfter7Days}
-      <SubscriptionEnd {subscription} {member} {teamId} />
-    {:else}
+    {#if subscription?.isActive || backupTeamData}
       <div
         class={`border-r border-neutral-700 bg-black w-12 md:w-16 hidden md:block fixed ${
           sevenDaysAfterEndDate
@@ -311,35 +325,33 @@
           {/each}
         </nav>
       </div>
-
-      <div
-        class={`absolute ${
-          sevenDaysAfterEndDate
-            ? !subscription?.isActive && !subscription?.isAfter7Days
-              ? 'top-36 md:top-24'
-              : `${isBannerOpen ? 'top-[100px]' : 'top-[60px]'} md:top-16`
-            : 'top-16'
-        } bottom-0 text-white overflow-y-auto w-full overflow-x-hidden`}
-      >
-        <SvelteToast />
-
-        {#if loading}
-          <div
-            transition:fade|local
-            class=" w-full flex flex-col h-screen justify-center items-center rounded-md pb-40 px-4 md:px-0"
-          >
-            <small class="text-left w-full md:w-1/2 mb-2">
-              Secondary security authenticating user access ...
-            </small>
-            <div
-              class="h-6 w-full md:w-1/2 rounded-md shim-red bg-neutral-700"
-            />
-          </div>
-        {:else}
-          <slot />
-        {/if}
-      </div>
     {/if}
+
+    <div
+      class={`absolute ${
+        sevenDaysAfterEndDate
+          ? !subscription?.isActive && !subscription?.isAfter7Days
+            ? 'top-36 md:top-24'
+            : `${isBannerOpen ? 'top-[100px]' : 'top-[60px]'} md:top-16`
+          : 'top-16'
+      } bottom-0 text-white overflow-y-auto w-full overflow-x-hidden`}
+    >
+      <SvelteToast />
+
+      {#if subscription?.isActive || backupTeamData}
+        <slot />
+      {:else if !subscription?.isActive && subscription?.isAfter7Days}
+        <SubscriptionEnd {teamId} />
+      {:else if sevenDaysAfterEndDate && !subscription?.isActive && !subscription?.isAfter7Days && !backupTeamData}
+        <GracePeriod
+          {sevenDaysAfterEndDate}
+          {subscription}
+          {member}
+          {teamId}
+          on:click={() => (backupTeamData = true)}
+        />
+      {/if}
+    </div>
   </div>
 </AuthWrapper>
 

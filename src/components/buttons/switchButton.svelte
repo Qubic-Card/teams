@@ -1,15 +1,10 @@
 <script>
   export let checked = false;
-  export let mode = 'editor';
 </script>
 
-<label class="switch {mode === 'editor' ? 'h-7' : 'h-6'}">
+<label class="switch h-7">
   <input type="checkbox" bind:checked on:change />
-  <span
-    class="slider {mode === 'editor'
-      ? 'before:bottom-[5px] before:h-5 before:w-5 rounded-md'
-      : 'before:bottom-[4px] before:h-4 before:w-4 rounded-r-md'}"
-  />
+  <span class="slider before:bottom-[5px] before:h-5 before:w-5 rounded-md" />
 </label>
 
 <style>

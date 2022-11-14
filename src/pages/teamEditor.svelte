@@ -4,7 +4,7 @@
   import Input from '@comp/input.svelte';
   import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
   import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import Confirmation from '@comp/modals/confirmation.svelte';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import FilePond, { registerPlugin } from 'svelte-filepond';
   import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
   import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
@@ -182,14 +182,11 @@
 </script>
 
 {#if showDeleteBrochureModal}
-  <Confirmation
-    isDelete
-    isDispatch
-    heading="Are you sure you want to delete"
-    text={`${$teamData?.brochure?.title}?`}
-    buttonLabel="Delete"
+  <ConfirmationModal
+    {isLoading}
     showModal={showDeleteBrochureModal}
     toggleModal={toggleBrochureModal}
+    buttonLabel="Remove"
     on:action={async () => {
       showDeleteBrochureModal = false;
       $teamData.brochure.url = '';
@@ -197,7 +194,14 @@
       await handleSave();
       toastSuccess('Brochure deleted successfully');
     }}
-  />
+  >
+    <slot slot="title">
+      <h1 class="font-bold">Remove brochure</h1>
+    </slot>
+    <slot slot="text">
+      <p>Are you sure you want to remove brochure?</p>
+    </slot>
+  </ConfirmationModal>
 {/if}
 
 <ModalOverlay {isOpen} on:click={() => (isOpen = false)} />

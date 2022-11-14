@@ -37,18 +37,18 @@ const sortMember = (data = [], uidTarget, sort) => {
 
   if (sort === 'asc') {
     sortedDate = nonEmptyLogs
-      .map((m) => m.created_at)
+      .map((m) => m.logged_at)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
   } else {
     sortedDate = nonEmptyLogs
-      .map((m) => m.created_at)
+      .map((m) => m.logged_at)
       .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }
 
   let sortedMembers = [];
 
   sortedDate.map((date) => {
-    let member = nonEmptyLogs.find((m) => m.created_at === date);
+    let member = nonEmptyLogs.find((m) => m.logged_at === date);
     sortedMembers.push(member);
   });
 
