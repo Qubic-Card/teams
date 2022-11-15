@@ -134,8 +134,10 @@
 <!-- -translate-x-32 md:-translate-x-16 lg:-translate-x-12 translate-y-12 -->
 <style>
   .rounded-custom {
-    border-radius: 9999px !important;
-    -webkit-border-radius: 9999px !important;
-    -moz-border-radius: 9999px !important;
+    -webkit-border-radius: 50% !important;
+    -moz-border-radius: 50% !important;
+    border-radius: 50% !important;
+    -khtml-border-radius: 50% !important;
+    vertical-align: middle !important;
   }
 </style>

@@ -11,6 +11,7 @@
   import TeamAnalyticsCard from '../cards/teamAnalyticsCard.svelte';
   import getPagination from '@lib/utils/getPagination';
   import setHours4Digit from '@lib/utils/setHour4Digit';
+  import { userChangeTimestamp } from '@lib/stores/userStore';
 
   export let member,
     isRounded = false;
@@ -78,8 +79,14 @@
         .select('data, type, created_at, card_holder', { count: 'estimated' })
         .eq('team_member', member?.member_id)
         .range(from, to)
-        .gte('created_at', new Date(fromDate).toISOString())
-        .lte('created_at', new Date(toDate).toISOString())
+        .gte(
+          'created_at',
+          $userChangeTimestamp > fromDate ? $userChangeTimestamp : fromDate
+        )
+        .lte(
+          'created_at',
+          $userChangeTimestamp > toDate ? $userChangeTimestamp : toDate
+        )
         .order('created_at', { ascending: dsc });
 
       if (error) {
@@ -148,11 +155,19 @@
         <div
           class="flex p-2 gap-2 flex-1 bg-neutral-900 outline outline-1 outline-neutral-800 rounded-md"
         >
-          <img
-            class="w-16 md:w-24 h-16 md:h-24 rounded-full"
-            src={member?.team_profile?.avatar}
-            alt={member?.team_profile?.firstname + ' avatar'}
-          />
+          {#if member?.team_profile?.avatar}
+            <img
+              class="w-16 md:w-24 h-16 md:h-24 rounded-full"
+              src={member?.team_profile?.avatar}
+              alt={member?.team_profile?.firstname + ' avatar'}
+            />
+          {:else}
+            <img
+              class="w-16 md:w-24 h-16 md:h-24 rounded-full bg-black"
+              src="/favicon.svg"
+              alt={member?.team_profile?.firstname + ' avatar'}
+            />
+          {/if}
           <div class="flex flex-col w-full">
             <h1 class="font-semibold text-white text-md md:text-lg">
               {member?.team_profile?.firstname ?? ''}
