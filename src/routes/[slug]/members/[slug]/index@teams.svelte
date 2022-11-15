@@ -144,7 +144,10 @@
     $profileData.design.theme = $profileTheme;
     const { error } = await supabase
       .from('team_members')
-      .update({ team_profile: $profileData }, { returning: 'minimal' })
+      .update(
+        { team_profile: $profileData, last_updated: new Date() },
+        { returning: 'minimal' }
+      )
       .eq('uid', $page.params.slug)
       .eq('team_id', teamId);
     if (error) {

@@ -98,7 +98,7 @@
       on:click={() => (isOpen = true)}
       src="/favicon.svg"
       alt=""
-      class="rounded-full w-20 h-20 bg-black absolute right-0 -bottom-12 cursor-pointer {uid ===
+      class="rounded-full rounded-custom w-20 h-20 bg-black absolute right-0 -bottom-12 cursor-pointer {uid ===
       $user?.id
         ? 'outline outline-2 outline-blue-600'
         : ''}"
@@ -108,7 +108,7 @@
       on:click={() => (isOpen = true)}
       src={avatar}
       alt=""
-      class="rounded-full w-20 h-20 absolute right-0 -bottom-12 cursor-pointer {uid ===
+      class="rounded-full rounded-custom w-20 h-20 absolute right-0 -bottom-12 cursor-pointer {uid ===
       $user?.id
         ? 'outline outline-2 outline-blue-600'
         : ''}"
@@ -130,4 +130,12 @@
     </div>
   {/if}
 </Listbox>
+
 <!-- -translate-x-32 md:-translate-x-16 lg:-translate-x-12 translate-y-12 -->
+<style>
+  .rounded-custom {
+    border-radius: 9999px !important;
+    -webkit-border-radius: 9999px !important;
+    -moz-border-radius: 9999px !important;
+  }
+</style>
