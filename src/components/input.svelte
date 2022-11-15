@@ -31,10 +31,8 @@
   export let inputText = 'text-gray-100';
   export let small;
   export let outline;
-<<<<<<< HEAD
   export let titleColor = 'text-gray-400';
-=======
->>>>>>> update membership ui
+
   let isWhatsappInvalid = false;
   let focus = false;
 

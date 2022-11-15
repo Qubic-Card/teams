@@ -352,71 +352,73 @@
       </div>
     </div>
 
-  <div class="flex flex-col gap-2 my-2 pr-4">
-    <div
-      class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 py-3 border-b mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
-    >
-      <h1 class="text-xl font-semibold flex-grow w-1/2">Members</h1>
+    <div class="flex flex-col gap-2 my-2 pr-4">
+      <div
+        class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 py-3 border-b mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
+      >
+        <h1 class="text-xl font-semibold flex-grow w-1/2">Members</h1>
 
-      <div class="flex gap-2 md:w-1/2 w-full items-center">
-        <MemberSortDropdown
-          mode="membership"
-          on:asc={() => sortHandler('asc')}
-          on:dsc={() => sortHandler('dsc')}
-        />
-        <MembershipSortDropdown
-          {sortOptions}
-          on:filter={(e) => filterHandler(e.detail)}
-        />
-        <Input
-          small
-          bind:value={searchQuery}
-          type="text"
-          title=""
-          placeholder="Search name"
-          class="w-full h-8"
-          inputbg="bg-neutral-800"
-          inputText="text-white"
-        />
-      </div>
+        <div class="flex gap-2 md:w-1/2 w-full items-center">
+          <MemberSortDropdown
+            mode="membership"
+            on:asc={() => sortHandler('asc')}
+            on:dsc={() => sortHandler('dsc')}
+          />
+          <MembershipSortDropdown
+            {sortOptions}
+            on:filter={(e) => filterHandler(e.detail)}
+          />
+          <Input
+            small
+            bind:value={searchQuery}
+            type="text"
+            title=""
+            placeholder="Search name"
+            class="w-full h-8"
+            inputbg="bg-neutral-800"
+            inputText="text-white"
+          />
+        </div>
 
-      <div class="flex flex-col gap-2 pl-4">
-        {#await getMembers(tenantData?.TID)}
-          <div class="animate-pulse">
-            {#each Array(10) as item}
-              <div class="bg-neutral-900 h-20 rounded-md" />
-            {/each}
-          </div>
-        {:then name}
-          {#if isLoading}
-            {#each Array(members.length) as item}
-              <div class="bg-neutral-900 h-20 rounded-md" />
-            {/each}
-          {:else if members}
-            {#if members.length > 0}
-              {#each members as member, i}
-                <MembershipCard {member} />
+        <div class="flex flex-col gap-2 pl-4">
+          {#await getMembers(tenantData?.TID)}
+            <div class="animate-pulse">
+              {#each Array(10) as item}
+                <div class="bg-neutral-900 h-20 rounded-md" />
               {/each}
-              {#if lastEvaluatedKey === undefined}
-                <h1 class="text-center mt-6">
-                  You have reached the end of the list
-                </h1>
+            </div>
+          {:then name}
+            {#if isLoading}
+              {#each Array(members.length) as item}
+                <div class="bg-neutral-900 h-20 rounded-md" />
+              {/each}
+            {:else if members}
+              {#if members.length > 0}
+                {#each members as member, i}
+                  <MembershipCard {member} />
+                {/each}
+                {#if lastEvaluatedKey === undefined}
+                  <h1 class="text-center mt-6">
+                    You have reached the end of the list
+                  </h1>
+                {:else}
+                  <button
+                    disabled={lastEvaluatedKey === undefined}
+                    class="bg-blue-600 rounded-md p-2 w-full disabled:opacity-50"
+                    on:click={async () =>
+                      await loadMoreMembers(tenantData?.TID)}
+                  >
+                    View more
+                  </button>
+                {/if}
               {:else}
-                <button
-                  disabled={lastEvaluatedKey === undefined}
-                  class="bg-blue-600 rounded-md p-2 w-full disabled:opacity-50"
-                  on:click={async () => await loadMoreMembers(tenantData?.TID)}
-                >
-                  View more
-                </button>
+                <div class="h-full">No Members</div>
               {/if}
-            {:else}
-              <div class="h-full">No Members</div>
             {/if}
-          {/if}
-        {:catch name}
-          <h1>Error</h1>
-        {/await}
+          {:catch name}
+            <h1>Error</h1>
+          {/await}
+        </div>
       </div>
     </div>
   </div>

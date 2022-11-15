@@ -61,7 +61,7 @@
       />
       <div class="flex flex-col justify-start h-full w-full">
         <div class="flex justify-between">
-          <h1 class="font-bold">{tenantData.Name}</h1>
+          <h1 class="font-semibold">{tenantData.Name}</h1>
           <TenantModal
             mode="edit"
             input={tenantData}
@@ -91,7 +91,7 @@
             <div
               class="bg-neutral-900 flex flex-col justify-between w-[200px] lg:w-[250px] h-full p-2 rounded-md outline outline-1 outline-neutral-800"
             >
-              <h1 class="font-bold text-md">
+              <h1 class="font-semibold text-md">
                 <span class="text-neutral-400">$Starpoin</span> 2000
               </h1>
               <p
