@@ -221,7 +221,10 @@
 
     const { error } = await supabase
       .from('profile')
-      .update({ metadata: $basicProfile }, { returning: 'minimal' })
+      .update(
+        { metadata: $basicProfile, last_updated: new Date() },
+        { returning: 'minimal' }
+      )
       .eq('uid', $user.id);
     if (error) {
       toastFailed();
@@ -587,7 +590,9 @@
     <div>
       <h1 class="text-xl text-black text-center w-full mt-8">
         Some error occurred. Please reload the page and try again <br /> or
-        <a href="https://wa.me/628113087599" class="font-semibold"> contact us! </a>
+        <a href="https://wa.me/628113087599" class="font-semibold">
+          contact us!
+        </a>
       </h1>
     </div>
   {/await}
