@@ -53,7 +53,7 @@ export const updateTeamMember = async (mid, uid, tid, input, company) => {
         job: '',
         avatar: '',
         design: {
-          theme: 'black',
+          theme: 'dark',
           background: '',
         },
         address: '',

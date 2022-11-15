@@ -177,8 +177,8 @@
                         '',
                         mid
                       );
-                      loading = false;
                       register.success = true;
+                      loading = false;
                     }
                   } else {
                     const { error, memberId } = await createTeamMember(
@@ -217,16 +217,6 @@
               }
             }
           }
-
-          register = {
-            fname: '',
-            lname: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            checked: false,
-            success: false,
-          };
         } catch (error) {
           toastFailed();
           console.log(error);
@@ -293,8 +283,6 @@
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
-
-  // 1a8bfef4-9e7e-4a8e-98a8-8d69f2fde038
 </script>
 
 {#await getTeamData()}
@@ -304,7 +292,27 @@
     />
   </div>
 {:then name}
-  {#if state === 'activation'}
+  {#if Object.keys(team).length === 0}
+    <div
+      class="flex flex-col justify-center items-center md:items-start bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg gap-10 py-16 px-4 md:px-8"
+    >
+      <h1 class="text-2xl font-semibold">Team not found</h1>
+      <p class="text-md">
+        Please <span
+          class="font-semibold cursor-pointer"
+          on:click={() =>
+            window.open('https://wa.me/628113087599', '_blank').focus()}
+          >contact</span
+        > our support, if you think this is a mistake
+      </p>
+      <button
+        class="bg-blue-600 text-white p-2 rounded-md w-1/2"
+        on:click={() => goto('/')}
+      >
+        Back to login page
+      </button>
+    </div>
+  {:else if state === 'activation'}
     <div
       class="flex flex-col justify-center bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg gap-10 py-16 px-4 md:px-8"
     >
@@ -342,7 +350,7 @@
       {#if register.success}
         <div class="flex flex-col gap-2 h-1/2">
           <h1 class="text-3xl font-semibold">Success</h1>
-          <h1 class="text-xl">
+          <h1 class="text-lg">
             Please check your email to confirm your account.
           </h1>
         </div>

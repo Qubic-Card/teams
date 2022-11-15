@@ -15,6 +15,9 @@
     selectedAddress,
     selectedProfileMenu,
   } from '@lib/stores/subsEndStore';
+  import { log } from '@lib/logger/logger';
+  import { memberData } from '@lib/stores/userStore';
+  import { teamData } from '@lib/stores/teamStore';
 
   export let teamId;
   let expiredCards = [];
@@ -128,7 +131,7 @@
   const deleteCard = async (cards) => {
     isLoading = true;
     const { data, error } = await supabase.rpc('delete_card', {
-      cards: cards,
+      cards: cards.map((m) => m.cardId),
     });
 
     if (error) {
@@ -136,8 +139,21 @@
       toastFailed('Something went wrong, please contact us');
       isLoading = false;
     } else {
-      // console.log(data);
-      expiredCards = expiredCards.filter((item) => !cards.includes(item.id));
+      cards.forEach((card) => {
+        log(
+          `${card.email} has been removed from ${$teamData.name}`,
+          'DANGER',
+          null,
+          teamId,
+          $memberData.fullName,
+          '',
+          $memberData.id
+        );
+      });
+
+      expiredCards = expiredCards.filter(
+        (item) => !cards.map((m) => m.cardId).includes(item.id)
+      );
 
       toastSuccess('Card deleted successfully');
       isLoading = false;
@@ -149,7 +165,14 @@
 
     selectedArr = expiredCards.filter((item) => selectedArr.includes(item.id));
 
-    deleteCard(selectedArr.map((c) => c.id));
+    deleteCard(
+      selectedArr.map((c) => {
+        return {
+          cardId: c.id,
+          email: c.email.user,
+        };
+      })
+    );
   };
 </script>
 
@@ -233,7 +256,8 @@
                       await transferCardHandler(card, true)}
                   />
                   <DeleteCardModal
-                    on:delete={async () => deleteCard([card.id])}
+                    on:delete={async () =>
+                      deleteCard([{ cardId: card.id, email: card.email.user }])}
                   />
                 </div>
               </td>
