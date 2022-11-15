@@ -89,7 +89,8 @@
       return;
     } else {
       isLoading = true;
-      let hash = encryptActivationCode(newToken);
+      let hash = await encryptActivationCode(newToken);
+
       const { data, error } = await supabase
         .from('teams')
         .update(

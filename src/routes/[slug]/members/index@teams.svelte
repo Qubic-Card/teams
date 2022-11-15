@@ -54,7 +54,7 @@
       if (item === 'allow_read_analytics') permissions.analytics = true;
     });
   }
-  // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
+
   const deleteMember = async (id) => {
     members = members.filter((m) => m.member_id !== id);
 
@@ -112,7 +112,7 @@
     if (data) {
       inactiveCards = data.filter((c) => c.tcc.length === 0);
 
-      cards = inactiveCards.map((c) => {
+      inactiveCards = inactiveCards.map((c) => {
         return {
           NFCtap: null,
           QRScan: null,
@@ -135,12 +135,14 @@
     const { data, error } = await supabase.rpc('getcards', {
       tid: teamId,
     });
+    // .ilike('email', '%test%');
 
     if (error) console.log(error);
 
     if (data) {
-      cards = sortCard(data, $user?.id, 'asc');
-      // console.log(data);
+      inactiveCards = data.filter((c) => c.avatar === null);
+      cards = data.filter((c) => c.avatar !== null);
+      cards = sortCard(cards, $user?.id, 'asc');
     }
 
     loading = false;
@@ -292,19 +294,50 @@
         {#if loading}
           <CardsSkeleton cardsLength={cards.length} />
         {:else}
-          <div
-            class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
-          >
-            {#each cards as card}
-              <CardsCard
-                {card}
-                {permissions}
-                {getAllCards}
-                {getActiveCards}
-                {state}
-              />
-            {/each}
-          </div>
+          {#if cards.length > 0}
+            {#if state === 'all' || state === 'active'}
+              <div class="flex flex-col mt-4">
+                <h1 class="text-lg font-semibold pl-4">Active</h1>
+                <div
+                  class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
+                >
+                  {#each cards as card}
+                    <CardsCard
+                      {card}
+                      {permissions}
+                      {getAllCards}
+                      {getActiveCards}
+                      {state}
+                    />
+                  {/each}
+                </div>
+              </div>
+            {/if}
+          {:else}
+            <h1 class="text-xl text-white text-center w-full mt-8">
+              No cards found
+            </h1>
+          {/if}
+          {#if inactiveCards.length > 0}
+            {#if state === 'all' || state === 'inactive'}
+              <div class="flex flex-col {state === 'all' ? 'mt-8' : 'mt-4'}">
+                <h1 class="text-lg font-semibold pl-4">Inactive</h1>
+                <div
+                  class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
+                >
+                  {#each inactiveCards as card}
+                    <CardsCard
+                      {card}
+                      {permissions}
+                      {getAllCards}
+                      {getActiveCards}
+                      {state}
+                    />
+                  {/each}
+                </div>
+              </div>
+            {/if}
+          {/if}
         {/if}
       {:catch name}
         <div>

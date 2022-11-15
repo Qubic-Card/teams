@@ -62,6 +62,24 @@
     }
   };
 
+  const checkTeamCardCon = async () => {
+    const { data, error } = await supabase
+      .from('team_cardcon')
+      .select('id')
+      .eq('team_member_id', member.member_id);
+
+    if (error) {
+      return false;
+    }
+    if (data) {
+      if (data.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   const deleteMemberHandler = async () => {
     let card_holder = memberProfile.firstname + ' ' + memberProfile.lastname;
 
@@ -72,6 +90,7 @@
       .update(
         {
           uid: null,
+          role: 2,
           team_profile: teamProfileTemplate,
         },
         { returning: 'minimal' }
@@ -164,8 +183,12 @@
   buttonLabel="Remove"
   {isLoading}
   on:action={async () => {
-    await deleteMemberHandler();
-    await deleteMember(member.member_id);
+    if (await checkTeamCardCon()) {
+      toastFailed('Member has a card connection, please disconnect first');
+    } else {
+      await deleteMemberHandler();
+      await deleteMember(member.member_id);
+    }
     showDeleteMemberModal = false;
   }}
 >
@@ -241,9 +264,8 @@
           <div class="hidden md:flex flex-col">
             <h1 class=" text-neutral-400">Last Activity</h1>
             <p class="break-all">
-              {convertToGMT7(member.logged_at).getMonth()}/{convertToGMT7(
-                member.logged_at
-              ).getFullYear()} - {setHours4Digit(
+              {convertToGMT7(member.logged_at).toLocaleString().split(',')[0]} -
+              {setHours4Digit(
                 convertToGMT7(member.logged_at).getHours(),
                 convertToGMT7(member.logged_at).getMinutes()
               )}
@@ -397,9 +419,7 @@
           <h1 class=" text-neutral-400">Last Activity</h1>
 
           <p class="break-all">
-            {convertToGMT7(member.logged_at).getMonth()}/{convertToGMT7(
-              member.logged_at
-            ).getFullYear()} - {setHours4Digit(
+            {convertToGMT7(member.logged_at).toLocaleString().split(',')[0]} - {setHours4Digit(
               convertToGMT7(member.logged_at).getHours(),
               convertToGMT7(member.logged_at).getMinutes()
             )}

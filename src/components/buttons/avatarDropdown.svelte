@@ -1,11 +1,12 @@
 <script>
+  import { log } from '@lib/logger/logger';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import supabase from '@lib/db';
   import { teamData } from '@lib/stores/teamStore';
-  import { user } from '@lib/stores/userStore';
+  import { memberData, user } from '@lib/stores/userStore';
   import { toastSuccess } from '@lib/utils/toast';
   import { Listbox } from '@rgossiaux/svelte-headlessui';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import { fade } from 'svelte/transition';
 
   export let sortOptions = [],
@@ -14,6 +15,7 @@
     email,
     uid;
 
+  const teamId = getContext('teamId');
   let selected = sortOptions[0];
   let isOpen = false;
   let isLoading = false;
@@ -38,14 +40,21 @@
       console.log(error);
       return;
     } else {
+      log(
+        `${email} has been disconnected from ******${cardId.slice(-6)}`,
+        'DANGER',
+        null,
+        teamId,
+        $memberData.fullName,
+        '',
+        $memberData.id
+      );
       toastSuccess('Card has been disconnected');
     }
 
     isOpen = false;
     isLoading = false;
   };
-
-  // 613572e9-f471-4f0d-90d2-d8511d1ac462
 </script>
 
 <ConfirmationModal
