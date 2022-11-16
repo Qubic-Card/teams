@@ -19,7 +19,7 @@
 
   let loading = false;
   let codeActivation = '';
-  let state = 'regisfter';
+  let state = 'activation';
   let team = {};
   let register = {
     fname: '',
@@ -267,7 +267,7 @@
               } else {
                 window.location.reload();
                 log(
-                  logMsg(register.email),
+                  logMsg(login.email),
                   'SUCCESS',
                   '',
                   $page.url.searchParams.get('team_id'),

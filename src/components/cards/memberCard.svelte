@@ -1,7 +1,8 @@
 <script>
-  import setHours4Digit from '@lib/utils/setHour4Digit';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import MemberAnalyticsModal from '@comp/modals/memberAnalyticsModal.svelte';
   import MemberRoleDropdown from '@comp/buttons/memberRoleDropdown.svelte';
+  import setHours4Digit from '@lib/utils/setHour4Digit';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
@@ -12,8 +13,6 @@
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { log } from '@lib/logger/logger';
   import { teamData } from '@lib/stores/teamStore';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
-  import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
 
   export let permissions, deleteMember;
   export let roles = [];
@@ -107,10 +106,6 @@
       );
       toastSuccess('Member has been deleted');
       isLoading = false;
-
-      if (!(await checkIsActiveMember($user?.id))) {
-        window.location.reload();
-      }
     }
   };
 
@@ -380,25 +375,27 @@
             />
           {/if}
         </div>
-        <div
-          class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
-          on:click={toggleDeleteMemberModal}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="#ef4444"
-            stroke-width="2"
+        {#if member.uid !== $user?.id}
+          <div
+            class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
+            on:click={toggleDeleteMemberModal}
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-        </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#ef4444"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </div>
+        {/if}
       </div>
 
       <div
