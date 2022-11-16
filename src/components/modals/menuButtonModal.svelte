@@ -13,7 +13,10 @@
 
   let isOpen = false;
 
-  const handleLogout = async () => await supabase.auth.signOut();
+  const handleLogout = async () => {
+    isOpen = false;
+    await supabase.auth.signOut();
+  };
 </script>
 
 {#if isOpen}

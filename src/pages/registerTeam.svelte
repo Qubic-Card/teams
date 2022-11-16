@@ -6,11 +6,13 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import encryptActivationCode from '@lib/utils/encryptActivationCode';
   import {
+    checkAlreadyTeamMember,
+    checkEmptyStringInObject,
     checkFirstRegisteredMember,
     checkIsRegistered,
     checkTeamMembers,
     createTeamMember,
-    updateTeamMember,
+    logMsg,
   } from '@lib/query/register';
   import { goto } from '$app/navigation';
   import { log } from '@lib/logger/logger';
@@ -32,10 +34,6 @@
     email: '',
     password: '',
     forgotPassword: false,
-  };
-
-  const logMsg = (email) => {
-    return `User ${email ?? ''} has joined the team`;
   };
 
   const getTeamData = async () => {
@@ -89,6 +87,21 @@
     }
   };
 
+  const getProfile = async (uid) => {
+    const { data, error } = await supabase
+      .from('profile')
+      .select('metadata->>firstname, metadata->>lastname, metadata->>company')
+      .eq('uid', uid);
+
+    if (error) console.log(error);
+    if (data) {
+      const profile = data[0];
+      register.fname = profile.firstname;
+      register.lname = profile.lastname;
+      register.company = profile.company;
+    }
+  };
+
   const handleSignUp = async () => {
     if (register.checked) {
       if (checkEmptyStringInObject(register)) {
@@ -109,12 +122,7 @@
         toastFailed("Password doesn't match");
       } else {
         try {
-          const {
-            error: check_error,
-            available,
-            nullUid,
-            mid,
-          } = await checkTeamMembers(
+          const { error: check_error, available } = await checkTeamMembers(
             $page.url.searchParams.get('team_id'),
             team.member_count
           );
@@ -152,67 +160,37 @@
                   toastFailed('Email is already registered');
                   loading = false;
                 } else {
-                  if (nullUid) {
-                    const { error } = await updateTeamMember(
-                      mid,
-                      user.id,
-                      $page.url.searchParams.get('team_id'),
-                      register,
-                      team.company
-                    );
+                  const { error, memberId } = await createTeamMember(
+                    user.id,
+                    register,
+                    team.company,
+                    $page.url.searchParams.get('team_id'),
+                    (await checkFirstRegisteredMember(
+                      $page.url.searchParams.get('team_id')
+                    ))
+                      ? 1
+                      : 2
+                  );
 
-                    if (error) {
-                      toastFailed(
-                        'Something went wrong, please contact our support'
-                      );
-                      loading = false;
-                    } else {
-                      toastSuccess('Please confirm your email');
-                      log(
-                        logMsg(register.email),
-                        'SUCCESS',
-                        '',
-                        $page.url.searchParams.get('team_id'),
-                        '',
-                        '',
-                        mid
-                      );
-                      register.success = true;
-                      loading = false;
-                    }
+                  if (error) {
+                    toastFailed(
+                      'Something went wrong, please contact our support'
+                    );
                   } else {
-                    const { error, memberId } = await createTeamMember(
-                      user.id,
-                      register,
-                      team.company,
+                    log(
+                      logMsg(register.email),
+                      'SUCCESS',
+                      '',
                       $page.url.searchParams.get('team_id'),
-                      (await checkFirstRegisteredMember(
-                        $page.url.searchParams.get('team_id')
-                      ))
-                        ? 1
-                        : 2
+                      '',
+                      '',
+                      memberId
                     );
-
-                    if (error) {
-                      toastFailed(
-                        'Something went wrong, please contact our support'
-                      );
-                    } else {
-                      log(
-                        logMsg(register.email),
-                        'SUCCESS',
-                        '',
-                        $page.url.searchParams.get('team_id'),
-                        '',
-                        '',
-                        memberId
-                      );
-                      toastSuccess('Please confirm your email');
-                    }
-
-                    register.success = true;
-                    loading = false;
+                    toastSuccess('Please confirm your email');
                   }
+
+                  register.success = true;
+                  loading = false;
                 }
               }
             }
@@ -227,7 +205,7 @@
       toastFailed('Please agree to our conditions');
     }
   };
-
+  // becirel626@lidely.com
   const loginHandler = async () => {
     try {
       if (checkEmptyStringInObject(login)) {
@@ -241,9 +219,68 @@
           email: login.email,
           password: login.password,
         });
+
         if (error) {
           throw error;
         } else {
+          const { error: check_error, available } = await checkTeamMembers(
+            $page.url.searchParams.get('team_id'),
+            team.member_count
+          );
+
+          if (check_error) {
+            toastFailed();
+            return;
+          } else if (!available) {
+            toastFailed('Team member limit reached');
+            return;
+          } else {
+            const { error: check_error, isMember } =
+              await checkAlreadyTeamMember(
+                user.id,
+                $page.url.searchParams.get('team_id')
+              );
+
+            if (check_error) {
+              toastFailed();
+              return;
+            } else if (!isMember) {
+              loading = true;
+
+              register.email = login.email;
+              await getProfile(user.id);
+
+              const { error, memberId } = await createTeamMember(
+                user.id,
+                register,
+                team.company,
+                $page.url.searchParams.get('team_id'),
+                (await checkFirstRegisteredMember(
+                  $page.url.searchParams.get('team_id')
+                ))
+                  ? 1
+                  : 2
+              );
+
+              if (error) {
+                toastFailed('Something went wrong, please contact our support');
+              } else {
+                window.location.reload();
+                log(
+                  logMsg(login.email),
+                  'SUCCESS',
+                  '',
+                  $page.url.searchParams.get('team_id'),
+                  '',
+                  '',
+                  memberId
+                );
+              }
+            }
+            loading = false;
+            // goto('/');
+          }
+
           loading = false;
         }
       }
@@ -266,15 +303,6 @@
       toastFailed();
       loading = false;
     }
-  };
-
-  const checkEmptyStringInObject = (obj) => {
-    for (let key in obj) {
-      if (obj[key] === '') {
-        return true;
-      }
-    }
-    return false;
   };
 
   const isContainNumber = (str) => /\d/.test(str);
@@ -457,72 +485,86 @@
           </button>
           <button
             class="p-2 outline outline-1 outline-neutral-500 rounded-md hover:outline-neutral-800 text-sm"
-            on:click={() => (state = 'login')}
+            on:click={() => {
+              state = 'login';
+              login.forgotPassword = false;
+            }}
           >
-            Already have an account
+            Already have a Qubic account
           </button>
         </div>
       {/if}
     </div>
   {:else}
     <div
-      class="flex flex-col justify-center bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg py-16 px-4 md:px-8"
+      class="flex flex-col bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg py-16 px-4 md:px-8"
     >
-      <Input
-        bind:value={login.email}
-        titleColor="text-black"
-        placeholder="Email"
-        title="Email"
-        inputbg="bg-neutral-100"
-        inputText="text-neutral-900"
-        outline="outline outline-1 outline-neutral-500"
-      />
+      <button
+        on:click={() =>
+          login.forgotPassword
+            ? (login.forgotPassword = false)
+            : (state = 'register')}
+        class="mb-0 md:mb-2 self-start"
+      >
+        <span class="text-2xl mr-2">&larr;</span> Back</button
+      >
+      <div class="flex flex-col h-full justify-center">
+        <Input
+          bind:value={login.email}
+          titleColor="text-black"
+          placeholder="Email"
+          title="Email"
+          inputbg="bg-neutral-100"
+          inputText="text-neutral-900"
+          outline="outline outline-1 outline-neutral-500"
+        />
 
-      {#if !login.forgotPassword}
-        <div class="flex flex-col text-xs md:text-sm">
-          <p class="block text-sm mt-2 text-left">Password</p>
-          <input
-            bind:value={login.password}
-            on:keypress={onEnter}
-            type="password"
-            placeholder="Your Password"
-            class="w-full px-4 py-2 mt-2 text-base outline outline-1 outline-neutral-500 rounded-md text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-100 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
-          />
-        </div>
-      {/if}
-
-      <div class="flex flex-col gap-2 mt-10">
         {#if !login.forgotPassword}
-          <button
-            disabled={loading}
-            class="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex gap-2 justify-center items-center h-10 md:h-12 text-sm"
-            on:click={loginHandler}
-          >
-            {#if loading}
-              <Spinner class="h-6 w-6 my-4" />
-            {/if}
-            Join
-          </button>
-          <button
-            on:click={() => (login.forgotPassword = true)}
-            class="p-2 outline outline-1 outline-neutral-500 rounded-md hover:outline-neutral-800 text-sm"
-          >
-            Forgot Password
-          </button>
+          <div class="flex flex-col text-xs md:text-sm">
+            <p class="block text-sm mt-2 text-left">Password</p>
+            <input
+              bind:value={login.password}
+              on:keypress={onEnter}
+              type="password"
+              placeholder="Your Password"
+              class="w-full px-4 py-2 mt-2 text-base outline outline-1 outline-neutral-500 rounded-md text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-100 focus:border-gray-500  focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
+            />
+          </div>
         {/if}
 
-        {#if login.forgotPassword}
-          <button
-            on:click={async () => {
-              login.forgotPassword
-                ? await handleForgotPassword()
-                : (login.forgotPassword = true);
-            }}
-            class="p-2 bg-blue-600 rounded-md text-sm text-white"
-          >
-            Send Email
-          </button>
-        {/if}
+        <div class="flex flex-col gap-2 mt-10">
+          {#if !login.forgotPassword}
+            <button
+              disabled={loading}
+              class="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex gap-2 justify-center items-center h-10 md:h-12 text-sm"
+              on:click={loginHandler}
+            >
+              {#if loading}
+                <Spinner class="h-6 w-6 my-4" />
+              {/if}
+              Join
+            </button>
+            <button
+              on:click={() => (login.forgotPassword = true)}
+              class="p-2 outline outline-1 outline-neutral-500 rounded-md hover:outline-neutral-800 text-sm"
+            >
+              Forgot Password
+            </button>
+          {/if}
+
+          {#if login.forgotPassword}
+            <button
+              on:click={async () => {
+                login.forgotPassword
+                  ? await handleForgotPassword()
+                  : (login.forgotPassword = true);
+              }}
+              class="p-2 bg-blue-600 rounded-md text-sm text-white"
+            >
+              Send Email
+            </button>
+          {/if}
+        </div>
       </div>
     </div>
   {/if}

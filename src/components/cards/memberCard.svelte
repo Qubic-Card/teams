@@ -1,7 +1,8 @@
 <script>
-  import setHours4Digit from '@lib/utils/setHour4Digit';
+  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
   import MemberAnalyticsModal from '@comp/modals/memberAnalyticsModal.svelte';
   import MemberRoleDropdown from '@comp/buttons/memberRoleDropdown.svelte';
+  import setHours4Digit from '@lib/utils/setHour4Digit';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import supabase from '@lib/db';
@@ -10,10 +11,8 @@
   import roleId from '@lib/roleConfig';
   import { createEventDispatcher, getContext, onMount } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
-  import { teamProfileTemplate } from '@lib/constants';
   import { log } from '@lib/logger/logger';
   import { teamData } from '@lib/stores/teamStore';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
 
   export let permissions, deleteMember;
   export let roles = [];
@@ -87,14 +86,7 @@
 
     const { error: error_member } = await supabase
       .from('team_members')
-      .update(
-        {
-          uid: null,
-          role: 2,
-          team_profile: teamProfileTemplate,
-        },
-        { returning: 'minimal' }
-      )
+      .delete()
       .eq('id', member.member_id);
 
     if (error_member) {
@@ -264,7 +256,14 @@
           <div class="hidden md:flex flex-col">
             <h1 class=" text-neutral-400">Last Activity</h1>
             <p class="break-all">
-              {convertToGMT7(member.logged_at).toLocaleString().split(',')[0]} -
+              {convertToGMT7(member.logged_at)
+                .toDateString()
+                .slice(4)
+                .split(' ')
+                .splice(0, 2)
+                .reverse()
+                .join(' ')}
+              {convertToGMT7(member.logged_at).getFullYear()} -
               {setHours4Digit(
                 convertToGMT7(member.logged_at).getHours(),
                 convertToGMT7(member.logged_at).getMinutes()
@@ -376,25 +375,27 @@
             />
           {/if}
         </div>
-        <div
-          class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
-          on:click={toggleDeleteMemberModal}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="#ef4444"
-            stroke-width="2"
+        {#if member.uid !== $user?.id}
+          <div
+            class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
+            on:click={toggleDeleteMemberModal}
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-        </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#ef4444"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </div>
+        {/if}
       </div>
 
       <div
@@ -419,7 +420,15 @@
           <h1 class=" text-neutral-400">Last Activity</h1>
 
           <p class="break-all">
-            {convertToGMT7(member.logged_at).toLocaleString().split(',')[0]} - {setHours4Digit(
+            {convertToGMT7(member.logged_at)
+              .toDateString()
+              .slice(4)
+              .split(' ')
+              .splice(0, 2)
+              .reverse()
+              .join(' ')}
+            {convertToGMT7(member.logged_at).getFullYear()}
+            - {setHours4Digit(
               convertToGMT7(member.logged_at).getHours(),
               convertToGMT7(member.logged_at).getMinutes()
             )}

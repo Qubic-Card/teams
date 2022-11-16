@@ -4,6 +4,7 @@
   import { fly, slide } from 'svelte/transition';
   import { user } from '@lib/stores/userStore';
   import supabase from '@lib/db';
+  import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
 
   let teams = [];
   let isHasBasic = false;
@@ -52,7 +53,9 @@
       });
 
       teams = newData;
-
+      if (!isHasBasic && teams.length === 0) {
+        $user = null;
+      }
       // if (teamsArr.length < 0) {
       //   $teams.isTeamMember = false;
       // } else $teams.isTeamMember = true;
@@ -60,7 +63,7 @@
   };
 </script>
 
-{#await (getTeamsList(), getBusinessCards($user?.id)) then name}
+{#await (getBusinessCards($user?.id), getTeamsList()) then name}
   <section
     class="text-white overflow-hidden bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
   >

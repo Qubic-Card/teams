@@ -6,28 +6,13 @@
   import { browser } from '$app/env';
   import { cards } from '@lib/stores/cardsStore';
   import Cookies from 'js-cookie';
+  import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
 
   $user = supabase.auth.user();
 
-  const checkIsActiveMember = async () => {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('uid')
-      .eq('uid', $user?.id);
-
-    if (error) console.log(error);
-    if (data) {
-      if (data.length > 0) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  };
-
   const redirect = async () => {
     if ($page?.routeId?.includes('slug')) {
-      if (!(await checkIsActiveMember())) {
+      if (!(await checkIsActiveMember($user?.id))) {
         $user = null;
       }
       if (!$user) goto('/');

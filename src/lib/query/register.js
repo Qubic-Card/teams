@@ -42,50 +42,6 @@ export const createTeamMember = async (uid, input, company, tid, role) => {
   }
 };
 
-export const updateTeamMember = async (mid, uid, tid, input, company) => {
-  const { data, error } = await supabase
-    .from('team_members')
-    .update({
-      uid: uid,
-      team_profile: {
-        firstname: input.fname,
-        lastname: input.lname,
-        job: '',
-        avatar: '',
-        design: {
-          theme: 'dark',
-          background: '',
-        },
-        address: '',
-        company: company ?? '',
-        links: [
-          {
-            link: 'https://qubic.id',
-            title: 'My Website',
-            isActive: true,
-          },
-        ],
-        socials: [
-          {
-            data: input.email,
-            type: 'email',
-            isActive: true,
-          },
-        ],
-        isShowMetaImage: true,
-      },
-    })
-    .eq('id', mid)
-    .eq('team_id', tid);
-
-  if (error) {
-    console.log(error);
-    return { error: true };
-  } else {
-    return { error: false };
-  }
-};
-
 export const checkFirstRegisteredMember = async (tid) => {
   const { data, error } = await supabase
     .from('team_members')
@@ -132,18 +88,45 @@ export const checkTeamMembers = async (tid, member_count) => {
     console.log(error);
     return { error: true };
   } else {
-    const nullUid = data.filter((item) => item.uid === null);
-    const active = data.filter((item) => item.uid !== null);
-
-    if (active.length < member_count) {
+    if (data.length < member_count) {
       return {
         error: false,
         available: true,
-        nullUid: nullUid.length > 0,
-        mid: nullUid[0]?.id ?? null,
       };
     } else {
-      return { error: false, available: false, nullUid: nullUid.length > 0 };
+      return { error: false, available: false };
     }
   }
+};
+
+export const checkAlreadyTeamMember = async (uid, tid) => {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('id')
+    .eq('uid', uid)
+    .eq('team_id', tid);
+
+  if (error) {
+    return { error: true };
+  } else {
+    console.log(data);
+    if (data.length > 0) {
+      return { error: false, isMember: true };
+    } else {
+      return { error: false, isMember: false };
+    }
+  }
+};
+
+export const logMsg = (email) => {
+  return `User ${email ?? ''} has joined the team`;
+};
+
+export const checkEmptyStringInObject = (obj) => {
+  for (let key in obj) {
+    if (obj[key] === '') {
+      return true;
+    }
+  }
+  return false;
 };
