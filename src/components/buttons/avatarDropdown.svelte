@@ -73,8 +73,8 @@
   </slot>
   <slot slot="text">
     <p>
-      Are you sure you want to disconnect <br />
-      ******{cardId.slice(-6)} from {$teamData.name} team?
+      Are you sure you want to disconnect {email} with ******{cardId.slice(-6)} from
+      {$teamData.name}?
     </p>
   </slot>
 </ConfirmationModal>

@@ -153,7 +153,9 @@ export const getLogsRecords = async (col, id, fromDate, toDate) => {
             'Created at': convertToGMT7(log?.created_at),
             Team: log?.team?.name,
             Company: log?.team?.company,
-            Interactions: log?.data?.message?.includes('removed')
+            Interactions: log?.data?.message?.includes('disconnected')
+              ? log?.data?.message.split(' ')[0] + ' ' + 'has been disconnected'
+              : log?.data?.message?.includes('removed')
               ? log?.data?.message.split(' ')[0] + ' ' + 'has been removed'
               : log?.data?.message?.includes('activated') ||
                 log?.type === 'WARN'

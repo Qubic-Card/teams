@@ -52,7 +52,7 @@ const sortMember = (data = [], uidTarget, sort) => {
     sortedMembers.push(member);
   });
 
-  let newData = [...matchedData, ...sortedMembers];
+  let newData = [...matchedData, ...sortedMembers, ...emptyLogs];
 
   return newData;
 };
