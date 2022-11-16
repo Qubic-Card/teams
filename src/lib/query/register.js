@@ -11,7 +11,7 @@ export const createTeamMember = async (uid, input, company, tid, role) => {
       job: '',
       avatar: '',
       design: {
-        theme: 'black',
+        theme: 'dark',
         background: '',
       },
       address: '',

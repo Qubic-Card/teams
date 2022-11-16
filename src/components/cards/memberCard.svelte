@@ -80,15 +80,11 @@
   };
 
   const deleteMemberHandler = async () => {
-    let card_holder = memberProfile.firstname + ' ' + memberProfile.lastname;
-
     isLoading = true;
-
     const { error: error_member } = await supabase
       .from('team_members')
       .delete()
       .eq('id', member.member_id);
-
     if (error_member) {
       console.log(error_member);
       toastFailed();
@@ -96,7 +92,7 @@
       return;
     } else {
       log(
-        `${card_holder} has been removed from team by ${$memberData.fullName}`,
+        `${member.email} has been removed from team by ${$memberData.fullName}`,
         'DANGER',
         null,
         teamId,

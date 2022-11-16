@@ -262,18 +262,18 @@
         {:else}
           <div class="flex flex-col gap-2 px-4">
             {#each members as member, i}
-              {#if member.email !== null}
-                <MemberCard
-                  {member}
-                  {roles}
-                  {permissions}
-                  {i}
-                  {updatedRole}
-                  {deleteMember}
-                  active
-                  on:setRole={(e) => (updatedRole = e.detail)}
-                />
-              {/if}
+              <!-- {#if member.email !== null} -->
+              <MemberCard
+                {member}
+                {roles}
+                {permissions}
+                {i}
+                {updatedRole}
+                {deleteMember}
+                active
+                on:setRole={(e) => (updatedRole = e.detail)}
+              />
+              <!-- {/if} -->
             {/each}
           </div>
         {/if}
