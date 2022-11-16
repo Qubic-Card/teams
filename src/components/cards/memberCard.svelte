@@ -10,10 +10,10 @@
   import roleId from '@lib/roleConfig';
   import { createEventDispatcher, getContext, onMount } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
-  import { teamProfileTemplate } from '@lib/constants';
   import { log } from '@lib/logger/logger';
   import { teamData } from '@lib/stores/teamStore';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
+  import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
 
   export let permissions, deleteMember;
   export let roles = [];
@@ -87,14 +87,7 @@
 
     const { error: error_member } = await supabase
       .from('team_members')
-      .update(
-        {
-          uid: null,
-          role: 2,
-          team_profile: teamProfileTemplate,
-        },
-        { returning: 'minimal' }
-      )
+      .delete()
       .eq('id', member.member_id);
 
     if (error_member) {
@@ -114,6 +107,10 @@
       );
       toastSuccess('Member has been deleted');
       isLoading = false;
+
+      if (!(await checkIsActiveMember($user?.id))) {
+        window.location.reload();
+      }
     }
   };
 
@@ -264,7 +261,14 @@
           <div class="hidden md:flex flex-col">
             <h1 class=" text-neutral-400">Last Activity</h1>
             <p class="break-all">
-              {convertToGMT7(member.logged_at).toLocaleString().split(',')[0]} -
+              {convertToGMT7(member.logged_at)
+                .toDateString()
+                .slice(4)
+                .split(' ')
+                .splice(0, 2)
+                .reverse()
+                .join(' ')}
+              {convertToGMT7(member.logged_at).getFullYear()} -
               {setHours4Digit(
                 convertToGMT7(member.logged_at).getHours(),
                 convertToGMT7(member.logged_at).getMinutes()
@@ -419,7 +423,15 @@
           <h1 class=" text-neutral-400">Last Activity</h1>
 
           <p class="break-all">
-            {convertToGMT7(member.logged_at).toLocaleString().split(',')[0]} - {setHours4Digit(
+            {convertToGMT7(member.logged_at)
+              .toDateString()
+              .slice(4)
+              .split(' ')
+              .splice(0, 2)
+              .reverse()
+              .join(' ')}
+            {convertToGMT7(member.logged_at).getFullYear()}
+            - {setHours4Digit(
               convertToGMT7(member.logged_at).getHours(),
               convertToGMT7(member.logged_at).getMinutes()
             )}
