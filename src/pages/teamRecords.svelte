@@ -65,10 +65,12 @@
       {
         tid: teamId,
         by: holder,
-        type: selectedType,
+        type: 'Teams ' + selectedType,
         storage_url: url,
         filename: `${fileName}-${
-          selectedType === 'Activities' ? 'activities' : 'connections'
+          selectedType === 'Activities'
+            ? 'teams-activities'
+            : 'teams-connections'
         }`,
       },
       { returning: 'minimal' }
@@ -103,7 +105,9 @@
         .from('records')
         .upload(
           `${teamId}/${fileName}-${
-            selectedType === 'Activities' ? 'activities' : 'connections'
+            selectedType === 'Activities'
+              ? 'teams-activities'
+              : 'teams-connections'
           }`,
           selectedType === 'Activities' ? logsCsv : connectionsCsv,
           {
@@ -127,7 +131,9 @@
       if (data) {
         toastSuccess(
           `${fileName}-${
-            selectedType === 'Activities' ? 'activities' : 'connections'
+            selectedType === 'Activities'
+              ? 'teams-activities'
+              : 'teams-connections'
           } created successfully`
         );
         await createTeamStorage(data.Key);
