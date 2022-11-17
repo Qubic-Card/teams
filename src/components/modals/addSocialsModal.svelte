@@ -87,7 +87,9 @@
             src={socialIcons[item]}
             alt={item}
           />
-          <p class="flex justify-center items-center">{item}</p>
+          <p class="flex justify-center items-center">
+            {item.charAt(0).toUpperCase() + item.slice(1)}
+          </p>
         </div>
       {/each}
     </div>

@@ -265,7 +265,6 @@
               if (error) {
                 toastFailed('Something went wrong, please contact our support');
               } else {
-                window.location.reload();
                 log(
                   logMsg(login.email),
                   'SUCCESS',
@@ -275,6 +274,7 @@
                   '',
                   memberId
                 );
+                window.location.reload();
               }
             }
             loading = false;

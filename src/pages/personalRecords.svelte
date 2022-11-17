@@ -59,10 +59,12 @@
     const { data, error } = await supabase.from('team_storage').insert({
       tid: teamId,
       by: holder,
-      type: selectedType,
+      type: 'Personal ' + selectedType,
       storage_url: url,
       filename: `${fileName}-${
-        selectedType === 'Activities' ? 'activities' : 'connections'
+        selectedType === 'Activities'
+          ? 'personal-activities'
+          : 'personal-connections'
       }`,
     });
 
@@ -96,7 +98,9 @@
         .from('records')
         .upload(
           `${teamId}/${$user?.id}/${fileName}-${
-            selectedType === 'Activities' ? 'activities' : 'connections'
+            selectedType === 'Activities'
+              ? 'personal-activities'
+              : 'personal-connections'
           }`,
           selectedType === 'Activities' ? logsCsv : connectionsCsv,
           {
@@ -121,7 +125,9 @@
       if (data) {
         toastSuccess(
           `${fileName}-${
-            selectedType === 'Activities' ? 'activities' : 'connections'
+            selectedType === 'Activities'
+              ? 'personal-activities'
+              : 'personal-connections'
           } created successfully`
         );
         await createTeamStorage(data.Key);

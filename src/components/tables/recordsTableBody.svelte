@@ -55,9 +55,9 @@
   <td class="font-semibold text-ellipsis pl-4">
     <p class="w-56 lg:w-80 truncate">
       {#if record.storage_url}
-        {record?.filename?.split('-').slice(0, -1).join('-') ?? '-'}
+        {record?.filename?.split('-').slice(0, 2).join('-') ?? '-'}
       {:else}
-        {record?.name?.split('-').slice(0, -1).join('-') ?? '-'}
+        {record?.name?.split('-').slice(0, 2).join('-') ?? '-'}
       {/if}
     </p>
   </td>
@@ -74,7 +74,9 @@
       {#if record.storage_url}
         {record.type}
       {:else}
-        {record.name.includes('activities') ? 'Activities' : 'Connections'}
+        {record.name.includes('activities')
+          ? 'Personal Activities'
+          : 'Personal Connections'}
       {/if}
     </td>
     {#if isTeam}
