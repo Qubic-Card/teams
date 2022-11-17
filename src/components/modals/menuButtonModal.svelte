@@ -51,7 +51,7 @@
     on:click|preventDefault={() => (isOpen = true)}
     class="p-3 bg-black rounded-full h-10 flex items-center justify-center mx-2 w-10"
   >
-    {$user.email.charAt(0).toUpperCase()}
+    {$user?.email.charAt(0).toUpperCase()}
   </button>
 {/if}
 

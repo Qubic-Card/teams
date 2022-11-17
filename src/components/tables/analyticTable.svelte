@@ -46,7 +46,7 @@
                   You have removed {row.message.split(' ')[0]} from team
                 </td>
               {:else if row.type === 'SUCCESS'}
-                <td class="pl-4 w-auto">You have activated new card to team</td>
+                <td class="pl-4 w-auto">{row.message}</td>
               {:else if row.type === 'WARN'}
                 <td class="pl-4 w-auto"> You have changed team name</td>
               {:else}

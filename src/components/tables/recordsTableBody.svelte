@@ -72,7 +72,15 @@
     </td>
     <td class="pl-4 pr-4">
       {#if record.storage_url}
-        {record.type}
+        {#if record.type.includes('Activities')}
+          {record.storage_url.includes('team')
+            ? 'Team Activities'
+            : 'Personal Activities'}
+        {:else}
+          {record.storage_url.includes('team')
+            ? 'Team Connections'
+            : 'Personal Connections'}
+        {/if}
       {:else}
         {record.name.includes('activities')
           ? 'Personal Activities'
