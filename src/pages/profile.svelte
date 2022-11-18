@@ -148,14 +148,14 @@
         ? $currentTheme?.text
         : 'text-transparent'}"
     >
-      <h1 class="text-sm md:text-lg font-semibold">
+      <h1 class="text-sm md:text-lg font-semibold text-center break-all">
         {data?.firstname ?? ''}
         {data?.lastname ?? ''}
       </h1>
-      <h1 class="text-xs md:text-sm opacity-80">
+      <h1 class="text-xs md:text-sm opacity-80 text-center">
         {data?.job ?? ''}
       </h1>
-      <h1 class="text-sm md:text-md opacity-90">
+      <h1 class="text-sm md:text-md opacity-90 text-center">
         {data?.company ?? ''}
       </h1>
     </div>
