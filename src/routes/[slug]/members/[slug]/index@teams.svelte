@@ -113,7 +113,7 @@
     let { data, error } = await supabase
       .from('team_members')
       .select(
-        'team_profile, uid, team_id, id, team_cardcon!inner(display_personal)'
+        'team_profile, uid, team_id, id, team_cardcon: team_cardcon(display_personal)'
       )
       .eq('uid', $page.params.slug)
       .eq('team_id', teamId);
@@ -130,8 +130,12 @@
 
       await checkIsConfirmedEmail(data[0]['uid']);
 
-      $isDisplayPersonal = data[0].team_cardcon[0].display_personal;
-      if (!data[0].team_cardcon[0].display_personal) $selectedTab = 'team';
+      if (data[0].team_cardcon.length > 0) {
+        $isDisplayPersonal = data[0].team_cardcon[0].display_personal;
+        if (!data[0].team_cardcon[0].display_personal) $selectedTab = 'team';
+      } else {
+        $isDisplayPersonal = null;
+      }
     }
     if (error) console.log(error);
 
@@ -204,7 +208,7 @@
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           {#if permissions.readTeam}
-            {#if $isDisplayPersonal}
+            {#if $isDisplayPersonal !== false}
               <div class="flex mb-4">
                 <button
                   on:click={() => ($selectedTab = 'personal')}
@@ -263,8 +267,9 @@
       </div>
     </div>
   </div>
-{:catch}
+{:catch error}
   <div>
+    <h1>{error}</h1>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
       <a href="https://wa.me/628113087599" class="font-semibold">

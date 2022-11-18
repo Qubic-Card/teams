@@ -340,15 +340,17 @@
                   </div>
 
                   {#if permissions.writeTeam}
-                    <div
-                      class="flex justify-between text-xs md:text-sm items-center p-2 bg-neutral-500 mx-3 rounded-md my-2"
-                    >
-                      <h1 class="text-white">Show personal profile</h1>
-                      <SwitchButton
-                        bind:checked={$isDisplayPersonal}
-                        on:change={setDisplayPersonal}
-                      />
-                    </div>
+                    {#if $isDisplayPersonal !== null}
+                      <div
+                        class="flex justify-between text-xs md:text-sm items-center p-2 bg-neutral-500 mx-3 rounded-md my-2"
+                      >
+                        <h1 class="text-white">Show personal profile</h1>
+                        <SwitchButton
+                          bind:checked={$isDisplayPersonal}
+                          on:change={setDisplayPersonal}
+                        />
+                      </div>
+                    {/if}
                     <div class="grid grid-cols-2 gap-2 px-3 pt-3">
                       {#if !$teamData?.brochure?.url}
                         <FilePond
