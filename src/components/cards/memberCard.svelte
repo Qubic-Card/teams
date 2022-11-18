@@ -37,7 +37,7 @@
     (showDeleteMemberModal = !showDeleteMemberModal);
   const toProfileEditor = () =>
     goto(`/${$page.params.slug}/members/${member?.uid}`, {
-      state: { card: member?.id },
+      state: { card: member?.card_id },
     });
 
   const selectRole = (role) => (selectedRole = role);
