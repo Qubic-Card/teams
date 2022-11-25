@@ -64,6 +64,7 @@
     }, 500);
 
     members = sortMember(members, $user?.id, 'asc');
+    await getMembers();
   };
 
   const getMembers = async () => {
@@ -75,6 +76,11 @@
 
     if (data) {
       members = sortMember(data, $user?.id, 'asc');
+
+      members = members.filter(
+        (member, index, self) =>
+          index === self.findIndex((m) => m.member_id === member.member_id)
+      );
     }
   };
 
@@ -116,7 +122,7 @@
         return {
           NFCtap: null,
           QRScan: null,
-          avatar: null,
+          team_profile: null,
           color: c.color,
           datecreated: null,
           email: null,
@@ -140,8 +146,8 @@
     if (error) console.log(error);
 
     if (data) {
-      inactiveCards = data.filter((c) => c.avatar === null);
-      cards = data.filter((c) => c.avatar !== null);
+      inactiveCards = data.filter((c) => c.team_profile === null);
+      cards = data.filter((c) => c.team_profile !== null);
       cards = sortCard(cards, $user?.id, 'asc');
     }
 
@@ -162,6 +168,8 @@
 
     loading = false;
   };
+
+  // $: console.log(permissions);
 </script>
 
 <svelte:window bind:innerWidth />
@@ -297,7 +305,13 @@
           {#if cards.length > 0}
             {#if state === 'all' || state === 'active'}
               <div class="flex flex-col mt-4">
-                <h1 class="text-lg font-semibold pl-4">Active</h1>
+                {#if permissions.readMembers || cards
+                    .map((c) => c.uid)
+                    .includes($user?.id)}
+                  <h1 class="text-lg font-semibold pl-4">Active</h1>
+                {:else}
+                  <h1 class="text-lg font-semibold pl-4">No cards</h1>
+                {/if}
                 <div
                   class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
                 >
@@ -321,7 +335,10 @@
           {#if inactiveCards.length > 0}
             {#if state === 'all' || state === 'inactive'}
               <div class="flex flex-col {state === 'all' ? 'mt-8' : 'mt-4'}">
-                <h1 class="text-lg font-semibold pl-4">Inactive</h1>
+                {#if permissions.readMembers}
+                  <h1 class="text-lg font-semibold pl-4">Inactive</h1>
+                {/if}
+
                 <div
                   class="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
                 >

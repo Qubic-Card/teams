@@ -11,7 +11,7 @@
   import TeamAnalyticsCard from '../cards/teamAnalyticsCard.svelte';
   import getPagination from '@lib/utils/getPagination';
   import setHours4Digit from '@lib/utils/setHour4Digit';
-  import { userChangeTimestamp } from '@lib/stores/userStore';
+  import { user, userChangeTimestamp } from '@lib/stores/userStore';
 
   export let member,
     isRounded = false;
@@ -244,7 +244,7 @@
                   : 'bg-transparent hover:bg-neutral-700'
               }`}
             >
-              {#if log.type === 'DANGER' || log.type === 'SUCCESS' || log.type === 'WARN'}
+              {#if log.type === 'SUCCESS' || log.type === 'WARN'}
                 <h1
                   class={`${
                     log.type === 'DANGER'
@@ -258,6 +258,16 @@
                 >
                   {log?.data?.message}
                 </h1>
+              {:else if log.type === 'DANGER'}
+                {#if log.data?.message.includes(member.email) && member?.uid === $user?.id}
+                  <p class="break-all text-red-200">
+                    You {log.data?.message.split(' ').slice(1).join(' ')}
+                  </p>
+                {:else}
+                  <p class="break-all text-red-200">
+                    {log.data.message}
+                  </p>
+                {/if}
               {:else}
                 <h1 class="text-white text-xs md:text-sm">
                   {`${log?.card_holder ?? 'Member'}'s` +

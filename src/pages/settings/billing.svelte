@@ -14,7 +14,7 @@
         <h1 class="font-semibold text-sm md:text-xl">Billing</h1>
         <div class="gap-2 flex">
           <button
-            class="p-2 w-full md:w-40 hover:bg-blue-600/60 bg-blue-600 text-white rounded-md"
+            class="p-2 w-full md:w-40 hover:bg-blue-600/60 bg-blue-600 text-white rounded-md text-xs"
             on:click={async () =>
               await window.open('https://wa.me/628113087599', '_blank').focus()}
             >Change subscription</button

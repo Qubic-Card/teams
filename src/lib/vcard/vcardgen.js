@@ -164,7 +164,7 @@ export const genvcard = async (prop, team, dateConnected) => {
     if (team.links) {
       team.links.map((e, i) => {
         if (e.isActive)
-          return (vCard.socialUrls['Company' + e.title + i] = e.link);
+          return (vCard.socialUrls['Company ' + e.title + i] = e.link);
       });
     }
   }

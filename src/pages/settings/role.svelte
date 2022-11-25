@@ -121,14 +121,18 @@
         <AddRoleModal {permissions} />
       {/if}
     </div>
-    {#each defaultRole as role}
+    {#each defaultRole as role, i}
       <Disclosure let:open>
         <div class="flex justify-between items-center">
           <DisclosureButton
             on:click={() => (isClicked = true)}
             class="text-xs md:text-sm w-full text-left hover:bg-neutral-800 mb-1 p-4 rounded-lg flex justify-between mr-2 transition-colors duration-300"
           >
-            {role?.name?.charAt(0).toUpperCase() + role?.name?.slice(1)}
+            {#if i === 0}
+              Super Admin
+            {:else}
+              {role?.name?.charAt(0).toUpperCase() + role?.name?.slice(1)}
+            {/if}
           </DisclosureButton>
         </div>
         {#if open}
