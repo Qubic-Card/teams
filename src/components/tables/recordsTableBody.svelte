@@ -118,10 +118,11 @@
           <div class="flex flex-col gap-4">
             <p>
               Are you sure you want to remove <br />
-              {record.storage_url
-                ? record.filename
-                : record.profileData?.firstname ?? record?.name}
-              {!record.storage_url ? '' : record.profileData?.lastname ?? ''} ?
+              {#if record.storage_url}
+                {record?.filename?.split('-').slice(0, 2).join('-') ?? '-'}
+              {:else}
+                {record?.name?.split('-').slice(0, 2).join('-') ?? '-'}
+              {/if}
             </p>
           </div>
         </slot>

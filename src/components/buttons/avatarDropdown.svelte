@@ -11,9 +11,12 @@
 
   export let sortOptions = [],
     avatar = '',
+    fullname = '',
     cardId,
     email,
-    uid;
+    permissions,
+    uid,
+    mid;
 
   const teamId = getContext('teamId');
   let selected = sortOptions[0];
@@ -48,6 +51,15 @@
         $memberData.fullName,
         '',
         $memberData.id
+      );
+      log(
+        `${email} has been disconnected from ******${cardId.slice(-6)}`,
+        'DANGER',
+        null,
+        teamId,
+        fullname,
+        '',
+        mid
       );
       toastSuccess('Card has been disconnected');
     }
@@ -95,23 +107,21 @@
 
   {#if avatar === ''}
     <img
-      on:click={() => (isOpen = true)}
+      on:click={() => (permissions.writeMembers ? (isOpen = true) : null)}
       src="/favicon.svg"
       alt=""
-      class="rounded-full rounded-custom w-20 h-20 bg-black absolute right-0 -bottom-12 cursor-pointer {uid ===
-      $user?.id
-        ? 'outline outline-2 outline-blue-600'
-        : ''}"
+      class="rounded-full rounded-custom w-20 h-20 bg-black absolute right-0 -bottom-12 {permissions.writeMembers
+        ? 'cursor-pointer'
+        : ''} {uid === $user?.id ? 'outline outline-2 outline-blue-600' : ''}"
     />
   {:else}
     <img
-      on:click={() => (isOpen = true)}
+      on:click={() => (permissions.writeMembers ? (isOpen = true) : null)}
       src={avatar}
       alt=""
-      class="rounded-full rounded-custom w-20 h-20 absolute right-0 -bottom-12 cursor-pointer {uid ===
-      $user?.id
-        ? 'outline outline-2 outline-blue-600'
-        : ''}"
+      class="rounded-full rounded-custom w-20 h-20 absolute right-0 -bottom-12 {permissions.writeMembers
+        ? 'cursor-pointer'
+        : ''} {uid === $user?.id ? 'outline outline-2 outline-blue-600' : ''}"
     />
   {/if}
 

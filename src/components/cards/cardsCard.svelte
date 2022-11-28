@@ -75,9 +75,15 @@
     >
       <div class="flex justify-between relative">
         <h1>******{card.id.slice(-6)}</h1>
-        {#if card.avatar !== null}
+
+        {#if card.team_profile !== null}
           <AvatarDropdown
-            avatar={card.avatar}
+            {permissions}
+            avatar={card.team_profile.avatar}
+            fullname={card.team_profile.firstname ??
+              '' + ' ' + card.team_profile.lastname ??
+              ''}
+            mid={card.memberid}
             cardId={card.id}
             uid={card.uid}
             email={card.email}
@@ -121,9 +127,14 @@
           </h1>
         {/if}
       </div>
-      {#if card.avatar !== null}
+      {#if card.team_profile !== null}
         <AvatarDropdown
-          avatar={card.avatar}
+          {permissions}
+          avatar={card.team_profile.avatar}
+          fullname={card.team_profile.firstname ??
+            '' + ' ' + card.team_profile.lastname ??
+            ''}
+          mid={card.memberid}
           cardId={card.id}
           uid={card.uid}
           email={card.email}
