@@ -90,7 +90,7 @@
   <div class="flex flex-col items-center gap-2 text-center">
     <h2 class="text-lg md:text-xl">Your Subscription has Ended</h2>
     <p class="text-md md:text-lg text-neutral-400">
-      Your data will deleted after the probation ends
+      Your data will be deleted after the probation ends
     </p>
     <div class="flex flex-col border-b-2 border-neutral-800 w-full pb-2 gap-2">
       <button

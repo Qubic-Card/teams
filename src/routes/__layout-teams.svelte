@@ -125,6 +125,7 @@
             'allow_read_analytics',
             'allow_read_connections',
             'allow_read_billing',
+            'allow_write_records',
             'will_expired',
           ];
         }
@@ -163,7 +164,9 @@
         >
           Your access to Qubic Teams will be terminated completely on {new Date(
             sevenDaysAfterEndDate
-          ).toLocaleDateString()}. Please renew your subscription to continue.
+          ).toLocaleDateString()}. Please
+          <a href="https://wa.me/628113087599" class="underline">renew</a> your subscription
+          to continue.
         </div>
       {/if}
     {/if}

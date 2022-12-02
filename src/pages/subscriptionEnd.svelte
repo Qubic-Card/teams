@@ -29,7 +29,9 @@
   const getExpiredCards = async () => {
     const { data: cards, error } = await supabase
       .from('business_cards')
-      .select('color, id, type, member: team_members(uid, id, team_profile)')
+      .select(
+        'color, id, type, member: team_cardcon(team_member_id(uid, id, team_profile))'
+      )
       .eq('team_id', teamId)
       .eq('mode', 'team')
       .order('created_at', { ascending: true });
@@ -45,7 +47,7 @@
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                uid: cards[index].member[0].uid,
+                uid: cards[index].member[0].team_member_id.uid,
               }),
             }
           );
@@ -96,7 +98,7 @@
       expiredCards = expiredCards.filter((item) => item.id !== card.id);
     } else {
       if ($selectedAddress.uid) {
-        card.member[0].uid = $selectedAddress.uid;
+        card.member[0].team_member_id.uid = $selectedAddress.uid;
 
         await deleteTeamCardCon(card.id);
         await changeCardMode(card.id);

@@ -14,7 +14,7 @@ const uniqueByKeepFirst = (a, key) => {
 const createCardConnection = async (card) => {
   const { data, error } = await supabase.from('card_connection').insert(
     {
-      uid: card.member[0].uid,
+      uid: card.member[0].team_member_id.uid,
       card_id: card.id,
     },
     { returning: 'minimal' }
@@ -30,7 +30,7 @@ const updateCardConnection = async (card) => {
   const { data, error } = await supabase
     .from('card_connection')
     .update(
-      { uid: card.member[0].uid },
+      { uid: card.member[0].team_member_id.uid },
       {
         returning: 'minimal',
       }
@@ -52,7 +52,7 @@ export const cardConnectionHandler = async (card) => {
   if (data.length === 0) {
     await createCardConnection(card);
   } else {
-    if (data[0].uid !== card.member[0].uid) {
+    if (data[0].uid !== card.member[0].team_member_id.uid) {
       await updateCardConnection(card);
     }
   }
@@ -93,26 +93,27 @@ export const updateBasicProfile = async (member) => {
     .from('profile')
     .update(
       {
-        uid: member.member[0].uid,
+        uid: member.member[0].team_member_id.uid,
         metadata: {
-          avatar: member.member[0].team_profile.avatar,
-          address: member.member[0].team_profile.address,
-          company: member.member[0].team_profile.company,
-          design: member.member[0].team_profile.design,
-          firstname: member.member[0].team_profile.firstname,
-          lastname: member.member[0].team_profile.lastname,
-          job: member.member[0].team_profile.job,
-          isShowMetaImage: member.member[0].team_profile.isShowMetaImage,
+          avatar: member.member[0].team_member_id.team_profile.avatar,
+          address: member.member[0].team_member_id.team_profile.address,
+          company: member.member[0].team_member_id.team_profile.company,
+          design: member.member[0].team_member_id.team_profile.design,
+          firstname: member.member[0].team_member_id.team_profile.firstname,
+          lastname: member.member[0].team_member_id.team_profile.lastname,
+          job: member.member[0].team_member_id.team_profile.job,
+          isShowMetaImage:
+            member.member[0].team_member_id.team_profile.isShowMetaImage,
           socials: uniqueByKeepFirst(
-            member.member[0].team_profile.socials,
+            member.member[0].team_member_id.team_profile.socials,
             (social) => social.type
           ),
-          links: member.member[0].team_profile.links,
+          links: member.member[0].team_member_id.team_profile.links,
         },
       },
       { returning: 'minimal' }
     )
-    .eq('uid', member.member[0].uid);
+    .eq('uid', member.member[0].team_member_id.uid);
 
   if (error) {
     console.log(error);
