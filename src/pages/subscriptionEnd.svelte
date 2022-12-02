@@ -27,42 +27,14 @@
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   const getExpiredCards = async () => {
-    const { data: cards, error } = await supabase
-      .from('business_cards')
-      .select(
-        'color, id, type, member: team_cardcon(team_member_id(uid, id, team_profile))'
-      )
-      .eq('team_id', teamId)
-      .eq('mode', 'team')
-      .order('created_at', { ascending: true });
+    const { data: cards, error } = await supabase.rpc('getcards', {
+      tid: teamId,
+    });
 
     if (error) console.log(error);
     if (cards) {
-      for (let index in cards) {
-        if (cards[index].member[0]) {
-          const { data, error } = await supabase.functions.invoke(
-            'getUserEmail',
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                uid: cards[index].member[0].team_member_id.uid,
-              }),
-            }
-          );
-          if (error) console.log(error);
-          if (data) {
-            expiredCards = [
-              ...expiredCards,
-              {
-                ...cards[index],
-                email: data,
-              },
-            ];
-          }
-        }
-      }
+      expiredCards = cards;
+      console.log(cards);
     }
   };
 
@@ -89,30 +61,27 @@
     if ($selectedAddress.choosen === 0) {
       await deleteTeamCardCon(card.id);
       await changeCardMode(card.id);
-      await cardConnectionHandler(card);
-      if ($selectedProfileMenu.includes('with')) {
+      await cardConnectionHandler(card, $selectedAddress.uid);
+      if ($selectedProfileMenu.includes('with') && card.team_profile !== null) {
         await updateBasicProfile(card);
       }
       if (toast) toastSuccess('Card transfered successfully');
-
       expiredCards = expiredCards.filter((item) => item.id !== card.id);
     } else {
       if ($selectedAddress.uid) {
-        card.member[0].team_member_id.uid = $selectedAddress.uid;
-
         await deleteTeamCardCon(card.id);
         await changeCardMode(card.id);
-        await cardConnectionHandler(card);
-        if ($selectedProfileMenu.includes('with')) {
+        await cardConnectionHandler(card, $selectedAddress.uid);
+        if (
+          $selectedProfileMenu.includes('with') &&
+          card.team_profile !== null
+        ) {
           await updateBasicProfile(card);
         }
-
         if (toast) toastSuccess('Card transfered successfully');
-
         expiredCards = expiredCards.filter((item) => item.id !== card.id);
       }
     }
-
     isLoading = false;
   };
 
@@ -171,7 +140,7 @@
       selectedArr.map((c) => {
         return {
           cardId: c.id,
-          email: c.email.user,
+          email: c.email,
         };
       })
     );
@@ -205,6 +174,9 @@
         <div class="flex gap-2">
           <TransferModal
             disabled={selectedCards.size === 0}
+            selectedCards={expiredCards.filter((item) =>
+              Array.from(selectedCards).includes(item.id)
+            )}
             bulkTransfer
             on:transfer={async () => await bulkTransfer()}
           />
@@ -250,16 +222,17 @@
                 >{card.type === 'pvc' ? 'PVC' : capitalize(card.type)}
                 {capitalize(card.color)}</td
               >
-              <td class="py-2 md:block hidden">{card.email.user}</td>
+              <td class="py-2 md:block hidden">{card.email ?? '-'}</td>
               <td class="py-2">
                 <div class="flex">
                   <TransferModal
+                    {card}
                     on:transfer={async () =>
                       await transferCardHandler(card, true)}
                   />
                   <DeleteCardModal
                     on:delete={async () =>
-                      deleteCard([{ cardId: card.id, email: card.email.user }])}
+                      deleteCard([{ cardId: card.id, email: card.email }])}
                   />
                 </div>
               </td>
