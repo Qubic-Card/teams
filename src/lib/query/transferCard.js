@@ -11,10 +11,11 @@ const uniqueByKeepFirst = (a, key) => {
   });
 };
 
-const createCardConnection = async (card) => {
+const createCardConnection = async (card, uid) => {
+  // console.log('createCardConnection', uid !== '' ? uid : card.uid);
   const { data, error } = await supabase.from('card_connection').insert(
     {
-      uid: card.member[0].team_member_id.uid,
+      uid: uid !== '' ? uid : card.uid,
       card_id: card.id,
     },
     { returning: 'minimal' }
@@ -26,11 +27,11 @@ const createCardConnection = async (card) => {
   }
 };
 
-const updateCardConnection = async (card) => {
+const updateCardConnection = async (card, uid) => {
   const { data, error } = await supabase
     .from('card_connection')
     .update(
-      { uid: card.member[0].team_member_id.uid },
+      { uid: uid !== '' ? uid : card.uid },
       {
         returning: 'minimal',
       }
@@ -43,17 +44,23 @@ const updateCardConnection = async (card) => {
   }
 };
 
-export const cardConnectionHandler = async (card) => {
+export const cardConnectionHandler = async (card, uid) => {
   const { data, error } = await supabase
     .from('card_connection')
     .select('card_id, uid')
     .eq('card_id', card.id);
 
   if (data.length === 0) {
-    await createCardConnection(card);
+    await createCardConnection(card, uid);
   } else {
-    if (data[0].uid !== card.member[0].team_member_id.uid) {
-      await updateCardConnection(card);
+    if (uid) {
+      if (data[0].uid !== uid) {
+        await updateCardConnection(card, uid);
+      }
+    } else {
+      if (data[0].uid !== card.uid) {
+        await updateCardConnection(card, '');
+      }
     }
   }
 };
@@ -93,27 +100,26 @@ export const updateBasicProfile = async (member) => {
     .from('profile')
     .update(
       {
-        uid: member.member[0].team_member_id.uid,
+        uid: member.uid,
         metadata: {
-          avatar: member.member[0].team_member_id.team_profile.avatar,
-          address: member.member[0].team_member_id.team_profile.address,
-          company: member.member[0].team_member_id.team_profile.company,
-          design: member.member[0].team_member_id.team_profile.design,
-          firstname: member.member[0].team_member_id.team_profile.firstname,
-          lastname: member.member[0].team_member_id.team_profile.lastname,
-          job: member.member[0].team_member_id.team_profile.job,
-          isShowMetaImage:
-            member.member[0].team_member_id.team_profile.isShowMetaImage,
+          avatar: member.team_profile.avatar,
+          address: member.team_profile.address,
+          company: member.team_profile.company,
+          design: member.team_profile.design,
+          firstname: member.team_profile.firstname,
+          lastname: member.team_profile.lastname,
+          job: member.team_profile.job,
+          isShowMetaImage: member.team_profile.isShowMetaImage,
           socials: uniqueByKeepFirst(
-            member.member[0].team_member_id.team_profile.socials,
+            member.team_profile.socials,
             (social) => social.type
           ),
-          links: member.member[0].team_member_id.team_profile.links,
+          links: member.team_profile.links,
         },
       },
       { returning: 'minimal' }
     )
-    .eq('uid', member.member[0].team_member_id.uid);
+    .eq('uid', member.uid);
 
   if (error) {
     console.log(error);
@@ -122,7 +128,6 @@ export const updateBasicProfile = async (member) => {
 };
 
 export const searchProfile = async (email) => {
-  console.log(email);
   const { data, error } = await supabase
     .from('profile')
     .select('uid')

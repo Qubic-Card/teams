@@ -8,18 +8,28 @@
     selectedAddress,
     selectedProfileMenu,
   } from '@lib/stores/subsEndStore';
-  import supabase from '@lib/db';
-  import { toastFailed } from '@lib/utils/toast';
   import { searchProfile } from '@lib/query/transferCard';
   export let bulkTransfer = false,
-    disabled;
+    disabled,
+    card,
+    selectedCards;
 
   let showModal = false;
   let email = '';
 
   const toggleModal = () => {
     showModal = !showModal;
-    $selectedAddress.choosen = 0;
+
+    if (
+      card
+        ? card.email == null
+        : selectedCards.filter((c) => c.email == null).length > 0
+    ) {
+      $selectedAddress.choosen = 1;
+    } else {
+      $selectedAddress.choosen = 0;
+    }
+
     $selectedAddress.uid = '';
     email = '';
     $selectedProfileMenu = 'Transfer with current profile';
@@ -61,8 +71,21 @@
     >
       <h1 class="text-lg">Select how you want to transfer</h1>
       <div class="flex flex-col gap-2">
-        <TransferProfileDropdown />
-        <TransferAddressDropdown />
+        {#if card ? card.email == null : selectedCards.filter((c) => c.email == null).length > 0}
+          <h1
+            class="outline outline-1 outline-neutral-700 text-left p-2 rounded-md hover:outline-neutral-600 w-full flex justify-between items-center"
+          >
+            Transfer card only
+          </h1>
+          <h1
+            class="outline outline-1 outline-neutral-700 text-left p-2 rounded-md hover:outline-neutral-600 w-full flex justify-between items-center"
+          >
+            Transfer to a Qubic User
+          </h1>
+        {:else}
+          <TransferProfileDropdown />
+          <TransferAddressDropdown />
+        {/if}
         {#if $selectedAddress.choosen === 1}
           <Input
             title=""
@@ -79,6 +102,9 @@
               <small class="text-red-500"> User not found! </small>
             {/if}
           {/if}
+          <small class="text-red-500">
+            All selected card(s) will be tranferred to this email
+          </small>
         {/if}
       </div>
       <div class="flex flex-col">
