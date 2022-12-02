@@ -125,6 +125,7 @@
             'allow_read_analytics',
             'allow_read_connections',
             'allow_read_billing',
+            'allow_write_records',
             'will_expired',
           ];
         }

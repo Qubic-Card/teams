@@ -92,7 +92,9 @@
           >Cancel</button
         >
         <button
-          disabled={$selectedAddress.uid === ''}
+          disabled={$selectedAddress.choosen === 1
+            ? $selectedAddress.uid === ''
+            : false}
           on:click={handleTransfer}
           class="outline outline-1 outline-red-500 hover:outline-red-600 w-40 bg-red-600/40 p-2 rounded-md text-center disabled:opacity-50"
           >Proceed</button
