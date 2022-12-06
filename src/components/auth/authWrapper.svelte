@@ -9,7 +9,7 @@
   import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
 
   $user = supabase.auth.user();
-
+  $: console.log($user?.email_confirmed_at);
   const redirect = async () => {
     if ($page?.routeId?.includes('slug')) {
       if (!(await checkIsActiveMember($user?.id))) {
@@ -20,6 +20,11 @@
 
     if ($page?.routeId?.includes('basic')) {
       if (!$user) goto('/');
+    }
+
+    if (!$user?.email_confirmed_at) {
+      $user = null;
+      goto('/');
     }
   };
   $: if (browser) redirect();
