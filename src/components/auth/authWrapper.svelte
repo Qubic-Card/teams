@@ -21,6 +21,11 @@
     if ($page?.routeId?.includes('basic')) {
       if (!$user) goto('/');
     }
+
+    if (!$user?.email_confirmed_at) {
+      $user = null;
+      goto('/');
+    }
   };
   $: if (browser) redirect();
 
