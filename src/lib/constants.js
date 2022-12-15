@@ -202,12 +202,12 @@ export let sidebarItems = [
     routeId: '[slug]/members@teams',
     urldefault: 'https://img.icons8.com/ios/100/FFFFFF/conference-call--v1.png',
   },
-  // {
-  //   title: 'membership',
-  //   routeId: '[slug]/membership@teams',
-  //   urldefault:
-  //     'https://img.icons8.com/ios-filled/100/FFFFFF/bank-card-front-side--v1.png',
-  // },
+  {
+    title: 'membership',
+    routeId: '[slug]/membership@teams',
+    urldefault:
+      'https://img.icons8.com/ios-filled/100/FFFFFF/bank-card-front-side--v1.png',
+  },
   {
     title: 'settings',
     routeId: '[slug]/settings@teams',
@@ -394,4 +394,10 @@ export const teamProfileTemplate = {
   ],
   lastname: '',
   firstname: 'Qubic.id',
+};
+
+export const DDB_DOC = {
+  M: 'Memberships-Dev',
+  TE: 'Tenants-Dev',
+  TR: 'Transactions-Dev',
 };

@@ -8,7 +8,8 @@
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
 
-  export let mode = 'member';
+  export let mode = 'member',
+    widthMenu = 'w-36';
 
   export let sortOptions = ['Most Recent', 'Oldest'];
   export let selectedIndex = 0;

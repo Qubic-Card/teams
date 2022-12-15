@@ -3,25 +3,27 @@
   import supabase from '@lib/db';
   import { last14Days, last7Days } from '@lib/utils/getDates';
   import { tapCount } from '@lib/utils/count';
-  import { socialIcons } from '@lib/constants';
+  import { DDB_DOC, socialIcons } from '@lib/constants';
   import getPercentage from '@lib/utils/getPercentage';
+  import ddbDocClient from '@lib/dynamodb';
 
-  export let teamId = '';
-  export let id = 0;
+  // export let teamId = '';
+  // export let id = 0;
+  export let tenantData;
 
   const analyticsData = [
     {
       percentage: 10,
-      data: 10,
+      data: 0,
       type: 'New Members',
     },
     {
       percentage: 10,
-      data: 10,
+      data: 0,
       type: 'Members Total',
     },
   ];
-
+  // $: console.log(tenantData);
   let socialsCount = [];
   let memberCountPercentage = 30;
   let active = 0;
@@ -57,9 +59,81 @@
       console.log(error);
     }
   };
+
+  const getMembersLast14Days = async () => {
+    try {
+      setTimeout(async () => {
+        // wait for the tenantData
+        const getparams = {
+          TableName: DDB_DOC.M,
+          IndexName: 'TID-JoinedAt-index',
+          KeyConditionExpression:
+            'TID = :tid AND JoinedAt BETWEEN :start AND :end',
+          ExpressionAttributeValues: {
+            ':tid': tenantData.TID,
+            ':start': new Date(last14Days[0]).toISOString(),
+            ':end': new Date().toISOString(),
+          },
+          ExpressionAttributeNames: {
+            '#joinedAt': 'JoinedAt',
+          },
+          ProjectionExpression: '#joinedAt',
+        };
+
+        const data = await ddbDocClient.query(getparams);
+
+        let members = data.Items;
+
+        let current = members.filter((member) => {
+          return (
+            new Date(member.JoinedAt).getTime() >=
+            new Date(last7Days[0]).getTime()
+          );
+        });
+
+        let previous = members.filter((member) => {
+          return (
+            new Date(member.JoinedAt).getTime() <
+            new Date(last7Days[0]).getTime()
+          );
+        });
+
+        analyticsData[0].data = data.Items.length;
+        analyticsData[0].percentage = getPercentage(
+          current.length,
+          previous.length === 0 ? 1 : previous.length
+        );
+      }, 500);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getMembersCount = async () => {
+    try {
+      // total member 7 hari terakhir / total member 14 hari terakhir
+      setTimeout(async () => {
+        // wait for the tenantData
+        const getparams = {
+          TableName: DDB_DOC.M,
+          IndexName: 'TID-JoinedAt-index',
+          KeyConditionExpression: 'TID = :tid',
+          ExpressionAttributeValues: {
+            ':tid': tenantData.TID,
+          },
+        };
+
+        const data = await ddbDocClient.query(getparams);
+
+        analyticsData[1].data = data.Count;
+      }, 500);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 </script>
 
-{#await (getTeamWeeklyLogsActivity(), getTeamConnections())}
+{#await (getMembersCount(), getMembersLast14Days())}
   <div
     class="flex flex-col gap-2 w-full md:w-1/3 h-32 animate-pulse bg-neutral-900 rounded-md outline outline-1 outline-neutral-800"
   />
@@ -149,17 +223,7 @@
   >
     <h1 class="text-lg">Circulating Point</h1>
 
-    <div class="bg-neutral-600 w-full h-4 flex items-center rounded-sm">
-      <div
-        data-tooltip="{active} / {memberCount} members - {memberCountPercentage}%"
-        style="--width: {memberCountPercentage}%;"
-        class="{memberCountPercentage >= 50
-          ? 'bg-green-400'
-          : memberCountPercentage < 25
-          ? 'bg-red-400'
-          : 'bg-orange-400'} box h-full rounded-sm"
-      />
-    </div>
+    <h1 class="text-2xl">{tenantData.CirculatingPoints}</h1>
   </div>
 {:catch name}
   <h1>Error</h1>
