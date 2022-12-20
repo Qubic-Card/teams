@@ -20,7 +20,7 @@
   import GracePeriod from '@pages/gracePeriod.svelte';
 
   let isSidebarOpened = false;
-  let member = [];
+  let member;
   let subscription;
   // let loading = true;
   let permissions = {
@@ -66,8 +66,6 @@
         new Date(subscription?.subs_end_date).getDate() + 7
       )
     );
-
-    // if (member || userChangeTimestamp || $userData) loading = false;
   });
 
   $: {
@@ -132,8 +130,6 @@
       }
     }
   }
-
-  // $: console.log(subscription, sevenDaysAfterEndDate);
 
   let isBannerOpen = true; // Banner view on desktop
   let backupTeamData = false;
