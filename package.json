@@ -21,6 +21,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.231.0",
+    "@aws-sdk/lib-dynamodb": "^3.231.0",
     "@covve/easy-vcard": "^1.1.0",
     "@rgossiaux/svelte-headlessui": "^1.0.0-beta.12",
     "@supabase/supabase-js": "^1.30.7",

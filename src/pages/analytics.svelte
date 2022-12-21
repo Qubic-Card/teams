@@ -277,7 +277,8 @@
     isAlreadySeeMore = false;
   };
 
-  $: selectedDays, connection(), activityHandler();
+  $: if ($memberData?.id !== undefined)
+    selectedDays, connection(), activityHandler();
   $: page, toItem, getWeeklyLogsActivity();
 
   onMount(async () => {

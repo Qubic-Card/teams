@@ -1,4 +1,6 @@
 <script>
+  import setHours4Digit from '@lib/utils/setHour4Digit';
+
   export let member;
 </script>
 
@@ -12,28 +14,32 @@
   />
 
   <div
-    class="flex flex-col md:grid gap-2 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_150px_100px_minmax(200px,_1fr)] text-sm"
+    class="flex flex-col md:grid gap-2 md:grid-cols-[150px_100px_100px_minmax(200px,_1fr)] lg:grid-cols-[300px_200px_105px_minmax(200px,_1fr)] text-sm"
   >
     <div class="flex flex-col">
       <h1 class="font-semibold text-white md:text-sm text-xs break-all">
-        memberProfile?.team_profile?.firstname
-        <!-- memberProfile?.team_profile?.lastname ?? '' -->
+        {member.Firstname}
+        {member.Lastname}
       </h1>
-      <p class="break-all">memberProfile?.team_profile?.job</p>
+      <p class="break-all">{member.Job}</p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Joined At</h1>
+
       <p>
-        {new Date().toLocaleDateString()} - {new Date().getHours()}:{new Date().getMinutes()}
+        {new Date(member.JoinedAt).toLocaleDateString()} - {setHours4Digit(
+          new Date(member.JoinedAt).getHours(),
+          new Date(member.JoinedAt).getMinutes()
+        )}
       </p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Points</h1>
-      <p>10</p>
+      <p>{member.Points}</p>
     </div>
     <div class="flex flex-col">
       <h1 class="font-regular text-neutral-400">Added By</h1>
-      <p>Galih</p>
+      <p>{member.AddedBy}</p>
     </div>
   </div>
 </div>

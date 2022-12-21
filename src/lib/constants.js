@@ -395,3 +395,9 @@ export const teamProfileTemplate = {
   lastname: '',
   firstname: 'Qubic.id',
 };
+
+export const DDB_DOC = {
+  M: 'Memberships-Dev',
+  TE: 'Tenants-Dev',
+  TR: 'Transactions-Dev',
+};

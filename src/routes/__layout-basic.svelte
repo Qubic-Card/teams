@@ -10,8 +10,6 @@
 
   let isMounted = false;
   onMount(() => (isMounted = true));
-
-  let back = '<-';
 </script>
 
 <svelte:head>
@@ -24,10 +22,10 @@
       class="flex text-white bg-white border-b border-zinc-500 justify-between items-center pl-4 py-1"
     >
       <button
-        class="border-r border-zinc-500 h-full text-black w-24 text-xl"
+        class="border-r border-zinc-500 h-full text-black w-24 text-2xl"
         on:click={async () => await goto('/')}
       >
-        {back}
+        ←
       </button>
       {#if $user != null}
         <MenuButtonModal editor="basic" />
