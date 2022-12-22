@@ -47,6 +47,7 @@
     "svelte-flatpickr": "^3.2.6",
     "svelte-preprocess": "^4.10.5",
     "tappin-vcards-js": "^2.10.0",
-    "ua-parser-js": "^1.0.2"
+    "ua-parser-js": "^1.0.2",
+    "link-preview-js": "^3.0.4"
   }
 }

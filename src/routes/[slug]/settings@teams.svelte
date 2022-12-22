@@ -1,4 +1,5 @@
 <script lang="ts">
+  import RegistrationLink from './../../pages/settings/registrationLink.svelte';
   import TeamName from './../../pages/settings/teamName.svelte';
   import supabase from '@lib/db';
   import { teamRoles } from '@lib/stores/roleStore';
@@ -12,7 +13,6 @@
   import encryptActivationCode from '@lib/utils/encryptActivationCode';
   import { teamData } from '@lib/stores/teamStore';
   import { log } from '@lib/logger/logger';
-  import { team } from '@lib/stores/recordsStore';
 
   const teamId = getContext('teamId');
   let roles = [];
@@ -170,6 +170,7 @@
             on:keypress={onKeyPress}
             on:click={async () => addActivationCode(activationCode)}
           />
+          <RegistrationLink />
         {:else}
           <div class="h-72 bg-no-repeat flex justify-center items-center bg-">
             <h1 class="z-30 absolute text-xs md:text-sm lg:text-lg">
