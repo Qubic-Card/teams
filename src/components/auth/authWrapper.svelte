@@ -15,16 +15,19 @@
       if (!(await checkIsActiveMember($user?.id))) {
         $user = null;
       }
+      if (!$user?.email_confirmed_at) {
+        $user = null;
+        goto('/');
+      }
       if (!$user) goto('/');
     }
 
     if ($page?.routeId?.includes('basic')) {
       if (!$user) goto('/');
-    }
-
-    if (!$user?.email_confirmed_at) {
-      $user = null;
-      goto('/');
+      if (!$user?.email_confirmed_at) {
+        $user = null;
+        goto('/');
+      }
     }
   };
   $: if (browser) redirect();
