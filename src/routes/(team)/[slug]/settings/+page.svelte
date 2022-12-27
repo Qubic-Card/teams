@@ -1,6 +1,6 @@
 <script lang="ts">
-  import RegistrationLink from './../../pages/settings/registrationLink.svelte';
-  import TeamName from './../../pages/settings/teamName.svelte';
+  import RegistrationLink from '../../../../pages/settings/registrationLink.svelte';
+  import TeamName from '../../../../pages/settings/teamName.svelte';
   import supabase from '@lib/db';
   import { teamRoles } from '@lib/stores/roleStore';
   import SettingsSkeleton from '@comp/skeleton/settingsSkeleton.svelte';

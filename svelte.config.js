@@ -15,14 +15,10 @@ const config = {
 
   kit: {
     adapter: adapter(),
-    vite: {
-      resolve: {
-        alias: {
-          '@pages': path.resolve('./src/pages'),
-          '@comp': path.resolve('./src/components'),
-          '@lib': path.resolve('./src/lib'),
-        },
-      },
+    alias: {
+      '@pages': path.resolve('./src/pages'),
+      '@comp': path.resolve('./src/components'),
+      '@lib': path.resolve('./src/lib'),
     },
   },
 };

@@ -2,12 +2,11 @@
   "name": "teams",
   "version": "0.0.1",
   "scripts": {
-    "dev": "svelte-kit dev",
-    "build": "svelte-kit build",
+    "dev": "vite dev",
+    "build": "vite build",
     "package": "svelte-kit package",
     "start": "node index.js",
     "preview": "svelte-kit preview",
-    "prepare": "svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch"
   },
@@ -17,7 +16,8 @@
     "postcss-load-config": "^3.1.4",
     "tailwindcss": "^3.0.23",
     "tslib": "^2.3.1",
-    "typescript": "~4.6.2"
+    "typescript": "~4.6.2",
+    "vite": "^4.0.3"
   },
   "type": "module",
   "dependencies": {
@@ -27,7 +27,7 @@
     "@rgossiaux/svelte-headlessui": "^1.0.0-beta.12",
     "@supabase/supabase-js": "^1.30.7",
     "@sveltejs/adapter-node": "1.0.0-next.78",
-    "@sveltejs/kit": "1.0.0-next.357",
+    "@sveltejs/kit": "1.0.0-next.588",
     "@types/vcards-js": "^2.10.2",
     "@zerodevx/svelte-toast": "^0.7.1",
     "chart.js": "^3.8.0",
@@ -40,12 +40,12 @@
     "filepond-plugin-image-resize": "^2.0.10",
     "filepond-plugin-image-transform": "^3.8.7",
     "js-cookie": "^3.0.1",
-    "svelte": "^3.44.0",
-    "svelte-check": "^2.2.6",
+    "svelte": "3.54.0",
+    "svelte-check": "2.10.3",
     "svelte-easy-crop": "^1.0.7",
     "svelte-filepond": "^0.2.0",
     "svelte-flatpickr": "^3.2.6",
-    "svelte-preprocess": "^4.10.5",
+    "svelte-preprocess": "5.0.0",
     "tappin-vcards-js": "^2.10.0",
     "ua-parser-js": "^1.0.2",
     "link-preview-js": "^3.0.4"

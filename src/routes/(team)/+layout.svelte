@@ -1,6 +1,6 @@
 <script>
   import { fade, slide } from 'svelte/transition';
-  import '../app.css';
+  import '../../app.css';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -69,7 +69,7 @@
   });
 
   $: {
-    if ($page.routeId === '[slug]/members/[slug]@teams') {
+    if ($page.route.id === '[slug]/members/[slug]@teams') {
       teamId = $page.url.pathname.split('/')[1];
       setContext('teamId', $page.url.pathname.split('/')[1]);
     } else {
@@ -256,11 +256,11 @@
                 class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
                   isSidebarOpened ? 'justify-between' : 'justify-center'
                 } ${isSidebarOpened && 'px-12 w-full'} ${
-                  $page.routeId === '[slug]/dashboard/team@teams'
+                  $page.route.id === '[slug]/dashboard/team@teams'
                     ? 'first:bg-neutral-900'
                     : ''
                 } ${
-                  isSidebarOpened && $page.routeId === item.routeId
+                  isSidebarOpened && $page.route.id === item.routeId
                     ? 'bg-neutral-900'
                     : ''
                 }`}
@@ -272,7 +272,7 @@
                   </p>
                 {/if}
                 <div
-                  class="rounded-lg p-3 {$page.routeId === item.routeId
+                  class="rounded-lg p-3 {$page.route.id === item.routeId
                     ? 'bg-neutral-800'
                     : 'outline outline-1 outline-neutral-800'}"
                 >
@@ -302,18 +302,18 @@
             {#if $teamData.name}
               <div
                 class={`flex cursor-pointer justify-center items-center w-16 h-16 ${
-                  $page.routeId === '[slug]/dashboard/team@teams'
+                  $page.route.id === '[slug]/dashboard/team@teams'
                     ? 'first:bg-neutral-900'
                     : ''
                 } ${
-                  isSidebarOpened && $page.routeId === item.routeId
+                  isSidebarOpened && $page.route.id === item.routeId
                     ? 'bg-neutral-900'
                     : ''
                 }`}
                 on:click={() => handler($teamData?.id, item.title)}
               >
                 <div
-                  class="rounded-lg {$page.routeId === item.routeId
+                  class="rounded-lg {$page.route.id === item.routeId
                     ? 'bg-neutral-800'
                     : 'outline outline-1 outline-neutral-800'} p-3"
                 >
