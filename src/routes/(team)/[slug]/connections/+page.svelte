@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/stores';
   import supabase from '@lib/db';
   import ConnectionsSkeletion from '@comp/skeleton/connectionsSkeleton.svelte';
   import ConnectionTableBody from '@comp/tables/connectionTableBody.svelte';
@@ -11,10 +12,9 @@
   import Search from '@comp/search.svelte';
   import TableHead from '@comp/tables/tableHead.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { getContext } from 'svelte';
+
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
 
-  const teamId = getContext('teamId');
   let innerWidth;
   let asc = false;
   let searchQuery = '';
@@ -32,7 +32,7 @@
   let isLoading = false;
   let tabs = 'user';
   let maxPage = 0;
-  let page = 0;
+  let activePage = 0;
   let toItem = 15;
   let totalTeamData = 0;
   let totalUserData = 0;
@@ -44,7 +44,7 @@
     if (item === 'will_expired') permissions.will_expire = true;
   });
 
-  const setPage = (p) => (page = p);
+  const setPage = (p) => (activePage = p);
   const selectMenu = (menu) => (selectedSearchMenu = menu.detail);
   const setTabs = (tab) => (tabs = tab);
 
@@ -58,14 +58,14 @@
 
   const getTeamConnectionsList = async () => {
     loading = true;
-    const { from, to } = getPagination(page, toItem);
+    const { from, to } = getPagination(activePage, toItem);
     const { data, error, count } = await supabase
       .from('team_connection_acc')
       .select(
         '*, by(team_profile->firstname, team_profile->lastname), team_id(*)',
         { count: 'estimated' }
       )
-      .eq('team_id', teamId)
+      .eq('team_id', $page.params.slug)
       .order('dateConnected', { ascending: false })
       .range(from, to)
       .ilike(selectedSearchMenu, `%${searchQuery}%`)
@@ -85,7 +85,7 @@
 
   const getUserConnectionsList = async () => {
     loading = true;
-    const { from, to } = getPagination(page, toItem);
+    const { from, to } = getPagination(activePage, toItem);
     const { data, error, count } = await supabase
       .from('team_connection_acc')
       .select('*, by(team_profile->firstname, team_profile->lastname)', {
@@ -115,7 +115,7 @@
     let column;
 
     tabs === 'all'
-      ? (id = permissions.readConnection ? teamId : $memberData?.id)
+      ? (id = permissions.readConnection ? $page.params.slug : $memberData?.id)
       : (id = $memberData?.id);
 
     tabs === 'all'
@@ -162,7 +162,7 @@
   };
 
   $: if (searchQuery !== '') {
-    page = 0;
+    activePage = 0;
     if (permissions.readConnection && tabs === 'all') {
       searchQuery, selectedSearchMenu, getTeamConnectionsList();
     } else if (permissions.readConnection && tabs === 'user') {
@@ -181,8 +181,8 @@
   }
 
   $: if (tabs === 'user') {
-    toItem, page, getUserConnectionsList();
-  } else toItem, page, getTeamConnectionsList();
+    toItem, activePage, getUserConnectionsList();
+  } else toItem, activePage, getTeamConnectionsList();
 </script>
 
 <svelte:window bind:innerWidth />

@@ -15,12 +15,10 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import sortBy from '@lib/utils/sortBy';
   import { personal, team } from '@lib/stores/recordsStore';
-
-  import { getContext } from 'svelte';
+  import { page } from '$app/stores';
 
   export let isTeamInactive, holder, getAllStorage;
 
-  const teamId = getContext('teamId');
   let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
   let selectedType = 'Activities';
   let fromDateValue = new Date();
@@ -29,6 +27,7 @@
   let isCreateRecordLoading = false;
   let asc = false;
   let innerWidth;
+  let teamId = $page.params.slug;
 
   const fromDateOptions = {
     onChange: (selectedDates, dateStr, instance) => {
@@ -56,17 +55,20 @@
   };
 
   const createTeamStorage = async (url) => {
-    const { data, error } = await supabase.from('team_storage').insert({
-      tid: teamId,
-      by: holder,
-      type: 'Personal ' + selectedType,
-      storage_url: url,
-      filename: `${fileName}-${
-        selectedType === 'Activities'
-          ? 'personal-activities'
-          : 'personal-connections'
-      }`,
-    });
+    const { data, error } = await supabase
+      .from('team_storage')
+      .insert({
+        tid: teamId,
+        by: holder,
+        type: 'Personal ' + selectedType,
+        storage_url: url,
+        filename: `${fileName}-${
+          selectedType === 'Activities'
+            ? 'personal-activities'
+            : 'personal-connections'
+        }`,
+      })
+      .select('*');
 
     $team = [data[0], ...$team];
     if (error) console.log(error);
@@ -130,7 +132,8 @@
               : 'personal-connections'
           } created successfully`
         );
-        await createTeamStorage(data.Key);
+
+        await createTeamStorage(data.path);
         await getAllStorage();
         isCreateRecordLoading = false;
       }
@@ -161,7 +164,7 @@
       .remove([`${teamId}/${$user?.id}/${record.name}`]);
 
     //delete from team storage database
-    const { data, error: err } = await supabase
+    const { error: err } = await supabase
       .from('team_storage')
       .delete()
       .eq('filename', record.name);

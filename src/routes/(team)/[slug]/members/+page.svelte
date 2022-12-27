@@ -1,5 +1,4 @@
 <script>
-  import { getContext } from 'svelte';
   import supabase from '@lib/db';
   import { user, userData } from '@lib/stores/userStore';
   import sortMember from '@lib/utils/sortMember';
@@ -11,6 +10,7 @@
   import CardsCard from '@comp/cards/cardsCard.svelte';
   import sortCard from '@lib/utils/sortCard';
   import CardsSkeleton from '@comp/skeleton/cardsSkeleton.svelte';
+  import { page } from '$app/stores';
 
   let permissions = {
     readMembers: false,
@@ -32,7 +32,6 @@
   let loading = false;
   let selectedIndex = 0;
   let resetSort = false;
-  const teamId = getContext('teamId');
 
   const resetSortHandler = () => {
     resetSort = true;
@@ -69,7 +68,7 @@
 
   const getMembers = async () => {
     const { data, error } = await supabase.rpc('getmembers', {
-      tid: teamId,
+      tid: $page.params.slug,
     });
 
     if (error) console.log(error);
@@ -102,7 +101,7 @@
 
   const getAll = async () => {
     await getMembers();
-    roles = await getAllRoleByTeam(teamId);
+    roles = await getAllRoleByTeam($page.params.slug);
   };
 
   const getInactiveCards = async () => {
@@ -110,7 +109,7 @@
     const { data, error } = await supabase
       .from('business_cards')
       .select('id, color, type, tcc: team_cardcon(card_id)')
-      .eq('team_id', teamId)
+      .eq('team_id', $page.params.slug)
       .eq('mode', 'team');
 
     if (error) console.log(error);
@@ -139,7 +138,7 @@
   const getAllCards = async () => {
     loading = true;
     const { data, error } = await supabase.rpc('getcards', {
-      tid: teamId,
+      tid: $page.params.slug,
     });
     // .ilike('email', '%test%');
 
@@ -157,7 +156,7 @@
   const getActiveCards = async () => {
     loading = true;
     const { data, error } = await supabase.rpc('getactivecards', {
-      tid: teamId,
+      tid: $page.params.slug,
     });
 
     if (error) console.log(error);
@@ -186,7 +185,7 @@
         <h1 class="text-sm text-neutral-400">Data from last 7 days</h1>
 
         <div class="flex flex-col md:flex-row gap-2 w-full">
-          <TeamAnalyticsCard {teamId} teams />
+          <TeamAnalyticsCard teamId={$page.params.slug} teams />
         </div>
       </div>
     </div>

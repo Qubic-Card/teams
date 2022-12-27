@@ -38,14 +38,9 @@
 
   const getSubscriptionsData = async () => {
     const { data, error } = await supabase.functions.invoke('globaldate', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        teamId: teamId,
-      }),
+      body: { teamId: teamId },
     });
-
+    // console.log(teamId);
     if (error) console.log(error);
     if (data) subscription = data;
   };
@@ -69,14 +64,14 @@
   });
 
   $: {
-    if ($page.route.id === '[slug]/members/[slug]@teams') {
+    if ($page.route.id === '/(team)/[slug]/members') {
       teamId = $page.url.pathname.split('/')[1];
-      setContext('teamId', $page.url.pathname.split('/')[1]);
+      setContext('teamId', teamId);
     } else {
       teamId = $page.params.slug;
-      setContext('teamId', $page.params.slug);
+      setContext('teamId', teamId);
     }
-
+    // console.log($page.url.pathname.split('/')[1]);
     $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
     $memberData.roleName = member?.role?.role_name;
@@ -252,7 +247,7 @@
         <nav class="w-full flex flex-col justify-center items-center">
           {#each sidebarItems as item}
             {#if $teamData.name}
-              <div
+              <button
                 class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
                   isSidebarOpened ? 'justify-between' : 'justify-center'
                 } ${isSidebarOpened && 'px-12 w-full'} ${
@@ -282,7 +277,7 @@
                     class="w-4 md:w-5 "
                   />
                 </div>
-              </div>
+              </button>
             {:else}
               <div class="animate-pulse gap-5">
                 <p
@@ -300,7 +295,7 @@
         <nav class="w-full flex justify-center items-center overflow-x-auto">
           {#each sidebarItems as item}
             {#if $teamData.name}
-              <div
+              <button
                 class={`flex cursor-pointer justify-center items-center w-16 h-16 ${
                   $page.route.id === '[slug]/dashboard/team@teams'
                     ? 'first:bg-neutral-900'
@@ -323,7 +318,7 @@
                     class="w-4 md:w-5 "
                   />
                 </div>
-              </div>
+              </button>
             {:else}
               <div
                 class="animate-pulse flex justify-between items-center bg-neutral-800 w-full h-16"

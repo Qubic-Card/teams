@@ -52,11 +52,11 @@
         contentType: 'image/jpeg',
       });
 
-    const { publicURL, error } = supabase.storage
+    const { data: avatar } = supabase.storage
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${fileName}`);
 
-    $profileData.avatar = publicURL;
+    $profileData.avatar = avatar.publicUrl;
     await handleSave();
     isOpen = false;
   };

@@ -8,11 +8,10 @@
   import Cookies from 'js-cookie';
   import Checkboxes from '@comp/checkbox.svelte';
   import { teamRoles } from '@lib/stores/roleStore';
-  import { getContext } from 'svelte';
+  import { page } from '$app/stores';
 
   export let permissions;
 
-  const teamId = getContext('teamId');
   let roleName = '';
   let showModal = false;
   let loading = false;
@@ -38,9 +37,9 @@
           .insert({
             role_maps: checkedRole,
             role_name: roleName,
-            team_id: teamId,
+            team_id: $page.params.slug,
           })
-          .eq('id', teamId);
+          .eq('id', $page.params.slug);
 
         if (error) {
           loading = false;

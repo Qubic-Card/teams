@@ -47,7 +47,6 @@
 </script>
 
 <div
-  on:scroll={(e) => console.log(e.target)}
   bind:this={profile}
   class={`${$basicCurrentTheme?.pageBackground} ${$$props.class} relative transition-colors duration-500 ease-in text-sm`}
   class:bg-image-profile={$basicCurrentTheme?.backgroundImage}

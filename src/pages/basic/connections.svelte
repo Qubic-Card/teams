@@ -23,8 +23,9 @@
   const setStatus = async (id, stat, index) => {
     const { data, error } = await supabase
       .from('card_connection')
-      .update({ status: stat }, { returning: 'minimal' })
-      .eq('id', id);
+      .update({ status: stat })
+      .eq('id', id)
+      .select();
 
     businessCards[index].status = !businessCards[index].status;
 

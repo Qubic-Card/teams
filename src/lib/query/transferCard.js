@@ -13,13 +13,13 @@ const uniqueByKeepFirst = (a, key) => {
 
 const createCardConnection = async (card, uid) => {
   // console.log('createCardConnection', uid !== '' ? uid : card.uid);
-  const { data, error } = await supabase.from('card_connection').insert(
-    {
+  const { data, error } = await supabase
+    .from('card_connection')
+    .insert({
       uid: uid !== '' ? uid : card.uid,
       card_id: card.id,
-    },
-    { returning: 'minimal' }
-  );
+    })
+    .select();
 
   if (error) {
     console.log(error);
@@ -30,12 +30,7 @@ const createCardConnection = async (card, uid) => {
 const updateCardConnection = async (card, uid) => {
   const { data, error } = await supabase
     .from('card_connection')
-    .update(
-      { uid: uid !== '' ? uid : card.uid },
-      {
-        returning: 'minimal',
-      }
-    )
+    .update({ uid: uid !== '' ? uid : card.uid })
     .eq('card_id', card.id);
 
   if (error) {
@@ -68,13 +63,10 @@ export const cardConnectionHandler = async (card, uid) => {
 export const changeCardMode = async (cardId) => {
   const { data, error } = await supabase
     .from('business_cards')
-    .update(
-      {
-        mode: 'basic',
-        team_id: null,
-      },
-      { returning: 'minimal' }
-    )
+    .update({
+      mode: 'basic',
+      team_id: null,
+    })
     .eq('id', cardId);
 
   if (error) {
@@ -98,27 +90,24 @@ export const deleteTeamCardCon = async (cardId) => {
 export const updateBasicProfile = async (member) => {
   const { data, error } = await supabase
     .from('profile')
-    .update(
-      {
-        uid: member.uid,
-        metadata: {
-          avatar: member.team_profile.avatar,
-          address: member.team_profile.address,
-          company: member.team_profile.company,
-          design: member.team_profile.design,
-          firstname: member.team_profile.firstname,
-          lastname: member.team_profile.lastname,
-          job: member.team_profile.job,
-          isShowMetaImage: member.team_profile.isShowMetaImage,
-          socials: uniqueByKeepFirst(
-            member.team_profile.socials,
-            (social) => social.type
-          ),
-          links: member.team_profile.links,
-        },
+    .update({
+      uid: member.uid,
+      metadata: {
+        avatar: member.team_profile.avatar,
+        address: member.team_profile.address,
+        company: member.team_profile.company,
+        design: member.team_profile.design,
+        firstname: member.team_profile.firstname,
+        lastname: member.team_profile.lastname,
+        job: member.team_profile.job,
+        isShowMetaImage: member.team_profile.isShowMetaImage,
+        socials: uniqueByKeepFirst(
+          member.team_profile.socials,
+          (social) => social.type
+        ),
+        links: member.team_profile.links,
       },
-      { returning: 'minimal' }
-    )
+    })
     .eq('uid', member.uid);
 
   if (error) {

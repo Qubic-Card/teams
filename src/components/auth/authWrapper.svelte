@@ -2,16 +2,23 @@
   import { user } from '@lib/stores/userStore';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import supabase from '@lib/db';
+  import supabase from '@lib/db.js';
   import { browser } from '$app/environment';
   import { cards } from '@lib/stores/cardsStore';
   import Cookies from 'js-cookie';
   import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
 
-  $user = supabase.auth.user();
+  // $user = supabase.auth.getUser();
+  // const getUser = async () => {
+  //   const { data } = await supabase.auth.getUser();
+  //   $user = data.user;
+  // };
 
   const redirect = async () => {
-    if ($page?.route.id?.includes('slug')) {
+    const { data } = await supabase.auth.getUser();
+    $user = data.user;
+
+    if ($page?.route.id.includes('slug')) {
       if (!(await checkIsActiveMember($user?.id))) {
         $user = null;
       }
@@ -30,14 +37,18 @@
       }
     }
   };
+
   $: if (browser) redirect();
+  // $: getUser();
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event == 'SIGNED_IN') {
-      $user = supabase.auth.user();
+      const { data } = await supabase.auth.getUser();
+      $user = data.user;
     }
     if (event == 'TOKEN_REFRESHED') {
-      $user = supabase.auth.user();
+      const { data } = await supabase.auth.getUser();
+      $user = data.user;
     }
     if (event == 'PASSWORD_RECOVERY') {
       $user = null;

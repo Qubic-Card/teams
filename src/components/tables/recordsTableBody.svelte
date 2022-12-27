@@ -12,20 +12,17 @@
   const deleteModalHandler = () => (showDeleteModal = !showDeleteModal);
 
   const downloadCsv = async (filename) => {
-    const { signedURL, error } = await supabase.storage
+    const { data } = await supabase.storage
       .from('records')
       .createSignedUrl(
         record.storage_url
-          ? record.storage_url.slice(8)
+          ? record.storage_url
           : `${teamId}/${$user?.id}/${filename}`,
         60
       );
 
-    if (error) {
-      console.log(error);
-      toastFailed();
-    } else {
-      fetch(signedURL)
+    if (data.signedUrl) {
+      fetch(data.signedUrl)
         .then((resp) => resp.blob())
         .then((blob) => {
           const url = window.URL.createObjectURL(blob);
@@ -44,6 +41,8 @@
           );
         })
         .catch((err) => toastFailed());
+    } else {
+      toastFailed();
     }
   };
 </script>

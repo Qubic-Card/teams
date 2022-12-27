@@ -12,8 +12,9 @@
   const setStatus = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .update({ status: !card.status }, { returning: 'minimal' })
-      .eq('card_id', card.id);
+      .update({ status: !card.status })
+      .eq('card_id', card.id)
+      .select();
 
     card.status = !card.status;
 

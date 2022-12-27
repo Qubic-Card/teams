@@ -18,7 +18,7 @@
   const handleLogin = async () => {
     try {
       loading = true;
-      const { user, error } = await supabase.auth.signIn({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
@@ -42,7 +42,7 @@
   const handleForgotPassword = async () => {
     try {
       loading = true;
-      const { error } = await supabase.auth.api.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
       if (error) throw error;
       toastSuccess('Check your email!');
       loading = false;

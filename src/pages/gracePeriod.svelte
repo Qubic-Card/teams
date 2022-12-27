@@ -18,13 +18,11 @@
     isLoading = true;
     const { data, error } = await supabase
       .from('teams')
-      .update(
-        {
-          subscription_end_date: new Date(sevenDays[4]).toISOString(),
-        },
-        { returning: 'minimal' }
-      )
-      .eq('id', teamId);
+      .update({
+        subscription_end_date: new Date(sevenDays[4]).toISOString(),
+      })
+      .eq('id', teamId)
+      .select();
 
     if (error) {
       console.log(error);

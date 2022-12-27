@@ -9,7 +9,7 @@
   import { memberData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import roleId from '@lib/roleConfig';
-  import { createEventDispatcher, getContext, onMount } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { log } from '@lib/logger/logger';
   import { teamData } from '@lib/stores/teamStore';
@@ -19,7 +19,7 @@
   export let member, i, updatedRole, active;
 
   const dispatch = createEventDispatcher();
-  const teamId = getContext('teamId');
+
   let selectedRole = '';
   let showModal = false;
   let roleID = null;
@@ -46,9 +46,10 @@
     isLoading = true;
     const { data, error } = await supabase
       .from('team_members')
-      .update({ role: id }, { returning: 'minimal' })
+      .update({ role: id })
       .eq('uid', member.uid)
-      .eq('team_id', teamId);
+      .eq('team_id', $page.params.slug)
+      .select();
 
     if (error) {
       console.log(error);
@@ -95,7 +96,7 @@
         `${member.email} has been removed from team by ${$memberData.fullName}`,
         'DANGER',
         null,
-        teamId,
+        $page.params.slug,
         $memberData.fullName,
         '',
         $memberData.id

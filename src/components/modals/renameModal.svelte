@@ -20,13 +20,11 @@
         loading = true;
         const { error } = await supabase
           .from('team_roles')
-          .update(
-            {
-              role_name: roleName,
-            },
-            { returning: 'minimal' }
-          )
-          .eq('id', id);
+          .update({
+            role_name: roleName,
+          })
+          .eq('id', id)
+          .select();
 
         if (error) {
           throw new Error(error.message);
