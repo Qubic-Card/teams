@@ -18,7 +18,7 @@
   import PersonalEditor from '@pages/personalEditor.svelte';
   import { profileData, teamData } from '@lib/stores/profileData';
   import { selectedTab } from '@lib/stores/selectedTab';
-  import { getContext } from 'svelte';
+
   import SelectTheme from '@comp/modals/selectTheme.svelte';
   import { theme } from '@lib/profileTheme';
 
@@ -29,7 +29,7 @@
     ReadTeam: false,
     will_expire: false,
   };
-  const teamId = getContext('teamId');
+
   let isCheckRoleDone = false;
   let isTeamInactive = false;
   let memberId = null;
@@ -66,12 +66,9 @@
 
   const checkIsConfirmedEmail = async (uid) => {
     const { data, error } = await supabase.functions.invoke('getUserEmail', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      body: {
         uid: uid,
-      }),
+      },
     });
 
     if (error) console.log(error);
@@ -91,7 +88,7 @@
     const { data, error } = await supabase
       .from('teams')
       .select('*')
-      .eq('id', teamId);
+      .eq('id', $page.url.pathname.split('/')[1]);
 
     if (error) console.log(error);
     if (data) {
@@ -116,7 +113,7 @@
         'team_profile, uid, team_id, id, team_cardcon: team_cardcon(display_personal)'
       )
       .eq('uid', $page.params.slug)
-      .eq('team_id', teamId);
+      .eq('team_id', $page.url.pathname.split('/')[1]);
 
     if (data) {
       const profile = data[0]['team_profile'];
@@ -148,12 +145,10 @@
     $profileData.design.theme = $profileTheme;
     const { error } = await supabase
       .from('team_members')
-      .update(
-        { team_profile: $profileData, last_updated: new Date() },
-        { returning: 'minimal' }
-      )
+      .update({ team_profile: $profileData, last_updated: new Date() })
       .eq('uid', $page.params.slug)
-      .eq('team_id', teamId);
+      .eq('team_id', $page.url.pathname.split('/')[1])
+      .select();
     if (error) {
       toastFailed();
       console.log(error);
@@ -260,7 +255,7 @@
             {selectedTab}
             class="min-h-screen border-8 border-black rounded-3xl"
             data={$profileData}
-            {teamId}
+            teamId={$page.url.pathname.split('/')[1]}
             {companyNickname}
           />
         </div>
@@ -269,7 +264,7 @@
   </div>
 {:catch error}
   <div>
-    <h1>{error}</h1>
+    <h1 class="pl-20">{error}</h1>
     <h1 class="text-xl text-white text-center w-full mt-8">
       Some error occurred. Please reload the page and try again <br /> or
       <a href="https://wa.me/628113087599" class="font-semibold">

@@ -182,35 +182,35 @@ export const analyticsChartConfig = {
 export let sidebarItems = [
   {
     title: 'dashboard',
-    routeId: '[slug]/dashboard@teams',
+    routeId: '/(team)/[slug]/dashboard',
     urldefault:
       'https://img.icons8.com/fluency-systems-regular/96/ffffff/home.png',
   },
   {
     title: 'connections',
-    routeId: '[slug]/connections@teams',
+    routeId: '/(team)/[slug]/connections',
     urldefault: 'https://img.icons8.com/ios/100/FFFFFF/contact-card.png',
   },
   {
     title: 'records',
-    routeId: '[slug]/records@teams',
+    routeId: '/(team)/[slug]/records',
     urldefault:
       'https://img.icons8.com/material-outlined/96/FFFFFF/add-database.png',
   },
   {
     title: 'members',
-    routeId: '[slug]/members@teams',
+    routeId: '/(team)/[slug]/members',
     urldefault: 'https://img.icons8.com/ios/100/FFFFFF/conference-call--v1.png',
   },
   // {
   //   title: 'membership',
-  //   routeId: '[slug]/membership@teams',
+  //   routeId: '/(team)/[slug]/membership',
   //   urldefault:
   //     'https://img.icons8.com/ios-filled/100/FFFFFF/bank-card-front-side--v1.png',
   // },
   {
     title: 'settings',
-    routeId: '[slug]/settings@teams',
+    routeId: '/(team)/[slug]/settings',
     urldefault:
       'https://img.icons8.com/external-tanah-basah-basic-outline-tanah-basah/96/ffffff/external-setting-essentials-tanah-basah-basic-outline-tanah-basah.png',
   },

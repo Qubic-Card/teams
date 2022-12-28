@@ -46,11 +46,11 @@
           contentType: 'image/jpeg',
         });
 
-      const { publicURL, error } = supabase.storage
+      const { data: banner } = supabase.storage
         .from('banner')
         .getPublicUrl(`${$user?.id}/${fileName}`);
 
-      updatedData({ url: publicURL, isBanner: true });
+      updatedData({ url: banner.publicUrl, isBanner: true });
     } else {
       const { data } = await supabase.storage
         .from('avatars')
@@ -58,11 +58,11 @@
           contentType: 'image/jpeg',
         });
 
-      const { publicURL, error } = supabase.storage
+      const { data: avatar } = supabase.storage
         .from('avatars')
         .getPublicUrl(`${$user?.id}/${fileName}`);
 
-      updatedData({ url: publicURL, isBanner: false });
+      updatedData({ url: avatar.publicUrl, isBanner: false });
     }
 
     croppedImage = '';

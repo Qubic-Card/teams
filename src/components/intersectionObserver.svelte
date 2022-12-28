@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { browser } from '$app/env';
+  import { browser } from '$app/environment';
   import { inView, isInViewTriggered } from '@lib/stores/intersectingStore';
 
   export let section = 'avatar';

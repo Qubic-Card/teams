@@ -38,8 +38,9 @@
     loading = true;
     const { error } = await supabase
       .from('team_connection_acc')
-      .update({ profileData: data.profileData }, { returning: 'minimal' })
-      .eq('id', data.id);
+      .update({ profileData: data.profileData })
+      .eq('id', data.id)
+      .select();
 
     if (error) {
       toastFailed('Failed to update connection data');

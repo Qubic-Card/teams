@@ -23,7 +23,7 @@
 </script>
 
 <CardOwnershipWrapper let:isMounted>
-  <div class=" text-black bg-white">
+  <div class="text-black bg-white">
     {#if isMounted}
       <TabGroup>
         <TabList
@@ -57,6 +57,8 @@
           </TabPanel>
         </TabPanels>
       </TabGroup>
+    {:else}
+      <div class="bg-white h-screen w-screen" />
     {/if}
   </div>
 </CardOwnershipWrapper>

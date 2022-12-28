@@ -9,7 +9,7 @@
   import { memberData, user } from '@lib/stores/userStore';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import roleId from '@lib/roleConfig';
-  import { createEventDispatcher, getContext, onMount } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import convertToGMT7 from '@lib/utils/convertToGMT7';
   import { log } from '@lib/logger/logger';
   import { teamData } from '@lib/stores/teamStore';
@@ -19,7 +19,7 @@
   export let member, i, updatedRole, active;
 
   const dispatch = createEventDispatcher();
-  const teamId = getContext('teamId');
+
   let selectedRole = '';
   let showModal = false;
   let roleID = null;
@@ -46,9 +46,10 @@
     isLoading = true;
     const { data, error } = await supabase
       .from('team_members')
-      .update({ role: id }, { returning: 'minimal' })
+      .update({ role: id })
       .eq('uid', member.uid)
-      .eq('team_id', teamId);
+      .eq('team_id', $page.params.slug)
+      .select();
 
     if (error) {
       console.log(error);
@@ -95,7 +96,7 @@
         `${member.email} has been removed from team by ${$memberData.fullName}`,
         'DANGER',
         null,
-        teamId,
+        $page.params.slug,
         $memberData.fullName,
         '',
         $memberData.id
@@ -386,7 +387,7 @@
         </div>
         {#if permissions.writeMembers}
           {#if member.uid !== $user?.id}
-            <div
+            <button
               class="outline outline-1 outline-neutral-700 p-1 rounded-md ml-2 cursor-pointer"
               on:click={toggleDeleteMemberModal}
             >
@@ -404,7 +405,7 @@
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
-            </div>
+            </button>
           {/if}
         {/if}
       </div>

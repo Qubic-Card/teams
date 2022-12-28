@@ -19,8 +19,8 @@
     } else {
       try {
         loading = true;
-        const { error, data } = await supabase.auth.api.updateUser(
-          $page.url.searchParams.get('reset'),
+        const { error, data } = await supabase.auth.updateUser(
+          // $page.url.searchParams.get('reset'),
           { password: password }
         );
         if (error) throw error;

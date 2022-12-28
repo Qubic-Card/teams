@@ -6,8 +6,9 @@
   import { memberData, user } from '@lib/stores/userStore';
   import { toastSuccess } from '@lib/utils/toast';
   import { Listbox } from '@rgossiaux/svelte-headlessui';
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
+  import { page } from '$app/stores';
 
   export let sortOptions = [],
     avatar = '',
@@ -18,7 +19,6 @@
     uid,
     mid;
 
-  const teamId = getContext('teamId');
   let selected = sortOptions[0];
   let isOpen = false;
   let isLoading = false;
@@ -47,7 +47,7 @@
         `${email} has been disconnected from ******${cardId.slice(-6)}`,
         'DANGER',
         null,
-        teamId,
+        $page.params.slug,
         $memberData.fullName,
         '',
         $memberData.id
@@ -56,7 +56,7 @@
         `${email} has been disconnected from ******${cardId.slice(-6)}`,
         'DANGER',
         null,
-        teamId,
+        $page.params.slug,
         fullname,
         '',
         mid

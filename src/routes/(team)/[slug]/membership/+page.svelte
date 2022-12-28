@@ -5,15 +5,14 @@
   import MembershipAnalyticCard from '@comp/cards/membershipAnalyticCard.svelte';
   import MemberSortDropdown from '@comp/buttons/memberSortDropdown.svelte';
   import TenantInfoCard from '@comp/cards/tenantInfoCard.svelte';
-  import { getContext } from 'svelte';
-  import { membership } from '@lib/membership';
+
   import ddbDocClient from '@lib/dynamodb';
   import TenantModal from '@comp/modals/tenantModal.svelte';
   import { DDB_DOC } from '@lib/constants';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { user } from '@lib/stores/userStore';
+  import { page } from '$app/stores';
 
-  const teamId = getContext('teamId');
   let searchQuery = '';
   let members;
   let tenants = [];
@@ -29,7 +28,7 @@
     },
   };
   let isLoading = false;
-  let page = -1;
+  let activePage = -1;
   let lastEvaluatedKey = {};
 
   function randomDate(start, end) {
@@ -123,8 +122,8 @@
   const addNewTenantHandler = async (input) => {
     try {
       const item = {
-        TeamID: teamId,
-        TID: teamId + '-' + new Date().getTime(),
+        TeamID: $page.params.slug,
+        TID: $page.params.slug + '-' + new Date().getTime(),
         Name: input.Name,
         PointName: input.PointName,
         Metadata: {
@@ -190,7 +189,7 @@
   const loadMoreMembers = async (tid) => {
     try {
       isLoading = true;
-      page++;
+      activePage++;
 
       const getparams = {
         TableName: DDB_DOC.M,
@@ -230,7 +229,7 @@
         KeyConditionExpression: 'TeamID = :teamid',
 
         ExpressionAttributeValues: {
-          ':teamid': teamId,
+          ':teamid': $page.params.slug,
         },
         // ProjectionExpression: 'TID, Name',
       });

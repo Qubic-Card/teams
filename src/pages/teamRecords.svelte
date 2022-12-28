@@ -15,7 +15,7 @@
   import Spinner from '@comp/loading/spinner.svelte';
   import sortBy from '@lib/utils/sortBy';
   import { personal, team } from '@lib/stores/recordsStore';
-  import { getContext } from 'svelte';
+
   import PaginationButton from '@comp/buttons/paginationButton.svelte';
 
   export let holder,
@@ -26,7 +26,7 @@
     totalTeamRecords,
     toItem;
 
-  const teamId = getContext('teamId');
+  let teamId = $page.params.slug;
   let fileName = `${formatDate(new Date())}-${formatDate(new Date())}`;
   let selectedType = 'Activities';
   let fromDateValue = new Date();
@@ -61,8 +61,9 @@
   };
 
   const createTeamStorage = async (url) => {
-    const { data, error } = await supabase.from('team_storage').insert(
-      {
+    const { data, error } = await supabase
+      .from('team_storage')
+      .insert({
         tid: teamId,
         by: holder,
         type: 'Team ' + selectedType,
@@ -70,9 +71,8 @@
         filename: `${fileName}-${
           selectedType === 'Activities' ? 'team-activities' : 'team-connections'
         }`,
-      },
-      { returning: 'minimal' }
-    );
+      })
+      .select('*');
 
     if (error) console.log(error);
   };
@@ -134,7 +134,7 @@
               : 'team-connections'
           } created successfully`
         );
-        await createTeamStorage(data.Key);
+        await createTeamStorage(data.path);
         await getAllStorage();
         isLoading = false;
       }

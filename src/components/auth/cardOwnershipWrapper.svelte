@@ -30,7 +30,9 @@
   let isMounted = false;
 
   onMount(async () => {
-    if (await getBusinessCards($user?.id)) {
+    const { data } = await supabase.auth.getUser();
+
+    if (await getBusinessCards(data.user.id)) {
       // goto('/basic');
       isMounted = true;
     } else {

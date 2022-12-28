@@ -14,7 +14,7 @@
   import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
   import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
   import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import { fade } from 'svelte/transition';
 
@@ -37,7 +37,6 @@
   let showModal = false;
   let loading = false;
 
-  const teamID = getContext('teamId');
   let isOpen = false;
   let croppedImage = '';
   let fileName = '';

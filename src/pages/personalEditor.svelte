@@ -44,7 +44,6 @@
     handleUpSocial,
   } from '@lib/utils/editors';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
-  import { getContext } from 'svelte';
 
   export let permissions, isTeamInactive, handleSave;
 
@@ -60,7 +59,7 @@
 
   let pond;
   let name = 'filepond';
-  const teamID = getContext('teamId');
+
   let isOpen = false;
   let croppedImage = '';
   let fileName = '';
@@ -95,14 +94,14 @@
         contentType: 'image/jpeg',
       });
 
-    const { publicURL, error } = supabase.storage
+    const { data: avatar } = supabase.storage
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${fileName}`);
 
     pond.removeFile();
     croppedImage = '';
     isOpen = false;
-    $profileData.avatar = publicURL;
+    $profileData.avatar = avatar.publicUrl;
     await handleSave();
     isLoading = false;
   };

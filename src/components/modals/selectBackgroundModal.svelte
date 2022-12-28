@@ -117,13 +117,13 @@
         contentType: 'image/jpeg',
       });
 
-    const { publicURL, error } = supabase.storage
+    const { data: banner } = supabase.storage
       .from('banner')
       .getPublicUrl(`${$user?.id}/${fileName}`);
 
     croppedImage = '';
     isOpen = false;
-    $profileData.design.background = publicURL;
+    $profileData.design.background = banner.publicUrl;
     showModal = false;
     setState('idle');
 

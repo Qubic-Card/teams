@@ -13,7 +13,7 @@
   import supabase from '@lib/db';
   import RecordsSkeleton from '@comp/skeleton/recordsSkeleton.svelte';
   import { personal, team } from '@lib/stores/recordsStore';
-  import { getContext } from 'svelte';
+  import { page } from '$app/stores';
 
   let permissions = {
     writeRecords: false,
@@ -21,14 +21,12 @@
   let isTeamInactive = false;
   let holder = '';
 
-  const teamId = getContext('teamId');
-
   let maxPage = 0;
-  let page = 0;
+  let activePage = 0;
   let toItem = 15;
   let totalTeamRecords = 0;
   let isLoading = false;
-  const setPage = (p) => (page = p);
+  const setPage = (p) => (activePage = p);
   const getPagination = (page, size) => {
     const limit = size ? +size : 3;
     const from = page ? page * limit : 0;
@@ -40,7 +38,7 @@
   const getPersonalStorage = async () => {
     const { data, error } = await supabase.storage
       .from('records')
-      .list(`${teamId}/${$user?.id}`, {
+      .list(`${$page.params.slug}/${$user?.id}`, {
         sortBy: { column: 'created_at', order: 'desc' },
       });
 
@@ -53,11 +51,11 @@
 
   const getTeamStorage = async () => {
     isLoading = true;
-    const { from, to } = getPagination(page, toItem);
+    const { from, to } = getPagination(activePage, toItem);
     const { data, error, count } = await supabase
       .from('team_storage')
       .select('*', { count: 'estimated' })
-      .eq('tid', teamId)
+      .eq('tid', $page.params.slug)
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -81,7 +79,7 @@
     if (error) {
       console.log(error);
     } else {
-      holder = data[0]?.firstname + ' ' + data[0]?.lastname;
+      holder = data[0]['firstname'] + ' ' + data[0]['lastname'];
     }
   };
 
@@ -95,7 +93,7 @@
     if (item === 'inactive') isTeamInactive = true;
   });
 
-  $: toItem, page, getTeamStorage();
+  $: toItem, activePage, getTeamStorage();
 </script>
 
 {#await (getAllStorage(), getMemberData())}

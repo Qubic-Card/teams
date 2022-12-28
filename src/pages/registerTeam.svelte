@@ -136,19 +136,17 @@
               return;
             } else {
               loading = true;
-              const { user, session, error } = await supabase.auth.signUp(
-                {
-                  email: register.email,
-                  password: register.password,
-                },
-                {
+              const { data, error } = await supabase.auth.signUp({
+                email: register.email,
+                password: register.password,
+                options: {
                   data: {
                     firstname: register.fname,
                     lastname: register.lname,
                     company: team.company ?? '',
                   },
-                }
-              );
+                },
+              });
 
               if (error) {
                 toastFailed();
@@ -156,12 +154,12 @@
                 loading = false;
                 return;
               } else {
-                if (await checkIsRegistered(user.id)) {
+                if (await checkIsRegistered(data.user.id)) {
                   toastFailed('Email is already registered');
                   loading = false;
                 } else {
                   const { error, memberId } = await createTeamMember(
-                    user.id,
+                    data.user.id,
                     register,
                     team.company,
                     $page.url.searchParams.get('team_id'),
@@ -215,7 +213,7 @@
         return;
       } else {
         loading = true;
-        const { user, error } = await supabase.auth.signIn({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: login.email,
           password: login.password,
         });
@@ -237,7 +235,7 @@
           } else {
             const { error: check_error, isMember } =
               await checkAlreadyTeamMember(
-                user.id,
+                data.user.id,
                 $page.url.searchParams.get('team_id')
               );
 
@@ -248,10 +246,10 @@
               loading = true;
 
               register.email = login.email;
-              await getProfile(user.id);
+              await getProfile(data.user.id);
 
               const { error, memberId } = await createTeamMember(
-                user.id,
+                data.user.id,
                 register,
                 team.company,
                 $page.url.searchParams.get('team_id'),
@@ -293,9 +291,7 @@
   const handleForgotPassword = async () => {
     try {
       loading = true;
-      const { error } = await supabase.auth.api.resetPasswordForEmail(
-        login.email
-      );
+      const { error } = await supabase.auth.resetPasswordForEmail(login.email);
       if (error) throw error;
       toastSuccess('Check your email!');
       loading = false;

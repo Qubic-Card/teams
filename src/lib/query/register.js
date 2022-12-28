@@ -1,38 +1,41 @@
 import supabase from '@lib/db';
 
 export const createTeamMember = async (uid, input, company, tid, role) => {
-  const { data, error } = await supabase.from('team_members').insert({
-    team_id: tid,
-    uid: uid,
-    role: role,
-    team_profile: {
-      firstname: input.fname,
-      lastname: input.lname,
-      job: '',
-      avatar: '',
-      design: {
-        theme: 'dark',
-        background: '',
+  const { data, error } = await supabase
+    .from('team_members')
+    .insert({
+      team_id: tid,
+      uid: uid,
+      role: role,
+      team_profile: {
+        firstname: input.fname,
+        lastname: input.lname,
+        job: '',
+        avatar: '',
+        design: {
+          theme: 'dark',
+          background: '',
+        },
+        address: '',
+        company: company ?? '',
+        links: [
+          {
+            link: 'https://qubic.id',
+            title: 'My Website',
+            isActive: true,
+          },
+        ],
+        socials: [
+          {
+            data: input.email,
+            type: 'email',
+            isActive: true,
+          },
+        ],
+        isShowMetaImage: true,
       },
-      address: '',
-      company: company ?? '',
-      links: [
-        {
-          link: 'https://qubic.id',
-          title: 'My Website',
-          isActive: true,
-        },
-      ],
-      socials: [
-        {
-          data: input.email,
-          type: 'email',
-          isActive: true,
-        },
-      ],
-      isShowMetaImage: true,
-    },
-  });
+    })
+    .select('*');
 
   if (error) {
     console.log(error);

@@ -1,6 +1,4 @@
 <script>
-  import colorMapping from '@lib/utils/colorMapping';
-  import supabase from '@lib/db';
   import { last14Days, last7Days } from '@lib/utils/getDates';
   import { tapCount } from '@lib/utils/count';
   import { DDB_DOC, socialIcons } from '@lib/constants';

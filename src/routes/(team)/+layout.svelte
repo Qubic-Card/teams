@@ -1,6 +1,6 @@
 <script>
   import { fade, slide } from 'svelte/transition';
-  import '../app.css';
+  import '../../app.css';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -38,29 +38,29 @@
 
   const getSubscriptionsData = async () => {
     const { data, error } = await supabase.functions.invoke('globaldate', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        teamId: teamId,
-      }),
+      body: { teamId: teamId },
     });
-
+    // console.log(teamId);
     if (error) console.log(error);
     if (data) subscription = data;
   };
 
   onMount(async () => {
+    const { data } = await supabase.auth.getUser();
+
     await getSubscriptionsData();
-    member = await getRoleMapsByProfile($user?.id, teamId);
-    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
+    member = await getRoleMapsByProfile(data.user.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs(data.user.id, teamId));
     $teamData = await getTeamData(teamId);
 
-    $teams = {
-      subscription_end_date: member?.team_id?.subscription_end_date,
-      member_count: member?.team_id?.member_count,
-    };
-
+    if (member != undefined) {
+      $userData = member?.role?.role_maps;
+      $teams = {
+        subscription_end_date: member.team_id.subscription_end_date,
+        member_count: member.team_id.member_count,
+      };
+    }
+    // console.log('onmount', member);
     sevenDaysAfterEndDate = new Date(
       new Date(subscription?.subs_end_date).setDate(
         new Date(subscription?.subs_end_date).getDate() + 7
@@ -69,15 +69,15 @@
   });
 
   $: {
-    if ($page.routeId === '[slug]/members/[slug]@teams') {
+    if ($page.route.id === '/(team)/[slug]/members/[slug]') {
       teamId = $page.url.pathname.split('/')[1];
-      setContext('teamId', $page.url.pathname.split('/')[1]);
+      setContext('teamId', teamId);
     } else {
       teamId = $page.params.slug;
-      setContext('teamId', $page.params.slug);
+      setContext('teamId', teamId);
     }
 
-    $userData = member?.role?.role_maps;
+    // $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
     $memberData.roleName = member?.role?.role_name;
     $memberData.fullName =
@@ -252,15 +252,15 @@
         <nav class="w-full flex flex-col justify-center items-center">
           {#each sidebarItems as item}
             {#if $teamData.name}
-              <div
+              <button
                 class={`flex cursor-pointer items-center h-16 w-full text-gray-100 ${
                   isSidebarOpened ? 'justify-between' : 'justify-center'
                 } ${isSidebarOpened && 'px-12 w-full'} ${
-                  $page.routeId === '[slug]/dashboard/team@teams'
+                  $page.route.id === '[slug]/dashboard/team@teams'
                     ? 'first:bg-neutral-900'
                     : ''
                 } ${
-                  isSidebarOpened && $page.routeId === item.routeId
+                  isSidebarOpened && $page.route.id === item.routeId
                     ? 'bg-neutral-900'
                     : ''
                 }`}
@@ -272,7 +272,7 @@
                   </p>
                 {/if}
                 <div
-                  class="rounded-lg p-3 {$page.routeId === item.routeId
+                  class="rounded-lg p-3 {$page.route.id === item.routeId
                     ? 'bg-neutral-800'
                     : 'outline outline-1 outline-neutral-800'}"
                 >
@@ -282,7 +282,7 @@
                     class="w-4 md:w-5 "
                   />
                 </div>
-              </div>
+              </button>
             {:else}
               <div class="animate-pulse gap-5">
                 <p
@@ -300,20 +300,20 @@
         <nav class="w-full flex justify-center items-center overflow-x-auto">
           {#each sidebarItems as item}
             {#if $teamData.name}
-              <div
+              <button
                 class={`flex cursor-pointer justify-center items-center w-16 h-16 ${
-                  $page.routeId === '[slug]/dashboard/team@teams'
+                  $page.route.id === '[slug]/dashboard/team@teams'
                     ? 'first:bg-neutral-900'
                     : ''
                 } ${
-                  isSidebarOpened && $page.routeId === item.routeId
+                  isSidebarOpened && $page.route.id === item.routeId
                     ? 'bg-neutral-900'
                     : ''
                 }`}
                 on:click={() => handler($teamData?.id, item.title)}
               >
                 <div
-                  class="rounded-lg {$page.routeId === item.routeId
+                  class="rounded-lg {$page.route.id === item.routeId
                     ? 'bg-neutral-800'
                     : 'outline outline-1 outline-neutral-800'} p-3"
                 >
@@ -323,7 +323,7 @@
                     class="w-4 md:w-5 "
                   />
                 </div>
-              </div>
+              </button>
             {:else}
               <div
                 class="animate-pulse flex justify-between items-center bg-neutral-800 w-full h-16"

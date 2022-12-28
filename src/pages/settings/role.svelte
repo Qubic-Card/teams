@@ -15,10 +15,9 @@
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import { getRoleMapsByProfile } from '@lib/query/getRoleMaps';
   import { defaultRole } from '@lib/constants';
-  import { getContext } from 'svelte';
   import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
+  import { page } from '$app/stores';
 
-  const teamId = getContext('teamId');
   export let permissions;
   let roleMaps = [];
   let isClicked = true;
@@ -31,13 +30,11 @@
     loading = true;
     const { data, error } = await supabase
       .from('team_roles')
-      .update(
-        {
-          role_maps: $role,
-        },
-        { returning: 'minimal' }
-      )
-      .eq('id', id);
+      .update({
+        role_maps: $role,
+      })
+      .eq('id', id)
+      .select();
 
     loading = false;
     if (error) {
@@ -185,7 +182,7 @@
                         await updateTeamsRoleMapping(role.id);
                         roleMaps = await getRoleMapsByProfile(
                           $user?.id,
-                          teamId
+                          $page.params.slug
                         );
                         setUserData(roleMaps?.role?.role_maps);
                       }}

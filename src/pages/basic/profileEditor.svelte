@@ -221,11 +221,9 @@
 
     const { error } = await supabase
       .from('profile')
-      .update(
-        { metadata: $basicProfile, last_updated: new Date() },
-        { returning: 'minimal' }
-      )
-      .eq('uid', $user.id);
+      .update({ metadata: $basicProfile, last_updated: new Date() })
+      .eq('uid', $user.id)
+      .select();
     if (error) {
       toastFailed();
       console.log(error);

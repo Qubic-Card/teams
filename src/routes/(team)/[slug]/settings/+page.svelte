@@ -1,20 +1,19 @@
 <script lang="ts">
-  import RegistrationLink from './../../pages/settings/registrationLink.svelte';
-  import TeamName from './../../pages/settings/teamName.svelte';
+  import RegistrationLink from '../../../../pages/settings/registrationLink.svelte';
+  import TeamName from '../../../../pages/settings/teamName.svelte';
   import supabase from '@lib/db';
   import { teamRoles } from '@lib/stores/roleStore';
   import SettingsSkeleton from '@comp/skeleton/settingsSkeleton.svelte';
   import { memberData, userData } from '@lib/stores/userStore';
   import Billing from '@pages/settings/billing.svelte';
   import Role from '@pages/settings/role.svelte';
-  import { getContext } from 'svelte';
   import Activation from '@pages/settings/activation.svelte';
   import { toastFailed, toastSuccess } from '@lib/utils/toast';
   import encryptActivationCode from '@lib/utils/encryptActivationCode';
   import { teamData } from '@lib/stores/teamStore';
   import { log } from '@lib/logger/logger';
+  import { page } from '$app/stores';
 
-  const teamId = getContext('teamId');
   let roles = [];
   let isClicked = true;
   let permissions = {
@@ -34,7 +33,7 @@
       const { data, error } = await supabase
         .from('team_roles')
         .select('*, team_id(subscription_end_date, member_count, team_token)')
-        .eq('team_id', teamId)
+        .eq('team_id', $page.params.slug)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -58,8 +57,9 @@
       loading = true;
       const { error } = await supabase
         .from('teams')
-        .update({ name: $teamData.name }, { returning: 'minimal' })
-        .eq('id', teamId);
+        .update({ name: $teamData.name })
+        .eq('id', $page.params.slug)
+        .select();
 
       if (error) {
         loading = false;
@@ -72,7 +72,7 @@
           `Team Name has been changed to ${$teamData.name} by ${$memberData.fullName}`,
           'WARN',
           null,
-          teamId,
+          $page.params.slug,
           $memberData.fullName,
           '',
           $memberData.id
@@ -93,13 +93,10 @@
 
       const { data, error } = await supabase
         .from('teams')
-        .update(
-          {
-            team_token: hash,
-          },
-          { returning: 'minimal' }
-        )
-        .eq('id', teamId);
+        .update({
+          team_token: hash,
+        })
+        .eq('id', $page.params.slug);
 
       if (error) {
         toastFailed('Failed to change activation code');

@@ -45,7 +45,7 @@
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import getCroppedImg from '@lib/utils/canvas';
   import Cropper from 'svelte-easy-crop';
-  import { getContext } from 'svelte';
+  import { page } from '$app/stores';
 
   // Register the plugins
   registerPlugin(
@@ -58,7 +58,6 @@
   );
 
   export let permissions, isTeamInactive, memberId;
-  const teamId = getContext('teamId');
 
   let pond;
   let brochurePond;
@@ -102,14 +101,14 @@
         contentType: 'image/jpeg',
       });
 
-    const { publicURL, error } = supabase.storage
+    const { data: avatar } = supabase.storage
       .from('avatars')
       .getPublicUrl(`${$user?.id}/${fileName}`);
 
     pond.removeFile();
     croppedImage = '';
     isOpen = false;
-    $teamData.logo = publicURL;
+    $teamData.logo = avatar.publicUrl;
     await handleSave();
     isLoading = false;
   };
@@ -122,7 +121,7 @@
         contentType: 'application/pdf',
       });
 
-    const { publicURL, error } = supabase.storage
+    const { data: brochure } = supabase.storage
       .from('brochure')
       .getPublicUrl(`${$user?.id}/${timestamp}${file?.filename}`);
 
@@ -130,7 +129,7 @@
     brochurePond.removeFile();
     brochureFilename = file.filename;
     $teamData.brochure = {
-      url: publicURL,
+      url: brochure.publicUrl,
       title: file.filename,
       filename: file.filename,
     };
@@ -151,8 +150,8 @@
     $teamData.links = $teamLinks;
     const { error } = await supabase
       .from('teams')
-      .update({ metadata: $teamData }, { returning: 'minimal' })
-      .eq('id', teamId);
+      .update({ metadata: $teamData })
+      .eq('id', $page.url.pathname.split('/')[1]);
 
     if (error) {
       toastFailed();
@@ -165,10 +164,7 @@
   const setDisplayPersonal = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
-      .update(
-        { display_personal: $isDisplayPersonal },
-        { returning: 'minimal' }
-      )
+      .update({ display_personal: $isDisplayPersonal })
       .eq('team_member_id', memberId)
       .eq('card_id', history.state.card);
 
