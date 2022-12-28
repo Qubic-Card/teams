@@ -46,16 +46,21 @@
   };
 
   onMount(async () => {
+    const { data } = await supabase.auth.getUser();
+
     await getSubscriptionsData();
-    member = await getRoleMapsByProfile($user?.id, teamId);
-    userChangeTimestamp.set(await getUserChangeTs($user?.id, teamId));
+    member = await getRoleMapsByProfile(data.user.id, teamId);
+    userChangeTimestamp.set(await getUserChangeTs(data.user.id, teamId));
     $teamData = await getTeamData(teamId);
 
-    $teams = {
-      subscription_end_date: member?.team_id?.subscription_end_date,
-      member_count: member?.team_id?.member_count,
-    };
-
+    if (member != undefined) {
+      $userData = member?.role?.role_maps;
+      $teams = {
+        subscription_end_date: member.team_id.subscription_end_date,
+        member_count: member.team_id.member_count,
+      };
+    }
+    // console.log('onmount', member);
     sevenDaysAfterEndDate = new Date(
       new Date(subscription?.subs_end_date).setDate(
         new Date(subscription?.subs_end_date).getDate() + 7
@@ -64,15 +69,15 @@
   });
 
   $: {
-    if ($page.route.id === '/(team)/[slug]/members') {
+    if ($page.route.id === '/(team)/[slug]/members/[slug]') {
       teamId = $page.url.pathname.split('/')[1];
       setContext('teamId', teamId);
     } else {
       teamId = $page.params.slug;
       setContext('teamId', teamId);
     }
-    // console.log($page.url.pathname.split('/')[1]);
-    $userData = member?.role?.role_maps;
+
+    // $userData = member?.role?.role_maps;
     $memberData.id = member?.id;
     $memberData.roleName = member?.role?.role_name;
     $memberData.fullName =

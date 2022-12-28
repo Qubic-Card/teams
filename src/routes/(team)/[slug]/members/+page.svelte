@@ -167,8 +167,6 @@
 
     loading = false;
   };
-
-  // $: console.log(permissions);
 </script>
 
 <svelte:window bind:innerWidth />
@@ -197,7 +195,7 @@
     >
       <div class="flex gap-6 w-full lg:w-1/2">
         {#each menu as item, i}
-          <div
+          <button
             on:click={() => {
               selectMenu(i);
               resetSortHandler();
@@ -208,7 +206,7 @@
               : 'font-regular text-neutral-400 text-sm md:text-md my-auto'}"
           >
             {item}
-          </div>
+          </button>
         {/each}
       </div>
       {#if selectedMenu === 1}

@@ -1,5 +1,6 @@
 <script>
   import AuthWrapper from '@comp/auth/authWrapper.svelte';
+  import { SvelteToast } from '@zerodevx/svelte-toast';
   import '../app.css';
 </script>
 
@@ -9,6 +10,7 @@
 
 <AuthWrapper>
   <div class="relative min-h-screen">
+    <SvelteToast />
     <slot />
   </div>
 </AuthWrapper>
