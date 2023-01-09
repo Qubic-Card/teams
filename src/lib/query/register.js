@@ -63,16 +63,14 @@ export const checkFirstRegisteredMember = async (tid) => {
 
 export const checkIsRegistered = async (uid) => {
   const { data, error } = await supabase.functions.invoke('getUserEmail', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+    body: {
       uid: uid,
-    }),
+    },
   });
 
   if (error) console.log(error);
   if (data) {
+    console.log('data', data);
     if (data.user) {
       return false;
     } else {
