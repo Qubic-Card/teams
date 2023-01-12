@@ -9,6 +9,7 @@
     isDisplayPersonal,
     profileTheme,
     currentTheme,
+    cardsId,
   } from '@lib/stores/editorStore';
   import EditorSkeleton from '@comp/skeleton/editorSkeleton.svelte';
   import supabase from '@lib/db';
@@ -110,7 +111,7 @@
     let { data, error } = await supabase
       .from('team_members')
       .select(
-        'team_profile, uid, team_id, id, team_cardcon: team_cardcon(display_personal)'
+        'team_profile, uid, team_id, id, team_cardcon: team_cardcon(display_personal, card_id)'
       )
       .eq('uid', $page.params.slug)
       .eq('team_id', $page.url.pathname.split('/')[1]);
@@ -124,6 +125,7 @@
       $currentTheme = theme[profile['design']['theme']];
       member.uid = data[0]['uid'];
       memberId = data[0]['id'];
+      $cardsId = data[0].team_cardcon.map((item) => item.card_id);
 
       await checkIsConfirmedEmail(data[0]['uid']);
 

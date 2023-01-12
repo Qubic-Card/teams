@@ -184,10 +184,10 @@
                       '',
                       memberId
                     );
+                    register.success = true;
                     toastSuccess('Please confirm your email');
                   }
 
-                  register.success = true;
                   loading = false;
                 }
               }

@@ -17,6 +17,7 @@
     teamSocials,
     teamLinks,
     isDisplayPersonal,
+    cardsId,
   } from '@lib/stores/editorStore';
   import supabase from '@lib/db';
   import { user } from '@lib/stores/userStore';
@@ -166,7 +167,7 @@
       .from('team_cardcon')
       .update({ display_personal: $isDisplayPersonal })
       .eq('team_member_id', memberId)
-      .eq('card_id', history.state.card);
+      .in('card_id', $cardsId);
 
     if (error) {
       toastFailed();
