@@ -8,6 +8,7 @@ export const teamSocials = writable([]);
 export const teamLinks = writable([]);
 
 export const isDisplayPersonal = writable(false);
+export const cardsId = writable([]);
 export const profileTheme = writable('dark');
 export const currentTheme = writable(theme['dark']);
 
