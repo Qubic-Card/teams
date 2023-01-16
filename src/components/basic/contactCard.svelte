@@ -242,7 +242,9 @@
                 undefined,
                 convertToGMT7(profile?.dateConnected)
               ),
-              'contact'
+              profile?.profileData?.firstname ??
+                '' + '' + profile?.profileData?.lastname ??
+                ''
             )}
           class="w-full bg-blue-600 hover:font-semibold text-white mx-auto p-3 rounded-md"
         >

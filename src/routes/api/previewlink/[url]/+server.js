@@ -5,7 +5,22 @@ import { getLinkPreview } from 'link-preview-js';
 export const GET = async ({ params }) => {
   const url = params.url;
   const res = await getLinkPreview(url, {
-    timeout: 2000, headers: { "user-agent": "googlebot" }
+    followRedirects: 'manual',
+    handleRedirects: (baseURL, forwardedURL) => {
+      const urlObj = new URL(baseURL);
+      const forwardedURLObj = new URL(forwardedURL);
+      if (
+        forwardedURLObj.hostname === urlObj.hostname ||
+        forwardedURLObj.hostname === 'www.' + urlObj.hostname ||
+        'www.' + forwardedURLObj.hostname === urlObj.hostname
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    timeout: 2000,
+    headers: { 'user-agent': 'googlebot' },
   });
 
   return new Response(JSON.stringify({ res }));
