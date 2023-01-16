@@ -30,6 +30,7 @@
     const fileURL = URL.createObjectURL(
       new Blob([vCardString], { type: 'text/vcard;charset=utf-8' })
     );
+
     let fileLink = document.createElement('a');
     fileLink.href = fileURL;
     fileLink.download = `${fileName}.vcf`;
@@ -209,7 +210,13 @@
                 ? $basicBusinessVcard
                 : $basicPersonalVcard
             ),
-            'contact'
+            !$basicProfile.isBusiness
+              ? $basicProfile.firstname ??
+                  '' + ' ' + $basicProfile.lastname ??
+                  ''
+              : $basicProfile.firstnameBusiness ??
+                  '' + ' ' + $basicProfile.lastnameBusiness ??
+                  ''
           )}
       >
         Add to Contacts

@@ -7,18 +7,19 @@
   import { cards } from '@lib/stores/cardsStore';
   import Cookies from 'js-cookie';
   import { checkIsActiveMember } from '@lib/query/checkIsActiveMember';
+  import { onMount } from 'svelte';
 
-  // $user = supabase.auth.getUser();
-  // const getUser = async () => {
-  //   const { data } = await supabase.auth.getUser();
-  //   $user = data.user;
-  // };
-
-  const redirect = async () => {
+  const getUser = async () => {
     const { data } = await supabase.auth.getUser();
     $user = data.user;
+  };
 
-    if ($page?.route.id.includes('slug')) {
+  onMount(async () => {
+    await getUser();
+  });
+
+  const redirect = async () => {
+    if ($page?.route.id.includes('(team)')) {
       if (!(await checkIsActiveMember($user?.id))) {
         $user = null;
       }
@@ -29,7 +30,7 @@
       if (!$user) goto('/');
     }
 
-    if ($page?.route.id?.includes('basic')) {
+    if ($page?.route.id?.includes('(basic)')) {
       if (!$user) goto('/');
       if (!$user?.email_confirmed_at) {
         $user = null;

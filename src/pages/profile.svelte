@@ -178,7 +178,7 @@
               display_personal: $isDisplayPersonal,
             })
           ),
-          'contact'
+          data?.firstname ?? '' + ' ' + data?.lastname ?? ''
         )}
     >
       Add to Contacts
