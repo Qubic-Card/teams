@@ -51,6 +51,7 @@
             : `${$user?.id}/basic-banner.${fileFormat}`,
           fileImage,
           {
+            contentType: `image/${fileFormat}`,
             upsert: true,
           }
         );
@@ -68,6 +69,7 @@
       const { data } = await supabase.storage
         .from('avatars')
         .upload(`${$user?.id}/basic-avatar.${fileFormat}`, fileImage, {
+          contentType: `image/${fileFormat}`,
           upsert: true,
         });
 
