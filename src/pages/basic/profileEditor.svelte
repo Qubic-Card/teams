@@ -29,7 +29,7 @@
     TabPanel,
     TabPanels,
   } from '@rgossiaux/svelte-headlessui';
-  import CropModal from '@comp/basic/cropModal.svelte';
+  import BasicCropModal from '@comp/basic/basicCropModal.svelte';
   import InputSocialsEditor from '@comp/basic/inputSocialsEditor.svelte';
   import InputLinksEditor from '@comp/basic/inputLinksEditor.svelte';
   import SelectTheme from '@comp/modals/selectTheme.svelte';
@@ -66,10 +66,6 @@
   let image;
 
   let profileId = null;
-  let query = 'background';
-  let url;
-  let unsplashDatas;
-  let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY.toString();
 
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
@@ -83,8 +79,6 @@
     pond.removeFile();
   };
 
-  const closeBannerModal = (e) => (isBannerOpen = e.detail);
-
   const updateData = (e) => {
     if (e.detail.isBanner) {
       if ($basicProfile.isBusiness) {
@@ -92,7 +86,7 @@
       } else {
         $basicProfile.design.background = e.detail.url;
       }
-      query = 'background';
+
       fileName = '';
       image = '';
     } else {
@@ -103,31 +97,6 @@
     isBannerOpen = false;
     pond.removeFile();
   };
-
-  const handlePick = async (item) => {
-    let timestamp = new Date().getTime();
-    fileName = item.detail.id.trim() + '-' + timestamp;
-    image = item.detail.urls.regular;
-    isBannerOpen = true;
-    return true;
-  };
-
-  const searchQuery = (val) => (query = val.detail);
-  const getUnsplash = async () => {
-    try {
-      url =
-        `https://api.unsplash.com/search/photos?page=1&query=${query}&client_id=` +
-        accessKey;
-      const res = await fetch(url);
-      const data = await res.json();
-
-      unsplashDatas = data.results;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  $: query, getUnsplash();
 
   const getProfile = async () => {
     let { data, error } = await supabase
@@ -188,7 +157,6 @@
     $basicProfile.socials = $basicSocials;
     $basicProfile.links = $basicLinks;
     $basicProfile.design.theme = $basicProfileTheme;
-
     $basicPersonalVcard = {
       firstname: $basicProfile?.firstname ?? '',
       lastname: $basicProfile?.lastname ?? '',
@@ -442,7 +410,8 @@
                       beforeAddFile={handleCrop}
                     />
 
-                    <CropModal
+                    <BasicCropModal
+                      isBanner={false}
                       {isOpen}
                       {handleSave}
                       {image}
@@ -451,24 +420,7 @@
                       on:closeModal={closeModal}
                     />
 
-                    <CropModal
-                      isBanner
-                      aspect={3 / 1}
-                      isOpen={isBannerOpen}
-                      {handleSave}
-                      {image}
-                      {fileName}
-                      on:updatedData={updateData}
-                      on:closeModal={closeBannerModal}
-                    />
-
-                    <SelectBackgroundModal
-                      {handleSave}
-                      {updateData}
-                      on:pickImage={handlePick}
-                      on:searchQuery={searchQuery}
-                      {unsplashDatas}
-                    />
+                    <SelectBackgroundModal {handleSave} />
                   </div>
                 </div>
               </TabPanel>

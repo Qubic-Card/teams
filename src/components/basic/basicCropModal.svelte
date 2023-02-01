@@ -8,6 +8,7 @@
   import { createEventDispatcher } from 'svelte';
   import getFileFromBase64 from '@lib/utils/getFileFromBase64';
   import Spinner from '../loading/spinner.svelte';
+  import { basicProfile } from '@lib/stores/profileData';
   // import ModalOverlay from '@comp/modals/modalOverlay.svelte';
 
   export let isOpen, handleSave, image, fileName, isBanner;
@@ -44,34 +45,42 @@
     if (isBanner) {
       const { data } = await supabase.storage
         .from('banner')
-        .upload(`${$user?.id}/banner.${fileFormat}`, fileImage, {
-          cacheControl: '3600',
-          upsert: true,
-        });
+        .upload(
+          $basicProfile.isBusiness
+            ? `${$user?.id}/basic-banner-business.${fileFormat}`
+            : `${$user?.id}/basic-banner.${fileFormat}`,
+          fileImage,
+          {
+            upsert: true,
+          }
+        );
 
       const { data: banner } = supabase.storage
         .from('banner')
-        .getPublicUrl(`${$user?.id}/banner.${fileFormat}`);
+        .getPublicUrl(
+          $basicProfile.isBusiness
+            ? `${$user?.id}/basic-banner-business.${fileFormat}`
+            : `${$user?.id}/basic-banner.${fileFormat}`
+        );
 
       updatedData({ url: banner.publicUrl, isBanner: true });
     } else {
       const { data } = await supabase.storage
         .from('avatars')
-        .upload(`${$user?.id}/avatar.${fileFormat}`, fileImage, {
-          cacheControl: '3600',
+        .upload(`${$user?.id}/basic-avatar.${fileFormat}`, fileImage, {
           upsert: true,
         });
 
       const { data: avatar } = supabase.storage
         .from('avatars')
-        .getPublicUrl(`${$user?.id}/avatar.${fileFormat}`);
+        .getPublicUrl(`${$user?.id}/basic-avatar.${fileFormat}`);
 
       updatedData({ url: avatar.publicUrl, isBanner: false });
     }
 
+    isOpen = false;
     croppedImage = '';
     image = '';
-    isOpen = false;
     await handleSave();
     isLoading = false;
   };
