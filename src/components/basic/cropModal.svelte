@@ -39,28 +39,32 @@
 
   const handleAddFile = async () => {
     isLoading = true;
+    let fileFormat = `${fileImage.type.split('/')[1]}`;
+
     if (isBanner) {
       const { data } = await supabase.storage
         .from('banner')
-        .upload(`${$user?.id}/${fileName}`, fileImage, {
-          contentType: 'image/jpeg',
+        .upload(`${$user?.id}/banner.${fileFormat}`, fileImage, {
+          cacheControl: '3600',
+          upsert: true,
         });
 
       const { data: banner } = supabase.storage
         .from('banner')
-        .getPublicUrl(`${$user?.id}/${fileName}`);
+        .getPublicUrl(`${$user?.id}/banner.${fileFormat}`);
 
       updatedData({ url: banner.publicUrl, isBanner: true });
     } else {
       const { data } = await supabase.storage
         .from('avatars')
-        .upload(`${$user?.id}/${fileName}`, fileImage, {
-          contentType: 'image/jpeg',
+        .upload(`${$user?.id}/avatar.${fileFormat}`, fileImage, {
+          cacheControl: '3600',
+          upsert: true,
         });
 
       const { data: avatar } = supabase.storage
         .from('avatars')
-        .getPublicUrl(`${$user?.id}/${fileName}`);
+        .getPublicUrl(`${$user?.id}/avatar.${fileFormat}`);
 
       updatedData({ url: avatar.publicUrl, isBanner: false });
     }

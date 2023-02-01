@@ -16,13 +16,15 @@
     selectedProfileMenu,
   } from '@lib/stores/subsEndStore';
   import { log } from '@lib/logger/logger';
-  import { memberData } from '@lib/stores/userStore';
+  import { memberData, user } from '@lib/stores/userStore';
   import { teamData } from '@lib/stores/teamStore';
 
   export let teamId;
   let expiredCards = [];
   let isLoading = false;
   let selectedCards = new Set();
+  let userCards = [];
+  let memberCards = [];
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -33,8 +35,10 @@
 
     if (error) console.log(error);
     if (cards) {
-      expiredCards = cards;
-      console.log(cards);
+      userCards = cards.filter((card) => card.email === $user?.email);
+      memberCards = cards.filter((card) => card.email !== $user?.email);
+
+      expiredCards = [...userCards, ...memberCards];
     }
   };
 
@@ -217,12 +221,22 @@
                   on:change={onCheckCard}
                 />
               </td>
-              <td class="py-2 pl-4">******{card.id.slice(-6)}</td>
+              <td class="py-2 pl-4"
+                >******{card.id.slice(-6)}
+                <span class="text-neutral-500 text-xs md:hidden block"
+                  >{card.email === $user?.email ? '(You)' : ''}</span
+                ></td
+              >
               <td class="py-2 pl-4"
                 >{card.type === 'pvc' ? 'PVC' : capitalize(card.type)}
                 {capitalize(card.color)}</td
               >
-              <td class="py-2 md:block hidden">{card.email ?? '-'}</td>
+              <td class="py-2 md:table-cell hidden"
+                >{card.email ?? '-'}
+                <span class="text-neutral-500 text-xs ml-2"
+                  >{card.email === $user?.email ? '(You)' : ''}</span
+                ></td
+              >
               <td class="py-2">
                 <div class="flex">
                   <TransferModal
