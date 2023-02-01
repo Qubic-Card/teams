@@ -1,30 +1,30 @@
 <script>
-  import { fade } from 'svelte/transition';
-  import Cropper from 'svelte-easy-crop';
-  import getCroppedImg from '@lib/utils/canvas';
-  import supabase from '@lib/db';
-  import { Dialog } from '@rgossiaux/svelte-headlessui';
-  import { user } from '@lib/stores/userStore';
-  import { createEventDispatcher } from 'svelte';
-  import getFileFromBase64 from '@lib/utils/getFileFromBase64';
-  import Spinner from '../loading/spinner.svelte';
-  import { basicProfile } from '@lib/stores/profileData';
+  import { fade } from "svelte/transition";
+  import Cropper from "svelte-easy-crop";
+  import getCroppedImg from "@lib/utils/canvas";
+  import supabase from "@lib/db";
+  import { Dialog } from "@rgossiaux/svelte-headlessui";
+  import { user } from "@lib/stores/userStore";
+  import { createEventDispatcher } from "svelte";
+  import getFileFromBase64 from "@lib/utils/getFileFromBase64";
+  import Spinner from "../loading/spinner.svelte";
+  import { basicProfile } from "@lib/stores/profileData";
   // import ModalOverlay from '@comp/modals/modalOverlay.svelte';
 
   export let isOpen, handleSave, image, fileName, isBanner;
   export let aspect = 1;
   // e5b936c8-77fd-4cd9-a5b5-0ff7c1ea31eb
-  let croppedImage = '';
+  let croppedImage = "";
   let pixelCrop;
   let fileImage;
   let isLoading = false;
 
   const dispatch = createEventDispatcher();
 
-  const updatedData = (data) => dispatch('updatedData', data);
+  const updatedData = (data) => dispatch("updatedData", data);
   const closeModal = () => {
-    dispatch('closeModal', false);
-    croppedImage = '';
+    dispatch("closeModal", false);
+    croppedImage = "";
   };
 
   const cropImage = async () => {
@@ -38,13 +38,36 @@
     const scale = 200 / width;
   };
 
+  const checkIfBannerExists = () => {
+    if ($basicProfile.isBusiness) {
+      if ($basicProfile.design.backgroundBusiness) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      if ($basicProfile.design.background) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
+  const checkIfAvatarExists = () => {
+    if ($basicProfile.avatar) {
+      return true;
+    }
+    return false;
+  };
+
   const handleAddFile = async () => {
     isLoading = true;
-    let fileFormat = `${fileImage.type.split('/')[1]}`;
+    let fileFormat = `${fileImage.type.split("/")[1]}`;
 
     if (isBanner) {
       const { data, error } = await supabase.storage
-        .from('banner')
+        .from("banner")
         .upload(
           $basicProfile.isBusiness
             ? `${$user?.id}/basic-banner-business.${fileFormat}`
@@ -52,12 +75,12 @@
           fileImage,
           {
             contentType: `image/${fileFormat}`,
-            upsert: true,
+            upsert: checkIfBannerExists(),
           }
         );
-        if (error) console.log('error',error);
+      if (error) console.log("error", error);
       const { data: banner } = supabase.storage
-        .from('banner')
+        .from("banner")
         .getPublicUrl(
           $basicProfile.isBusiness
             ? `${$user?.id}/basic-banner-business.${fileFormat}`
@@ -67,22 +90,22 @@
       updatedData({ url: banner.publicUrl, isBanner: true });
     } else {
       const { data, error } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(`${$user?.id}/basic-avatar.${fileFormat}`, fileImage, {
           contentType: `image/${fileFormat}`,
-          upsert: true,
+          upsert: checkIfAvatarExists(),
         });
-        if (error) console.log('error',error);
+      if (error) console.log("error", error);
       const { data: avatar } = supabase.storage
-        .from('avatars')
+        .from("avatars")
         .getPublicUrl(`${$user?.id}/basic-avatar.${fileFormat}`);
 
       updatedData({ url: avatar.publicUrl, isBanner: false });
     }
 
     isOpen = false;
-    croppedImage = '';
-    image = '';
+    croppedImage = "";
+    image = "";
     await handleSave();
     isLoading = false;
   };
@@ -100,7 +123,7 @@
 <Dialog
   static
   class={`${
-    isOpen ? 'translate-x-0' : 'translate-x-[900px]'
+    isOpen ? "translate-x-0" : "translate-x-[900px]"
   } transition-all duration-300 ease-in-out flex justify-between flex-col h-screen w-full md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-white border-l-2 border-neutral-300 text-black overflow-y-auto snap-y snap-mandatory`}
   open={isOpen}
   on:close={() => {
@@ -135,7 +158,7 @@
         src={croppedImage}
         alt="Cropped profile"
         class={`${
-          isBanner ? 'w-full h-48' : 'w-64 h-64'
+          isBanner ? "w-full h-48" : "w-64 h-64"
         } rounded-2xl aspect-square bg-black mx-auto border border-neutral-700 object-cover`}
       /><br />
     {/if}
