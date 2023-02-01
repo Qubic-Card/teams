@@ -49,7 +49,7 @@
     let fileFormat = `${fileImage.type.split('/')[1]}`;
     const { data, error: err } = await supabase.storage
       .from('avatars')
-      .update(`${$user?.id}/avatar.${fileFormat}`, fileImage, {
+      .upload(`${$user?.id}/avatar.${fileFormat}`, fileImage, {
         upsert: true,
       });
 

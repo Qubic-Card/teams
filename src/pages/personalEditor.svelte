@@ -92,7 +92,6 @@
     const { data } = await supabase.storage
       .from('avatars')
       .upload(`${$user?.id}/avatar.${fileFormat}`, fileImage, {
-        cacheControl: '3600',
         upsert: true,
       });
 
