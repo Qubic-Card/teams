@@ -111,15 +111,16 @@
 
   const handleAddFile = async () => {
     isLoading = true;
+    let fileFormat = `${fileImage.type.split('/')[1]}`;
     const { data } = await supabase.storage
       .from('banner')
-      .upload(`${$user?.id}/${fileName}`, fileImage, {
-        contentType: 'image/jpeg',
+      .upload(`${$user?.id}/banner.${fileFormat}`, fileImage, {
+        upsert: true,
       });
 
     const { data: banner } = supabase.storage
       .from('banner')
-      .getPublicUrl(`${$user?.id}/${fileName}`);
+      .getPublicUrl(`${$user?.id}/banner.${fileFormat}`);
 
     croppedImage = '';
     isOpen = false;
