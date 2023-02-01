@@ -120,13 +120,14 @@
     let timestamp = new Date().getTime();
     const { data } = await supabase.storage
       .from('brochure')
-      .upload(`${$user?.id}/${timestamp}${file?.filename}`, file.file, {
+      .upload(`${$user?.id}/brochure.pdf`, file.file, {
         contentType: 'application/pdf',
+        upsert: true,
       });
 
     const { data: brochure } = supabase.storage
       .from('brochure')
-      .getPublicUrl(`${$user?.id}/${timestamp}${file?.filename}`);
+      .getPublicUrl(`${$user?.id}/brochure.pdf`);
 
     toastSuccess('Successfully uploaded the brochure');
     brochurePond.removeFile();
