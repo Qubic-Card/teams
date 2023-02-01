@@ -101,7 +101,7 @@
   $: query, getUnsplash();
 
   const updateData = (e) => {
-    console.log(e.detail);
+    
     if (e.detail.isBanner) {
       if ($basicProfile.isBusiness) {
         $basicProfile.design.backgroundBusiness = e.detail.url;

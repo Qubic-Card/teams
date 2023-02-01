@@ -43,7 +43,7 @@
     let fileFormat = `${fileImage.type.split('/')[1]}`;
 
     if (isBanner) {
-      const { data } = await supabase.storage
+      const { data, err } = await supabase.storage
         .from('banner')
         .upload(
           $basicProfile.isBusiness
@@ -55,7 +55,7 @@
             upsert: true,
           }
         );
-
+        if (err) console.log('error',err);
       const { data: banner } = supabase.storage
         .from('banner')
         .getPublicUrl(
@@ -66,13 +66,13 @@
 
       updatedData({ url: banner.publicUrl, isBanner: true });
     } else {
-      const { data } = await supabase.storage
+      const { data, err } = await supabase.storage
         .from('avatars')
         .upload(`${$user?.id}/basic-avatar.${fileFormat}`, fileImage, {
           contentType: `image/${fileFormat}`,
           upsert: true,
         });
-
+        if (err) console.log('error',err);
       const { data: avatar } = supabase.storage
         .from('avatars')
         .getPublicUrl(`${$user?.id}/basic-avatar.${fileFormat}`);
