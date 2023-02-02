@@ -100,13 +100,13 @@
 
     const { data } = await supabase.storage
       .from('avatars')
-      .upload(`${$user?.id}/avatar.${fileFormat}`, fileImage, {
-        contentType: 'image/jpeg',
+      .upload(`${$user?.id}/${fileName}`, fileImage, {
+        contentType: 'image/'+fileFormat,
       });
 
     const { data: avatar } = supabase.storage
       .from('avatars')
-      .getPublicUrl(`${$user?.id}/avatar.${fileFormat}`);
+      .getPublicUrl(`${$user?.id}/${fileName}`);
 
     pond.removeFile();
     croppedImage = '';
