@@ -138,7 +138,7 @@
         } else {
           const { data: banner } = supabase.storage
             .from("banner")
-            .getPublicUrl(`${$user?.id}/banner.${fileFormat}`);
+            .getPublicUrl(`${$user?.id}/${fileName}`);
 
           croppedImage = "";
           isOpen = false;
