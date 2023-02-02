@@ -43,8 +43,9 @@
 
   const closeBannerModal = () => (isBannerOpen = false);
   const handleCrop = async (item) => {
+    console.log(item)
     image = URL.createObjectURL(item.file);
-    fileName = item.id;
+    fileName = item.filename;
     isBannerOpen = true;
     toggleModal();
     pond.removeFile();
@@ -108,16 +109,10 @@
       } else {
         $basicProfile.design.background = e.detail.url;
       }
-
-      query = '';
-      fileName = '';
-      image = '';
     } else {
       $basicProfile.avatar = e.detail.url;
     }
   };
-
-  $: console.log($basicProfile.design);
 </script>
 
 <BasicCropModal
@@ -125,8 +120,8 @@
   aspect={3 / 1}
   isOpen={isBannerOpen}
   {handleSave}
-  {image}
-  {fileName}
+  bind:image={image}
+  bind:fileName={fileName}
   on:updatedData={(e) => {
     updateData(e);
     isBannerOpen = false;

@@ -38,69 +38,111 @@
     const scale = 200 / width;
   };
 
-  const checkIfBannerExists = () => {
+  const getBannerPath = () => {
     if ($basicProfile.isBusiness) {
       if ($basicProfile.design.backgroundBusiness) {
-        return true;
+        const background = $basicProfile.design.backgroundBusiness;
+      
+        const i = background.indexOf(`${$user.id}`);
+        return background.slice(i);
       } else {
         return false;
       }
     } else {
       if ($basicProfile.design.background) {
-        return true;
+        const background = $basicProfile.design.background;
+      
+        const i = background.indexOf(`${$user.id}`);
+        return background.slice(i);
       } else {
         return false;
       }
     }
   };
 
-  const checkIfAvatarExists = () => {
+  const getAvatarPath = () => {
     if ($basicProfile.avatar) {
-      return true;
+      const avatar = $basicProfile.avatar;
+      console.log("avatar", avatar);
+      const i = avatar.indexOf(`${$user.id}`);
+      return avatar.slice(i);
     }
     return false;
+  };
+
+  const uploadBanner = async (fileFormat, file_name) => {
+    const { error } = await supabase.storage
+      .from("banner")
+      .upload(`${$user?.id}/${file_name}`, fileImage, {
+        contentType: `image/${fileFormat}`,
+        upsert: true,
+      });
+    if (error) {
+      console.log("error", error);
+    } else {
+      const { data: banner } = supabase.storage
+        .from("banner")
+        .getPublicUrl(`${$user?.id}/${file_name}`);
+      updatedData({ url: banner.publicUrl, isBanner: true });
+    }
+  };
+
+  const uploadAvatar = async (fileFormat, file_name) => {
+    const { error } = await supabase.storage
+      .from("avatars")
+      .upload(`${$user?.id}/${file_name}`, fileImage, {
+        contentType: `image/${fileFormat}`,
+        upsert: true,
+      });
+    if (error) {
+      console.log("error", error);
+    } else {
+      const { data: avatar } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(`${$user?.id}/${file_name}`);
+
+      updatedData({ url: avatar.publicUrl, isBanner: false });
+    }
   };
 
   const handleAddFile = async () => {
     isLoading = true;
     let fileFormat = `${fileImage.type.split("/")[1]}`;
-
+    const bannerPath = getBannerPath();
+    const avatarPath = getAvatarPath();
+    const file_name = fileName;
+    
+    // HANDLING BANNER
     if (isBanner) {
-      const { data, error } = await supabase.storage
-        .from("banner")
-        .upload(
-          $basicProfile.isBusiness
-            ? `${$user?.id}/basic-banner-business.${fileFormat}`
-            : `${$user?.id}/basic-banner.${fileFormat}`,
-          fileImage,
-          {
-            contentType: `image/${fileFormat}`,
-            upsert: checkIfBannerExists(),
-          }
-        );
-      if (error) console.log("error", error);
-      const { data: banner } = supabase.storage
-        .from("banner")
-        .getPublicUrl(
-          $basicProfile.isBusiness
-            ? `${$user?.id}/basic-banner-business.${fileFormat}`
-            : `${$user?.id}/basic-banner.${fileFormat}`
-        );
+      if (bannerPath) {
+        const { error: err } = await supabase.storage
+          .from("banner")
+          .remove([bannerPath]);
 
-      updatedData({ url: banner.publicUrl, isBanner: true });
-    } else {
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .upload(`${$user?.id}/basic-avatar.${fileFormat}`, fileImage, {
-          contentType: `image/${fileFormat}`,
-          upsert: checkIfAvatarExists(),
-        });
-      if (error) console.log("error", error);
-      const { data: avatar } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(`${$user?.id}/basic-avatar.${fileFormat}`);
+        if (err) {
+          console.log(err);
+        } else {
+          await uploadBanner(fileFormat, file_name);
+        }
+      } else {
+        await uploadBanner(fileFormat, file_name);
+      }
+    }
 
-      updatedData({ url: avatar.publicUrl, isBanner: false });
+    // HANDLING AVATAR
+    else {
+      if (avatarPath) {
+        const { error: err } = await supabase.storage
+          .from("avatars")
+          .remove([avatarPath]);
+        if (err) {
+          console.log(err);
+        } else {
+          await uploadAvatar(fileFormat, file_name);
+        }
+      } else {
+        await uploadAvatar(fileFormat, file_name);
+      }
     }
 
     isOpen = false;
