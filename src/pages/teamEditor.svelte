@@ -1,27 +1,27 @@
 <script>
-  import Spinner from '@comp/loading/spinner.svelte';
-  import { fade } from 'svelte/transition';
-  import Input from '@comp/input.svelte';
-  import AddSocialsModal from '@comp/modals/addSocialsModal.svelte';
-  import SwitchButton from '@comp/buttons/switchButton.svelte';
-  import ConfirmationModal from '@comp/modals/confirmationModal.svelte';
-  import FilePond, { registerPlugin } from 'svelte-filepond';
-  import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
-  import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-  import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
-  import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-  import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
-  import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
+  import Spinner from "@comp/loading/spinner.svelte";
+  import { fade } from "svelte/transition";
+  import Input from "@comp/input.svelte";
+  import AddSocialsModal from "@comp/modals/addSocialsModal.svelte";
+  import SwitchButton from "@comp/buttons/switchButton.svelte";
+  import ConfirmationModal from "@comp/modals/confirmationModal.svelte";
+  import FilePond, { registerPlugin } from "svelte-filepond";
+  import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+  import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+  import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+  import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+  import FilePondPluginImageCrop from "filepond-plugin-image-crop";
+  import FilePondPluginImageTransform from "filepond-plugin-image-transform";
 
   import {
     teamSocials,
     teamLinks,
     isDisplayPersonal,
     cardsId,
-  } from '@lib/stores/editorStore';
-  import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
-  import { toastFailed, toastSuccess } from '@lib/utils/toast';
+  } from "@lib/stores/editorStore";
+  import supabase from "@lib/db";
+  import { user } from "@lib/stores/userStore";
+  import { toastFailed, toastSuccess } from "@lib/utils/toast";
   import {
     Menu,
     Tab,
@@ -33,20 +33,20 @@
     MenuItems,
     MenuItem,
     Dialog,
-  } from '@rgossiaux/svelte-headlessui';
-  import toNewTab from '@lib/utils/newTab';
-  import { teamData } from '@lib/stores/profileData';
-  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
+  } from "@rgossiaux/svelte-headlessui";
+  import toNewTab from "@lib/utils/newTab";
+  import { teamData } from "@lib/stores/profileData";
+  import ModalOverlay from "@comp/modals/modalOverlay.svelte";
   import {
     handleDeleteLink,
     handleDeleteSocial,
     handleUpLink,
     handleUpSocial,
-  } from '@lib/utils/editors';
-  import getFileFromBase64 from '@lib/utils/getFileFromBase64';
-  import getCroppedImg from '@lib/utils/canvas';
-  import Cropper from 'svelte-easy-crop';
-  import { page } from '$app/stores';
+  } from "@lib/utils/editors";
+  import getFileFromBase64 from "@lib/utils/getFileFromBase64";
+  import getCroppedImg from "@lib/utils/canvas";
+  import Cropper from "svelte-easy-crop";
+  import { page } from "$app/stores";
 
   // Register the plugins
   registerPlugin(
@@ -62,15 +62,15 @@
 
   let pond;
   let brochurePond;
-  let name = 'filepond';
+  let name = "filepond";
   let isOpen = false;
-  let croppedImage = '';
-  let fileName = '';
+  let croppedImage = "";
+  let fileName = "";
   let pixelCrop;
   let image;
   let fileImage;
   let isLoading = false;
-  let brochureFilename = '';
+  let brochureFilename = "";
   let showDeleteBrochureModal = false;
 
   const toggleBrochureModal = () =>
@@ -89,94 +89,104 @@
 
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
-    fileName = item.id;
+    fileName = item.filename;
     isOpen = true;
     return true;
   };
 
   const handleAddFile = async () => {
     isLoading = true;
-    let fileFormat = `${fileImage.type.split('/')[1]}`;
+    let fileFormat = `${fileImage.type.split("/")[1]}`;
 
-    const { data } = await supabase.storage
-      .from('avatars')
+    const { error } = await supabase.storage
+      .from("avatars")
       .upload(`${$user?.id}/${fileName}`, fileImage, {
-        contentType: 'image/'+fileFormat,
+        contentType: "image/" + fileFormat,
       });
 
-    const { data: avatar } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(`${$user?.id}/${fileName}`);
+    if (error) {
+      console.log(error);
+      toastFailed("Oops, something went wrong")
+    } else {
+      const { data: avatar } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(`${$user?.id}/${fileName}`);
+      $teamData.avatar = avatar.publicUrl;
+      pond.removeFile();
+      croppedImage = "";
+      isOpen = false;
 
-    pond.removeFile();
-    croppedImage = '';
-    isOpen = false;
-    $teamData.logo = avatar.publicUrl;
-    await handleSave();
+      await handleSave();
+    }
+
     isLoading = false;
   };
 
   const handleAddBrochure = async (err, file) => {
-    let timestamp = new Date().getTime();
-    const { data } = await supabase.storage
-      .from('brochure')
+    const { error } = await supabase.storage
+      .from("brochure")
       .upload(`${$user?.id}/brochure.pdf`, file.file, {
-        contentType: 'application/pdf',
+        contentType: "application/pdf",
         upsert: true,
       });
 
-    const { data: brochure } = supabase.storage
-      .from('brochure')
-      .getPublicUrl(`${$user?.id}/brochure.pdf`);
+    if (error) {
+      toastFailed("Oops, something went wrong")
+      console.log(error);
+    } else {
+      const { data: brochure } = supabase.storage
+        .from("brochure")
+        .getPublicUrl(`${$user?.id}/brochure.pdf`);
 
-    toastSuccess('Successfully uploaded the brochure');
-    brochurePond.removeFile();
-    brochureFilename = file.filename;
-    $teamData.brochure = {
-      url: brochure.publicUrl,
-      title: file.filename,
-      filename: file.filename,
-    };
-    await handleSave();
+      toastSuccess("Successfully uploaded the brochure");
+      brochurePond.removeFile();
+      brochureFilename = file.filename;
+      $teamData.brochure = {
+        url: brochure.publicUrl,
+        title: file.filename,
+        filename: file.filename,
+      };
+      await handleSave();
+    }
   };
 
   const addLink = () => {
     $teamLinks.length < 5
       ? teamLinks.set([
-          { title: 'My Website', link: 'https://qubic.id', isActive: true },
+          { title: "My Website", link: "https://qubic.id", isActive: true },
           ...$teamLinks,
         ])
-      : toastFailed('Only 5 link allowed for free members');
+      : toastFailed("Only 5 link allowed for free members");
   };
 
   const handleSave = async () => {
     $teamData.socials = $teamSocials;
     $teamData.links = $teamLinks;
     const { error } = await supabase
-      .from('teams')
+      .from("teams")
       .update({ metadata: $teamData })
-      .eq('id', $page.url.pathname.split('/')[1]);
+      .eq("id", $page.url.pathname.split("/")[1]);
 
     if (error) {
       toastFailed();
       console.log(error);
     } else {
-      toastSuccess('Changes saved');
+      toastSuccess("Changes saved");
     }
   };
 
   const setDisplayPersonal = async () => {
     const { data, error } = await supabase
-      .from('team_cardcon')
+      .from("team_cardcon")
       .update({ display_personal: $isDisplayPersonal })
-      .eq('team_member_id', memberId)
-      .in('card_id', $cardsId);
+      .eq("team_member_id", memberId)
+      .in("card_id", $cardsId);
 
     if (error) {
       toastFailed();
       console.log(error);
     } else {
-      toastSuccess('Changes saved');
+      toastSuccess("Changes saved");
     }
   };
 </script>
@@ -189,10 +199,10 @@
     buttonLabel="Remove"
     on:action={async () => {
       showDeleteBrochureModal = false;
-      $teamData.brochure.url = '';
-      $teamData.brochure.title = '';
+      $teamData.brochure.url = "";
+      $teamData.brochure.title = "";
       await handleSave();
-      toastSuccess('Brochure deleted successfully');
+      toastSuccess("Brochure deleted successfully");
     }}
   >
     <slot slot="title">
@@ -209,7 +219,7 @@
 <Dialog
   static
   class={`${
-    isOpen ? 'translate-x-0' : 'translate-x-[900px]'
+    isOpen ? "translate-x-0" : "translate-x-[900px]"
   } transition-all duration-300 ease-in-out flex flex-col h-screen w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
   open={isOpen}
   on:close={() => (isOpen = false)}
@@ -280,21 +290,21 @@
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
-                    : 'text-white p-2 text-xs md:text-sm rounded-l-md'}
+                    ? "bg-neutral-800 text-white p-2 text-xs md:text-sm"
+                    : "text-white p-2 text-xs md:text-sm rounded-l-md"}
                 >Team Profile</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
-                    : 'text-white p-2 text-xs md:text-sm'}>Socials</Tab
+                    ? "bg-neutral-800 text-white p-2 text-xs md:text-sm"
+                    : "text-white p-2 text-xs md:text-sm"}>Socials</Tab
               >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? 'bg-neutral-800 text-white p-2 text-xs md:text-sm'
-                    : 'text-white p-2 rounded-r-md text-xs md:text-sm'}
+                    ? "bg-neutral-800 text-white p-2 text-xs md:text-sm"
+                    : "text-white p-2 rounded-r-md text-xs md:text-sm"}
                 >Links</Tab
               >
             </TabList>
@@ -359,7 +369,7 @@
                           credits=""
                           allowProcess={false}
                           class="cursor-pointer"
-                          acceptedFileTypes={['application/pdf']}
+                          acceptedFileTypes={["application/pdf"]}
                           instantUpload={false}
                           labelIdle="Add Brochure"
                           allowMultiple={false}
@@ -414,7 +424,7 @@
                         credits=""
                         allowProcess={false}
                         class="cursor-pointer"
-                        acceptedFileTypes={['image/png', 'image/jpeg']}
+                        acceptedFileTypes={["image/png", "image/jpeg"]}
                         instantUpload={false}
                         labelIdle="Add Team Logo"
                         allowMultiple={false}
@@ -431,7 +441,7 @@
                     <h1 class="font-semibold text-lg text-white">Socials</h1>
                     <AddSocialsModal
                       isTeam
-                      class={`${permissions.writeTeam ? '' : 'hidden'}`}
+                      class={`${permissions.writeTeam ? "" : "hidden"}`}
                     />
                   </div>
                   {#if $teamSocials.length > 0}
@@ -439,51 +449,51 @@
                       <div class="p-1 flex">
                         <Input
                           class="flex-grow"
-                          title={item.type === 'tiktok'
-                            ? 'TikTok'
-                            : item.type === 'youtube'
-                            ? 'YouTube'
+                          title={item.type === "tiktok"
+                            ? "TikTok"
+                            : item.type === "youtube"
+                            ? "YouTube"
                             : item.type.charAt(0).toUpperCase() +
                               item.type.slice(1)}
-                          placeholder={item.type === 'instagram'
-                            ? 'Username (without @)'
-                            : item.type === 'tiktok'
-                            ? 'Tiktok (with @)'
-                            : item.type === 'whatsapp'
-                            ? 'Whatsapp (with country code. ex: 62...'
-                            : item.type === 'twitter'
-                            ? 'Username (without @)'
-                            : item.type === ' facebook'
-                            ? 'Username'
-                            : item.type === 'youtube'
-                            ? 'channel/UC4kUcG-bHD1ARIPINkS_n8A'
-                            : item.type === 'linkedin'
-                            ? 'in/username or company/qubic-id'
-                            : item.type === 'email'
-                            ? 'support@qubic.id'
-                            : item.type === 'phone'
-                            ? '+62 / 081'
-                            : item.type === 'facebook' ||
-                              item.type === 'telegram' ||
-                              item.type === 'github'
-                            ? 'Username'
-                            : item.type === 'line'
-                            ? 'Line ID'
-                            : item.type === 'discord'
-                            ? 'User ID'
+                          placeholder={item.type === "instagram"
+                            ? "Username (without @)"
+                            : item.type === "tiktok"
+                            ? "Tiktok (with @)"
+                            : item.type === "whatsapp"
+                            ? "Whatsapp (with country code. ex: 62..."
+                            : item.type === "twitter"
+                            ? "Username (without @)"
+                            : item.type === " facebook"
+                            ? "Username"
+                            : item.type === "youtube"
+                            ? "channel/UC4kUcG-bHD1ARIPINkS_n8A"
+                            : item.type === "linkedin"
+                            ? "in/username or company/qubic-id"
+                            : item.type === "email"
+                            ? "support@qubic.id"
+                            : item.type === "phone"
+                            ? "+62 / 081"
+                            : item.type === "facebook" ||
+                              item.type === "telegram" ||
+                              item.type === "github"
+                            ? "Username"
+                            : item.type === "line"
+                            ? "Line ID"
+                            : item.type === "discord"
+                            ? "User ID"
                             : item.type}
                           bind:value={$teamSocials[i].data}
                           on:change={handleSave}
                           isSocialInput={true}
-                          isTiktokInput={item.type === 'tiktok' ? true : false}
-                          isEmailInput={item.type === 'email' ? true : false}
-                          isWhatsappInput={item.type === 'whatsapp'
+                          isTiktokInput={item.type === "tiktok" ? true : false}
+                          isEmailInput={item.type === "email" ? true : false}
+                          isWhatsappInput={item.type === "whatsapp"
                             ? true
                             : false}
-                          isInstagramInput={item.type === 'instagram'
+                          isInstagramInput={item.type === "instagram"
                             ? true
                             : false}
-                          isPhoneInput={item.type === 'phone' ? true : false}
+                          isPhoneInput={item.type === "phone" ? true : false}
                           isEmptyChecking={true}
                           disabled={permissions.writeTeam
                             ? false
@@ -625,7 +635,7 @@
                     <h1 class="font-semibold text-lg text-white">Links</h1>
                     <img
                       class={`h-10 w-10 cursor-pointer ${
-                        permissions.writeTeam ? '' : 'hidden'
+                        permissions.writeTeam ? "" : "hidden"
                       }`}
                       on:click={addLink}
                       src="/add-icon.svg"
@@ -670,7 +680,7 @@
                         </div>
                         <div
                           class={`mx-3 flex-1 gap-3 place-items-center ${
-                            permissions.writeTeam ? 'flex' : 'hidden'
+                            permissions.writeTeam ? "flex" : "hidden"
                           }`}
                         >
                           <SwitchButton
@@ -734,8 +744,8 @@
 </div>
 
 <style global>
-  @import 'filepond/dist/filepond.css';
-  @import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+  @import "filepond/dist/filepond.css";
+  @import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 
   /* width */
   ::-webkit-scrollbar {
