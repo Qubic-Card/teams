@@ -63,7 +63,7 @@
   const getAvatarPath = () => {
     if ($basicProfile.avatar) {
       const avatar = $basicProfile.avatar;
-      console.log("avatar", avatar);
+
       const i = avatar.indexOf(`${$user.id}`);
       return avatar.slice(i);
     }
@@ -92,7 +92,7 @@
       .from("avatars")
       .upload(`${$user?.id}/${file_name}`, fileImage, {
         contentType: `image/${fileFormat}`,
-        upsert: true,
+        upsert: false,
       });
     if (error) {
       console.log("error", error);
@@ -173,15 +173,6 @@
     closeModal();
   }}
 >
-  <p
-    class="self-end mt-8"
-    on:click={() => {
-      isOpen = false;
-      closeModal();
-    }}
-  >
-    x
-  </p>
 
   <div class="h-full">
     <h2>Crop image</h2>
