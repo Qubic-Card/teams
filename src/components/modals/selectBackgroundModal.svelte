@@ -1,25 +1,25 @@
 <script>
-  import ModalOverlay from '@comp/modals/modalOverlay.svelte';
-  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
-  import Spinner from '@comp/loading/spinner.svelte';
-  import { fade } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
-  import FilePond, { registerPlugin } from 'svelte-filepond';
-  import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
-  import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-  import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
-  import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-  import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
-  import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
-  import { Dialog } from '@rgossiaux/svelte-headlessui';
-  import Cropper from 'svelte-easy-crop';
-  import getCroppedImg from '@lib/utils/canvas';
-  import { toastFailed, toastSuccess } from '@lib/utils/toast';
-  import { profileData } from '@lib/stores/profileData';
-  import CropModal from '@comp/modals/cropModal.svelte';
-  import getFileFromBase64 from '@lib/utils/getFileFromBase64';
-  import supabase from '@lib/db';
-  import { user } from '@lib/stores/userStore';
+  import ModalOverlay from "@comp/modals/modalOverlay.svelte";
+  import ModalWrapperHeadless from "@comp/modals/modalWrapperHeadless.svelte";
+  import Spinner from "@comp/loading/spinner.svelte";
+  import { fade } from "svelte/transition";
+  import { createEventDispatcher } from "svelte";
+  import FilePond, { registerPlugin } from "svelte-filepond";
+  import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+  import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+  import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+  import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+  import FilePondPluginImageCrop from "filepond-plugin-image-crop";
+  import FilePondPluginImageTransform from "filepond-plugin-image-transform";
+  import { Dialog } from "@rgossiaux/svelte-headlessui";
+  import Cropper from "svelte-easy-crop";
+  import getCroppedImg from "@lib/utils/canvas";
+  import { toastFailed, toastSuccess } from "@lib/utils/toast";
+  import { profileData } from "@lib/stores/profileData";
+  import CropModal from "@comp/modals/cropModal.svelte";
+  import getFileFromBase64 from "@lib/utils/getFileFromBase64";
+  import supabase from "@lib/db";
+  import { user } from "@lib/stores/userStore";
 
   // Register the plugins
   registerPlugin(
@@ -34,13 +34,13 @@
   export let unsplashDatas, handleSave;
 
   let pond;
-  let name = 'filepond';
-  let searchQuery = '';
+  let name = "filepond";
+  let searchQuery = "";
   let selectedImage;
-  let state = 'idle';
+  let state = "idle";
   let isOpen = false;
-  let croppedImage = '';
-  let fileName = '';
+  let croppedImage = "";
+  let fileName = "";
   let pixelCrop;
   let image;
   let fileImage;
@@ -48,10 +48,10 @@
   let showModal = false;
   let isLoading = false;
 
-  const toAuthorProfile = (url) => window.open(url, '_blank');
+  const toAuthorProfile = (url) => window.open(url, "_blank");
 
   const getTrackDownloadLocation = async (id) => {
-    let downloadLocation = '';
+    let downloadLocation = "";
     try {
       const res = await fetch(
         `https://api.unsplash.com/photos/${id}/download?client_id=${import.meta.env.VITE_UNSPLASH_ACCESS_KEY.toString()}`
@@ -69,22 +69,22 @@
 
   const dispatch = createEventDispatcher();
 
-  const toggleModal = () => dispatch('showModal');
+  const toggleModal = () => dispatch("showModal");
 
   const pickHandler = (img) => {
     selectedImage = img;
     image = img.urls.regular;
-    fileName = img.id.trim();
+    fileName = img.filename;
     unsplashImageId = img.id;
     showModal = true;
     isOpen = false;
-    searchQuery = '';
+    searchQuery = "";
 
-    dispatch('pick', 'background');
+    dispatch("pick", "background");
     toggleModal();
   };
 
-  const searchHandler = () => dispatch('searchQuery', searchQuery);
+  const searchHandler = () => dispatch("searchQuery", searchQuery);
 
   const setState = (newState) => (state = newState);
 
@@ -103,7 +103,7 @@
 
   const handleCrop = async (item) => {
     image = URL.createObjectURL(item.file);
-    fileName = item.id.trim();
+    fileName = item.filename;
     isOpen = false;
     showModal = !showModal;
     return true;
@@ -111,33 +111,54 @@
 
   const handleAddFile = async () => {
     isLoading = true;
-    let fileFormat = `${fileImage.type.split('/')[1]}`;
-    const { data } = await supabase.storage
-      .from('banner')
-      .upload(`${$user?.id}/banner.${fileFormat}`, fileImage, {
-        upsert: true,
-      });
+    let fileFormat = `${fileImage.type.split("/")[1]}`;
+    const background = $profileData.design.background;
 
-    const { data: banner } = supabase.storage
-      .from('banner')
-      .getPublicUrl(`${$user?.id}/banner.${fileFormat}`);
+    if (background) {
+      const i = background.indexOf(`${$user.id}`);
 
-    croppedImage = '';
-    isOpen = false;
-    $profileData.design.background = banner.publicUrl;
-    showModal = false;
-    setState('idle');
+      const { error: err } = await supabase.storage
+        .from("banner")
+        .remove([background.slice(i)]);
 
-    if (state === 'unsplash') {
-      getTrackDownloadLocation(unsplashImageId);
-      toastSuccess('Background image changed successfully');
-      setState('idle');
-      showModal = false;
+      if (err) {
+        console.log(err);
+        toastFailed("Oops, something is wrong");
+      } else {
+        const { error } = await supabase.storage
+          .from("banner")
+          .upload(`${$user?.id}/${fileName}`, fileImage, {
+            contentType: `image/${fileFormat}`,
+            upsert: true,
+          });
+
+        if (error) {
+          console.log(error);
+          toastFailed("Oops, something is wrong");
+        } else {
+          const { data: banner } = supabase.storage
+            .from("banner")
+            .getPublicUrl(`${$user?.id}/banner.${fileFormat}`);
+
+          croppedImage = "";
+          isOpen = false;
+          $profileData.design.background = banner.publicUrl;
+          showModal = false;
+          setState("idle");
+
+          if (state === "unsplash") {
+            getTrackDownloadLocation(unsplashImageId);
+            toastSuccess("Background image changed successfully");
+            setState("idle");
+            showModal = false;
+          }
+
+          await handleSave();
+        }
+      }
     }
 
-    await handleSave();
     isLoading = false;
-    image = undefined;
   };
 
   const onKeyPress = (e) => {
@@ -153,12 +174,12 @@
   <Dialog
     static
     class={`${
-      showModal ? 'translate-x-0' : 'translate-x-[900px]'
+      showModal ? "translate-x-0" : "translate-x-[900px]"
     } transition-all duration-300 ease-in-out justify-between flex flex-col h-screen w-3/4 md:w-1/3 p-4 gap-4 bottom-0 right-0 z-50 fixed bg-neutral-800 border-l-2 border-neutral-700 text-white overflow-y-auto snap-y snap-mandatory`}
     open={showModal}
     on:close={() => {
       showModal = false;
-      setState('idle');
+      setState("idle");
     }}
   >
     <div class="h-full flex flex-col gap-2">
@@ -226,22 +247,22 @@
 <ModalWrapperHeadless
   desktopWidth="md:w-1/2 lg:w-1/3"
   desktopRight="md:right-1/4"
-  desktopTop={state === 'idle' ? 'md:top-[35%]' : 'md:top-0'}
-  desktopHeight={state === 'idle' ? 'md:h-[29%]' : 'h-screen'}
-  mobileHeight={state === 'idle' ? 'h-[40%]' : 'h-screen'}
+  desktopTop={state === "idle" ? "md:top-[35%]" : "md:top-0"}
+  desktopHeight={state === "idle" ? "md:h-[29%]" : "h-screen"}
+  mobileHeight={state === "idle" ? "h-[40%]" : "h-screen"}
   {isOpen}
   on:modalHandler={(e) => {
     isOpen = e.detail;
-    setState('idle');
+    setState("idle");
   }}
 >
-  {#if state === 'idle'}
+  {#if state === "idle"}
     <div class="p-2 flex justify-between">
       <h1 class="font-semibold">Select background image</h1>
       <button
         on:click={() => {
           isOpen = false;
-          setState('idle');
+          setState("idle");
         }}
       >
         <svg
@@ -261,7 +282,7 @@
       </button>
     </div>
     <button
-      on:click={() => setState('unsplash')}
+      on:click={() => setState("unsplash")}
       class="bg-blue-600 text-white mx-8 h-20 rounded-md mb-2"
       >Upload from Unsplash</button
     >
@@ -272,14 +293,14 @@
         credits=""
         allowProcess={true}
         class="cursor-pointer"
-        acceptedFileTypes={['image/png', 'image/jpeg']}
+        acceptedFileTypes={["image/png", "image/jpeg"]}
         instantUpload={false}
         labelIdle="Add background image"
         beforeAddFile={handleCrop}
         allowMultiple={false}
       />
     </div>
-  {:else if state === 'unsplash'}
+  {:else if state === "unsplash"}
     <div class="flex items-center justify-between p-2">
       <div class="flex">
         <p class="text-center translate-y-1">Powered By</p>
@@ -292,7 +313,7 @@
       <button
         on:click={() => {
           isOpen = false;
-          setState('idle');
+          setState("idle");
         }}
       >
         <svg
@@ -329,7 +350,7 @@
       {#if unsplashDatas}
         <div
           class={`${
-            unsplashDatas?.length > 0 ? 'grid' : 'flex'
+            unsplashDatas?.length > 0 ? "grid" : "flex"
           } grid-cols-2 grid-flow-row p-2 text-black h-1/2 snap-container snap-y snap-mandatory overflow-y-auto`}
         >
           {#if unsplashDatas?.length > 0}
@@ -339,13 +360,13 @@
                   on:click={() => pickHandler(item)}
                   class={`flex flex-col justify-evenly items-center snap-center h-[250px] w-full object-cover bg-center bg-no-repeat p-2 cursor-pointer hover:opacity-50 text-transparent hover:text-white hover:font-semibold ${
                     item.urls.regular === selectedImage
-                      ? 'border-4 border-black'
-                      : ''
+                      ? "border-4 border-black"
+                      : ""
                   }`}
                   style={`background-image: url('${item.urls.regular}')`}
                 >
                   <h1 class="uppercase text-center text-3xl">
-                    {item.alt_description === null ? '' : item.alt_description}
+                    {item.alt_description === null ? "" : item.alt_description}
                   </h1>
                 </div>
                 <div
