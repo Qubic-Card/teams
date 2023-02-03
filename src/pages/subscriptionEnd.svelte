@@ -63,14 +63,19 @@
   const transferCardHandler = async (card, toast) => {
     isLoading = true;
     if ($selectedAddress.choosen === 0) {
-      await deleteTeamCardCon(card.id);
-      await changeCardMode(card.id);
-      await cardConnectionHandler(card, $selectedAddress.uid);
-      if ($selectedProfileMenu.includes('with') && card.team_profile !== null) {
-        await updateBasicProfile(card);
+      if (card.email !== null) {
+        await deleteTeamCardCon(card.id);
+        await changeCardMode(card.id);
+        await cardConnectionHandler(card, $selectedAddress.uid);
+        if (
+          $selectedProfileMenu.includes('with') &&
+          card.team_profile !== null
+        ) {
+          await updateBasicProfile(card);
+        }
+        if (toast) toastSuccess('Card transfered successfully');
+        expiredCards = expiredCards.filter((item) => item.id !== card.id);
       }
-      if (toast) toastSuccess('Card transfered successfully');
-      expiredCards = expiredCards.filter((item) => item.id !== card.id);
     } else {
       if ($selectedAddress.uid) {
         await deleteTeamCardCon(card.id);
