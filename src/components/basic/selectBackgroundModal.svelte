@@ -27,13 +27,10 @@
   let name = 'filepond';
 
   let showModal = false;
-  let searchQuery = '';
   let selectedImage;
-  let downloadLocation = '';
   // INFO: state idle untuk memunculkan pilihan button upload from local atau unsplash
   let state = 'idle';
   let isBannerOpen = false;
-  let isOpen = false;
   let query = '';
   let url;
   let accessKey = import.meta.env.VITE_UNSPLASH_ACCESS_KEY.toString();
@@ -53,22 +50,6 @@
 
   const toAuthorProfile = (url) => window.open(url, '_blank');
 
-  const getTrackDownloadLocation = async (id) => {
-    try {
-      const res = await fetch(
-        `https://api.unsplash.com/photos/${id}/download?client_id=${import.meta.env.VITE_UNSPLASH_ACCESS_KEY.toString()}`
-      );
-
-      if (!res.ok) {
-        throw Error(res.statusText);
-      }
-
-      downloadLocation = await res.url;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const dispatch = createEventDispatcher();
 
   const toggleModal = () => {
@@ -77,9 +58,8 @@
   };
 
   const handlePick = async (img) => {
-    getTrackDownloadLocation(img.id);
-
     image = img.urls.regular;
+    fileName = Date.now();
     isBannerOpen = true;
     toggleModal();
   };

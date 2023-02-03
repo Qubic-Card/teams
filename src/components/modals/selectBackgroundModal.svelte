@@ -74,7 +74,7 @@
   const pickHandler = (img) => {
     selectedImage = img;
     image = img.urls.regular;
-    fileName = img.filename;
+    fileName = Date.now().toString();
     unsplashImageId = img.id;
     showModal = true;
     isOpen = false;
@@ -283,10 +283,10 @@
     </div>
     <button
       on:click={() => setState("unsplash")}
-      class="bg-blue-600 text-white mx-8 h-20 rounded-md mb-2"
+      class="bg-blue-600 text-white mx-8 py-4 rounded-md"
       >Upload from Unsplash</button
     >
-    <div class="mx-8 h-24" in:fade|local>
+    <div class="mx-8 h-20" in:fade|local>
       <FilePond
         bind:this={pond}
         {name}
