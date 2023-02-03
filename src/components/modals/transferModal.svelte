@@ -16,20 +16,21 @@
 
   let showModal = false;
   let email = '';
+  let askConfirmation = false;
 
   const toggleModal = () => {
     showModal = !showModal;
 
     if (
-      card
-        ? card.email == null
-        : selectedCards.filter((c) => c.email == null).length > 0
+      card ? card.email == null : selectedCards.every((c) => c.email == null)
     ) {
       $selectedAddress.choosen = 1;
     } else {
       $selectedAddress.choosen = 0;
     }
 
+    // $selectedAddress.choosen = 0;
+    askConfirmation = false;
     $selectedAddress.uid = '';
     email = '';
     $selectedProfileMenu = 'Transfer with current profile';
@@ -56,10 +57,7 @@
 {#if showModal}
   <Dialog
     open={showModal}
-    on:close={() => {
-      showModal = false;
-      $selectedAddress.choosen = 0;
-    }}
+    on:close={toggleModal}
     class="fixed inset-0 z-50 overflow-y-auto flex justify-center items-end md:items-center overflow-x-hidden"
   >
     <DialogOverlay
@@ -69,63 +67,95 @@
     <div
       class="flex flex-col justify-between bg-neutral-800 text-white w-full md:w-[30%] h-auto p-4 z-40 rounded-md gap-8"
     >
-      <h1 class="text-lg">Select how you want to transfer</h1>
-      <div class="flex flex-col gap-2">
-        {#if card ? card.email == null : selectedCards.filter((c) => c.email == null).length > 0}
-          <h1
-            class="outline outline-1 outline-neutral-700 text-left p-2 rounded-md hover:outline-neutral-600 w-full flex justify-between items-center"
+      {#if askConfirmation}
+        <h1>Are you sure?</h1>
+
+        <h2 class="h-20">
+          This transfer will not include card(s) that are not connected to any
+          profile.
+        </h2>
+        <div class="flex justify-end gap-4">
+          <button
+            on:click={toggleModal}
+            class="outline outline-1 outline-neutral-700 w-40 p-2 rounded-md text-center hover:outline-neutral-600"
+            >Cancel</button
           >
-            Transfer card only
-          </h1>
-          <h1
-            class="outline outline-1 outline-neutral-700 text-left p-2 rounded-md hover:outline-neutral-600 w-full flex justify-between items-center"
+          <button
+            on:click={() => {
+              handleTransfer();
+            }}
+            class="outline outline-1 outline-red-500 hover:outline-red-600 w-40 bg-red-600/40 p-2 rounded-md text-center disabled:opacity-50"
+            >Yes</button
           >
-            Transfer to a Qubic User
-          </h1>
-        {:else}
-          <TransferProfileDropdown />
-          <TransferAddressDropdown />
-        {/if}
-        {#if $selectedAddress.choosen === 1}
-          <Input
-            title=""
-            placeholder="Email"
-            bind:value={email}
-            on:change={async () => await searchProfile(email)}
-            inputbg="bg-neutral-900"
-            isEmailInput
-          />
-          {#if email !== ''}
-            {#if $selectedAddress.uid}
-              <small class="text-green-500"> User found! </small>
-            {:else}
-              <small class="text-red-500"> User not found! </small>
-            {/if}
+        </div>
+      {:else}
+        <h1 class="text-lg">Select how you want to transfer</h1>
+        <div class="flex flex-col gap-2">
+          {#if card ? card.email == null : selectedCards.every((c) => c.email == null)}
+            <h1
+              class="outline outline-1 outline-neutral-700 text-left p-2 rounded-md hover:outline-neutral-600 w-full flex justify-between items-center"
+            >
+              Transfer card only
+            </h1>
+            <h1
+              class="outline outline-1 outline-neutral-700 text-left p-2 rounded-md hover:outline-neutral-600 w-full flex justify-between items-center"
+            >
+              Transfer to a Qubic User
+            </h1>
+          {:else}
+            <TransferProfileDropdown />
+            <TransferAddressDropdown />
           {/if}
-          <small class="text-red-500">
-            All selected card(s) will be tranferred to this email
-          </small>
-        {/if}
-      </div>
-      <div class="flex flex-col">
-        <h2>This action cannot be undone.</h2>
-        <h2>Transfer card(s) cannot be recovered from their new owner.</h2>
-      </div>
-      <div class="flex gap-2 w-full justify-end mt-10">
-        <button
-          on:click={toggleModal}
-          class="outline outline-1 outline-neutral-700 w-40 p-2 rounded-md text-center hover:outline-neutral-600"
-          >Cancel</button
-        >
-        <button
-          disabled={$selectedAddress.choosen === 1
-            ? $selectedAddress.uid === ''
-            : false}
-          on:click={handleTransfer}
-          class="outline outline-1 outline-red-500 hover:outline-red-600 w-40 bg-red-600/40 p-2 rounded-md text-center disabled:opacity-50"
-          >Proceed</button
-        >
-      </div>
+          {#if $selectedAddress.choosen === 1}
+            <Input
+              title=""
+              placeholder="Email"
+              bind:value={email}
+              on:change={async () => await searchProfile(email)}
+              inputbg="bg-neutral-900"
+              isEmailInput
+            />
+            {#if email !== ''}
+              {#if $selectedAddress.uid}
+                <small class="text-green-500"> User found! </small>
+              {:else}
+                <small class="text-red-500"> User not found! </small>
+              {/if}
+            {/if}
+            <small class="text-red-500">
+              All selected card(s) will be tranferred to this email
+            </small>
+          {/if}
+        </div>
+        <div class="flex flex-col">
+          <h2>This action cannot be undone.</h2>
+          <h2>Transfer card(s) cannot be recovered from their new owner.</h2>
+        </div>
+        <div class="flex gap-2 w-full justify-end mt-10">
+          <button
+            on:click={toggleModal}
+            class="outline outline-1 outline-neutral-700 w-40 p-2 rounded-md text-center hover:outline-neutral-600"
+            >Cancel</button
+          >
+          <button
+            disabled={$selectedAddress.choosen === 1
+              ? $selectedAddress.uid === ''
+              : false}
+            on:click={() => {
+              if (
+                selectedCards !== undefined &&
+                selectedCards.filter((c) => c.email != null).length > 0
+              ) {
+                askConfirmation = true;
+              } else {
+                handleTransfer();
+              }
+            }}
+            class="outline outline-1 outline-red-500 hover:outline-red-600 w-40 bg-red-600/40 p-2 rounded-md text-center disabled:opacity-50"
+            >Proceed</button
+          >
+        </div>
+      {/if}
     </div>
   </Dialog>
 {/if}
