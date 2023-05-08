@@ -6,8 +6,6 @@
   import { onMount } from 'svelte';
   import MenuButtonModal from '@comp/modals/menuButtonModal.svelte';
 
-  let showMenu = false;
-
   let isMounted = false;
   onMount(() => (isMounted = true));
 </script>

@@ -76,16 +76,13 @@
   });
 </script>
 
-<!-- {#await (getBusinessCards($user?.id), getTeamsList()) then name} -->
-<section
-  class="text-white overflow-hidden bg-cover xl:bg-right 2xl:bg-center bg-[url('https://qubicmedia.s3.ap-southeast-1.amazonaws.com/qubic/newlook.jpg')]"
->
-  <div class="flex justify-around h-screen p-6 md:p-24 text-black">
+
+  
     <div
-      class="flex flex-col h-[90%] w-full p-4 2xl:w-1/2 py-6 md:py-16 gap-2 bg-white rounded-md md:rounded-xl"
+      class="flex flex-col h-full w-full p-4  py-6 gap-2 bg-white rounded-md md:rounded-xl"
       in:fly|local={{ y: 5000, duration: 1000 }}
     >
-      <h1 class="text-xl md:text-2xl font-semibold mb-2 md:mb-4">
+      <h1 class="text-xl text-black md:text-2xl font-semibold mb-2 md:mb-4">
         Select Editor
       </h1>
       {#if !isHasBasic && !isTeamMember}
@@ -119,21 +116,21 @@
             else toastFailed('Please confirm your email first');
           }}
           transition:slide|local={{ duration: 500 }}
-          class="flex items-center justify-between p-3 md:p-4 mb-3 border border-neutral-300 rounded-md w-full cursor-pointer bg-black text-white transition-colors duration-200"
+          class="flex items-center justify-between p-3 md:p-4 mb-3 border border-neutral-300 rounded-md w-full cursor-pointer bg-blue-600 text-white transition-colors duration-200"
         >
           <p>Basic Editor</p>
         </button>
       {/if}
 
       {#if isTeamMember}
-        <h2 class="font-medium">Teams</h2>
+        <h2 class="font-medium text-black">Teams</h2>
         {#if teams}
           {#if teams.length > 0}
             {#each teams as item}
               <button
                 on:click={() => chooseTeam(item.id)}
                 transition:slide|local={{ duration: 500 }}
-                class="flex items-center p-3 md:p-4 border border-neutral-300 gap-2 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80 bg-white text-black transition-colors duration-200"
+                class="flex items-center p-3 md:p-4 bg-neutral-100  gap-2 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80  text-black transition-colors duration-200"
               >
                 <img
                   src={item.logo ?? '/favicon.svg'}
@@ -159,11 +156,15 @@
           {/if}
         {/if}
       {/if}
+      <div class="h-full"></div>
+      <button on:click={async ()=> {
+        await supabase.auth.signOut();
+      }} class=" border border-red-500 text-red-500 py-3 rounded-md mt-4">
+        Logout
+      </button>
     </div>
 
-    <div class="bg-transparant md:w-full" />
-  </div>
-</section>
+   
 <!-- {:catch name}
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
