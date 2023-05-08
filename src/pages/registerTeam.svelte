@@ -310,7 +310,7 @@
 </script>
 
 {#await getTeamData()}
-  <div class="animate-pulse h-full w-full 2xl:w-1/2">
+  <div class="animate-pulse h-full w-full">
     <div
       class="flex flex-col justify-center bg-white h-full text-black rounded-lg"
     />
@@ -318,7 +318,7 @@
 {:then name}
   {#if Object.keys(team).length === 0}
     <div
-      class="flex flex-col justify-center items-center md:items-start bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg gap-10 py-16 px-4 md:px-8"
+      class="flex flex-col justify-center items-center md:items-start bg-white h-full w-full text-black rounded-lg gap-10 py-16 px-4 md:px-8"
     >
       <h1 class="text-2xl font-semibold">Team not found</h1>
       <p class="text-md">
@@ -330,7 +330,7 @@
         > our support, if you think this is a mistake
       </p>
       <button
-        class="bg-blue-600 text-white p-2 rounded-md w-1/2"
+        class="bg-blue-600 text-white p-4 rounded-md w-1/2"
         on:click={() => goto('/')}
       >
         Back to login page
@@ -338,7 +338,7 @@
     </div>
   {:else if state === 'activation'}
     <div
-      class="flex flex-col justify-center bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg gap-10 py-16 px-4 md:px-8"
+      class="flex flex-col justify-center bg-white h-full w-full text-black rounded-lg gap-10 py-16 px-4 md:px-8"
     >
       <h1 class="text-xl">
         Welcome to <br />
@@ -369,7 +369,7 @@
     </div>
   {:else if state === 'register'}
     <div
-      class="flex flex-col justify-center bg-white h-full w-full 2xl:w-1/2 text-black rounded-lg py-16 px-4 md:px-8"
+      class="flex flex-col justify-center bg-white h-full w-full text-black rounded-lg py-16 px-4 md:px-8"
     >
       {#if register.success}
         <div class="flex flex-col gap-2 h-1/2">
