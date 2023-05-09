@@ -10,7 +10,10 @@
   import { onMount } from 'svelte';
 
   const getUser = async () => {
-    const { data } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+      //do nothing
+    }
     $user = data.user;
   };
 
@@ -44,21 +47,19 @@
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event == 'SIGNED_IN') {
-      const { data } = await supabase.auth.getUser();
-      $user = data.user;
+      user.set(session.user)
     }
     if (event == 'TOKEN_REFRESHED') {
-      const { data } = await supabase.auth.getUser();
-      $user = data.user;
+      user.set(session.user)
     }
     if (event == 'PASSWORD_RECOVERY') {
-      $user = null;
+      user.set(null);
       await goto('/resetPassword' + '?reset=' + session.access_token, {
         noScroll: true,
       });
     }
     if (event == 'SIGNED_OUT') {
-      $user = null;
+      user.set(null);
       $cards = Cookies.get('card');
       Cookies.remove('card');
       await goto('/', { noScroll: true });

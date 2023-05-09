@@ -25,7 +25,11 @@
         );
         if (error) throw error;
         toastSuccess('Password changed');
+        password = "";
         loading = false;
+        if(await supabase.auth.getUser()) {
+          await supabase.auth.signOut();
+        }
         await goto('/');
       } catch (error) {
         toastFailed(error.error_description || error.message);
@@ -54,15 +58,15 @@
   <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<section class="flex h-screen bg-black">
+<section class="flex h-screen bg-gray-100">
   <div
-    class="lg:w-1/3 w-full border px-16 py-32 my-auto mx-6 md:mx-14 lg:mx-auto"
+    class="lg:w-1/3 w-full bg-white rounded-lg border px-16 py-32 my-auto mx-6 md:mx-14 lg:mx-auto"
   >
     <a href="/" class="flex items-center w-32 mb-4 font-medium md:mb-0">
-      <img src="/qubic.svg" alt="" />
+      <img src="/qubic-logo-text.svg" alt="" />
     </a>
     <h1
-      class="mt-6 text-2xl font-regular text-white tracking-tighter text-left sm:text-3xl title-font"
+      class="mt-6 text-2xl font-regular text-black tracking-tighter text-left sm:text-3xl title-font"
     >
       Get a new password
     </h1>
@@ -79,14 +83,14 @@
           name=""
           id=""
           placeholder="Your Password "
-          class="w-full px-4 py-2 mt-2 text-base text-black transition duration-500 ease-in-out transform border-transparent bg-neutral-700 focus:border-gray-500 focus:bg-white focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
+          class="w-full px-4 py-2 mt-2 text-base text-black transition duration-500 ease-in-out transform border-transparent rounded-md bg-neutral-200 focus:border-gray-500 focus:bg-white focus:outline-none focus:shadow-outline focus:ring-2 ring-offset-current ring-offset-2 "
         />
       </div>
 
       {#if !loading}
         <button
           on:click={async () => await handleResetPassword()}
-          class="block w-full px-4 py-3 mt-6 font-regular text-white transition duration-500 ease-in-out transform bg-blue-500 hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
+          class="block w-full px-4 py-3 mt-6 font-regular text-white transition duration-500 ease-in-out transform bg-blue-600 rounded-md hover:bg-black focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 "
           >Reset Password</button
         >
       {/if}
