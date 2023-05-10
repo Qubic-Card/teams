@@ -7,7 +7,8 @@
   import { user } from "@lib/stores/userStore";
   import { toastFailed, toastSuccess } from "@lib/utils/toast";
   import { page } from "$app/stores";
-  import {tips} from "@lib/tips"
+  import { tips } from "@lib/tips";
+    import { goto } from "$app/navigation";
 
   const random = Math.floor(Math.random() * tips.length);
   let loading = false;
@@ -46,6 +47,8 @@
       loading = true;
       const { error } = await supabase.auth.resetPasswordForEmail(email);
       if (error) throw error;
+      email = "";
+      await goto('/');
       toastSuccess("Check your email!");
       loading = false;
     } catch (error) {
@@ -64,7 +67,9 @@
 <div class="bg-gray-100">
   <AuthWrapper>
     <div class="text-white grid lg:grid-cols-2 w-full">
-      <div class="justify-start items-center w-full lg:w-[75%] h-screen p-4 lg:p-8">
+      <div
+        class="justify-start items-center w-full lg:w-[75%] h-screen p-4 lg:p-8"
+      >
         {#if $user}
           <SelectEditor />
         {:else if $page.url.searchParams.get("team_id")}
@@ -83,18 +88,19 @@
             </div>
 
             <div class="mx-auto w-[75%]">
-              <div class="pb-8">
-                <h1 class="text-3xl font-semibold">Welcome back</h1>
-                <p class="text-neutral-500 text-sm">
-                  Log in to make changes to your profile
-                </p>
-              </div>
               {#if isForgotPassword}
                 <h1
-                  class="mt-6 text-2xl mb-4 font-regular tracking-tighter text-left sm:text-3xl title-font"
+                  class="mt-6 text-3xl mb-4 font-semibold tracking-tighter text-left sm:text-3xl title-font"
                 >
-                  We got you!
+                  Make a new password
                 </h1>
+              {:else}
+                <div class="pb-8">
+                  <h1 class="text-3xl font-semibold">Welcome back</h1>
+                  <p class="text-neutral-500 text-sm">
+                    Log in to make changes to your profile
+                  </p>
+                </div>
               {/if}
               <p class="block text-sm text-left">Email Address</p>
               <input
@@ -153,9 +159,11 @@
         {/if}
         <div class="bg-black lg:w-full" />
       </div>
-      <div class=" h-full w-full items-left justify-center hidden lg:flex flex-col">
+      <div
+        class=" h-full w-full items-left justify-center hidden lg:flex flex-col"
+      >
         <p class="text-neutral-500 font-semibold">💡 Random Tip</p>
-         <h1 class="text-black text-4xl pt-4 px-10">{tips[random]}</h1>
+        <h1 class="text-black text-4xl pt-4 px-10">{tips[random]}</h1>
       </div>
     </div>
   </AuthWrapper>
