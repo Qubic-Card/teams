@@ -1,13 +1,14 @@
 <script>
-  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
-  import AvatarCard from '@comp/cards/avatarCard.svelte';
-  import BorderButton from '@comp/buttons/borderButton.svelte';
-  import { socialIcons } from '@lib/constants';
-  import { genvcard } from '@lib/vcard/vcardgen';
-  import { fade } from 'svelte/transition';
-  import Spinner from '@comp/loading/spinner.svelte';
-  import convertToGMT7 from '@lib/utils/convertToGMT7';
-  import toNewTab from '@lib/utils/newTab';
+  import ModalWrapperHeadless from "@comp/modals/modalWrapperHeadless.svelte";
+  import AvatarCard from "@comp/cards/avatarCard.svelte";
+  import BorderButton from "@comp/buttons/borderButton.svelte";
+  import { socialIcons } from "@lib/constants";
+  import { genvcard } from "@lib/vcard/vcardgen";
+  import { fade } from "svelte/transition";
+  import Spinner from "@comp/loading/spinner.svelte";
+  import convertToGMT7 from "@lib/utils/convertToGMT7";
+  import toNewTab from "@lib/utils/newTab";
+  import { profileData } from "@lib/stores/profileData";
 
   export let profile, deleteConnectionHandler, isLoading, getConnectionsList;
   let img;
@@ -16,46 +17,58 @@
 
   const download = (vCardString, fileName) => {
     const fileURL = URL.createObjectURL(
-      new Blob([vCardString], { type: 'text/vcard;charset=utf-8' })
+      new Blob([vCardString], { type: "text/vcard;charset=utf-8" })
     );
-    let fileLink = document.createElement('a');
+    let fileLink = document.createElement("a");
     fileLink.href = fileURL;
     fileLink.download = `${fileName}.vcf`;
     document.body.appendChild(fileLink);
     fileLink.click();
   };
 
+  const randomAvatar = () => {
+    const array = ["cat", "panda", "koala", "dog", "bear"];
+
+    return array[Math.floor(Math.random() * 4)];
+  };
+
   const checkIsBusiness = () => {
     return (
       profile?.profileData?.socials?.filter((social) =>
-        social.type.includes('business')
+        social.type.includes("business")
       )?.length > 0
     );
   };
 </script>
 
-<div class="flex items-center" transition:fade|local={{ duration: 200 }}>
-  <div
-    class="w-10 h-10 font-regular  rounded justify-center items-center flex bg-black text-white"
-  >
-    {profile?.profileData?.firstname?.slice(0, 1) ?? 'Q'}
-  </div>
+<div
+  class="flex items-center max-w-xl"
+  transition:fade|local={{ duration: 200 }}
+>
   <div
     class="bg-white flex justify-between items-center gap-2 relative border p-2 w-full mx-2 rounded"
   >
+    <img
+      class="rounded-full mr-2"
+      src={profile.profileData.avatar ?? "/avatars/" + randomAvatar() + ".png"}
+      width="36"
+      height="36"
+      alt=""
+    />
+
     <div on:click={() => (isOpen = true)} class="cursor-pointer w-full">
       <p class="cursor-pointer" on:click={() => (isOpen = true)}>
-        {profile?.profileData?.firstname ?? '-'}
+        {profile?.profileData?.firstname ?? "-"}
       </p>
       <p class="text-sm text-neutral-600">
         {profile?.profileData?.company
-          ? profile?.profileData?.company + ' | '
-          : ''}
-        {profile?.profileData?.job ?? '-'}
+          ? profile?.profileData?.company + " | "
+          : ""}
+        {profile?.profileData?.job ?? "-"}
       </p>
     </div>
     <div
-      class="border border-neutral-300 p-2 rounded-md cursor-pointer"
+      class="border border-neutral-300 opacity-50 p-2 rounded-md cursor-pointer"
       on:click={() => (isDeleteModalOpen = true)}
     >
       <svg
@@ -64,7 +77,7 @@
         fill="none"
         viewBox="0 0 24 24"
         stroke="red"
-        stroke-width="2"
+        stroke-width="1"
       >
         <path
           stroke-linecap="round"
@@ -156,7 +169,7 @@
           />
         </div>
         <div class="flex flex-col items-center gap-2 md:gap-4 mx-4 pb-4">
-          {#if profile?.profileData?.avatar === ''}
+          {#if profile?.profileData?.avatar === ""}
             <div
               class="flex rounded-2xl justify-center items-center w-24 h-24 aspect-square text-5xl text-white bg-black"
             >
@@ -181,9 +194,9 @@
                 profile?.profileData?.firstName}
               {profile?.profileData?.lastname ?? profile?.profileData?.lastName}
             </p>
-            <p class={`text-xs ${profile?.profileData?.job ? '' : 'hidden'}`}>
-              {profile?.profileData?.job ?? '-'}
-              at {profile?.profileData?.company ?? '-'}
+            <p class={`text-xs ${profile?.profileData?.job ? "" : "hidden"}`}>
+              {profile?.profileData?.job ?? "-"}
+              at {profile?.profileData?.company ?? "-"}
             </p>
             <p class="text-xs">
               Connected at {convertToGMT7(profile?.dateConnected)
@@ -193,16 +206,16 @@
 
             <div
               class={`${
-                profile?.link === '' || profile?.link === null
-                  ? 'hidden'
-                  : 'flex justify-center'
+                profile?.link === "" || profile?.link === null
+                  ? "hidden"
+                  : "flex justify-center"
               }`}
             >
               <p
                 class={`text-sm cursor-pointer underline hover:font-regular ${
-                  profile?.link === '' ? 'hidden' : ''
+                  profile?.link === "" ? "hidden" : ""
                 }`}
-                on:click={() => window.open(profile?.link, '_blank').focus()}
+                on:click={() => window.open(profile?.link, "_blank").focus()}
               >
                 {profile?.link}
               </p>
@@ -210,7 +223,7 @@
             <div>
               <div
                 class={`${
-                  profile?.message === null ? 'hidden' : 'flex justify-center'
+                  profile?.message === null ? "hidden" : "flex justify-center"
                 }`}
               >
                 <img
@@ -222,7 +235,7 @@
                   src="https://img.icons8.com/external-xnimrodx-lineal-xnimrodx/64/undefined/external-letter-job-amp-resume-xnimrodx-lineal-xnimrodx.png"
                 />
                 <p class="text-sm text-neutral-800 mt-4">
-                  {profile?.message ?? ''}
+                  {profile?.message ?? ""}
                 </p>
               </div>
             </div>
@@ -243,8 +256,8 @@
                 convertToGMT7(profile?.dateConnected)
               ),
               profile?.profileData?.firstname ??
-                '' + '' + profile?.profileData?.lastname ??
-                ''
+                "" + "" + profile?.profileData?.lastname ??
+                ""
             )}
           class="w-full bg-blue-600 hover:font-semibold text-white mx-auto p-3 rounded-md"
         >
@@ -253,8 +266,8 @@
         <div
           class={`w-full ${
             profile?.profileData?.socials?.length < 1
-              ? 'flex flex-wrap'
-              : 'grid grid-cols-3 grid-flow-row'
+              ? "flex flex-wrap"
+              : "grid grid-cols-3 grid-flow-row"
           } my-2 justify-center items-center gap-2 rounded-md`}
         >
           {#if profile?.profileData?.socials}
@@ -264,15 +277,15 @@
                   class="rounded-md bg-white col-span-1 py-4 outline-neutral-200"
                   on:click={async () =>
                     await toNewTab(
-                      checkIsBusiness() ? item.type.split('-')[0] : item.type,
+                      checkIsBusiness() ? item.type.split("-")[0] : item.type,
                       item.data
                     )}
                   ><img
-                    src={item.type.includes('github')
-                      ? 'https://img.icons8.com/fluency/48/FA5252/github.png'
+                    src={item.type.includes("github")
+                      ? "https://img.icons8.com/fluency/48/FA5252/github.png"
                       : socialIcons[
                           checkIsBusiness()
-                            ? item.type.split('-')[0]
+                            ? item.type.split("-")[0]
                             : item.type
                         ]}
                     class="w-10 h-10 mx-auto"
@@ -302,9 +315,9 @@
                   >
                     <p
                       class="break-all"
-                      on:click={() => window.open(item.link, '_blank').focus()}
+                      on:click={() => window.open(item.link, "_blank").focus()}
                     >
-                      {item.title ?? ''}
+                      {item.title ?? ""}
                     </p>
                   </div>
                 {/if}
@@ -323,9 +336,9 @@
                   >
                     <p
                       class="break-all"
-                      on:click={() => window.open(item.link, '_blank').focus()}
+                      on:click={() => window.open(item.link, "_blank").focus()}
                     >
-                      {item.title ?? ''}
+                      {item.title ?? ""}
                     </p>
                   </div>
                 {/if}

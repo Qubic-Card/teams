@@ -40,8 +40,7 @@
   const forgotPassword = () => {
     isForgotPassword = !isForgotPassword;
   };
-  // 157ff9ce-bfdd-4405-ae9d-300e3c97da88
-  // 39ba7789-537c-4b0f-a8a7-c8a8345838f3
+  
   const handleForgotPassword = async () => {
     try {
       loading = true;

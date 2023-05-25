@@ -159,7 +159,7 @@
       <div class="h-full"></div>
       <button on:click={async ()=> {
         await supabase.auth.signOut();
-      }} class=" border border-red-500 text-red-500 py-3 rounded-md mt-4">
+      }} class=" border border-red-500 text-red-500 py-3 rounded-md">
         Logout
       </button>
     </div>

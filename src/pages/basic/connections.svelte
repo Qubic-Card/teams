@@ -124,41 +124,41 @@
   {:else if businessCards}
     {#if businessCards.length > 0}
       <div
-        class="snap-container mx-auto md:h-[280px] h-[230px] flex flex-row space-x-3 w-full overflow-x-auto"
+        class="snap-container mx-auto md:h-[280px] h-[230px] flex flex-row space-x-3 w-full overflow-x-auto pb-4"
       >
         {#each businessCards as card, index}
           <div
-            class="snap-center aspect-[8/5] h-auto  flex-shrink-0 flex justify-center items-center border border-white hover:border-neutral-500 rounded-lg"
+            class="snap-center aspect-[8/5] h-auto  flex-shrink-0 flex justify-center items-center rounded-lg"
           >
-            <CardMock>
+            <CardMock color={card?.card_id?.color} type={card?.card_id?.type}>
               <div class="flex flex-col justify-between h-full flex-1">
-                <div class="text-white p-6">
+                <div class="{card?.card_id?.color == "white" ? "text-black" : "text-white"} p-6">
                   <h1 class="text-lg lg:text-xl font-semibold">
                     {card?.card_id?.type?.toUpperCase()}
                     {card?.card_id?.color?.toUpperCase()}
                   </h1>
-                  <p class="text-neutral-400 text-xs">
+                  <p class="{card?.card_id?.color == "white" ? "text-neutral-600" : "text-neutral-400"} text-xs">
                     {new Date(card?.datecreated).toDateString().slice(4)}
                   </p>
                 </div>
                 <div class="flex flex-row justify-between px-6">
-                  <div class="text-white items-center">
-                    <p class="text-neutral-400 text-xs">NFC Taps</p>
+                  <div class="{card?.card_id?.color == "white" ? "text-black" : "text-white"} items-center">
+                    <p class="{card?.card_id?.color == "white" ? "text-neutral-600" : "text-neutral-400"} text-xs">NFC Taps</p>
                     <p class="font-semibold text-lg lg:text-2xl">
                       {card.NFCtap}
                     </p>
                   </div>
-                  <div class="text-white items-center">
-                    <p class="text-neutral-400 text-xs">QR Scan</p>
+                  <div class="{card?.card_id?.color == "white" ? "text-black" : "text-white"} items-center">
+                    <p class="{card?.card_id?.color == "white" ? "text-neutral-600" : "text-neutral-400"} text-xs">QR Scan</p>
                     <p class="font-semibold text-lg lg:text-2xl">
                       {card.QRScan}
                     </p>
                   </div>
                 </div>
                 <div
-                  class="flex justify-between rounded-b-lg bg-white px-6 py-4 w-full"
+                  class="flex justify-between rounded-b-lg px-6 py-4 w-full"
                 >
-                  <p class="text-black font-semibold">
+                  <p class="{card?.card_id?.color == "white" ? "text-neutral-600" : "text-neutral-400"} font-semibold">
                     {card.status ? 'Active' : 'Inactive'}
                   </p>
                   <SwitchButton

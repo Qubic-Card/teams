@@ -131,8 +131,8 @@
       : 'md:w-1/2 lg:w-1/3 h-full'}"
   >
     {#if state === 'idle'}
-      <div class="flex flex-col justify-between p-2 w-full gap-2">
-        <button class="text-black self-end"
+      <div class="flex flex-col justify-between px-4 py-2 w-full gap-2">
+        <button on:click={toggleModal} class="text-black self-end"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -150,8 +150,12 @@
         </button>
         <button
           on:click={() => (state = 'unsplash')}
-          class="w-full bg-blue-600 p-4 rounded-md text-white mb-2"
-          >Unsplash</button
+          class="w-full flex bg-neutral-100 p-4 rounded-md text-white mb-2"
+          ><img
+          src="/unsplash.svg"
+          alt=""
+          class="w-28 mx-auto  rounded-md"
+        /></button
         >
         <FilePond
           bind:this={pond}
@@ -162,7 +166,7 @@
           acceptedFileTypes={['image/png', 'image/jpeg']}
           instantUpload={false}
           imageCropAspectRatio={1 / 1}
-          labelIdle="Add Background Image"
+          labelIdle="Upload custom image"
           allowMultiple={false}
           beforeAddFile={handleCrop}
         />

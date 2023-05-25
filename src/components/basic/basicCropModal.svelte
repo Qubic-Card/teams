@@ -175,7 +175,10 @@
 >
 
   <div class="h-full">
-    <h2>Crop image</h2>
+    <div class="flex justify-between flex-row items-center mb-3">
+      <h2 class="font-semibold ">Crop image</h2>
+      <button on:click={closeModal} class="text-red-400"> Cancel </button>
+    </div>
     <div class="relative h-1/2">
       <Cropper
         {image}
@@ -186,7 +189,7 @@
       />
     </div>
     {#if croppedImage}
-      <h2>Preview</h2>
+      <h2 class="font-semibold my-2">Preview</h2>
       <img
         src={croppedImage}
         alt="Cropped profile"
