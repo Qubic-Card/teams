@@ -8,7 +8,6 @@
   import Spinner from "@comp/loading/spinner.svelte";
   import convertToGMT7 from "@lib/utils/convertToGMT7";
   import toNewTab from "@lib/utils/newTab";
-  import { profileData } from "@lib/stores/profileData";
 
   export let profile, deleteConnectionHandler, isLoading, getConnectionsList;
   let img;
@@ -27,9 +26,12 @@
   };
 
   const randomAvatar = () => {
-    const array = ["cat", "panda", "koala", "dog", "bear"];
-
-    return array[Math.floor(Math.random() * 4)];
+    const array = ["bg-indigo-300", "bg-red-300", "bg-blue-300", "bg-green-300", "bg-orange-300"];
+    let char = profile?.profileData?.firstname ? profile?.profileData?.firstname : "Q";
+    let code = char.codePointAt(0);
+    console.log(code % char.length)
+    let over = code % char.length > array.length;
+    return array[over ? 3 : code % char.length];
   };
 
   const checkIsBusiness = () => {
@@ -46,15 +48,11 @@
   transition:fade|local={{ duration: 200 }}
 >
   <div
-    class="bg-white flex justify-between items-center gap-2 relative border p-2 w-full mx-2 rounded"
+    class=" flex justify-between items-center gap-2 relative border p-2 w-full mx-2 rounded"
   >
-    <img
-      class="rounded-full mr-2"
-      src={profile.profileData.avatar ?? "/avatars/" + randomAvatar() + ".png"}
-      width="36"
-      height="36"
-      alt=""
-    />
+    <div
+      class="rounded-full w-9 h-9 aspect-square flex justify-center items-center text-white mr-1 {randomAvatar() ? randomAvatar() : ""}"
+    >{profile?.profileData?.firstname ? profile?.profileData?.firstname.charAt(0).toUpperCase() : "Q"}</div>
 
     <div on:click={() => (isOpen = true)} class="cursor-pointer w-full">
       <p class="cursor-pointer" on:click={() => (isOpen = true)}>

@@ -20,6 +20,10 @@
 
   const getMetadata = async () => {
     let json;
+    if (!isShowMetaImage) {
+      return false;
+    }
+    
     try {
       const res = await fetch('/api/previewlink/' + encodeURIComponent(url));
       json = await res.json();
@@ -32,10 +36,6 @@
   const teamClickHandler = async () => {
     window.open(url.startsWith('www') ? 'https://' + url : url).focus();
   };
-
-  const proxyUrl = 'https://qubicrlp.herokuapp.com/v2';
-  const placeholderImg =
-    'https://images.unsplash.com/photo-1462556791646-c201b8241a94?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1465&q=80';
 </script>
 
 <button
@@ -45,8 +45,8 @@
   <div class="LowerContainer">
     {#await getMetadata() then data}
       <h3 class="font-bold my-2">{title ?? data.res.title}</h3>
-      {#if data.res}
-        {#if isShowMetaImage && data.res.images}
+      {#if data.res && isShowMetaImage}
+        {#if data.res.images}
           <div
             class="Image mb-2"
             style={`background-image:url(${
