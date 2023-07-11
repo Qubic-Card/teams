@@ -9,6 +9,9 @@ const toNewTab = async (type, data) => {
     case 'github':
       await window.open('https://github.com/' + data, '_blank').focus();
       break;
+    case 'threads':
+      await window.open('https://threads.net/@' + data, '_blank').focus();
+      break;
     case 'whatsapp':
       await window.open('https://wa.me/' + data, '_blank').focus();
       break;

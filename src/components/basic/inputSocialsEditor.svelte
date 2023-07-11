@@ -29,7 +29,7 @@
         item.type.split('-')[0].slice(1) +
         ' Business'
       : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-    placeholder={item.type.includes('instagram')
+    placeholder={item.type.includes('instagram') || item.type.includes('threads')
       ? 'Username (without @)'
       : item.type.includes('tiktok')
       ? 'Username (with @)'
