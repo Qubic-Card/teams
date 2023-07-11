@@ -110,6 +110,17 @@ const formatter = (vcard) => {
             `https://discord.gg/${username}`
           );
         }
+      } else if (socialsFormatted[idx].includes('threads')) {
+        if (checkIsLink(socialsFormatted[idx])) {
+          linkFormatter();
+        } else {
+          socialsFormatted[idx] = iOSSocialFormatter(
+            socialsFormatted[idx],
+            'Company Threads',
+            'Threads',
+            `https://threads.net/@${username}`
+          );
+        }
       } else if (socialsFormatted[idx].includes('instagram')) {
         if (checkIsLink(socialsFormatted[idx])) {
           iOSLinkFormatter(idx);

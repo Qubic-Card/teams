@@ -3,6 +3,7 @@ export let isEmailValid = false;
 export let isInstagramInvalid = false;
 export let isLinkInvalid = false;
 export let isTiktokValid = false;
+export let isThreadsValid = false;
 export let isPhoneValid = false;
 export let isNumber;
 export let isTwitterValid = false;
@@ -64,10 +65,12 @@ export const withAtValidator = (value, type) => {
   if (value.startsWith('@')) {
     if (type === 'tiktok') isTiktokValid = false;
     if (type === 'ig') isInstagramInvalid = true;
+    if (type === 'threads') isThreadsValid = false;
     if (type === 'twitter') isTwitterValid = true;
   } else {
     if (type === 'tiktok') isTiktokValid = true;
     if (type === 'ig') isInstagramInvalid = false;
+    if (type === 'threads') isThreadsValid = true;
     if (type === 'twitter') isTwitterValid = false;
   }
 };

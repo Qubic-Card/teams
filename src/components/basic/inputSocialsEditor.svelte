@@ -59,6 +59,7 @@
     bind:value={socials[i].data}
     on:change={handleSave}
     isSocialInput={true}
+    isThreadsInput={item.type.includes('threads')}
     isTiktokInput={item.type.includes('tiktok')}
     isEmailInput={item.type.includes('email')}
     isWhatsappInput={item.type.includes('whatsapp')}

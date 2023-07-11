@@ -13,6 +13,7 @@
     isPhoneValid,
     isNumber,
     numberRegex,
+    isThreadsValid,
   } from '@lib/validation.js';
   import { fade } from 'svelte/transition';
 
@@ -25,6 +26,7 @@
   export let isInstagramInput = false;
   export let isTiktokInput = false;
   export let isPhoneInput = false;
+  export let isThreadsInput = false;
   export let isEmptyChecking = false;
   export let isTwitterInput = false;
   export let inputbg = 'bg-neutral-800';
@@ -55,6 +57,7 @@
   $: value && isEmailInput && emailValidator(value);
   $: value && isWhatsappInput && whatsappValidator();
   $: value && isInstagramInput && withAtValidator(value, 'ig');
+  $: value && isThreadsInput && withAtValidator(value, 'threads');
   $: value && isTiktokInput && withAtValidator(value, 'tiktok');
   $: value && isTwitterInput && withAtValidator(value, 'twitter');
   $: value && isPhoneInput;
@@ -104,6 +107,9 @@
 
   {#if isInstagramInput && isInstagramInvalid}
     <small class="text-red-500">Instagram doesn't require "@"</small>
+  {/if}
+  {#if isThreadsInput && !isThreadsValid}
+    <small class="text-red-500">Threads doesn't require "@"</small>
   {/if}
   {#if isTiktokInput && isTiktokValid}
     <small class="text-red-500">TikTok require "@"</small>
