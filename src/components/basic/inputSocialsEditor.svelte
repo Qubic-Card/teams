@@ -29,9 +29,9 @@
         item.type.split('-')[0].slice(1) +
         ' Business'
       : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-    placeholder={item.type.includes('instagram') || item.type.includes('threads')
+    placeholder={item.type.includes('instagram') 
       ? 'Username (without @)'
-      : item.type.includes('tiktok')
+      : item.type.includes('tiktok') || item.type.includes('threads')
       ? 'Username (with @)'
       : item.type.includes('whatsapp')
       ? 'with country code. ex: 62...'

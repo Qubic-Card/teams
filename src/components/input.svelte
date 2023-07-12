@@ -109,7 +109,7 @@
     <small class="text-red-500">Instagram doesn't require "@"</small>
   {/if}
   {#if isThreadsInput && !isThreadsValid}
-    <small class="text-red-500">Threads doesn't require "@"</small>
+    <small class="text-red-500">Threads starts with "@"</small>
   {/if}
   {#if isTiktokInput && isTiktokValid}
     <small class="text-red-500">TikTok require "@"</small>

@@ -118,7 +118,7 @@ const formatter = (vcard) => {
             socialsFormatted[idx],
             'Company Threads',
             'Threads',
-            `https://threads.net/@${username}`
+            `https://threads.net/${username}`
           );
         }
       } else if (socialsFormatted[idx].includes('instagram')) {

@@ -3,7 +3,7 @@ import { goto } from '$app/navigation';
 const go = async (type, data) => {
   switch (type) {
     case 'threads':
-      await goto(`https://threads.net/@${data}`);
+      await goto(`https://threads.net/${data}`);
     case 'discord':
       await goto(`https://discord.gg/${data}`);
     case 'telegram':
