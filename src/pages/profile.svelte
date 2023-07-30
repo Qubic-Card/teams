@@ -231,7 +231,7 @@
         class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
       >
         <div class="flex flex-row px-2 py-3 items-center justify-center">
-          <p class="text-xs font-medium flex-grow">My Socials</p>
+          <p class="text-xs font-medium flex-grow">Socials</p>
           <button
             on:click={() => (showSocialsPersonal = !showSocialsPersonal)}
             class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
@@ -272,7 +272,7 @@
         class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
       >
         <div class="flex flex-row px-2 py-3 items-center justify-center">
-          <p class="text-xs font-medium flex-grow">My Links</p>
+          <p class="text-xs font-medium flex-grow">Links</p>
           <button
             on:click={() => (showLinksPersonal = !showLinksPersonal)}
             class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
@@ -344,7 +344,7 @@
           class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline}"
         >
           <div class="flex flex-row px-2 py-3 items-center justify-center">
-            <p class="text-xs font-medium flex-grow">My Socials</p>
+            <p class="text-xs font-medium flex-grow">Socials</p>
             <button
               on:click={() => (showSocialsTeam = !showSocialsTeam)}
               class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
@@ -385,7 +385,7 @@
           class="my-4 overflow-clip rounded-md outline-1 outline {$currentTheme?.outline} mb-20"
         >
           <div class="flex flex-row px-2 py-3 items-center justify-center">
-            <p class="text-xs font-medium flex-grow">My Links</p>
+            <p class="text-xs font-medium flex-grow">Links</p>
             <button
               on:click={() => (showLinksTeam = !showLinksTeam)}
               class="{$currentTheme?.button} {$currentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
