@@ -229,7 +229,7 @@
       class="my-4 overflow-clip rounded-md outline-1 outline {$basicCurrentTheme?.outline}"
     >
       <div class="flex flex-row px-2 py-3 items-center justify-center">
-        <p class="text-xs font-medium flex-grow">My Socials</p>
+        <p class="text-xs font-medium flex-grow">Socials</p>
         <button
           on:click={() => (showSocials = !showSocials)}
           class="{$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
@@ -288,7 +288,7 @@
       class="my-4 overflow-clip rounded-md outline-1 outline {$basicCurrentTheme?.outline} mb-20"
     >
       <div class="flex flex-row px-2 py-3 items-center justify-center">
-        <p class="text-xs font-medium flex-grow">My Links</p>
+        <p class="text-xs font-medium flex-grow">Links</p>
         <button
           on:click={() => (showLinks = !showLinks)}
           class="{$basicCurrentTheme?.button} {$basicCurrentTheme?.buttonText} rounded-full w-4 h-4 p-0 text-center items-center m-0 justify-center flex"
