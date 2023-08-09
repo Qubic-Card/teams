@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Qubic Card | Teams</title>
+  <title>Qubic Card | Editor</title>
 </svelte:head>
 
 <AuthWrapper>
