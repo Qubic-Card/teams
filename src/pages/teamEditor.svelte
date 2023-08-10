@@ -67,6 +67,7 @@
   let croppedImage = "";
   let fileName = "";
   let pixelCrop;
+  let logoMode = false;
   let image;
   let fileImage;
   let isLoading = false;
@@ -87,9 +88,10 @@
     const scale = 200 / width;
   };
 
-  const handleCrop = async (item) => {
+  const handleCrop = async (item, _logoMode) => {
     image = URL.createObjectURL(item.file);
     fileName = item.filename;
+    logoMode = _logoMode;
     isOpen = true;
     return true;
   };
@@ -106,12 +108,18 @@
 
     if (error) {
       console.log(error);
-      toastFailed("Oops, something went wrong")
+      toastFailed("Oops, something went wrong");
     } else {
       const { data: avatar } = supabase.storage
         .from("avatars")
         .getPublicUrl(`${$user?.id}/${fileName}`);
-      $teamData.avatar = avatar.publicUrl;
+      if (logoMode) {
+        $teamData.logo = avatar.publicUrl;
+        logoMode = false;
+      } else {
+        $teamData.avatar = avatar.publicUrl;
+      }
+
       pond.removeFile();
       croppedImage = "";
       isOpen = false;
@@ -131,7 +139,7 @@
       });
 
     if (error) {
-      toastFailed("Oops, something went wrong")
+      toastFailed("Oops, something went wrong");
       console.log(error);
     } else {
       const { data: brochure } = supabase.storage
@@ -350,17 +358,16 @@
                   </div>
 
                   {#if permissions.writeTeam}
-                    {#if $isDisplayPersonal !== null}
-                      <div
-                        class="flex justify-between text-xs md:text-sm items-center p-2 bg-neutral-500 mx-3 rounded-md my-2"
-                      >
-                        <h1 class="text-white">Show personal profile</h1>
-                        <SwitchButton
-                          bind:checked={$isDisplayPersonal}
-                          on:change={setDisplayPersonal}
-                        />
-                      </div>
-                    {/if}
+                    <div
+                      class="flex justify-between text-xs md:text-sm items-center p-2 bg-neutral-800 mx-3 rounded-md my-2"
+                    >
+                      <h1 class="text-white">Show personal profile</h1>
+                      <SwitchButton
+                        bind:checked={$isDisplayPersonal}
+                        on:change={setDisplayPersonal}
+                      />
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2 px-3 pt-3">
                       {#if !$teamData?.brochure?.url}
                         <FilePond
@@ -428,7 +435,7 @@
                         instantUpload={false}
                         labelIdle="Add Team Logo"
                         allowMultiple={false}
-                        onpreparefile={handleCrop}
+                        onpreparefile={(e)=>handleCrop(e,true)}
                       />
                     </div>
                   {/if}
