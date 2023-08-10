@@ -125,37 +125,36 @@
         console.log(err);
         toastFailed("Oops, something is wrong");
       }
+    }
+    const { error } = await supabase.storage
+      .from("banner")
+      .upload(`${$user?.id}/${fileName}`, fileImage, {
+        contentType: `image/${fileFormat}`,
+        upsert: true,
+      });
+
+    if (error) {
+      console.log(error);
+      toastFailed("Oops, something is wrong");
     } else {
-      const { error } = await supabase.storage
+      const { data: banner } = supabase.storage
         .from("banner")
-        .upload(`${$user?.id}/${fileName}`, fileImage, {
-          contentType: `image/${fileFormat}`,
-          upsert: true,
-        });
+        .getPublicUrl(`${$user?.id}/${fileName}`);
 
-      if (error) {
-        console.log(error);
-        toastFailed("Oops, something is wrong");
-      } else {
-        const { data: banner } = supabase.storage
-          .from("banner")
-          .getPublicUrl(`${$user?.id}/${fileName}`);
+      croppedImage = "";
+      isOpen = false;
+      $profileData.design.background = banner.publicUrl;
+      showModal = false;
+      setState("idle");
 
-        croppedImage = "";
-        isOpen = false;
-        $profileData.design.background = banner.publicUrl;
-        showModal = false;
+      if (state === "unsplash") {
+        getTrackDownloadLocation(unsplashImageId);
+        toastSuccess("Background image changed successfully");
         setState("idle");
-
-        if (state === "unsplash") {
-          getTrackDownloadLocation(unsplashImageId);
-          toastSuccess("Background image changed successfully");
-          setState("idle");
-          showModal = false;
-        }
-
-        await handleSave();
+        showModal = false;
       }
+
+      await handleSave();
     }
 
     isLoading = false;
