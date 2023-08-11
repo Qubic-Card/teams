@@ -247,7 +247,7 @@
   desktopWidth="md:w-1/2 lg:w-1/3"
   desktopRight="md:right-1/4"
   desktopTop={state === "idle" ? "md:top-[35%]" : "md:top-0"}
-  desktopHeight={state === "idle" ? "md:h-[29%]" : "h-screen"}
+  desktopHeight={state === "idle" ? "md:h-[250px]" : "h-screen"}
   mobileHeight={state === "idle" ? "h-[40%]" : "h-screen"}
   {isOpen}
   on:modalHandler={(e) => {
@@ -256,7 +256,8 @@
   }}
 >
   {#if state === "idle"}
-    <div class="p-2 flex justify-between">
+  <div class="h-full w-full overflow-hidden">
+    <div class="flex justify-between pt-4 px-2">
       <h1 class="font-semibold">Select background image</h1>
       <button
         on:click={() => {
@@ -280,6 +281,7 @@
         </svg>
       </button>
     </div>
+    <div class="flex flex-col justify-center h-full gap-2">
     <button
       on:click={() => setState("unsplash")}
       class="bg-blue-600 text-white mx-8 py-4 rounded-md"
@@ -299,6 +301,8 @@
         allowMultiple={false}
       />
     </div>
+  </div>
+  </div>
   {:else if state === "unsplash"}
     <div class="flex items-center justify-between p-2">
       <div class="flex">
