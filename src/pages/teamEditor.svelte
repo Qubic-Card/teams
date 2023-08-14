@@ -100,32 +100,49 @@
     isLoading = true;
     let fileFormat = `${fileImage.type.split("/")[1]}`;
 
-    const { error } = await supabase.storage
-      .from("avatars")
-      .upload(`${$user?.id}/${fileName}`, fileImage, {
-        contentType: "image/" + fileFormat,
-      });
+    try {
+      if (logoMode) {
+        const { error } = await supabase.storage
+          .from("logo")
+          .upload(`${$user?.id}/${fileName}`, fileImage, {
+            contentType: "image/" + fileFormat,
+            upsert: false
+          });
+        if (error) throw error.message;
+      } else {
+        const { error } = await supabase.storage
+          .from("avatars")
+          .upload(`${$user?.id}/${fileName}`, fileImage, {
+            contentType: "image/" + fileFormat,
+          });
+        if (error) throw error.message;
+      }
+    } catch (error) {
+      toastFailed(error);
+      isLoading = false;
+      return;
+    }
 
-    if (error) {
-      console.log(error);
-      toastFailed("Oops, something went wrong");
+    if (logoMode) {
+      const { data: logo } = supabase.storage
+        .from("logo")
+        .getPublicUrl(`${$user?.id}/${fileName}`);
+
+      $teamData.logo = logo.publicUrl;
+      logoMode = false;
     } else {
       const { data: avatar } = supabase.storage
         .from("avatars")
         .getPublicUrl(`${$user?.id}/${fileName}`);
-      if (logoMode) {
-        $teamData.logo = avatar.publicUrl;
-        logoMode = false;
-      } else {
-        $teamData.avatar = avatar.publicUrl;
-      }
 
-      pond.removeFile();
-      croppedImage = "";
-      isOpen = false;
-
-      await handleSave();
+      $teamData.avatar = avatar.publicUrl;
     }
+
+    pond.removeFile();
+    croppedImage = "";
+    isOpen = false;
+
+    await handleSave();
 
     isLoading = false;
   };
@@ -139,8 +156,7 @@
       });
 
     if (error) {
-      toastFailed("Oops, something went wrong");
-      console.log(error);
+      toastFailed(error.message);
     } else {
       const { data: brochure } = supabase.storage
         .from("brochure")
@@ -435,7 +451,7 @@
                         instantUpload={false}
                         labelIdle="Add Team Logo"
                         allowMultiple={false}
-                        onpreparefile={(e)=>handleCrop(e,true)}
+                        onpreparefile={(e) => handleCrop(e, true)}
                       />
                     </div>
                   {/if}
