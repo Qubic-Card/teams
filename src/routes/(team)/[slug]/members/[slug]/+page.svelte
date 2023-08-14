@@ -111,7 +111,7 @@
     let { data, error } = await supabase
       .from('team_members')
       .select(
-        'team_profile, uid, team_id, id, team_cardcon: team_cardcon(display_personal, card_id)'
+        'team_profile, uid, team_id, id, team_cardcon: team_cardcon(display_personal, card_id), display_personal'
       )
       .eq('uid', $page.params.slug)
       .eq('team_id', $page.url.pathname.split('/')[1]);
@@ -126,15 +126,10 @@
       member.uid = data[0]['uid'];
       memberId = data[0]['id'];
       $cardsId = data[0].team_cardcon.map((item) => item.card_id);
-
+      $isDisplayPersonal = data[0]['display_personal'];
       await checkIsConfirmedEmail(data[0]['uid']);
-
-      if (data[0].team_cardcon.length > 0) {
-        $isDisplayPersonal = data[0].team_cardcon[0].display_personal;
-        if (!data[0].team_cardcon[0].display_personal) $selectedTab = 'team';
-      } else {
-        $isDisplayPersonal = null;
-      }
+      if($isDisplayPersonal)
+      $selectedTab = 'team';
     }
     if (error) console.log(error);
 

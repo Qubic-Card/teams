@@ -47,7 +47,6 @@
   import getCroppedImg from "@lib/utils/canvas";
   import Cropper from "svelte-easy-crop";
   import { page } from "$app/stores";
-    import { onMount } from "svelte";
 
   // Register the plugins
   registerPlugin(
@@ -202,10 +201,9 @@
 
   const setDisplayPersonal = async () => {
     const { error } = await supabase
-      .from("team_cardcon")
+      .from("team_members")
       .update({ display_personal: $isDisplayPersonal })
-      .eq("team_member_id", memberId)
-      .in("card_id", $cardsId);
+      .eq("id", memberId)
 
     if (error) {
       toastFailed();
@@ -214,12 +212,6 @@
       toastSuccess("Changes saved");
     }
   };
-
-  onMount(async ()=> {
-    const {data} = await supabase.from("team_cardcon").select("display_personal").eq("team_member_id", memberId)
-      .eq("card_id", $cardsId);
-    $isDisplayPersonal = data[0]['display_personal']
-  })
 </script>
 
 {#if showDeleteBrochureModal}
