@@ -110,7 +110,6 @@ export const checkAlreadyTeamMember = async (uid, tid) => {
   if (error) {
     return { error: true };
   } else {
-    console.log(data);
     if (data.length > 0) {
       return { error: false, isMember: true };
     } else {

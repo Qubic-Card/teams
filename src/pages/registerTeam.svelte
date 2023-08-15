@@ -233,13 +233,13 @@
             toastFailed('Team member limit reached');
             return;
           } else {
-            const { error: check_error, isMember } =
+            const { error: check_error2, isMember } =
               await checkAlreadyTeamMember(
                 data.user.id,
                 $page.url.searchParams.get('team_id')
               );
 
-            if (check_error) {
+            if (check_error2) {
               toastFailed();
               return;
             } else if (!isMember) {
@@ -272,11 +272,12 @@
                   '',
                   memberId
                 );
-                window.location.reload();
+                goto('/');
               }
+            } else {
+              toastFailed("Already a member")
             }
-            loading = false;
-            // goto('/');
+            
           }
 
           loading = false;
