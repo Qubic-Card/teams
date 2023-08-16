@@ -1,15 +1,17 @@
 <script>
-  import ModalWrapperHeadless from '@comp/modals/modalWrapperHeadless.svelte';
-  import { theme } from '@lib/profileTheme';
+  import ModalWrapperHeadless from "@comp/modals/modalWrapperHeadless.svelte";
+  import { theme } from "@lib/profileTheme";
   import {
     currentTheme,
     profileTheme,
     basicCurrentTheme,
     basicProfileTheme,
-  } from '@lib/stores/editorStore';
+    basicProfileThemeBusiness,
+  } from "@lib/stores/editorStore";
 
   export let handleSave, getProfile;
-  export let editor = 'team';
+  export let isBusiness;
+  export let editor = "team";
   // export let profile, deleteConnectionHandler, isLoading;
   let title;
   let isOpen = false;
@@ -24,23 +26,28 @@
   };
 
   const selectBasicThemeHandler = async (t) => {
-    $basicProfileTheme = t;
-    $basicCurrentTheme = theme[t];
+    if (isBusiness) {
+      $basicProfileThemeBusiness = t;
+      $basicCurrentTheme = theme[t];
+    } else {
+      $basicProfileTheme = t;
+      $basicCurrentTheme = theme[t];
+    }
     await handleSave();
   };
 </script>
 
 <div
   on:click={modalHandler}
-  class="flex justify-between items-center  transition-color duration-300 h-20 px-8 p-2 md:text-sm text-xs {editor ===
+  class="flex justify-between items-center transition-color duration-300 h-20 px-8 p-2 md:text-sm text-xs {editor ===
   'team'
     ? 'bg-black text-neutral-100 outline outline-1 outline-neutral-800 hover:outline-neutral-700'
     : 'bg-white text-neutral-900'} cursor-pointer"
 >
   <h1>Set theme</h1>
-  {#if editor == 'team'}
+  {#if editor == "team"}
     <h1>
-      {#if $profileTheme === 'offwhite'}
+      {#if $profileTheme === "offwhite"}
         Off White
       {:else}
         {$profileTheme.charAt(0).toUpperCase() + $profileTheme.slice(1)}
@@ -48,11 +55,12 @@
     </h1>
   {:else}
     <h1>
-      {#if $basicProfileTheme === 'offwhite'}
+      {#if $basicProfileTheme === "offwhite"}
         Off White
       {:else}
-        {$basicProfileTheme.charAt(0).toUpperCase() +
-          $basicProfileTheme.slice(1)}
+        {isBusiness
+          ? $basicProfileThemeBusiness
+          : $basicProfileTheme}
       {/if}
     </h1>
   {/if}
@@ -66,7 +74,7 @@
     {isOpen}
     on:modalHandler={(e) => (isOpen = e.detail)}
     initialFocus={title}
-    bg={editor === 'team' ? 'bg-neutral-900' : 'bg-neutral-100'}
+    bg={editor === "team" ? "bg-neutral-900" : "bg-neutral-100"}
   >
     <div
       class="flex justify-between items-center pt-2 z-50 w-full {editor ===
@@ -103,7 +111,7 @@
             ? 'cursor-pointer hover:brightness-50'
             : 'cursor-default brightness-50'}"
           on:click={() => {
-            if (editor === 'team') {
+            if (editor === "team") {
               if ($profileTheme !== key) {
                 selectThemeHandler(key);
               }
@@ -119,7 +127,7 @@
           >
             <div
               class={`h-16 ${
-                key !== 'light' ? theme[key].secondary : 'bg-neutral-200'
+                key !== "light" ? theme[key].secondary : "bg-neutral-200"
               } w-full flex justify-center items-end rounded-lg`}
             >
               <div
@@ -128,12 +136,12 @@
             </div>
             <div
               class={`h-20 w-full ${
-                key !== 'light' ? theme[key].secondary : 'bg-neutral-200'
+                key !== "light" ? theme[key].secondary : "bg-neutral-200"
               } rounded-lg mt-7`}
             />
             <div
               class={`h-20 w-full ${
-                key !== 'light' ? theme[key].secondary : 'bg-neutral-200'
+                key !== "light" ? theme[key].secondary : "bg-neutral-200"
               } rounded-lg`}
             />
           </div>
@@ -142,7 +150,7 @@
               ? 'font-semibold'
               : ''} {editor == 'team' ? 'text-white' : 'text-black'}"
           >
-            {#if key === 'offwhite'}
+            {#if key === "offwhite"}
               Off White
             {:else}
               {key.charAt(0).toUpperCase() + key.slice(1)}

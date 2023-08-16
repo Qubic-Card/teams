@@ -6,6 +6,7 @@
     basicSocials,
     basicLinks,
     basicProfileTheme,
+    basicProfileThemeBusiness,
     basicCurrentTheme,
   } from '@lib/stores/editorStore';
   import SelectBackgroundModal from '@comp/basic/selectBackgroundModal.svelte';
@@ -44,7 +45,7 @@
   import {
     basicBusinessVcard,
     basicPersonalVcard,
-    basicProfile,
+    basicProfile
   } from '@lib/stores/profileData';
 
   // Register the plugins
@@ -111,7 +112,8 @@
       $basicSocials = profile['socials'];
       $basicLinks = profile['links'];
       $basicProfileTheme = profile['design']['theme'];
-      $basicCurrentTheme = theme[profile['design']['theme']];
+      $basicProfileThemeBusiness = profile['design']['themeBusiness'] ?? 'dark';
+      $basicProfile?.isBusiness ? $basicCurrentTheme = theme[profile['design']['themeBusiness']] : $basicCurrentTheme = theme[profile['design']['theme']];
       profileId = data[0]['id'];
 
       $basicPersonalVcard = {
@@ -157,6 +159,7 @@
     $basicProfile.socials = $basicSocials;
     $basicProfile.links = $basicLinks;
     $basicProfile.design.theme = $basicProfileTheme;
+    $basicProfile.design.themeBusiness = $basicProfileThemeBusiness;
     $basicPersonalVcard = {
       firstname: $basicProfile?.firstname ?? '',
       lastname: $basicProfile?.lastname ?? '',
@@ -215,8 +218,10 @@
     );
 
     if (isPersonal) {
+      $basicCurrentTheme = theme[$basicProfileTheme];
       $basicProfile.isBusiness = false;
     } else {
+      $basicCurrentTheme = theme[$basicProfileThemeBusiness];
       $basicProfile.isBusiness = true;
 
       if (!$basicProfile.firstnameBusiness)
@@ -527,7 +532,7 @@
             </TabPanels>
           </TabGroup>
 
-          <SelectTheme {handleSave} editor="basic" />
+          <SelectTheme {handleSave} editor="basic" isBusiness={$basicProfile.isBusiness}/>
         </div>
         <div
           class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-screen overflow-y-scroll snap-container mb-10"
