@@ -133,7 +133,7 @@
                 class="flex items-center p-3 md:p-4 bg-neutral-100  gap-2 hover:border-neutral-400 rounded-md w-full cursor-pointer hover:bg-white/80  text-black transition-colors duration-200"
               >
                 <img
-                  src={item.metadata.logo ?? '/favicon.svg'}
+                  src={item.metadata.logo != null || item.metadata.logo.toString().length > 0 ? item.metadata.logo : '/favicon.svg'}
                   alt=""
                   class="w-10 h-10 rounded-md bg-black"
                 />
