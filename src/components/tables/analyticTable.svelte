@@ -20,15 +20,15 @@
         <thead class="text-neutral-200 ">
           <tr>
             <th class="text-left p-1 rounded-tl-lg"
-              ><div class="bg-black/60 pl-3 py-2 rounded-md">Date</div></th
+              ><div class="bg-neutral-800 pl-3 py-2 rounded-md">Date</div></th
             >
             <th class="text-left p-1"
-              ><div class="bg-black/60 pl-3 py-2 rounded-md">
+              ><div class="bg-neutral-800 pl-3 py-2 rounded-md">
                 Description
               </div></th
             >
             <th class="text-left p-1"
-              ><div class="bg-black/60 pl-3 py-2 rounded-md">Device</div></th
+              ><div class="bg-neutral-800 pl-3 py-2 rounded-md">Device</div></th
             >
           </tr>
         </thead>

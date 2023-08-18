@@ -193,10 +193,10 @@
       <ConnectionsSkeletion searchSkeletonVisible />
     {:then}
       <div
-        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-4 md:pr-16 border-neutral-700 fixed bg-black w-full"
+        class="flex md:flex-row flex-col justify-between items-center gap-4 border-b-2 pr-4 md:pr-16 border-neutral-800 fixed w-full"
       >
         <div
-          class="flex w-full md:w-48 text-white gap-1 border-b border-neutral-700"
+          class="flex w-full md:w-48 text-white gap-1 border-b border-neutral-800"
         >
           <button
             disabled={tabs !== 'all'}
@@ -246,10 +246,10 @@
         />
       {:else}
         <div
-          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-28 md:mt-20"
+          class="snap-container snap-x mx-auto snap-mandatory flex flex-col w-full overflow-x-auto mb-8 mt-28 md:mt-16"
         >
           <table class="snap-center text-black w-full">
-            <thead class="text-left text-neutral-400 bg-black/60">
+            <thead class="text-left text-neutral-400 bg-neutral-800">
               <tr>
                 {#if innerWidth > 640}
                   <TableHead

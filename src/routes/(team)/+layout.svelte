@@ -195,7 +195,7 @@
     {/if}
 
     <div
-      class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-700 text-gray-100 bg-black"
+      class="fixed left-0 right-0 h-16 flex justify-between items-center pr-2 py-4 z-30 border-b border-neutral-800 text-gray-100 bg-opacity-10 backdrop-blur-md bg-neutral-600"
     >
       <div class="flex justify-center items-center h-auto">
         {#if subscription?.isActive || backupTeamData}
@@ -204,20 +204,20 @@
               <img
                 src="/close-white.svg"
                 alt="close"
-                class="cursor-pointer px-4 w-16 py-4 border-r border-neutral-700"
+                class="cursor-pointer px-4 w-16 py-4 border-r border-neutral-800"
                 on:click={sidebarHandler}
               />
             {:else}
               <img
                 src="/menu-white.svg"
                 alt="humberger-menu"
-                class="cursor-pointer px-4 w-16 py-4 border-r border-neutral-700 hidden md:block"
+                class="cursor-pointer px-4 w-16 py-4 border-r border-neutral-800 hidden md:block"
                 on:click={sidebarHandler}
               />
             {/if}
           {:else}
             <div
-              class="w-16 h-16 border-r-2 border-neutral-800 flex justify-center items-center animate-pulse"
+              class="w-16 h-16 border-r-2 border-neutral-800 bg-opacity-10 flex justify-center items-center animate-pulse"
             >
               <div class="bg-neutral-800 w-10 h-10" />
             </div>
@@ -233,13 +233,13 @@
           </div>
         {/if}
       </div>
-
+      
       <MenuButtonModal logo={$teamData.logo} />
     </div>
 
     {#if subscription?.isActive || backupTeamData}
       <div
-        class={`border-r border-neutral-700 bg-black w-12 md:w-16 hidden md:block fixed ${
+        class={`border-r border-neutral-800 bg-opacity-10 bg-neutral-600 backdrop-blur-md w-12 md:w-16 hidden md:block fixed ${
           sevenDaysAfterEndDate
             ? !subscription?.isActive && !subscription?.isAfter7Days
               ? 'top-36 md:top-[6.3rem]'

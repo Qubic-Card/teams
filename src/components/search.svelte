@@ -28,21 +28,21 @@
     placeholder="Search"
     title=""
     bind:value
-    inputbg={editor === 'basic' ? 'bg-white' : 'bg-neutral-900'}
+    inputbg={editor === 'basic' ? 'bg-white' : 'bg-neutral-800'}
     inputText={editor === 'basic' ? 'text-black' : 'text-white'}
   />
   <Listbox value={selected} on:change={(e) => (selected = e.detail)} let:open>
     {#if open}
       <div
         transition:fade|local={{ duration: 200 }}
-        class="fixed inset-0 bg-black/50 z-50"
+        class="fixed inset-0  z-50"
         aria-hidden="true"
       />
     {/if}
     <ListboxButton
       class="{editor === 'basic'
         ? 'bg-black'
-        : 'bg-black outline outline-1 outline-neutral-800'} flex justify-between text-sm text-white rounded-md p-2 w-24"
+        : 'bg-neutral-800 outline outline-1 outline-neutral-800'} flex justify-between text-sm text-white rounded-md p-2 w-24"
       >{selected.label} <span>▼</span></ListboxButton
     >
     {#if open}

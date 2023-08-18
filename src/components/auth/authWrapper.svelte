@@ -19,6 +19,7 @@
 
   onMount(async () => {
     await getUser();
+    redirect();
   });
 
   const redirect = async () => {
@@ -42,7 +43,7 @@
     }
   };
 
-  $: if (browser) redirect();
+  // $: (onMount) redirect();
   // $: getUser();
 
   supabase.auth.onAuthStateChange(async (event, session) => {

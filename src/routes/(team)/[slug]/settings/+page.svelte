@@ -141,7 +141,7 @@
     />
   </div>
 {:then}
-  <div class="flex justify-center h-full pt-4 pl-4 md:pl-20 pr-4 mb-20 md:mb-0">
+  <div class="flex justify-center h-full pt-4 pl-4 md:pl-20 pr-4 mb-20">
     <div
       class="flex flex-col {permissions.isTeamInactive ||
       permissions.isTeamWillExpire

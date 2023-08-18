@@ -171,10 +171,10 @@
 
 <svelte:window bind:innerWidth />
 
-<div class="flex flex-col pb-20 bg-black min-h-screen pl-0 md:pl-16  gap-2">
+<div class="flex flex-col pb-20  min-h-screen pl-0 md:pl-16  gap-2">
   {#if permissions.analytics}
     <div
-      class="border-b border-neutral-700 h-12 text-lg font-semibold pt-2 top-0 sticky w-full bg-black pl-6 z-10"
+      class="border-b border-neutral-800 h-12 text-lg font-semibold pt-2 top-0 sticky w-full  pl-6 z-10"
     >
       Team Performance
     </div>
@@ -191,7 +191,7 @@
 
   <div class="flex flex-col my-2">
     <div
-      class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 border-b pt-3 mb-2 z-20 sticky top-0 border-neutral-700 bg-black"
+      class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 border-b pt-3 mb-2 z-20 sticky top-0 border-neutral-800 "
     >
       <div class="flex gap-6 w-full lg:w-1/2">
         {#each menu as item, i}

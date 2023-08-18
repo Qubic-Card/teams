@@ -41,7 +41,7 @@
   on:click={modalHandler}
   class="flex justify-between items-center transition-color duration-300 h-20 px-8 p-2 md:text-sm text-xs {editor ===
   'team'
-    ? 'bg-black text-neutral-100 outline outline-1 outline-neutral-800 hover:outline-neutral-700'
+    ? 'text-neutral-100 outline outline-1 rounded-lg outline-neutral-800 hover:outline-neutral-700'
     : 'bg-white text-neutral-900'} cursor-pointer"
 >
   <h1>Set theme</h1>

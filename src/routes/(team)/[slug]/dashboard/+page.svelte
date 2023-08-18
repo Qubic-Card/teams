@@ -39,20 +39,20 @@
 </script>
 
 <div
-  class="flex flex-col justify-between text-white gap-4 mb-20 md:mb-8 pt-6 pl-4 md:pl-24 pr-4"
+  class="flex flex-col justify-between text-white gap-4 mb-10 md:mb-4 pt-6 pl-4 md:pl-24 pr-4"
 >
   <div class="flex flex-col">
     <h1 class="text-sm md:text-lg font-semibold">Quick Actions</h1>
     <div
-      class="snap-container snap-x mx-auto snap-mandatory h-16 lg:h-12 flex w-full overflow-x-auto mt-2 gap-2"
+      class="snap-container snap-x mx-auto snap-mandatory flex w-full overflow-x-auto mt-2 gap-2"
     >
       {#each quickActions as item}
-        <div
+        <button
           on:click={item.handler}
-          class="flex justify-center items-center px-4 bg-neutral-900 rounded-md outline outline-1 outline-neutral-800 snap-center h-12 text-xs md:text-sm text-center w-[130px] md:w-[180px] lg:w-[250px] flex-shrink-0 cursor-pointer"
+          class="flex justify-center items-center py-3 px-4 bg-neutral-900 rounded-md border  border-neutral-800 snap-center  text-xs md:text-sm text-center w-[130px] md:w-[180px] lg:w-[250px]  cursor-pointer"
         >
           {item.name}
-        </div>
+  </button>
       {/each}
     </div>
   </div>

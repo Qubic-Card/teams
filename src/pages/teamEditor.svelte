@@ -308,12 +308,12 @@
         <div class="flex flex-col w-full">
           <TabGroup>
             <TabList
-              class="w-full grid grid-cols-3 outline-1 outline outline-neutral-700 p-2"
+              class="w-full grid grid-cols-3 outline-1 rounded-lg outline outline-neutral-800 p-2"
             >
               <Tab
                 class={({ selected }) =>
                   selected
-                    ? "bg-neutral-800 text-white p-2 text-xs md:text-sm"
+                    ? "bg-neutral-800 rounded-lg text-white p-2 text-xs md:text-sm"
                     : "text-white p-2 text-xs md:text-sm rounded-l-md"}
                 >Team Profile</Tab
               >
@@ -335,7 +335,7 @@
               <TabPanel>
                 <!-- BIO EDITOR -->
                 <div
-                  class="outline-1 outline outline-neutral-700 mb-4 pt-2 pb-2"
+                  class="outline-1 outline outline-neutral-800 rounded-lg mb-4 pt-2 pb-2"
                 >
                   <div class="px-3 grid grid-cols-1 space-x-5">
                     <Input
@@ -458,7 +458,7 @@
               </TabPanel>
               <TabPanel>
                 <!-- SOCIAL EDITOR -->
-                <div class="outline-1 outline outline-neutral-700 mb-4 p-4">
+                <div class="outline-1 outline outline-neutral-800 rounded-lg mb-4 p-4">
                   <div class="flex justify-between items-center">
                     <h1 class="font-semibold text-lg text-white">Socials</h1>
                     <AddSocialsModal
@@ -651,7 +651,7 @@
               <TabPanel>
                 <!-- Link Editor -->
                 <div
-                  class="outline-1 outline outline-neutral-700 p-4 mb-0 lg:mb-4"
+                  class="outline-1 outline outline-neutral-800 rounded-lg p-4 mb-0 lg:mb-4"
                 >
                   <div class="flex justify-between items-center">
                     <h1 class="font-semibold text-lg text-white">Links</h1>
