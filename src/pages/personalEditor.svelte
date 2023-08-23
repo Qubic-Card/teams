@@ -219,13 +219,13 @@
 
 {#if $profileData}
   <div class="flex justify-center" in:fade|local={{ duration: 200 }}>
-    <div class="w-full bg-black">
+    <div class="w-full ">
       <div class="gap-2 text-black">
-        <div class="flex flex-col w-full md:col-span-1 col-span-2 bg-black">
+        <div class="flex flex-col w-full md:col-span-1 col-span-2 ">
           <!-- <ProfileEditorSkeleton /> -->
           <TabGroup>
             <TabList
-              class="w-full grid grid-cols-3 outline-1 outline outline-neutral-700  p-2"
+              class="w-full grid grid-cols-3 outline-1 outline rounded-lg outline-neutral-700  p-2"
             >
               <Tab
                 class={({ selected }) =>
@@ -251,8 +251,8 @@
             <TabPanels class="mt-4">
               <TabPanel>
                 <!-- BIO EDITOR -->
-                <div class="outline-1 outline outline-neutral-700 mb-4 pb-2">
-                  <div class="px-3 pt-3 grid grid-cols-2 space-x-5 bg-black">
+                <div class="outline-1 outline rounded-lg outline-neutral-700 mb-4 pb-2">
+                  <div class="px-3 pt-3 grid grid-cols-2 space-x-5 ">
                     <Input
                       on:change={handleSave}
                       placeholder="Hello"
@@ -276,7 +276,7 @@
                         : true}
                     />
                   </div>
-                  <div class="px-3 bg-black">
+                  <div class="px-3 ">
                     <Input
                       on:change={handleSave}
                       placeholder="example company"
@@ -312,7 +312,7 @@
                     />
                   </div>
                   <div
-                    class={`p-3 bg-black ${
+                    class={`p-3  ${
                       permissions.writeProfile || permissions.writeMembers
                         ? ''
                         : 'hidden'
