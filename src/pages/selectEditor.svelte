@@ -86,9 +86,10 @@
         Select Editor
       </h1>
       {#if !isHasBasic && !isTeamMember}
-        <div class="flex flex-col justify-between h-full">
+        <div class="flex text-black flex-col justify-between h-full">
           <div>
-            <h1>Please activate your account using Qubic product.</h1>
+            <h1>Inactive account</h1>
+            <h1 class="text-sm text-neutral-700">Please activate your account using Qubic product.</h1>
             <p>
               Need help? <button
                 class="font-bold"
@@ -105,7 +106,7 @@
               await supabase.auth.signOut();
             }}
           >
-            ← Back to Login
+            Sign Out
           </button>
         </div>
       {/if}
