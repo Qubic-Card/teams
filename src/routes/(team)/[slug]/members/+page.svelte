@@ -55,15 +55,11 @@
   }
 
   const deleteMember = async (id) => {
-    members = members.filter((m) => m.member_id !== id);
-
     isDeleteMember = true;
-    setTimeout(() => {
-      isDeleteMember = false;
-    }, 500);
-
+    members = members.filter((m) => m.member_id !== id);
     members = sortMember(members, $user?.id, 'asc');
     await getMembers();
+    isDeleteMember = false;
   };
 
   const getMembers = async () => {
@@ -174,7 +170,7 @@
 <div class="flex flex-col pb-20  min-h-screen pl-0 md:pl-16  gap-2">
   {#if permissions.analytics}
     <div
-      class="border-b border-neutral-800 h-12 text-lg font-semibold pt-2 top-0 sticky w-full  pl-6 z-10"
+      class="border-b bg-neutral-900 border-neutral-800 h-12 text-lg font-semibold pt-2 top-0 sticky w-full  pl-6 z-10"
     >
       Team Performance
     </div>
@@ -191,7 +187,7 @@
 
   <div class="flex flex-col my-2">
     <div
-      class="flex px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 border-b pt-3 mb-2 z-20 sticky top-0 border-neutral-800 "
+      class="flex bg-neutral-900 px-6 flex-col md:flex-row items-center md:justify-between md:w-full gap-2 border-b pt-3 mb-2 z-20 sticky top-0 border-neutral-800 "
     >
       <div class="flex gap-6 w-full lg:w-1/2">
         {#each menu as item, i}

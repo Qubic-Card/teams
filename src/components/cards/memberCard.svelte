@@ -92,7 +92,7 @@
       isLoading = false;
       return;
     } else {
-      log(
+      await log(
         `${member.email} has been removed from team by ${$memberData.fullName}`,
         'DANGER',
         null,
@@ -103,6 +103,7 @@
       );
       toastSuccess('Member has been deleted');
       isLoading = false;
+      return;
     }
   };
 

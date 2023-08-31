@@ -19,6 +19,10 @@
     uid,
     mid;
 
+    // console.log(mid);
+    // console.log($memberData.fullName);
+    // console.log(fullname);
+
   let selected = sortOptions[0];
   let isOpen = false;
   let isLoading = false;
@@ -34,7 +38,7 @@
 
   const disconnectHandler = async () => {
     isLoading = true;
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('team_cardcon')
       .delete()
       .eq('card_id', cardId);
@@ -43,8 +47,8 @@
       console.log(error);
       return;
     } else {
-      log(
-        `${email} has been disconnected from ******${cardId.slice(-6)}`,
+      await log(
+        `${$memberData.fullName} has disconnected ${email} from card ******${cardId.slice(-6)}`,
         'DANGER',
         null,
         $page.params.slug,
@@ -52,8 +56,8 @@
         '',
         $memberData.id
       );
-      log(
-        `${email} has been disconnected from ******${cardId.slice(-6)}`,
+      await log(
+        `${email} has been disconnected from card ******${cardId.slice(-6)}`,
         'DANGER',
         null,
         $page.params.slug,
