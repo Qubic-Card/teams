@@ -37,12 +37,11 @@
   };
 
   const getSubscriptionsData = async () => {
-    const { data, error } = await supabase.functions.invoke('globaldate', {
-      body: { teamId: teamId },
-    });
-    // console.log(teamId);
-    if (error) console.log(error);
-    if (data) subscription = data;
+    const req = await fetch('/api/globaldate', {method:'POST', body: JSON.stringify({
+      'teamId': teamId
+    })});
+    const resp = await req.json();
+    if (resp) subscription = resp;
   };
 
   onMount(async () => {
