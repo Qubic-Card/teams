@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 16
+      nodejs: 18
   pre_build:
     commands:
       - npm install
@@ -12,6 +12,7 @@ phases:
       - npm run build
   post_build:
     commands:
+      - cp .platform build
       - cp package.json build
 
 artifacts:
