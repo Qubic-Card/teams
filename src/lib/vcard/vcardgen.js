@@ -2,7 +2,7 @@ import formatter from '@lib/vcard/formatter';
 import getBase64FromUrl from '@lib/utils/getBase64';
 import { default as vCardJS } from 'tappin-vcards-js';
 
-export const genvcard = async (prop, team, dateConnected) => {
+export const genvcard = async (prop, team, dateConnected, description) => {
   let personalEmail;
   let teamEmail;
   let wa;
@@ -31,11 +31,11 @@ export const genvcard = async (prop, team, dateConnected) => {
   if (dateConnected) {
     vCard.note =
       'Added via Qubic card on ' +
-      new Date(new Date(dateConnected).setUTCHours(7)).toDateString().slice(4);
+      new Date(new Date(dateConnected).setUTCHours(7)).toDateString().slice(4) + ' ' + (description ?? '');
   } else {
     vCard.note =
       'Added via Qubic card on ' +
-      new Date(new Date().setUTCHours(7)).toDateString().slice(4);
+      new Date(new Date().setUTCHours(7)).toDateString().slice(4) + ' ' + (description ?? '');
   }
 
   if (team?.display_personal || !team) {

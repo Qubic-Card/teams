@@ -28,11 +28,10 @@
   const selectBasicThemeHandler = async (t) => {
     if (isBusiness) {
       $basicProfileThemeBusiness = t;
-      $basicCurrentTheme = theme[t];
     } else {
       $basicProfileTheme = t;
-      $basicCurrentTheme = theme[t];
     }
+    $basicCurrentTheme = theme[t];
     await handleSave();
   };
 </script>
@@ -58,9 +57,7 @@
       {#if $basicProfileTheme === "offwhite"}
         Off White
       {:else}
-        {isBusiness
-          ? $basicProfileThemeBusiness
-          : $basicProfileTheme}
+        {isBusiness ? $basicProfileThemeBusiness : $basicProfileTheme}
       {/if}
     </h1>
   {/if}
@@ -102,9 +99,14 @@
     </div>
     <div class="grid grid-cols-2 grid-flow-row gap-2 overflow-y-scroll">
       {#each Object.keys(theme) as key}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           class="flex flex-col {editor == 'team'
             ? $profileTheme !== key
+              ? 'cursor-pointer hover:brightness-50'
+              : 'cursor-default brightness-50'
+            : isBusiness
+            ? $basicProfileThemeBusiness !== key
               ? 'cursor-pointer hover:brightness-50'
               : 'cursor-default brightness-50'
             : $basicProfileTheme !== key
@@ -116,8 +118,14 @@
                 selectThemeHandler(key);
               }
             } else {
-              if ($basicProfileTheme !== key) {
-                selectBasicThemeHandler(key);
+              if (isBusiness) {
+                if ($basicProfileTheme !== key) {
+                  selectBasicThemeHandler(key);
+                }
+              } else {
+                if ($basicProfileTheme !== key) {
+                  selectBasicThemeHandler(key);
+                }
               }
             }
           }}

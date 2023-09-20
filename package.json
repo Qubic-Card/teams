@@ -19,15 +19,16 @@
     "typescript": "~4.6.2",
     "vite": "^4.0.3"
   },
-  "engines" : { 
-    "npm" : ">=9.0.0 <10.0.0",
-    "node" : ">=18.0.0 <19.0.0"
+  "engines": {
+    "npm": ">=9.0.0 <10.0.0",
+    "node": ">=18.0.0 <19.0.0"
   },
   "type": "module",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.231.0",
     "@aws-sdk/lib-dynamodb": "^3.231.0",
     "@covve/easy-vcard": "^1.1.0",
+    "@googlemaps/google-maps-services-js": "^3.3.38",
     "@rgossiaux/svelte-headlessui": "^1.0.0-beta.12",
     "@supabase/supabase-js": "2.2.2",
     "@sveltejs/adapter-node": "1.0.0-next.102",
@@ -44,6 +45,7 @@
     "filepond-plugin-image-resize": "^2.0.10",
     "filepond-plugin-image-transform": "^3.8.7",
     "js-cookie": "^3.0.1",
+    "link-preview-js": "^3.0.4",
     "svelte": "3.54.0",
     "svelte-check": "2.10.3",
     "svelte-easy-crop": "^1.0.7",
@@ -51,7 +53,6 @@
     "svelte-flatpickr": "^3.2.6",
     "svelte-preprocess": "5.0.0",
     "tappin-vcards-js": "^2.10.0",
-    "ua-parser-js": "^1.0.2",
-    "link-preview-js": "^3.0.4"
+    "ua-parser-js": "^1.0.2"
   }
 }

@@ -136,7 +136,7 @@
 
 <button
   class="bg-neutral-800 text-xs p-1 w-20 {isRounded ? 'rounded-md' : ''}"
-  on:click={() => (isOpen = true)}>Analytic</button
+  on:click={() => (isOpen = true)}>Analytics</button
 >
 
 {#if isOpen}
@@ -174,6 +174,7 @@
               {member?.team_profile?.lastname ?? ''}
             </h1>
             <p>{member?.team_profile?.job}</p>
+            <p class="text-neutral-500">{member.email}</p>
           </div>
           <button on:click={closeModal} class="md:hidden block self-start">
             <svg
