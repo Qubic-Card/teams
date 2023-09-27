@@ -99,12 +99,12 @@
   const handleAddFile = async () => {
     isLoading = true;
     let fileFormat = `${fileImage.type.split("/")[1]}`;
-
+    let epoch = Date.now();
     try {
       if (logoMode) {
         const { error } = await supabase.storage
           .from("logo")
-          .upload(`${$user?.id}/${fileName}`, fileImage, {
+          .upload(`${$user?.id}/${epoch}`, fileImage, {
             contentType: "image/" + fileFormat,
             upsert: true
           });
@@ -112,7 +112,7 @@
       } else {
         const { error } = await supabase.storage
           .from("avatars")
-          .upload(`${$user?.id}/${fileName}`, fileImage, {
+          .upload(`${$user?.id}/${epoch}`, fileImage, {
             contentType: "image/" + fileFormat,
           });
         if (error) throw error.message;
@@ -126,14 +126,14 @@
     if (logoMode) {
       const { data: logo } = supabase.storage
         .from("logo")
-        .getPublicUrl(`${$user?.id}/${fileName}`);
+        .getPublicUrl(`${$user?.id}/${epoch}`);
 
       $teamData.logo = logo.publicUrl;
       logoMode = false;
     } else {
       const { data: avatar } = supabase.storage
         .from("avatars")
-        .getPublicUrl(`${$user?.id}/${fileName}`);
+        .getPublicUrl(`${$user?.id}/${epoch}`);
 
       $teamData.avatar = avatar.publicUrl;
     }

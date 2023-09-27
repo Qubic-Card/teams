@@ -71,6 +71,7 @@
   };
 
   const uploadBanner = async (fileFormat, file_name) => {
+     
     const { error } = await supabase.storage
       .from("banner")
       .upload(`${$user?.id}/${file_name}`, fileImage, {
@@ -107,10 +108,11 @@
 
   const handleAddFile = async () => {
     isLoading = true;
+    let epoch = Date.now();
     let fileFormat = `${fileImage.type.split("/")[1]}`;
     const bannerPath = getBannerPath();
     const avatarPath = getAvatarPath();
-    const file_name = fileName;
+    const file_name = epoch;
     
     // HANDLING BANNER
     if (isBanner) {

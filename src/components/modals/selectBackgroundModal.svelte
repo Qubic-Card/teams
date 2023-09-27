@@ -111,6 +111,7 @@
 
   const handleAddFile = async () => {
     isLoading = true;
+    let epoch = Date.now();
     let fileFormat = `${fileImage.type.split("/")[1]}`;
     const background = $profileData.design.background;
 
@@ -128,7 +129,7 @@
     }
     const { error } = await supabase.storage
       .from("banner")
-      .upload(`${$user?.id}/${fileName}`, fileImage, {
+      .upload(`${$user?.id}/${epoch}`, fileImage, {
         contentType: `image/${fileFormat}`,
         upsert: true,
       });
@@ -139,7 +140,7 @@
     } else {
       const { data: banner } = supabase.storage
         .from("banner")
-        .getPublicUrl(`${$user?.id}/${fileName}`);
+        .getPublicUrl(`${$user?.id}/${epoch}`);
 
       croppedImage = "";
       isOpen = false;
