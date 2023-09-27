@@ -72,7 +72,7 @@
           </div>
         {/if}
         <div class="flex flex-col  mt-3">
-          <p class="font-semibold">
+          <p class="font-semibold text-lg">
             {connection.profileData.firstname ?? ''}
             {connection.profileData.lastname ?? ''}
           </p>
@@ -88,12 +88,20 @@
               : ''}
             {connection.profileData.company ?? ''}
           </p>
-          <p class="text-xs text-neutral-300">
+          <p class="text-xs mt-2 text-neutral-300">
             Connected at {new Date(connection.dateConnected)
               .toDateString()
               .slice(4)}
           </p>
-
+          {#if connection.geodata}
+          <div class="max-w-md text-xs bg-neutral-900 rounded-md px-2 py-2 mt-2">
+            <span class="flex flex-row items-center bg-blue-200 text-blue-800 rounded-full w-fit px-2 py-1"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <p class="ml-2 font-semibold ">Smart Note</p></span>
+            <p class="text-neutral-300 mt-2">You met {connection.profileData.firstname} on {connection.geodata.formatted_address}</p>
+          <a target="_blank" rel="noreferrer" class="flex flex-row mt-2" href="https://google.com/maps/search/?api=1&place_id={connection.geodata.place_id}"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> <p class="border-b ml-2 text-blue-300">Find location on Google Maps</p></a>
+          </div>
+          {/if}
+          
+          
           <div
             class={`my-2 ${
               connection.link === '' || connection.link === null
