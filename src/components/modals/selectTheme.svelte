@@ -119,7 +119,7 @@
               }
             } else {
               if (isBusiness) {
-                if ($basicProfileTheme !== key) {
+                if ($basicProfileThemeBusiness !== key) {
                   selectBasicThemeHandler(key);
                 }
               } else {
