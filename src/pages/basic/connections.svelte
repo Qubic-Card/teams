@@ -90,7 +90,7 @@
       let { data, error } = await supabase
         .from('card_connection')
         .select(
-          'id, card_id(type, color, mode), status, QRScan, QRShare, NFCtap, datecreated'
+          'id, card_id(id, type, color, mode), status, QRScan, QRShare, NFCtap, datecreated'
         )
         .eq('uid', $user?.id)
         .limit(10)
@@ -140,6 +140,7 @@
                   <p class="{card?.card_id?.color == "white" ? "text-neutral-600" : "text-neutral-400"} text-xs">
                     {new Date(card?.datecreated).toDateString().slice(4)}
                   </p>
+                  <p>******{card?.card_id?.id.slice(-6)}</p>
                 </div>
                 <div class="flex flex-row justify-between px-6">
                   <div class="{card?.card_id?.color == "white" ? "text-black" : "text-white"} items-center">

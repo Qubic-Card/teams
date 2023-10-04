@@ -11,6 +11,7 @@
       <tr>
         <th class="text-left pl-4 p-2">Date</th>
         <th class="text-left pl-4 p-2">Description</th>
+        <th class="text-left">Card</th>
         <th class="text-left">Device</th>
       </tr>
     </thead>
@@ -26,6 +27,7 @@
               {new Date(row?.timestamp).toDateString().slice(4)}
             </td>
             <td class="pl-4 w-auto">{row?.data?.message}</td>
+            <td class="w-auto">******{row?.data?.card.slice(-6)}</td>
             <td class="flex flex-col h-[40px] justify-center">
               {row?.platform}
             </td>
