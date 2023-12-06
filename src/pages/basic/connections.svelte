@@ -9,6 +9,11 @@
   import ContactCard from '@comp/basic/contactCard.svelte';
   import Search from '@comp/search.svelte';
   import { basicSearchMenu } from '@lib/constants';
+    import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@rgossiaux/svelte-headlessui';
+
+
+    let profileOptions = ['Personal', 'Business', 'Qubic'];
+    let selectedProfileOption = 'Personal';
 
   let loading = false;
   let businessCards = [];
@@ -168,7 +173,18 @@
                     checked={card.status}
                   />
                 </div>
+                <Listbox  bind:value={selectedProfileOption}>
+                  <ListboxButton class="bg-white w-full rounded-b-lg py-2 px-4 border">{selectedProfileOption}</ListboxButton>
+                  <ListboxOptions class="bg-white rounded-lg py-2 px-4 border absolute z-50 shadow-md">
+                    {#each profileOptions as pro}
+                      <ListboxOption class={pro == selectedProfileOption ? 'font-semibold' : 'text-neutral-600 hover:text-neutral-900 hover:font-semibold cursor-pointer'} value={pro}>
+                        {pro}
+                      </ListboxOption>
+                    {/each}
+                  </ListboxOptions>
+                </Listbox>
               </div>
+              
             </CardMock>
           </div>
         {/each}

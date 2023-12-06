@@ -1,7 +1,12 @@
+@import 'filepond/dist/filepond.css';
+@import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
 /* Write your global styles here, in PostCSS syntax */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
 
 /* .snap-container::-webkit-scrollbar {
   height: 5px;
@@ -23,3 +28,24 @@
   border-radius: 30px;
   background-color: #949494b8;
 }
+
+
+  /* width */
+  .snap-container::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  /* Track */
+  .snap-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Handle */
+  .snap-container::-webkit-scrollbar-thumb {
+    background: rgb(218, 218, 218);
+  }
+
+  /* Handle on hover */
+  .snap-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(163, 163, 163);
+  }

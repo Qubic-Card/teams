@@ -34,7 +34,7 @@
     on:click={() => (isOpen = false)}
   />
 {/if}
-<div class="flex flex-row items-center gap-5 pr-3">
+<div class="flex flex-row items-center gap-5">
   {#if editor === "team"}
     <p
       class="text-neutral-300 text-sm border px-3 py-2 border-neutral-800 rounded-lg bg-blue-800 bg-opacity-20"
@@ -60,7 +60,8 @@
     {/if}
   {:else}
     <button
-      on:click|preventDefault={() => (isOpen = true)}
+    on:mouseout={() => (isOpen = false)}
+      on:mouseover={() => (isOpen = true)}
       class="p-3 bg-black rounded-full h-10 flex items-center justify-center mx-2 w-10"
     >
       {$user?.email.charAt(0).toUpperCase()}

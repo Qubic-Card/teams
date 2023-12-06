@@ -1,13 +1,13 @@
 export const theme = {
   dark: {
-    pageBackground: 'bg-black',
+    pageBackground: 'bg-[#171717]',
     text: 'text-gray-200',
     button: 'bg-blue-600',
     buttonText: 'text-white',
     avatarBorder: 'border-[#000000]',
     loadingBorder: '#F9F9F9',
     outline: 'outline-[#2E2E2E]',
-    secondary: 'bg-[#151515]',
+    secondary: 'bg-[#2C2C2C]',
   },
   light: {
     pageBackground: 'bg-white',

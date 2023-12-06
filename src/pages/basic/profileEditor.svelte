@@ -351,6 +351,7 @@
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
+                      
                     </div>
                   {:else}
                     <div class="px-3 bg-white grid grid-cols-2 space-x-5">
@@ -397,6 +398,7 @@
                         inputbg="bg-neutral-100"
                         inputText="text-black"
                       />
+                      
                     </div>
                   {/if}
 
@@ -556,26 +558,5 @@
 </div>
 
 <style global>
-  @import 'filepond/dist/filepond.css';
-  @import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
-
-  /* width */
-  .snap-container::-webkit-scrollbar {
-    width: 0px;
-  }
-
-  /* Track */
-  .snap-container::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* Handle */
-  .snap-container::-webkit-scrollbar-thumb {
-    background: rgb(218, 218, 218);
-  }
-
-  /* Handle on hover */
-  .snap-container::-webkit-scrollbar-thumb:hover {
-    background: rgb(163, 163, 163);
-  }
+  
 </style>
