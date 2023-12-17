@@ -6,12 +6,12 @@
     // let arr = [{title:"Griya BCA", description:"Rayakan Griya ke-10"}, {title:"Ultah Qubic", description:"Ulang taun Qubic yang ke-2"}]
 
     const loadEvents = async () => {
-        const { data, error } = await supabase
+        let { data: events, error } = await supabase
             .from("events")
-            .select()
+            .select("*")
             .eq("uid", $user.id);
-            console.log(data)
-        return data;
+        console.log(events);
+        return events;
     };
 </script>
 
@@ -29,13 +29,13 @@
             >
         </div>
         <div class="grid grid-cols-4 space-x-4 mt-3">
-            {#await loadEvents}
+            {#await loadEvents()}
                 <div></div>
             {:then arr}
-                <!-- {#each arr as e, i}
-                    <EventCard title={e.title} description={e.description}
+                {#each arr as e, i}
+                    <EventCard expiry={e.end_date} title={e.title} description={e.description}
                     ></EventCard>
-                {/each} -->
+                {/each}
             {/await}
         </div>
     </div>

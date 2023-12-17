@@ -2,12 +2,18 @@
     import { fade, fly, slide } from "svelte/transition";
     import { user } from "@lib/stores/userStore";
     import SVGInject from "@iconfu/svg-inject";
-    import { socials, links, basicSocials, basicLinks } from "@lib/stores/editorStore";
+    import {
+        socials,
+        links,
+        basicSocials,
+        basicLinks,
+    } from "@lib/stores/editorStore";
     import { theme } from "@lib/profileTheme";
     import Lenis from "@studio-freight/lenis";
     import Dummy from "@lib/dummy.json";
 
     import { onMount } from "svelte";
+    import { toastFailed } from "@lib/utils/toast";
 
     export let isShowMetaImage = false;
     export let isEditorMode = false;
@@ -24,15 +30,15 @@
 
     let currentTheme = theme[data?.design?.theme?.toString() ?? "dark"];
     let holder = data?.firstname + " " + data?.lastname;
-    
+
     SVGInject.setOptions({
-      useCache: false, // no caching
-      copyAttributes: false, // do not copy attributes from `<img>` to `<svg>`
-      makeIdsUnique: false, // do not make ids used within the SVG unique
-      afterLoad: function(svg, svgString) {
-        // add a class to the svg
-        svg.classList.add('fill-white');
-      },
+        useCache: false, // no caching
+        copyAttributes: false, // do not copy attributes from `<img>` to `<svg>`
+        makeIdsUnique: false, // do not make ids used within the SVG unique
+        afterLoad: function (svg, svgString) {
+            // add a class to the svg
+            svg.classList.add("fill-white");
+        },
     });
 
     let personalProfile = {
@@ -49,6 +55,10 @@
         links: data?.links?.filter((link) => link.isPersonal !== false),
         isBusiness: data?.isBusiness,
     };
+
+    const connectWithMe = () => {
+        toastFailed("Disabled in Editor")
+    }
 
     $: if (data) {
         personalProfile = {
@@ -78,7 +88,7 @@
     } else {
         currentTheme = theme["dark"];
     }
-    console.log(data)
+    console.log(data);
     onMount(() => {
         if (!isEditorMode) {
             const lenis = new Lenis({
@@ -94,13 +104,25 @@
             }
 
             requestAnimationFrame(raf);
+        } else {
+            const container = document.querySelector(".container");
+            const items = document.querySelectorAll(".child");
+
+            container.addEventListener("wheel", (event) => {
+                event.preventDefault();
+                const delta = event.deltaY;
+
+                container.scrollBy({
+                    top: delta,
+                    behavior: "smooth",
+                });
+            });
         }
     });
 </script>
-
-{#if !isEditorMode}
+    {#if data.logo}
     <div
-        class="h-14 {currentTheme?.border} border-b fixed max-w-md z-[1] top-0 mx-auto {currentTheme?.pageBackground} bg-opacity-40 backdrop-blur-sm w-full flex justify-center items-center"
+        class="h-14 {currentTheme?.border} border-b sticky max-w-md z-[1] top-0 mx-auto {currentTheme?.pageBackground} bg-opacity-40 backdrop-blur-sm w-full flex justify-center items-center"
     >
         <img
             class="h-10 w-10"
@@ -108,113 +130,106 @@
             alt=""
         />
     </div>
-{/if}
+    {/if}
 <div
-    class={`${currentTheme?.pageBackground} ${$$props.class} relative transition-colors min-h-screen px-6 duration-500 ease-in text-sm`}
+    class={`${currentTheme?.pageBackground} ${$$props.class} relative container transition-colors min-h-screen px-6 duration-500 ease-in text-sm`}
     class:bg-image-profile={currentTheme?.backgroundImage}
     style={`--bg-img-profile: url('${currentTheme?.backgroundImage}')`}
 >
     <!-- Event -->
     {#if !isEditorMode}
-    <div class="h-screen flex items-center w-full">
-        <div
-            class="aspect-[9/16] w-full bg-[url('https://images.unsplash.com/photo-1542992015-8b34590ec327?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-contain rounded-md"
-        ></div>
-    </div>
+        <div class="h-screen flex items-center w-full">
+            <div
+                class="aspect-[9/16] w-full bg-[url('https://images.unsplash.com/photo-1542992015-8b34590ec327?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-contain rounded-md"
+            ></div>
+        </div>
     {/if}
     <!-- INTRO -->
     <div
-        class="w-full max-w-sm text-white h-screen justify-center flex flex-col"
+        class="w-full child snap-start max-w-sm text-white h-screen justify-center flex flex-col"
     >
-        <h1 class=" text-5xl font-semibold">{data?.company}</h1>
-        <p class="text-xl opacity-50 mt-5">{data?.intro ?? ''}</p>
+        <h1 class=" text-5xl -mt-20 font-semibold">{data?.company}</h1>
+        <p class="text-xl break-words opacity-50 mt-5">{data?.intro ?? ""}</p>
     </div>
     <!-- PROFILE -->
-    <div class="w-full max-w-sm text-white min-h-screen flex flex-col">
+    <div class="w-full pt-6 child max-w-sm text-white min-h-screen flex-col">
         <div class="flex flex-row h-[175px]">
-            <div class="h-[175px] w-[175px]">
+            <div class="h-[175px] w-[175px] aspect-square">
                 <img
                     class="rounded-t-2xl h-full w-full object-cover rounded-bl-2xl"
                     src={data?.avatar}
                     alt=""
                 />
             </div>
-            <div class="flex flex-col justify-between ml-2">
-                <h1 class="text-2xl font-medium uppercase">
-                    {#if !data?.isBusiness}
-                        {data?.firstname ?? Dummy.firstname}
-                        {data?.lastname ?? ""}
-                    {:else}
-                        {data?.firstnameBusiness ?? Dummy.firstname}
-                        {data?.lastnameBusiness ?? ""}
-                    {/if}
+            <div class="flex pl-6 flex-col justify-between">
+                <h1 class="text-4xl font-medium uppercase">
+                    {data?.firstname ?? Dummy.firstname}
+                    {data?.lastname ?? ""}
                 </h1>
                 <div>
-                    <h1 class="text-sm text-neutral-500">
-                        {#if !data?.isBusiness}
-                            {data?.job ?? Dummy.job}
-                        {:else}
-                            {data?.jobBusiness ?? ""}
-                        {/if}
+                    <h1 class="text-sm {currentTheme?.text} text-opacity-50">
+                        {data?.job ?? Dummy.job}
                     </h1>
-                    <h1 class="text-sm text-neutral-500">
-                        {#if !data?.isBusiness}
-                            {data?.company ?? ""}
-                        {:else}
-                            {data?.companyBusiness ?? ""}
-                        {/if}
+                    <h1 class="text-sm {currentTheme?.text} text-opacity-50">
+                        {data?.company ?? ""}
                     </h1>
                 </div>
             </div>
         </div>
         <div
             transition:slide|local
-            class="flex space-x-2 mt-10 flex-wrap items-start"
+            class="flex space-x-2 mt-4 flex-wrap items-start"
         >
             {#if isEditorMode ? $basicSocials.length < 1 : data.socials.length < 1 || isEditorMode ? $basicSocials.every((s) => s.isActive === false) : data.socials.every((s) => s.isActive === false)}
                 <div></div>
             {:else}
+            <div class="flex flex-wrap">
                 {#each isEditorMode ? $basicSocials : data.socials as item, i}
                     {#if item.isActive}
                         <button
                             on:click={async () => {}}
-                            class="py-2 px-2 rounded-full flex space-x-3 justify-center items-center {currentTheme?.outline} {currentTheme?.secondary}"
+                            class="py-2 px-2 mx-1 my-1 rounded-full flex space-x-3 justify-center items-center {currentTheme?.outline} {currentTheme?.secondary}"
                         >
-                        <!-- <svg height="24px" width="24px">
-                            <use href={"/socialicons/" + item.type + ".svg#img"}></use>
-                        </svg> -->
-                        <img class="fill-white" src={"/socialicons/" + item.type + ".svg"} onload={SVGInject(this)} />
                             
+                        <div class="rounded-full bg-neutral-600">
+                            <img
+                            class="fill-white p-1  invert"
+                            src={"/socialicons/" + item.type + ".svg"} height="22" width="22"
+                        />
+                        </div>
+
                             <p class="pr-2">{item.type}</p>
                         </button>
                     {/if}
                 {/each}
+            </div>
             {/if}
         </div>
         <!-- banner -->
-        {#if data.design.background}
-        <div
-            class="aspect-[3] rounded-md bg-cover mt-10 bg-[url({data.design.background})]"
-        ></div>
+        {#if data?.design?.background}
+        <img class="aspect-[3] rounded-md object-cover mt-6" src={data?.design
+            .background} alt="">
+            
         {/if}
         <!-- Links -->
-        <div class="flex flex-col mt-10">
+        <div class="flex flex-col mt-6 space-y-4">
+            {#if data?.links}
             {#each isEditorMode ? $basicLinks : data.links as item, i}
                 {#if item.isActive}
-                    <a href={item.link} class="text-lg">{item.title}</a>
+                    <a href={item.link} class="text-xl">{item.title}</a>
                 {/if}
             {/each}
+            {/if}
         </div>
     </div>
 </div>
-{#if !isEditorMode}
     <div
-        class="h-14 {currentTheme?.pageBackground} {currentTheme?.border} {currentTheme?.buttonText} border-t fixed w-full text-sm font-light flex-row max-w-md bottom-0 mx-auto flex justify-between items-center"
+        class="h-14 {currentTheme?.pageBackground} {currentTheme?.border} {currentTheme?.buttonText} border-t sticky w-full text-sm font-light flex-row max-w-md bottom-0 mx-auto flex justify-between items-center"
     >
-        <button class="w-full h-full text-left border-r {currentTheme?.border}">
+        <button on:click={connectWithMe} class="w-full h-full text-left border-r {currentTheme?.border}">
             <p class="px-10">Connect With Me</p>
         </button>
-        <button class="px-10">
+        <button on:click={connectWithMe} class="px-10">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -239,4 +254,18 @@
             >
         </button>
     </div>
-{/if}
+
+<style>
+    .container {
+        height: 100vh;
+        scroll-snap-type: y mandatory;
+        scroll-padding: 10px;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    }
+
+    .child {
+        scroll-snap-align: center;
+        display: flex;
+    }
+</style>

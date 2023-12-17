@@ -51,7 +51,7 @@
     basicPersonalVcard,
     basicProfile,
   } from "@lib/stores/profileData";
-    import Proprofile from "./proprofile.svelte";
+  import Proprofile from "./proprofile.svelte";
 
   // Register the plugins
   registerPlugin(
@@ -63,10 +63,10 @@
     FilePondPluginFileValidateType,
   );
 
-  let pond;
-  let name = "filepond";
+  let logoFP;
+  let avatarFP;
 
-  let profileOptions = ["Default"];
+  let profileOptions = [];
   let selectedProfileOption = "Default";
   let activeProfileID;
 
@@ -80,13 +80,15 @@
   const addNewProfile = async () => {
     const { data, error } = await supabase
       .from("pro_profile")
-      .insert([{ name: "new profile " + (profileOptions.length + 1), uid: $user.id}])
+      .insert([
+        { name: "new profile " + (profileOptions.length + 1), uid: $user.id },
+      ])
       .select();
 
-    console.log(data)
+    console.log(data);
     if (data) {
       activeProfileID = data[0].id;
-      profileOptions.push(data[0].name);
+      profileOptions.push({name: data[0].name, id: data[0].id});
       selectedProfileOption = data[0].name;
       const profile = data[0]["metadata"];
       $basicProfile = { ...profile };
@@ -95,6 +97,7 @@
       $basicProfileTheme = profile["design"]["theme"];
       $basicCurrentTheme = theme[profile["design"]["theme"]];
       profileId = data[0]["id"];
+      toastSuccess("Added new profile")
     }
   };
 
@@ -138,9 +141,9 @@
     if (data) {
       activeProfileID = data[0].id;
       let Opts = [];
-      data.forEach((e) => Opts.push(e.name));
+      data.forEach((e) => Opts.push({id:e.id, name: e.name}));
       profileOptions = Opts;
-      selectedProfileOption = Opts[0];
+      selectedProfileOption = Opts[0].name;
       const profile = data[0]["metadata"];
       $basicProfile = { ...profile };
       $basicSocials = profile["socials"];
@@ -160,7 +163,7 @@
       $basicProfile.links = $basicLinks;
       $basicProfile.design.theme = $basicProfileTheme;
       $basicProfile.design.themeBusiness = $basicProfileThemeBusiness;
-      
+
       const { error } = await supabase
         .from("pro_profile")
         .update({ metadata: $basicProfile })
@@ -175,53 +178,30 @@
     }
   };
 
-  const switchProfile = async (isPersonal = true) => {
-    let filteredSocialsBusiness = $basicSocials.filter((social) =>
-      social.type.includes("business"),
-    );
-    let filteredSocialsPersonal = $basicSocials.filter(
-      (social) => !social.type.includes("business"),
-    );
-    let filteredLinksBusiness = $basicLinks.filter(
-      (link) => link.isPersonal === false,
-    );
-    let filteredLinksPersonal = $basicLinks.filter(
-      (link) => link.isPersonal !== false,
-    );
+  const deleteProfile = () => {
+    toastSuccess("profile deleted")
+  }
 
-    if (isPersonal) {
-      $basicCurrentTheme = theme[$basicProfileTheme];
-      $basicProfile.isBusiness = false;
-    } else {
-      $basicCurrentTheme = theme[$basicProfileThemeBusiness];
-      $basicProfile.isBusiness = true;
+  const switchProfile = async (id) => {
+    let { data, error } = await supabase
+      .from("pro_profile")
+      .select("*")
+      .eq("uid", $user.id)
+      .eq("id", id);
 
-      if (!$basicProfile.firstnameBusiness)
-        $basicProfile.firstnameBusiness = $basicProfile.firstname;
-
-      if (!$basicProfile.lastnameBusiness)
-        $basicProfile.lastnameBusiness = $basicProfile.lastname;
-
-      if (filteredLinksBusiness.length === 0) {
-        filteredLinksBusiness = [
-          {
-            title: "My Website",
-            link: "https://qubic.id",
-            isActive: true,
-            isPersonal: false,
-          },
-        ];
-      }
+    if (data) {
+      activeProfileID = data[0].id;
+      selectedProfileOption = data[0]['name'];
+      const profile = data[0]["metadata"];
+      $basicProfile = { ...profile };
+      $basicSocials = profile["socials"];
+      $basicLinks = profile["links"];
+      $basicProfileTheme = profile["design"]["theme"];
+      $basicCurrentTheme = theme[profile["design"]["theme"]];
+      profileId = data[0]["id"];
+      toastSuccess(`Switched to ${selectedProfileOption}`);
+      await handleSave(false);
     }
-
-    $basicSocials = [...filteredSocialsBusiness, ...filteredSocialsPersonal];
-    $basicLinks = [...filteredLinksBusiness, ...filteredLinksPersonal];
-    toastSuccess(
-      `Switched to ${
-        $basicProfile.isBusiness ? "Business Mode" : "Personal Mode"
-      }`,
-    );
-    await handleSave(false);
   };
 </script>
 
@@ -236,6 +216,7 @@
       <div class="grid grid-cols-2 gap-2 text-black mt-8">
         <div class="flex flex-col w-full md:col-span-1 col-span-2 mb-10">
           <div class="flex flex-row w-full justify-between items-center">
+            <div class="flex flex-row space-x-1">
             <Listbox bind:value={selectedProfileOption}>
               <ListboxButton class="bg-white rounded-lg py-2 px-4 border"
                 >{selectedProfileOption}</ListboxButton
@@ -245,16 +226,20 @@
               >
                 {#each profileOptions as pro}
                   <ListboxOption
-                    class={pro == selectedProfileOption
+                  on:click={async() => await switchProfile(pro.id)}
+                    class={pro.name == selectedProfileOption
                       ? "font-semibold"
                       : "text-neutral-600 hover:text-neutral-900 hover:font-semibold cursor-pointer"}
-                    value={pro}
+                    value={pro.name}
                   >
-                    {pro}
+                    {pro.name}
                   </ListboxOption>
                 {/each}
               </ListboxOptions>
             </Listbox>
+            <button on:click={deleteProfile} class="bg-white rounded-lg py-2 px-2 border"><img class="opacity-30" width="24" height="24" src="/icons/trash.svg" alt="delete"></button>
+            </div>
+            
             <button
               on:click={addNewProfile}
               class="text-sm border p-2 text-neutral-600 rounded-lg"
@@ -346,15 +331,39 @@
 
                   <div class="p-3 bg-white">
                     <FilePond
-                      bind:this={pond}
-                      {name}
+                      bind:this={avatarFP}
+                      name="Avatar File"
                       credits=""
                       allowProcess={false}
                       class="cursor-pointer"
                       acceptedFileTypes={["image/png", "image/jpeg"]}
                       instantUpload={false}
                       imageCropAspectRatio={1 / 1}
-                      labelIdle="Add Profile Picture"
+                      labelIdle="Add profile picture"
+                      allowMultiple={false}
+                      beforeAddFile={handleCrop}
+                    />
+
+                    <BasicCropModal
+                      isBanner={false}
+                      {isOpen}
+                      {handleSave}
+                      {image}
+                      {fileName}
+                      on:updatedData={updateData}
+                      on:closeModal={closeModal}
+                    />
+
+                    <FilePond
+                      bind:this={logoFP}
+                      name="Logo File"
+                      credits=""
+                      allowProcess={false}
+                      class="cursor-pointer"
+                      acceptedFileTypes={["image/png", "image/jpeg"]}
+                      instantUpload={false}
+                      imageCropAspectRatio={1 / 1}
+                      labelIdle="Add company logo"
                       allowMultiple={false}
                       beforeAddFile={handleCrop}
                     />
@@ -379,25 +388,23 @@
                     <h1 class="font-semibold text-lg">Socials</h1>
                     <AddSocialsModal profileData={$basicProfile} />
                   </div>
-                  
-                    {#if $basicSocials.length > 0}
-                      {#each $basicSocials as item, i}
-                        <InputSocialsEditor                          
-                          socials={$basicSocials}
-                          {item}
-                          {i}
-                          {handleSave}
-                          {handleDeleteSocial}
-                          {handleUpSocial}
-                        />
-                      {/each}
-                    {:else}
-                      <div class="text-center text-gray-600">
-                        No socials added yet
-                      </div>
-                    {/if}
-                  
-                  
+
+                  {#if $basicSocials.length > 0}
+                    {#each $basicSocials as item, i}
+                      <InputSocialsEditor
+                        socials={$basicSocials}
+                        {item}
+                        {i}
+                        {handleSave}
+                        {handleDeleteSocial}
+                        {handleUpSocial}
+                      />
+                    {/each}
+                  {:else}
+                    <div class="text-center text-gray-600">
+                      No socials added yet
+                    </div>
+                  {/if}
                 </div>
               </TabPanel>
               <TabPanel>
@@ -406,8 +413,7 @@
                     <h1 class="font-semibold text-lg">Links</h1>
                     <img
                       class="h-10 w-10 cursor-pointer"
-                      on:click={() =>
-                        addLink(false, $basicLinks)}
+                      on:click={() => addLink(false, $basicLinks)}
                       src="https://img.icons8.com/external-royyan-wijaya-detailed-outline-royyan-wijaya/48/000000/external-add-interface-royyan-wijaya-detailed-outline-royyan-wijaya.png"
                       alt="add"
                     />
@@ -455,11 +461,7 @@
             </TabPanels>
           </TabGroup>
 
-          <SelectTheme
-            {handleSave}
-            editor="basic"
-            isBusiness={false}
-          />
+          <SelectTheme {handleSave} editor="basic" isBusiness={false} />
         </div>
         <div
           class="md:col-span-1 col-span-2 max-w-md w-full mx-auto h-[87.5vh] overflow-y-scroll snap-container mb-10 rounded-3xl relative border-8 border-black bg-black"

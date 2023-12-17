@@ -112,7 +112,7 @@
 <button
   on:click={toggleModal}
   class="w-full text-black bg-neutral-100 rounded-md p-5 mt-2 md:text-sm text-xs"
-  >Select Background</button
+  >Select banner</button
 >
 
 <Dialog

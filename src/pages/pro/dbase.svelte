@@ -19,6 +19,7 @@
     import sortBy from "@lib/utils/sortBy";
     import { personal, team } from "@lib/stores/recordsStore";
     import { page } from "$app/stores";
+    import DateInput from "date-picker-svelte/DateInput.svelte";
 
     export let isTeamInactive, holder, getAllStorage;
 
@@ -216,63 +217,26 @@
         class="md:flex max-w-md hidden min-h-screen flex-col w-full justify-between gap-4 border-r bg-white  h-full"
     >
         <div class="pt-4 px-10 flex flex-col gap-4">
-            {#if $userData?.includes("inactive")}
-                <Input
-                    disabled={true}
-                    placeholder="Type"
-                    title="Type"
-                    bind:value={selectedType}
-                    isFilenameInput={true}
-                    isEmptyChecking={true}
-                />
-                <Input
-                    disabled={true}
-                    placeholder="From"
-                    title="From"
-                    bind:value={fileName}
-                    isFilenameInput={true}
-                    isEmptyChecking={true}
-                />
-                <Input
-                    disabled={true}
-                    placeholder="To"
-                    title="To"
-                    bind:value={fileName}
-                    isFilenameInput={true}
-                    isEmptyChecking={true}
-                />
-            {:else}
-                <RecordTypeDropdownButton
-                    on:select={selectTypeHandler}
-                    {selectedType}
-                />
                 <div class="flex flex-col gap-2">
                     <p class="text-gray-400">From</p>
-                    <Flatpickr
-                        options={fromDateOptions}
+                    <DateInput
+                        format="dd/MM/yyyy"
+                        min={toDateValue}
                         bind:value={fromDateValue}
-                        name="date"
-                        class="w-full bg-neutral-800 rounded-md p-2 cursor-pointer"
                     />
                 </div>
                 <div class="flex flex-col gap-2">
                     <p class="text-gray-400">To</p>
-                    <Flatpickr
-                        options={toDateOptions}
+                    <DateInput
+                        format="dd/MM/yyyy"
+                        min={fromDateValue}
                         bind:value={toDateValue}
-                        name="date"
-                        class="w-full bg-neutral-800 rounded-md p-2 cursor-pointer disabled:cursor-default"
                     />
                 </div>
-            {/if}
-            <Input
-                disabled={$userData?.includes("inactive")}
-                placeholder="Filename"
-                title="Filename"
-                bind:value={fileName}
-                isFilenameInput={true}
-                isEmptyChecking={true}
-            />
+                <div class="flex flex-col gap-2">
+                    <p class="text-gray-400">Filename</p>
+                    <input class="border rounded-md p-2 border-neutral-300" bind:value= {fileName}/>
+                </div>
             {#if fileName.length < 4}
                 <small class="text-red-500">
                     You must enter a filename with at least 4 characters.
@@ -285,14 +249,13 @@
             disabled={fileName.includes(".") || fileName.length < 4
                 ? true
                 : false ||
-                  $userData?.includes("inactive") ||
                   isCreateRecordLoading}
             on:click={async () => {
-                if (selectedType === "Choose Type") {
-                    toastFailed("Please select a type");
-                } else {
-                    await createRecordHandler();
-                }
+               
+                    toastFailed("Under maintenance");
+                
+                    // await createRecordHandler();
+                
             }}
         >
             {#if isCreateRecordLoading}

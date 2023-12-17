@@ -1,19 +1,42 @@
 <script>
     import Input from "@comp/input.svelte";
-    import FilePond, { registerPlugin } from 'svelte-filepond';
-    import { DateInput } from 'date-picker-svelte'
+    import FilePond, { registerPlugin } from "svelte-filepond";
+    import { DateInput } from "date-picker-svelte";
     import { goto } from "$app/navigation";
-  let date = new Date()
+    import supabase from "@lib/db";
+    import { user } from "@lib/stores/userStore";
+    import Error from "@pages/error.svelte";
+
+    let startDate = new Date();
+    let endDate = new Date();
 
     let title;
+    let description;
     let pond;
+
+    const create = async () => {
+        const id = $user.id
+        const { data, error } = await supabase
+            .from("events")
+            .insert([{ uid:id, title: title, description: description, end_date: endDate, start_date:startDate }])
+            .select();
+
+        if(error) {
+            console.log(error)
+        }
+
+        if(data){
+            goto("/basic/events");
+        }
+    };
 </script>
 
 <div class="bg-gray-100 w-full min-h-screen">
     <div class="pt-10 mx-10">
         <div>
             <h1 class="font-bold text-lg">
-                <span class="px-2 font-normal border rounded-full text-sm"
+                <span
+                    class="px-2 font-normal border rounded-full text-sm text-blue-600"
                     >New</span
                 > Create your event
             </h1>
@@ -34,14 +57,13 @@
             </div>
             <div class="  px-4 py-1">
                 <p class="text-sm text-gray-400">Description</p>
-                      <textarea
-                      maxlength="160"
-                        on:change={null}
-                        placeholder="Tell us about what this event is about"
-                        title="Description"
-                        
-                        class="w-full bg-neutral-100 rounded-md px-2 py-2 mt-2 resize-none"
-                      />
+                <textarea
+                    maxlength="160"
+                    on:change={null}
+                    placeholder="Tell us about what this event is about"
+                    title="Description"
+                    class="w-full bg-neutral-100 rounded-md px-2 py-2 mt-2 resize-none"
+                />
             </div>
             <div class=" px-4 py-1">
                 <FilePond
@@ -57,19 +79,31 @@
                 />
             </div>
             <div class=" px-4 py-1 flex flex-row items-center justify-between">
-                
                 <div>
                     <p class="text-sm text-gray-400">Start Date</p>
-                    <DateInput bind:value={date} />
+                    <DateInput format="dd/MM/yyyy" bind:value={startDate} />
                 </div>
                 <div>
                     <p class="text-sm text-gray-400">End Date</p>
-                    <DateInput bind:value={date} />
+                    <DateInput
+                        format="dd/MM/yyyy"
+                        min={startDate}
+                        bind:value={endDate}
+                    />
                 </div>
             </div>
-            <div class="border-t w-full flex items-center justify-end flex-row mt-3 py-3">
-                <button on:click={() => goto('/basic/events')} class=" px-2 py-1  text-neutral-600 mr-4">Cancel</button>
-                <button class=" px-4 py-1 bg-blue-600 rounded-full mr-4 text-white">Create</button>
+            <div
+                class="border-t w-full flex items-center justify-end flex-row mt-3 py-3"
+            >
+                <button
+                    on:click={() => goto("/basic/events")}
+                    class=" px-2 py-1 text-neutral-600 mr-4">Cancel</button
+                >
+                <button
+                on:click={create}
+                    class=" px-4 py-1 bg-blue-600 rounded-full mr-4 text-white"
+                    >Create</button
+                >
             </div>
         </div>
     </div>

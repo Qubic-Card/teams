@@ -129,12 +129,25 @@
   {:else if businessCards}
     {#if businessCards.length > 0}
       <div
-        class="snap-container mx-auto md:h-[280px] h-[230px] flex flex-row space-x-3 w-full overflow-x-auto pb-4"
+        class="snap-container mx-auto md:h-[310px] h-[260px] space-x-3 flex flex-row w-full overflow-x-auto overflow-y-visible pb-4"
       >
         {#each businessCards as card, index}
           <div
-            class="snap-center aspect-[8/5] h-auto  flex-shrink-0 flex justify-center items-center rounded-lg"
+            class="snap-center  flex-col   flex justify-center items-center rounded-lg"
           >
+          <Listbox class="w-full"  bind:value={selectedProfileOption}>
+            <ListboxButton class="bg-blue-600 text-white text-sm border pb-6 -mb-6 ml-3 rounded-lg text-start py-2 px-4">{selectedProfileOption}</ListboxButton>
+            <ListboxOptions class="bg-white rounded-lg py-2 px-4 border mt-2 ml-3 absolute z-50 shadow-md">
+              {#each profileOptions as pro}
+                <ListboxOption class={pro == selectedProfileOption ? 'font-semibold' : 'text-neutral-600 hover:text-neutral-900 hover:font-semibold cursor-pointer z-50'} value={pro}>
+                  {pro}
+                </ListboxOption>
+              {/each}
+            </ListboxOptions>
+          </Listbox>
+          <div class="aspect-[7/5] h-full w-full px-0">
+
+          
             <CardMock color={card?.card_id?.color} type={card?.card_id?.type}>
               <div class="flex flex-col justify-between h-full flex-1">
                 <div class="{card?.card_id?.color == "white" ? "text-black" : "text-white"} p-6">
@@ -173,20 +186,13 @@
                     checked={card.status}
                   />
                 </div>
-                <Listbox  bind:value={selectedProfileOption}>
-                  <ListboxButton class="bg-white w-full rounded-b-lg py-2 px-4 border">{selectedProfileOption}</ListboxButton>
-                  <ListboxOptions class="bg-white rounded-lg py-2 px-4 border absolute z-50 shadow-md">
-                    {#each profileOptions as pro}
-                      <ListboxOption class={pro == selectedProfileOption ? 'font-semibold' : 'text-neutral-600 hover:text-neutral-900 hover:font-semibold cursor-pointer'} value={pro}>
-                        {pro}
-                      </ListboxOption>
-                    {/each}
-                  </ListboxOptions>
-                </Listbox>
+                
               </div>
               
             </CardMock>
           </div>
+          </div>
+          
         {/each}
         <div
           on:click={() =>
