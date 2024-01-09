@@ -136,7 +136,6 @@
     const { data, error } = await supabase.rpc('getcards', {
       tid: $page.params.slug,
     });
-    // .ilike('email', '%test%');
 
     if (error) console.log(error);
 

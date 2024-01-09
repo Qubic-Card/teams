@@ -6,8 +6,11 @@
   import AvatarDropdown from '@comp/buttons/avatarDropdown.svelte';
 
   export let card, permissions, getAllCards, getActiveCards, state;
-
-  const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const capitalize = (s) => {
+    if(s != null) {
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    }
+  }
 
   const setStatus = async () => {
     const { data, error } = await supabase

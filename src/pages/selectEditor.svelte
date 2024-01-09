@@ -34,6 +34,8 @@
   };
 
   const getTeamsList = async () => {
+    let date = new Date();
+
     const { data, error } = await supabase
       .from('team_members')
       .select('team_id(*)')
@@ -49,9 +51,14 @@
         let uniqueTeamId = [...new Set(data.map((t) => t.team_id.id))];
 
         data.filter((t) => {
-          if (uniqueTeamId.includes(t.team_id.id)) {
-            newData.push(t.team_id);
-            uniqueTeamId = uniqueTeamId.filter((m) => m !== t.team_id.id);
+          let subDate= new Date(t.team_id.subscription_end_date)
+          subDate.setDate(subDate.getDate() + 30);
+          console.log(new Date(t.team_id.subscription_end_date))
+          if ( date.getDate() < subDate.getDate()) {
+            if (uniqueTeamId.includes(t.team_id.id)) {
+              newData.push(t.team_id);
+              uniqueTeamId = uniqueTeamId.filter((m) => m !== t.team_id.id);
+            }
           }
         });
 
@@ -139,33 +146,38 @@
                   class="w-10 h-10 rounded-md bg-black"
                 />
 
-                <p>
-                  {item.name.charAt(0).toUpperCase() + item.name.slice(1) ?? ''}
-                </p>
-              </button>
-            {/each}
-          {:else}
-            <p class="text-neutral-600">You don't have any teams yet.</p>
-            <p class="text-sm">
-              Contact us <button
-                class="cursor-pointer font-semibold underline"
-                on:click={() =>
-                  window.open('https://wa.me/628113087599', '_blank').focus()}
-                >here</button
-              > to get started.
+            <p>
+              {item.name.charAt(0).toUpperCase() + item.name.slice(1) ?? ""}
             </p>
-          {/if}
-        {/if}
+          </button>
+        {/each}
+      {:else}
+        <p class="text-neutral-600">You don't have any teams yet.</p>
+        <p class="text-sm">
+          Contact us <button
+            class="cursor-pointer font-semibold underline"
+            on:click={() =>
+              window.open("https://wa.me/628113087599", "_blank").focus()}
+            >here</button
+          > to get started.
+        </p>
       {/if}
-      <div class="h-full"></div>
-      <button on:click={async ()=> {
+    {/if}
+  {/if}
+  <div class="h-full" />
+  <div class="flex flex-row text-black justify-between">
+    <div></div>
+    <button
+      on:click={async () => {
         await supabase.auth.signOut();
-      }} class=" border border-red-500 text-red-500 py-3 rounded-md">
-        Logout
-      </button>
-    </div>
+      }}
+      class="text-gray-500 py-3 rounded-md"
+    >
+      Logout
+    </button>
+  </div>
+</div>
 
-   
 <!-- {:catch name}
   <div>
     <h1 class="text-xl text-white text-center w-full mt-8">
