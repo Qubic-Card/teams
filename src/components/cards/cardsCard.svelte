@@ -11,7 +11,6 @@
       return s.charAt(0).toUpperCase() + s.slice(1)
     }
   }
-
   const setStatus = async () => {
     const { data, error } = await supabase
       .from('team_cardcon')
@@ -83,9 +82,9 @@
         {#if card.team_profile !== null}
           <AvatarDropdown
             {permissions}
-            avatar={card.team_profile.avatar}
-            fullname={card.team_profile.firstname ??
-              '' + ' ' + card.team_profile.lastname ??
+            avatar={card.avatar ? card.avatar : null}
+            fullname={card.firstname ??
+              '' + ' ' + card.lastname ??
               ''}
             mid={card.memberid}
             cardId={card.id}
@@ -134,9 +133,9 @@
       {#if card.team_profile !== null}
         <AvatarDropdown
           {permissions}
-          avatar={card.team_profile.avatar}
-          fullname={card.team_profile.firstname ??
-            '' + ' ' + card.team_profile.lastname ??
+          avatar={card.avatar ? card.avatar : null}
+          fullname={card.firstname ??
+            '' + ' ' + card.lastname ??
             ''}
           mid={card.memberid}
           cardId={card.id}

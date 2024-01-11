@@ -109,7 +109,7 @@
     />
   {/if}
 
-  {#if avatar === ''}
+  {#if avatar === '' || avatar == null}
     <img
       on:click={() => (permissions.writeMembers ? (isOpen = true) : null)}
       src="/favicon.svg"
