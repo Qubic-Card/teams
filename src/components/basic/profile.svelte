@@ -150,7 +150,7 @@
   <!-- BIO -->
   <IntersectionObserver id="bio" section="bio">
     <div
-      class=" justify-center items-center flex flex-col pt-8 {$inView
+      class=" justify-center items-center flex flex-col pt-8 text-center px-10 {$inView
         ? $basicCurrentTheme?.text
         : 'text-transparent'}"
     >
