@@ -54,6 +54,6 @@
   <div
     class="bg-neutral-900 outline outline-1 outline-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
   >
-    <p class="mb-4">Atur subscription dalam billing</p>
+    <p class="mb-4">Consult and arrange the subscription payment to fit your requirements.</p>
   </div>
 </div>

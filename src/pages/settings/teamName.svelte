@@ -32,7 +32,7 @@
     class="bg-neutral-900 outline outline-1 outline-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
   >
     <p class="mb-4">
-      Atur nama tim agar mudah diingat dan mudah diidentifikasi.
+      Personalize your team name to be easier to organize and identify.
     </p>
   </div>
 </div>

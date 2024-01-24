@@ -147,13 +147,10 @@
             </p>
           </label>
         </div>
-        <p class="hidden md:block text-sm">
-          {#if mode === 'add'}
-            {role.desc.split(' ').slice(3).join(' ').charAt(0).toUpperCase() +
-              role.desc.split(' ').slice(3).join(' ').slice(1)}
-          {:else}
-            {role.desc}
-          {/if}
+        <p class="hidden text-neutral-400 md:block text-sm">
+          
+            {role.desc_eng}
+        
         </p>
       </div>
     {/each}

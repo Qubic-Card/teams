@@ -31,8 +31,7 @@
     class="bg-neutral-900 outline outline-1 outline-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
   >
     <p class="mb-4">
-      Atur activation code untuk digunakan ketika member baru melakukan
-      aktivasi.
+      Personalize your activation code to make it easier for new members to join while being secure.
     </p>
   </div>
 </div>

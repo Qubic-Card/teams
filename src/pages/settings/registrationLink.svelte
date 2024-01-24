@@ -27,6 +27,6 @@
   <div
     class="bg-neutral-900 outline outline-1 outline-neutral-800 p-4 w-1/4 rounded-lg text-md lg:text-lg hidden md:flex"
   >
-    <p class="mb-4">Link untuk registrasi team member baru</p>
+    <p class="mb-4">Copy and use the link to add new members.</p>
   </div>
 </div>

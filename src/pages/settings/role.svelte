@@ -221,7 +221,6 @@
   <div
     class="bg-neutral-900 outline outline-1 outline-neutral-800 w-1/4 h-80 p-4 rounded-lg text-md lg:text-lg hidden md:flex flex-col"
   >
-    <p class="mb-4">Role settings adalah tempat untuk setting role.</p>
-    <p>Berikan permissions yang sesuai di setiap role.</p>
+    <p class="mb-4">Manage and create the available roles for your team with many simple and specific permissions to choose from.</p>
   </div>
 </div>
