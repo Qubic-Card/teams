@@ -53,8 +53,7 @@
         data.filter((t) => {
           let subDate= new Date(t.team_id.subscription_end_date)
           subDate.setDate(subDate.getDate() + 30);
-          console.log(new Date(t.team_id.subscription_end_date))
-          if ( date.getDate() < subDate.getDate()) {
+          if ( date.getTime() < subDate.getTime()) {
             if (uniqueTeamId.includes(t.team_id.id)) {
               newData.push(t.team_id);
               uniqueTeamId = uniqueTeamId.filter((m) => m !== t.team_id.id);
@@ -69,9 +68,6 @@
       } else {
         isTeamMember = false;
       }
-      // if (teamsArr.length < 0) {
-      //   $teams.isTeamMember = fals
-      // } else $teams.isTeamMember =
     }
   };
 
