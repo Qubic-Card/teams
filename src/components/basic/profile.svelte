@@ -250,7 +250,7 @@
                       order={i}
                       on:click={() =>
                         toNewTab(item.type.split('-')[0], item.data)}
-                      class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center rounded-md items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
+                      class="py-2 px-5 sm:px-6 md:px-8 flex-grow flex justify-center items-center {$basicCurrentTheme?.outline} {$basicCurrentTheme?.secondary}"
                       ><img
                         src={item.type.includes('github')
                           ? '/icons/github-icons.svg'

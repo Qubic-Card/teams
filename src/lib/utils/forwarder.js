@@ -14,6 +14,9 @@ export const go = async (type, data, pageState, cardId, profileUid) => {
     case 'instagram':
       await goto('https://instagram.com/' + data);
       break;
+    case 'maps':
+      await goto('https://maps.app.goo.gl/'+ data);
+      break;
     case 'facebook':
       await goto('https://facebook.com/' + data);
       break;

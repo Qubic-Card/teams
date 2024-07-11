@@ -30,6 +30,9 @@ const go = async (type, data) => {
     case 'youtube':
       await goto('https://youtube.com/' + data);
       break;
+    case 'maps':
+      await goto('https://maps.app.goo.gl/' + data);
+      break;
     case 'instagram':
       await goto('https://instagram.com/' + data);
       break;

@@ -71,6 +71,11 @@ const addToContactHandler = (profile) => {
             vcard.addPhone(`+${social.data}`);
           }
         }
+        if(social.type === 'maps'){
+          vcard.addUrl(`https://maps.app.goo.gl/${social.data}`, {
+            label: 'GMaps',
+          });
+        }
         if (social.type === 'line') {
           vcard.addUrl(`https://line.me/R/ti/p/~${social.data}`, {
             label: 'Line',

@@ -29,7 +29,7 @@
         item.type.split('-')[0].slice(1) +
         ' Business'
       : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-    placeholder={item.type.includes('instagram') 
+    placeholder={item.type.includes('maps') ? 'Google location ID e.g. iHwo3PhgD7nsCGE2A' : item.type.includes('instagram') 
       ? 'Username (without @)'
       : item.type.includes('tiktok') || item.type.includes('threads')
       ? 'Username (with @)'

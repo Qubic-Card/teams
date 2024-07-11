@@ -1,6 +1,7 @@
 export const qubicGradient = 'bg-gradient-to-tl from-blue-400 to-indigo-500';
 
 export const socialIcons = {
+  maps: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/gmaps.svg',
   threads: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/threads.png',
   twitter:
     'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-twitter.svg',
