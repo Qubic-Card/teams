@@ -11,10 +11,7 @@
   const toggleModal = () => (showModal = !showModal);
 
   const addSocial = (item) => {
-    let socialType = $basicSocials.map((item) => item.type);
-    socialType.includes(!profileData.isBusiness ? item : item + '-business')
-      ? toastFailed('You can only add one of each social media')
-      : basicSocials.set([
+    basicSocials.set([
           {
             type: !profileData.isBusiness ? item : item + '-business',
             data: '',
