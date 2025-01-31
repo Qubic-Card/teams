@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-node';
+import adapter from '@sveltejs/adapter-netlify';
 import path from 'path';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 
@@ -12,7 +12,7 @@ const config = {
   ],
 
   kit: {
-    adapter: adapter(),
+    adapter: adapter({}),
     alias: {
       '@pages': path.resolve('./src/pages'),
       '@comp': path.resolve('./src/components'),
