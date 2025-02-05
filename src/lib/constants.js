@@ -1,32 +1,32 @@
 export const qubicGradient = 'bg-gradient-to-tl from-blue-400 to-indigo-500';
 
 export const socialIcons = {
-  maps: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/gmaps.svg',
-  threads: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/threads.png',
+  maps: 'https://img.icons8.com/?size=100&id=ZPLpfsKE1OLu&format=png&color=000000',
+  threads: 'https://cdn3.iconfinder.com/data/icons/social-media-2247/100/Threads-2-256.png',
   twitter:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-twitter.svg',
+    'https://img.icons8.com/?size=100&id=yoQabS8l0qpr&format=png&color=000000',
   facebook:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-facebook.svg',
+    'https://img.icons8.com/?size=100&id=uLWV5A9vXIPu&format=png&color=000000',
   youtube:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-youtube.svg',
+    'https://img.icons8.com/?size=100&id=9a46bTk3awwI&format=png&color=000000',
   linkedin:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-linkedin.svg',
+    'https://img.icons8.com/?size=100&id=xuvGCOXi8Wyg&format=png&color=000000',
   whatsapp:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-whatsapp.svg',
+    'https://img.icons8.com/?size=100&id=AltfLkFSP7XN&format=png&color=000000',
   instagram:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-instagram.svg',
+    'https://img.icons8.com/?size=100&id=Xy10Jcu1L2Su&format=png&color=000000',
   tiktok:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-tiktok.svg',
+    'https://img.icons8.com/?size=100&id=fdfLpA6fsXN2&format=png&color=000000',
   email:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-mail.png',
+    'https://img.icons8.com/?size=100&id=LPcVDft9Isqt&format=png&color=000000',
   phone:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-phone.png',
-  line: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/icons8-line.svg',
-  github: 'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/github.svg',
+    'https://img.icons8.com/?size=100&id=WV326xpsBMyb&format=png&color=000000',
+  line: 'https://img.icons8.com/?size=100&id=0ZWDaCvmIF4I&format=png&color=000000',
+  github: 'https://img.icons8.com/?size=100&id=AZOZNnY73haj&format=png&color=000000',
   telegram:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/telegram.svg',
+    'https://img.icons8.com/?size=100&id=oWiuH0jFiU0R&format=png&color=000000',
   discord:
-    'https://qubicmedia.s3.ap-southeast-1.amazonaws.com/icons/discord.svg',
+    'https://img.icons8.com/?size=100&id=SAZw8WuWnQea&format=png&color=000000',
 };
 
 export const cartImage = {
